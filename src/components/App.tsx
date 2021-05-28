@@ -59,7 +59,6 @@ import {
   MQ_MAX_WIDTH_PORTRAIT,
   POINTER_BUTTON,
   SCROLL_TIMEOUT,
-  TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   TOUCH_CTX_MENU_TIMEOUT,
   URL_HASH_KEYS,
@@ -203,8 +202,6 @@ const ExcalidrawContainerContext = React.createContext<HTMLDivElement | null>(
 export const useExcalidrawContainer = () =>
   useContext(ExcalidrawContainerContext);
 
-let didTapTwice: boolean = false;
-let tappedTwiceTimer = 0;
 let cursorX = 0;
 let cursorY = 0;
 let isHoldingSpace: boolean = false;
@@ -1186,37 +1183,7 @@ class App extends React.Component<AppProps, AppState> {
     copyToClipboard(this.scene.getElements(), this.state);
   };
 
-  private static resetTapTwice() {
-    didTapTwice = false;
-  }
-
   private onTapStart = (event: TouchEvent) => {
-    if (!didTapTwice) {
-      didTapTwice = true;
-      clearTimeout(tappedTwiceTimer);
-      tappedTwiceTimer = window.setTimeout(
-        App.resetTapTwice,
-        TAP_TWICE_TIMEOUT,
-      );
-      return;
-    }
-    // insert text only if we tapped twice with a single finger
-    // event.touches.length === 1 will also prevent inserting text when user's zooming
-    if (didTapTwice && event.touches.length === 1) {
-      const [touch] = event.touches;
-      this.handleCanvasDoubleClick(
-        {
-          clientX: touch.clientX,
-          clientY: touch.clientY,
-          ctrlKey: false,
-          metaKey: false,
-          altKey: false,
-        },
-        false,
-      );
-      didTapTwice = false;
-      clearTimeout(tappedTwiceTimer);
-    }
     event.preventDefault();
     if (event.touches.length === 2) {
       this.setState({
