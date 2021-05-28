@@ -2279,6 +2279,8 @@ class App extends React.Component<AppProps, AppState> {
     this.maybeOpenContextMenuAfterPointerDownOnTouchDevices(event);
     this.maybeCleanupAfterMissingPointerUp(event);
 
+    document.querySelector("textarea")?.blur();
+
     if (isPanning) {
       return;
     }
