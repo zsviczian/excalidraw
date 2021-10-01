@@ -207,6 +207,7 @@ import {
   updateImageCache,
 } from "../element/image";
 import throttle from "lodash.throttle";
+import { getDataURL } from "../excalidraw-app/data";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -3876,17 +3877,6 @@ class App extends React.Component<AppProps, AppState> {
     });
   }
 
-  private getDataURL = async (imageFile: File): Promise<DataURL> => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataURL = reader.result as DataURL;
-        resolve(dataURL);
-      };
-      reader.readAsDataURL(imageFile);
-    });
-  };
-
   private initializeImage = async ({
     imageFile,
     imageElement: _imageElement,
@@ -3898,7 +3888,7 @@ class App extends React.Component<AppProps, AppState> {
     // keep it more portable
     const imageId = await generateIdFromFile(imageFile);
 
-    const dataURL = await this.getDataURL(imageFile);
+    const dataURL = await getDataURL(imageFile);
 
     const imageElement = mutateElement(
       _imageElement,
@@ -3972,7 +3962,7 @@ class App extends React.Component<AppProps, AppState> {
       maxWidthOrHeight: 100,
       maxIteration: 1,
     });
-    const previewDataURL = await this.getDataURL(imagePreview);
+    const previewDataURL = await getDataURL(imagePreview);
     if (this.state.pendingImageElement) {
       setCursor(this.canvas, `url(${previewDataURL}) 4 4, auto`);
     }
