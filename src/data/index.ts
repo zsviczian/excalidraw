@@ -44,6 +44,7 @@ export const exportCanvas = async (
       exportPadding,
       exportScale: appState.exportScale,
       exportEmbedScene: appState.exportEmbedScene && type === "svg",
+      files: appState.files,
     });
     if (type === "svg") {
       return await fileSave(
@@ -60,7 +61,7 @@ export const exportCanvas = async (
     }
   }
 
-  const tempCanvas = exportToCanvas(elements, appState, {
+  const tempCanvas = await exportToCanvas(elements, appState, {
     exportBackground,
     viewBackgroundColor,
     exportPadding,
@@ -77,7 +78,7 @@ export const exportCanvas = async (
         await import(/* webpackChunkName: "image" */ "./image")
       ).encodePngMetadata({
         blob,
-        metadata: serializeAsJSON(elements, appState),
+        metadata: serializeAsJSON(elements, appState, "local"),
       });
     }
 

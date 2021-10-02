@@ -33,6 +33,7 @@ type MobileMenuProps = {
   renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
   viewModeEnabled: boolean;
   showThemeBtn: boolean;
+  onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
 };
 
 export const MobileMenu = ({
@@ -50,6 +51,7 @@ export const MobileMenu = ({
   renderCustomFooter,
   viewModeEnabled,
   showThemeBtn,
+  onImageAction,
 }: MobileMenuProps) => {
   const renderToolbar = () => {
     return (
@@ -65,6 +67,11 @@ export const MobileMenu = ({
                       canvas={canvas}
                       elementType={appState.elementType}
                       setAppState={setAppState}
+                      onImageAction={({ pointerType }) => {
+                        onImageAction({
+                          insertOnCanvasDirectly: pointerType !== "mouse",
+                        });
+                      }}
                     />
                   </Stack.Row>
                 </Island>
