@@ -22,6 +22,7 @@ import { loadFromBlob } from "../data/blob";
 import { ImportedDataState } from "../data/types";
 import {
   ExcalidrawElement,
+  ImageId,
   NonDeletedExcalidrawElement,
 } from "../element/types";
 import { useCallbackRefState } from "../hooks/useCallbackRefState";
@@ -30,14 +31,23 @@ import Excalidraw, {
   defaultLang,
   languages,
 } from "../packages/excalidraw/index";
-import { AppState, LibraryItems, ExcalidrawImperativeAPI } from "../types";
+import {
+  AppState,
+  LibraryItems,
+  ExcalidrawImperativeAPI,
+  BinaryFileData,
+  DataURL,
+} from "../types";
 import {
   debounce,
   getVersion,
   ResolvablePromise,
   resolvablePromise,
 } from "../utils";
-import { SAVE_TO_LOCAL_STORAGE_TIMEOUT } from "./app_constants";
+import {
+  FIREBASE_STORAGE_PREFIXES,
+  SAVE_TO_LOCAL_STORAGE_TIMEOUT,
+} from "./app_constants";
 import CollabWrapper, {
   CollabAPI,
   CollabContext,
@@ -57,6 +67,61 @@ import { shield } from "../components/icons";
 import "./index.scss";
 import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 
+import { getMany, set, del, createStore } from "idb-keyval";
+import { FileSync } from "./data/FileSync";
+import { mutateElement } from "../element/mutateElement";
+import { isInitializedImageElement } from "../element/typeChecks";
+import { loadFilesFromFirebase } from "./data/firebase";
+
+const filesStore = createStore("files-db", "files-store");
+
+const localFileStorage = new FileSync({
+  getFiles(ids) {
+    return getMany(ids, filesStore).then(
+      (filesData: (DataURL | undefined)[]) => {
+        const loadedFiles: BinaryFileData[] = [];
+        const erroredFiles: ImageId[] = [];
+        filesData.forEach((dataURL, index) => {
+          const id = ids[index];
+          if (dataURL) {
+            loadedFiles.push({ id, dataURL, type: "image" } as const);
+          } else {
+            erroredFiles.push(id);
+          }
+        });
+
+        return { loadedFiles, erroredFiles };
+      },
+    );
+  },
+  async saveFiles({ addedFiles, removedFiles }) {
+    const savedFiles = new Map<ImageId, true>();
+    const erroredFiles = new Map<ImageId, true>();
+
+    for (const [id, dataURL] of addedFiles) {
+      try {
+        set(id, dataURL, filesStore);
+        savedFiles.set(id, true);
+      } catch (error) {
+        console.error(error);
+        erroredFiles.set(id, true);
+      }
+    }
+
+    // delete obsolete files
+    for (const [id] of removedFiles) {
+      try {
+        del(id, filesStore);
+      } catch (error) {
+        console.error(error);
+        erroredFiles.set(id, true);
+      }
+    }
+
+    return { savedFiles, erroredFiles };
+  },
+});
+
 const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {
@@ -67,8 +132,21 @@ languageDetector.init({
 });
 
 const saveDebounced = debounce(
-  (elements: readonly ExcalidrawElement[], state: AppState) => {
-    saveToLocalStorage(elements, state);
+  async (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    onFilesSaved: (savedFiles: Map<ImageId, true>) => void,
+  ) => {
+    saveToLocalStorage(elements, appState);
+
+    const { savedFiles } = await localFileStorage.saveFiles({
+      elements,
+      appState,
+    });
+
+    if (savedFiles.size) {
+      onFilesSaved(savedFiles);
+    }
   },
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
 );
@@ -79,7 +157,12 @@ const onBlur = () => {
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
-}): Promise<ImportedDataState | null> => {
+}): Promise<
+  { scene: ImportedDataState | null } & (
+    | { isExternalScene: true; id: string; key: string }
+    | { isExternalScene: false; id?: null; key?: null }
+  )
+> => {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
   const jsonBackendMatch = window.location.hash.match(
@@ -116,7 +199,7 @@ const initializeScene = async (opts: {
       }
       scene.scrollToContent = true;
       if (!roomLinkData) {
-        window.history.replaceState({}, APP_NAME, window.location.origin);
+        // window.history.replaceState({}, APP_NAME, window.location.origin);
       }
     } else {
       // https://github.com/excalidraw/excalidraw/issues/1919
@@ -146,23 +229,38 @@ const initializeScene = async (opts: {
         !scene.elements.length ||
         window.confirm(t("alerts.loadSceneOverridePrompt"))
       ) {
-        return data;
+        return { scene: data, isExternalScene };
       }
     } catch (error) {
       return {
-        appState: {
-          errorMessage: t("alerts.invalidSceneUrl"),
+        scene: {
+          appState: {
+            errorMessage: t("alerts.invalidSceneUrl"),
+          },
         },
+        isExternalScene,
       };
     }
   }
 
   if (roomLinkData) {
-    return opts.collabAPI.initializeSocketClient(roomLinkData);
+    return {
+      scene: await opts.collabAPI.initializeSocketClient(roomLinkData),
+      isExternalScene: true,
+      id: roomLinkData.roomId,
+      key: roomLinkData.roomKey,
+    };
   } else if (scene) {
-    return scene;
+    return isExternalScene && jsonBackendMatch
+      ? {
+          scene,
+          isExternalScene,
+          id: jsonBackendMatch[1],
+          key: jsonBackendMatch[2],
+        }
+      : { scene, isExternalScene: false };
   }
-  return null;
+  return { scene: null, isExternalScene: false };
 };
 
 const PlusLinkJSX = (
@@ -213,10 +311,45 @@ const ExcalidrawWrapper = () => {
       return;
     }
 
-    initializeScene({ collabAPI }).then((scene) => {
-      if (scene) {
+    initializeScene({ collabAPI }).then((data) => {
+      if (data.scene) {
+        if (collabAPI.isCollaborating()) {
+          if (data.scene.elements) {
+            collabAPI
+              .fetchImageFilesFromFirebase({
+                elements: data.scene.elements,
+                appState: { files: data.scene.appState?.files || {} },
+              })
+              .then(({ loadedFiles }) => {
+                excalidrawAPI.setFiles(loadedFiles);
+              });
+          }
+        } else {
+          const imageIds =
+            data.scene.elements?.reduce((acc, element) => {
+              if (isInitializedImageElement(element)) {
+                return acc.concat(element.imageId);
+              }
+              return acc;
+            }, [] as ImageId[]) || [];
+
+          if (data.isExternalScene) {
+            loadFilesFromFirebase(
+              `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
+              data.key,
+              imageIds,
+            ).then(({ loadedFiles }) => {
+              excalidrawAPI.setFiles(loadedFiles);
+            });
+          } else {
+            localFileStorage.getFiles(imageIds).then(({ loadedFiles }) => {
+              excalidrawAPI.setFiles(loadedFiles);
+            });
+          }
+        }
+
         try {
-          scene.libraryItems =
+          data.scene.libraryItems =
             JSON.parse(
               localStorage.getItem(
                 STORAGE_KEYS.LOCAL_STORAGE_LIBRARY,
@@ -226,7 +359,7 @@ const ExcalidrawWrapper = () => {
           console.error(e);
         }
       }
-      initialStatePromiseRef.current.promise.resolve(scene);
+      initialStatePromiseRef.current.promise.resolve(data.scene);
     });
 
     const onHashChange = (event: HashChangeEvent) => {
@@ -241,7 +374,7 @@ const ExcalidrawWrapper = () => {
         window.history.replaceState({}, "", event.oldURL);
         excalidrawAPI.importLibrary(libraryUrl, hash.get("token"));
       } else {
-        initializeScene({ collabAPI }).then((scene) => {
+        initializeScene({ collabAPI }).then(({ scene }) => {
           if (scene) {
             excalidrawAPI.updateScene({
               ...scene,
@@ -278,10 +411,23 @@ const ExcalidrawWrapper = () => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.broadcastElements(elements);
     } else {
-      // collab scenes are persisted to the server, so we don't have to persist
-      // them locally, which has the added benefit of not overwriting whatever
-      // the user was working on before joining
-      saveDebounced(elements, appState);
+      saveDebounced(elements, appState, (savedFiles) => {
+        if (excalidrawAPI) {
+          excalidrawAPI.updateScene({
+            elements: excalidrawAPI
+              .getSceneElementsIncludingDeleted()
+              .map((element) => {
+                if (
+                  isInitializedImageElement(element) &&
+                  savedFiles.has(element.imageId)
+                ) {
+                  return mutateElement(element, { status: "saved" }, false);
+                }
+                return element;
+              }),
+          });
+        }
+      });
     }
   };
 

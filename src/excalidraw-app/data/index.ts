@@ -1,9 +1,13 @@
+import { toBase64 } from "../../data/encode";
 import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
-import { ExcalidrawElement } from "../../element/types";
+import { isInitializedImageElement } from "../../element/typeChecks";
+import { ExcalidrawElement, ImageId } from "../../element/types";
 import { t } from "../../i18n";
-import { AppState, UserIdleState } from "../../types";
+import { AppState, DataURL, UserIdleState } from "../../types";
+import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
+import { saveFilesToFirebase } from "./firebase";
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
@@ -278,10 +282,10 @@ export const exportToBackend = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  const json = serializeAsJSON(elements, appState);
+  const json = serializeAsJSON(elements, appState, "database");
   const encoded = new TextEncoder().encode(json);
 
-  const key = await window.crypto.subtle.generateKey(
+  const cryptoKey = await window.crypto.subtle.generateKey(
     {
       name: "AES-GCM",
       length: 128,
@@ -298,7 +302,7 @@ export const exportToBackend = async (
       name: "AES-GCM",
       iv,
     },
-    key,
+    cryptoKey,
     encoded,
   );
 
@@ -308,7 +312,7 @@ export const exportToBackend = async (
 
   // We use jwk encoding to be able to extract just the base64 encoded key.
   // We will hardcode the rest of the attributes when importing back the key.
-  const exportedKey = await window.crypto.subtle.exportKey("jwk", key);
+  const exportedKey = await window.crypto.subtle.exportKey("jwk", cryptoKey);
 
   try {
     const response = await fetch(BACKEND_V2_POST, {
@@ -317,11 +321,32 @@ export const exportToBackend = async (
     });
     const json = await response.json();
     if (json.id) {
+      const key = exportedKey.k!;
+
       const url = new URL(window.location.href);
       // We need to store the key (and less importantly the id) as hash instead
       // of queryParam in order to never send it to the server
-      url.hash = `json=${json.id},${exportedKey.k!}`;
+      url.hash = `json=${json.id},${key}`;
       const urlString = url.toString();
+
+      const files = new Map<ImageId, DataURL>();
+      for (const element of elements) {
+        if (
+          isInitializedImageElement(element) &&
+          appState.files[element.imageId]
+        ) {
+          files.set(element.imageId, appState.files[element.imageId].dataURL);
+        }
+
+        await saveFilesToFirebase({
+          prefix: `/files/shareLinks/${json.id}`,
+          decryptionKey: key,
+          files,
+          maxBytes: FILE_UPLOAD_MAX_BYTES,
+          allowedTypes: ["image/png", "image/jpeg", "image/svg"],
+        });
+      }
+
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
     } else if (json.error_class === "RequestTooLargeError") {
       window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));
@@ -332,4 +357,59 @@ export const exportToBackend = async (
     console.error(error);
     window.alert(t("alerts.couldNotCreateShareableLink"));
   }
+};
+
+export const dataURLToBlob = (dataURL: DataURL) => {
+  const byteString = atob(dataURL.split(",")[1]);
+  const mimeType = dataURL.split(",")[0].split(":")[1].split(";")[0];
+
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([ab], { type: mimeType });
+};
+
+export const arrayBufferToDataURL = async (
+  buffer: ArrayBuffer,
+  mimeType: string,
+) => {
+  const base64 = await toBase64(buffer);
+
+  return `data:${mimeType};base64,${base64}` as DataURL;
+};
+
+export const encryptData = async (
+  key: string,
+  data: Blob | string,
+): Promise<{ blob: Blob; iv: Uint8Array }> => {
+  const importedKey = await getImportedKey(key, "encrypt");
+  const iv = createIV();
+  const ui =
+    typeof data === "string"
+      ? new TextEncoder().encode(data)
+      : new Uint8Array(await data.arrayBuffer());
+  const ciphertext = await window.crypto.subtle.encrypt(
+    {
+      name: "AES-GCM",
+      iv,
+    },
+    importedKey,
+    ui,
+  );
+
+  return { blob: new Blob([new Uint8Array(ciphertext)]), iv };
+};
+
+export const getDataURL = async (file: File): Promise<DataURL> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataURL = reader.result as DataURL;
+      resolve(dataURL);
+    };
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
 };
