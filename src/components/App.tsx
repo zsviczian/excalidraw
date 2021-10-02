@@ -202,7 +202,7 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { generateIdFromFile, isImageFile } from "../data/blob";
+import { generateIdFromFile, getDataURL, isImageFile } from "../data/blob";
 import {
   getInitializedImageElements,
   updateImageCache,
