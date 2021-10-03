@@ -16,7 +16,7 @@ import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 // -----------------------------------------------------------------------------
 
 const FIREBASE_CONFIG = JSON.parse(
-  process.env.REACT_APP_FIREBASE_CONFIG ?? "{}",
+  process.env.REACT_APP_FIREBASE_CONFIG, // ?? "{}",
 );
 
 let firebasePromise: Promise<

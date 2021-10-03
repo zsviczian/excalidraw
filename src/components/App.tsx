@@ -208,7 +208,6 @@ import {
   updateImageCache,
 } from "../element/image";
 import throttle from "lodash.throttle";
-import { getDataURL } from "../excalidraw-app/data";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
