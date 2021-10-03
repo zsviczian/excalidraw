@@ -33,8 +33,8 @@ import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
-import { getStroke, StrokeOptions } from "perfect-freehand";
 import { MAX_DECIMALS_FOR_SVG_EXPORT, THEME_FILTER } from "../constants";
+import { getStroke, StrokeOptions } from "perfect-freehand";
 
 const defaultAppState = getDefaultAppState();
 
@@ -945,5 +945,5 @@ function getSvgPathFromStroke(points: number[][]): string {
       ["M", points[0], "Q"],
     )
     .join(" ")
-    .replaceAll(TO_FIXED_PRECISION, "$1");
+    .replace(TO_FIXED_PRECISION, "$1");
 }
