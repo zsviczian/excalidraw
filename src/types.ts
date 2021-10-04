@@ -51,6 +51,7 @@ export type BinaryFileData = {
   type: "image" | "other";
   id: ImageId;
   dataURL: DataURL;
+  created: number;
 };
 
 export type AppState = {
@@ -226,6 +227,7 @@ export interface ExcalidrawProps {
     textToSubmit: string,
     isDeleted: boolean,
   ) => string;
+  generateIdForFile?: (file: File) => string | Promise<string>;
 }
 
 export type SceneData = {

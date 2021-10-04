@@ -131,6 +131,7 @@ import {
   NonDeleted,
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
+  ImageId,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -1486,8 +1487,8 @@ class App extends React.Component<AppProps, AppState> {
         (state) => ({
           files: {
             ...state.files,
-            ...files.reduce((acc, { id, type, dataURL }) => {
-              acc[id] = { type, id, dataURL };
+            ...files.reduce((acc, fileData) => {
+              acc[fileData.id] = fileData;
               return acc;
             }, {} as Record<string, AppState["files"][number]>),
           },
@@ -3942,9 +3943,11 @@ class App extends React.Component<AppProps, AppState> {
     imageFile: File;
     imageElement: ExcalidrawImageElement;
   }) => {
-    // generate image id (digest) before any resizing/compression takes place to
-    // keep it more portable
-    const imageId = await generateIdFromFile(imageFile);
+    // generate image id (by default the file digest) before any
+    // resizing/compression takes place to keep it more portable
+    const imageId = await ((this.props.generateIdForFile?.(
+      imageFile,
+    ) as Promise<ImageId>) || generateIdFromFile(imageFile));
 
     const dataURL =
       this.state.files[imageId]?.dataURL || (await getDataURL(imageFile));
@@ -3967,6 +3970,7 @@ class App extends React.Component<AppProps, AppState> {
                 type: "image",
                 id: imageId,
                 dataURL,
+                created: Date.now(),
               },
             },
           }),
