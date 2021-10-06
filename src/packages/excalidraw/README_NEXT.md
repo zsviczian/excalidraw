@@ -382,6 +382,7 @@ To view the full example visit :point_down:
 | [`autoFocus`](#autoFocus) | boolean | false | Implies whether to focus the Excalidraw component on page load |
 | [`onBeforeTextEdit`](#onBeforeTextEdit) | (textElement: ExcalidrawTextElement) => string |  | Callback to be triggered when a text element is about to be edited. |
 | [`onBeforeTextSubmit`](#onBeforeTextSubmit) | (textElement: ExcalidrawTextElement, textToSubmit:string, isDeleted:boolean) => string |  | Callback to be triggered when the editing of a text element is finished. |
+| [`generateIdForFile`](#generateIdForFile) | `(file: File) => string | Promise<string>` | Allows you to override `id` generation for files added on canvas |
 
 ### Dimensions of Excalidraw
 
@@ -697,6 +698,14 @@ Callback to be triggered when the editing of a TextElement is finished, but righ
 <pre>
 (textElement: ExcalidrawTextElement, textToSubmit:string, isDeleted:boolean) => string
 </pre>
+
+### generateIdForFile
+
+Allows you to override `id` generation for files added on canvas (images). By default, an SHA-1 digest of the file is used.
+
+```
+(file: File) => string | Promise<string>
+```
 
 ### Extra API's
 

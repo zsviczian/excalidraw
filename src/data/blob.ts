@@ -1,12 +1,13 @@
-import { FileSystemHandle } from "browser-fs-access";
+import { FileSystemHandle } from "@dwelle/browser-fs-access";
+import { nanoid } from "nanoid";
 import { cleanAppStateForExport } from "../appState";
 import { EXPORT_DATA_TYPES } from "../constants";
 import { clearElementsForExport } from "../element";
-import { ExcalidrawElement } from "../element/types";
+import { ExcalidrawElement, ImageId } from "../element/types";
 import { CanvasError } from "../errors";
 import { t } from "../i18n";
 import { calculateScrollCenter } from "../scene";
-import { AppState } from "../types";
+import { AppState, DataURL } from "../types";
 import { isValidExcalidrawData } from "./json";
 import { restore } from "./restore";
 import { ImportedLibraryData } from "./types";
@@ -21,9 +22,15 @@ const parseFileContents = async (blob: Blob | File) => {
       ).decodePngMetadata(blob);
     } catch (error) {
       if (error.message === "INVALID") {
-        throw new Error(t("alerts.imageDoesNotContainScene"));
+        throw new DOMException(
+          t("alerts.imageDoesNotContainScene"),
+          "EncodingError",
+        );
       } else {
-        throw new Error(t("alerts.cannotRestoreFromImage"));
+        throw new DOMException(
+          t("alerts.cannotRestoreFromImage"),
+          "EncodingError",
+        );
       }
     }
   } else {
@@ -49,9 +56,15 @@ const parseFileContents = async (blob: Blob | File) => {
         });
       } catch (error) {
         if (error.message === "INVALID") {
-          throw new Error(t("alerts.imageDoesNotContainScene"));
+          throw new DOMException(
+            t("alerts.imageDoesNotContainScene"),
+            "EncodingError",
+          );
         } else {
-          throw new Error(t("alerts.cannotRestoreFromImage"));
+          throw new DOMException(
+            t("alerts.cannotRestoreFromImage"),
+            "EncodingError",
+          );
         }
       }
     }
@@ -100,6 +113,13 @@ export const isImageFileHandle = (handle: FileSystemHandle | null) => {
   return type === "png" || type === "svg";
 };
 
+export const isImageFile = (blob: Blob | null | undefined): blob is File => {
+  const { type } = blob || {};
+  return (
+    type === "image/jpeg" || type === "image/png" || type === "image/svg+xml"
+  );
+};
+
 export const loadFromBlob = async (
   blob: Blob,
   /** @see restore.localAppState */
@@ -118,7 +138,7 @@ export const loadFromBlob = async (
         appState: {
           theme: localAppState?.theme,
           fileHandle: blob.handle || null,
-          ...cleanAppStateForExport(data.appState || {}),
+          ...cleanAppStateForExport(data.appState || {}, data.elements || []),
           ...(localAppState
             ? calculateScrollCenter(data.elements || [], localAppState, null)
             : {}),
@@ -163,5 +183,39 @@ export const canvasToBlob = async (
     } catch (error) {
       reject(error);
     }
+  });
+};
+
+export const generateIdFromFile = async (file: File) => {
+  let id: ImageId;
+  try {
+    const hashBuffer = await window.crypto.subtle.digest(
+      "SHA-1",
+      await file.arrayBuffer(),
+    );
+    id =
+      // convert buffer to byte array
+      Array.from(new Uint8Array(hashBuffer))
+        // convert to hex string
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("") as ImageId;
+  } catch (error) {
+    console.error(error);
+    // length 40 to align with the HEX length of SHA-1 (which is 160 bit)
+    id = nanoid(40) as ImageId;
+  }
+
+  return id;
+};
+
+export const getDataURL = async (file: File): Promise<DataURL> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataURL = reader.result as DataURL;
+      resolve(dataURL);
+    };
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
   });
 };

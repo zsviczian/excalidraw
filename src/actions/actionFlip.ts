@@ -6,7 +6,11 @@ import { ExcalidrawElement, NonDeleted } from "../element/types";
 import { normalizeAngle, resizeSingleElement } from "../element/resizeElements";
 import { AppState } from "../types";
 import { getTransformHandles } from "../element/transformHandles";
-import { isFreeDrawElement, isLinearElement } from "../element/typeChecks";
+import {
+  isFreeDrawElement,
+  isImageElement,
+  isLinearElement,
+} from "../element/typeChecks";
 import { updateBoundElements } from "../element/binding";
 import { LinearElementEditor } from "../element/linearElementEditor";
 
@@ -93,13 +97,22 @@ const flipElements = (
   appState: AppState,
   flipDirection: "horizontal" | "vertical",
 ): ExcalidrawElement[] => {
-  for (let i = 0; i < elements.length; i++) {
-    flipElement(elements[i], appState);
-    // If vertical flip, rotate an extra 180
-    if (flipDirection === "vertical") {
-      rotateElement(elements[i], Math.PI);
+  elements.forEach((element) => {
+    if (isImageElement(element)) {
+      mutateElement(element, {
+        scale:
+          flipDirection === "horizontal"
+            ? [element.scale[0] * -1, element.scale[1]]
+            : [element.scale[0], element.scale[1] * -1],
+      });
+    } else {
+      flipElement(element, appState);
+      // If vertical flip, rotate an extra 180
+      if (flipDirection === "vertical") {
+        rotateElement(element, Math.PI);
+      }
     }
-  }
+  });
   return elements;
 };
 

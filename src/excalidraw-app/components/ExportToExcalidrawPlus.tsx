@@ -2,32 +2,13 @@ import React from "react";
 import { Card } from "../../components/Card";
 import { ToolButton } from "../../components/ToolButton";
 import { serializeAsJSON } from "../../data/json";
-import { getImportedKey, createIV, generateEncryptionKey } from "../data";
 import { loadFirebaseStorage } from "../data/firebase";
 import { NonDeletedExcalidrawElement } from "../../element/types";
 import { AppState } from "../../types";
 import { nanoid } from "nanoid";
 import { t } from "../../i18n";
 import { excalidrawPlusIcon } from "./icons";
-
-const encryptData = async (
-  key: string,
-  json: string,
-): Promise<{ blob: Blob; iv: Uint8Array }> => {
-  const importedKey = await getImportedKey(key, "encrypt");
-  const iv = createIV();
-  const encoded = new TextEncoder().encode(json);
-  const ciphertext = await window.crypto.subtle.encrypt(
-    {
-      name: "AES-GCM",
-      iv,
-    },
-    importedKey,
-    encoded,
-  );
-
-  return { blob: new Blob([new Uint8Array(ciphertext)]), iv };
-};
+import { encryptData, generateEncryptionKey } from "../../data/encryption";
 
 const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -40,12 +21,15 @@ const exportToExcalidrawPlus = async (
   const key = (await generateEncryptionKey())!;
   const encryptedData = await encryptData(
     key,
-    serializeAsJSON(elements, appState),
+    serializeAsJSON(elements, appState, "database"),
   );
 
-  const blob = new Blob([encryptedData.iv, encryptedData.blob], {
-    type: "application/octet-stream",
-  });
+  const blob = new Blob(
+    [encryptedData.iv, new Uint8Array(encryptedData.encryptedBuffer)],
+    {
+      type: "application/octet-stream",
+    },
+  );
 
   await firebase
     .storage()

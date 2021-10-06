@@ -1,9 +1,18 @@
+import {
+  createIV,
+  generateEncryptionKey,
+  getImportedKey,
+  IV_LENGTH_BYTES,
+} from "../../data/encryption";
 import { serializeAsJSON } from "../../data/json";
 import { restore } from "../../data/restore";
 import { ImportedDataState } from "../../data/types";
-import { ExcalidrawElement } from "../../element/types";
+import { isInitializedImageElement } from "../../element/typeChecks";
+import { ExcalidrawElement, ImageId } from "../../element/types";
 import { t } from "../../i18n";
-import { AppState, UserIdleState } from "../../types";
+import { AppState, DataURL, UserIdleState } from "../../types";
+import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
+import { saveFilesToFirebase } from "./firebase";
 
 const byteToHex = (byte: number): string => `0${byte.toString(16)}`.slice(-2);
 
@@ -15,18 +24,6 @@ const generateRandomID = async () => {
   const arr = new Uint8Array(10);
   window.crypto.getRandomValues(arr);
   return Array.from(arr, byteToHex).join("");
-};
-
-export const generateEncryptionKey = async () => {
-  const key = await window.crypto.subtle.generateKey(
-    {
-      name: "AES-GCM",
-      length: 128,
-    },
-    true, // extractable
-    ["encrypt", "decrypt"],
-  );
-  return (await window.crypto.subtle.exportKey("jwk", key)).k;
 };
 
 export const SOCKET_SERVER = process.env.REACT_APP_SOCKET_SERVER_URL;
@@ -77,13 +74,6 @@ export type SocketUpdateDataIncoming =
 
 export type SocketUpdateData = SocketUpdateDataSource[keyof SocketUpdateDataSource] & {
   _brand: "socketUpdateData";
-};
-
-const IV_LENGTH_BYTES = 12; // 96 bits
-
-export const createIV = () => {
-  const arr = new Uint8Array(IV_LENGTH_BYTES);
-  return window.crypto.getRandomValues(arr);
 };
 
 export const encryptAESGEM = async (
@@ -161,24 +151,6 @@ export const getCollaborationLink = (data: {
 }) => {
   return `${window.location.origin}${window.location.pathname}#room=${data.roomId},${data.roomKey}`;
 };
-
-export const getImportedKey = (key: string, usage: KeyUsage) =>
-  window.crypto.subtle.importKey(
-    "jwk",
-    {
-      alg: "A128GCM",
-      ext: true,
-      k: key,
-      key_ops: ["encrypt", "decrypt"],
-      kty: "oct",
-    },
-    {
-      name: "AES-GCM",
-      length: 128,
-    },
-    false, // extractable
-    [usage],
-  );
 
 export const decryptImported = async (
   iv: ArrayBuffer,
@@ -278,10 +250,10 @@ export const exportToBackend = async (
   elements: readonly ExcalidrawElement[],
   appState: AppState,
 ) => {
-  const json = serializeAsJSON(elements, appState);
+  const json = serializeAsJSON(elements, appState, "database");
   const encoded = new TextEncoder().encode(json);
 
-  const key = await window.crypto.subtle.generateKey(
+  const cryptoKey = await window.crypto.subtle.generateKey(
     {
       name: "AES-GCM",
       length: 128,
@@ -298,7 +270,7 @@ export const exportToBackend = async (
       name: "AES-GCM",
       iv,
     },
-    key,
+    cryptoKey,
     encoded,
   );
 
@@ -308,7 +280,7 @@ export const exportToBackend = async (
 
   // We use jwk encoding to be able to extract just the base64 encoded key.
   // We will hardcode the rest of the attributes when importing back the key.
-  const exportedKey = await window.crypto.subtle.exportKey("jwk", key);
+  const exportedKey = await window.crypto.subtle.exportKey("jwk", cryptoKey);
 
   try {
     const response = await fetch(BACKEND_V2_POST, {
@@ -317,11 +289,32 @@ export const exportToBackend = async (
     });
     const json = await response.json();
     if (json.id) {
+      const key = exportedKey.k!;
+
       const url = new URL(window.location.href);
       // We need to store the key (and less importantly the id) as hash instead
       // of queryParam in order to never send it to the server
-      url.hash = `json=${json.id},${exportedKey.k!}`;
+      url.hash = `json=${json.id},${key}`;
       const urlString = url.toString();
+
+      const files = new Map<ImageId, DataURL>();
+      for (const element of elements) {
+        if (
+          isInitializedImageElement(element) &&
+          appState.files[element.imageId]
+        ) {
+          files.set(element.imageId, appState.files[element.imageId].dataURL);
+        }
+
+        await saveFilesToFirebase({
+          prefix: `/files/shareLinks/${json.id}`,
+          encryptionKey: key,
+          files,
+          maxBytes: FILE_UPLOAD_MAX_BYTES,
+          allowedTypes: ["image/png", "image/jpeg", "image/svg"],
+        });
+      }
+
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
     } else if (json.error_class === "RequestTooLargeError") {
       window.alert(t("alerts.couldNotCreateShareableLinkTooBig"));
