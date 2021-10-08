@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 import { RoughCanvas } from "roughjs/bin/canvas";
 import rough from "roughjs/bin/rough";
 import clsx from "clsx";
-import { fileOpen, supported as fsSupported } from "@dwelle/browser-fs-access";
 import { nanoid } from "nanoid";
 
 import {
@@ -210,7 +209,7 @@ import {
   updateImageCache,
 } from "../element/image";
 import throttle from "lodash.throttle";
-import { AbortError } from "../errors";
+import { fileOpen, nativeFileSystemSupported } from "../data/filesystem";
 
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
@@ -1273,6 +1272,7 @@ class App extends React.Component<AppProps, AppState> {
       } else if (data.elements) {
         this.addElementsFromPasteOrLibrary({
           elements: data.elements,
+          files: data.files,
           position: "cursor",
         });
       } else if (data.text) {
@@ -1285,6 +1285,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private addElementsFromPasteOrLibrary = (opts: {
     elements: readonly ExcalidrawElement[];
+    files?: AppState["files"];
     position: { clientX: number; clientY: number } | "cursor" | "center";
   }) => {
     const elements = restoreElements(opts.elements, null);
@@ -1348,10 +1349,18 @@ class App extends React.Component<AppProps, AppState> {
             map[element.id] = true;
             return map;
           }, {} as any),
+          files: opts.files
+            ? { ...this.state.files, ...opts.files }
+            : this.state.files,
           selectedGroupIds: {},
         },
         this.scene.getElements(),
       ),
+      () => {
+        if (opts.files) {
+          this.refreshImages();
+        }
+      },
     );
     this.selectShapeTool("selection");
   };
@@ -4049,33 +4058,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const imageFile = await fileOpen({
         description: "Image",
-        extensions: [".jpg", ".jpeg", ".png", ".svg"],
-        mimeTypes: ["image/jpeg", "image/png", "image/svg+xml"],
-        multiple: false,
-        legacySetup: (resolve, rejectHandler, input) => {
-          const abortHandler = () => {
-            rejectHandler();
-          };
-          requestAnimationFrame(() => {
-            document.addEventListener("keyup", abortHandler);
-            document.addEventListener("click", abortHandler);
-          });
-          const interval = window.setInterval(() => {
-            if (input.files?.length) {
-              resolve(input.files[0]);
-            }
-          }, 500);
-          return (reject) => {
-            clearInterval(interval);
-            document.removeEventListener("keyup", abortHandler);
-            document.removeEventListener("click", abortHandler);
-            if (reject) {
-              // so that something is shown in console if we need to debug this
-              console.warn("Opening the file was canceled (legacy-fs).");
-              reject(new AbortError());
-            }
-          };
-        },
+        extensions: ["jpg", "png", "svg"],
       });
 
       this.setImagePreviewCursor(imageFile);
@@ -4322,7 +4305,7 @@ class App extends React.Component<AppProps, AppState> {
 
         if (file?.type === "image/png" || file?.type === "image/svg+xml") {
           try {
-            if (fsSupported) {
+            if (nativeFileSystemSupported) {
               try {
                 // This will only work as of Chrome 86,
                 // but can be safely ignored on older releases.
@@ -4404,7 +4387,7 @@ class App extends React.Component<AppProps, AppState> {
       // default: assume an Excalidraw file regardless of extension/MimeType
     } else {
       this.setState({ isLoading: true });
-      if (fsSupported) {
+      if (nativeFileSystemSupported) {
         try {
           // This will only work as of Chrome 86,
           // but can be safely ignored on older releases.

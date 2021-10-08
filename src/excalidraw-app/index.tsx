@@ -40,10 +40,12 @@ import {
 import {
   debounce,
   getVersion,
+  preventUnload,
   ResolvablePromise,
   resolvablePromise,
 } from "../utils";
 import {
+  APP_EVENTS,
   FIREBASE_STORAGE_PREFIXES,
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
 } from "./app_constants";
@@ -108,21 +110,24 @@ const localFileStorage = new FileSync({
     const savedFiles = new Map<ImageId, true>();
     const erroredFiles = new Map<ImageId, true>();
 
-    for (const [id, dataURL] of addedFiles) {
-      try {
-        const data: BinaryFileData = {
-          id,
-          dataURL,
-          type: "image",
-          created: Date.now(),
-        };
-        set(id, data, filesStore);
-        savedFiles.set(id, true);
-      } catch (error) {
-        console.error(error);
-        erroredFiles.set(id, true);
-      }
-    }
+    await Promise.all(
+      [...addedFiles].map(async ([id, dataURL]) => {
+        await new Promise((r) => setTimeout(r, 1500)); // FIXME
+        try {
+          const data: BinaryFileData = {
+            id,
+            dataURL,
+            type: "image",
+            created: Date.now(),
+          };
+          await set(id, data, filesStore);
+          savedFiles.set(id, true);
+        } catch (error) {
+          console.error(error);
+          erroredFiles.set(id, true);
+        }
+      }),
+    );
 
     return { savedFiles, erroredFiles };
   },
@@ -141,18 +146,16 @@ const saveDebounced = debounce(
   async (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
-    onFilesSaved: (savedFiles: Map<ImageId, true>) => void,
+    onFilesSaved: () => void,
   ) => {
     saveToLocalStorage(elements, appState);
 
-    const { savedFiles } = await localFileStorage.saveFiles({
+    await localFileStorage.saveFiles({
       elements,
       appState,
     });
 
-    if (savedFiles.size) {
-      onFilesSaved(savedFiles);
-    }
+    onFilesSaved();
   },
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
 );
@@ -303,6 +306,15 @@ const ExcalidrawWrapper = () => {
     setTimeout(() => {
       trackEvent("load", "version", getVersion());
     }, VERSION_TIMEOUT);
+
+    const onRoomCreate = (() => {
+      localFileStorage.reset();
+    }) as EventListener;
+
+    window.addEventListener(APP_EVENTS.COLLAB_ROOM_CLOSE, onRoomCreate);
+    return () => {
+      window.removeEventListener(APP_EVENTS.COLLAB_ROOM_CLOSE, onRoomCreate);
+    };
   }, []);
 
   const [
@@ -414,6 +426,28 @@ const ExcalidrawWrapper = () => {
   }, [collabAPI, excalidrawAPI]);
 
   useEffect(() => {
+    const unloadHandler = (event: BeforeUnloadEvent) => {
+      saveDebounced.flush();
+
+      if (
+        excalidrawAPI
+          ?.getSceneElements()
+          .some(
+            (element) =>
+              isInitializedImageElement(element) &&
+              element.status === "pending",
+          )
+      ) {
+        preventUnload(event);
+      }
+    };
+    window.addEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
+    return () => {
+      window.removeEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
+    };
+  }, [excalidrawAPI]);
+
+  useEffect(() => {
     languageDetector.cacheUserLanguage(langCode);
   }, [langCode]);
 
@@ -424,21 +458,25 @@ const ExcalidrawWrapper = () => {
     if (collabAPI?.isCollaborating()) {
       collabAPI.broadcastElements(elements);
     } else {
-      saveDebounced(elements, appState, (savedFiles) => {
+      saveDebounced(elements, appState, () => {
         if (excalidrawAPI) {
-          excalidrawAPI.updateScene({
-            elements: excalidrawAPI
-              .getSceneElementsIncludingDeleted()
-              .map((element) => {
-                if (
-                  isInitializedImageElement(element) &&
-                  savedFiles.has(element.imageId)
-                ) {
-                  return mutateElement(element, { status: "saved" }, false);
-                }
-                return element;
-              }),
-          });
+          let didChange = false;
+
+          const elements = excalidrawAPI
+            .getSceneElementsIncludingDeleted()
+            .map((element) => {
+              if (localFileStorage.shouldUpdateImageElementStatus(element)) {
+                didChange = true;
+                return mutateElement(element, { status: "saved" }, false);
+              }
+              return element;
+            });
+
+          if (didChange) {
+            excalidrawAPI.updateScene({
+              elements,
+            });
+          }
         }
       });
     }
