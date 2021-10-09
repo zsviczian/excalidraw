@@ -1,4 +1,4 @@
-import { ExcalidrawElement, ImageId } from "../../element/types";
+import { ExcalidrawElement, FileId } from "../../element/types";
 import { getSceneVersion } from "../../element";
 import Portal from "../collab/Portal";
 import { restoreElements } from "../../data/restore";
@@ -159,22 +159,16 @@ export const saveFilesToFirebase = async ({
   prefix,
   encryptionKey,
   files,
-  allowedTypes,
   maxBytes,
 }: {
   prefix: string;
   encryptionKey: string;
-  files: Map<ImageId, DataURL>;
-  allowedTypes: string[];
+  files: Map<FileId, DataURL>;
   maxBytes: number;
 }) => {
   const firebase = await loadFirebaseStorage();
   const filesToUpload = [...files].map(([id, dataURL]) => {
     const mimeType = getDataURLMimeType(dataURL);
-
-    if (!allowedTypes.includes(mimeType)) {
-      throw new Error("Disallowed file type.");
-    }
 
     const bufferView = new TextEncoder().encode(dataURL);
 
@@ -185,20 +179,20 @@ export const saveFilesToFirebase = async ({
     return { bufferView, id, mimeType };
   });
 
-  const erroredFiles = new Map<ImageId, true>();
-  const savedFiles = new Map<ImageId, true>();
+  const erroredFiles = new Map<FileId, true>();
+  const savedFiles = new Map<FileId, true>();
 
   await Promise.all(
     filesToUpload.map(async ({ id, bufferView, mimeType }) => {
-      const encodedFile = await compressData<BinaryFileMetadata>(bufferView, {
-        encryptionKey,
-        metadata: {
-          id,
-          type: mimeType.includes("image/") ? "image" : "other",
-          created: Date.now(),
-        },
-      });
       try {
+        const encodedFile = await compressData<BinaryFileMetadata>(bufferView, {
+          encryptionKey,
+          metadata: {
+            id,
+            type: mimeType.includes("image/") ? "image" : "other",
+            created: Date.now(),
+          },
+        });
         await firebase
           .storage()
           .ref(`${prefix}/${id}`)
@@ -302,13 +296,13 @@ export const loadFromFirebase = async (
 export const loadFilesFromFirebase = async (
   prefix: string,
   decryptionKey: string,
-  filesIds: readonly ImageId[],
+  filesIds: readonly FileId[],
 ): Promise<{
   loadedFiles: BinaryFileData[];
-  erroredFiles: ImageId[];
+  erroredFiles: FileId[];
 }> => {
   const loadedFiles: BinaryFileData[] = [];
-  const erroredFiles: ImageId[] = [];
+  const erroredFiles: FileId[] = [];
 
   await Promise.all(
     [...new Set(filesIds)].map(async (id) => {
