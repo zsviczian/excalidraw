@@ -3989,9 +3989,10 @@ class App extends React.Component<AppProps, AppState> {
               if (!this.imageCache.has(fileId)) {
                 await updateImageCache({
                   imageCache: this.imageCache,
-                  imageElements: [imageElement],
+                  fileIds: [imageElement.fileId],
                   files: this.state.files,
                 });
+                invalidateShapeForElement(imageElement);
               }
               if (
                 this.state.pendingImageElement?.id !== imageElement.id &&
@@ -4114,7 +4115,7 @@ class App extends React.Component<AppProps, AppState> {
       isInitializedImageElement(imageElement) &&
       this.imageCache.get(imageElement.fileId);
 
-    if (!image) {
+    if (!image || image instanceof Promise) {
       if (
         imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
         imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value
@@ -4169,17 +4170,22 @@ class App extends React.Component<AppProps, AppState> {
     ),
     files: AppState["files"] = this.state.files,
   ) => {
-    const uncachedImages = imageElements.filter(
+    const uncachedImageElements = imageElements.filter(
       (element) => !element.isDeleted && !this.imageCache.has(element.fileId),
     );
 
-    if (uncachedImages.length) {
-      const { didUpdate } = await updateImageCache({
+    if (uncachedImageElements.length) {
+      const { updatedFiles } = await updateImageCache({
         imageCache: this.imageCache,
-        imageElements: uncachedImages,
+        fileIds: uncachedImageElements.map((element) => element.fileId),
         files,
       });
-      if (didUpdate) {
+      if (updatedFiles.size) {
+        for (const element of uncachedImageElements) {
+          if (updatedFiles.has(element.fileId)) {
+            invalidateShapeForElement(element);
+          }
+        }
         this.scene.informMutation();
       }
     }
@@ -4477,7 +4483,10 @@ class App extends React.Component<AppProps, AppState> {
       const image =
         isInitializedImageElement(draggingElement) &&
         this.imageCache.get(draggingElement.fileId);
-      const aspectRatio = image ? image.width / image.height : null;
+      const aspectRatio =
+        image && !(image instanceof Promise)
+          ? image.width / image.height
+          : null;
 
       dragNewElement(
         draggingElement,
