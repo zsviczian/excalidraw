@@ -45,7 +45,6 @@ import {
   resolvablePromise,
 } from "../utils";
 import {
-  APP_EVENTS,
   FIREBASE_STORAGE_PREFIXES,
   SAVE_TO_LOCAL_STORAGE_TIMEOUT,
 } from "./app_constants";
@@ -69,7 +68,7 @@ import "./index.scss";
 import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 
 import { getMany, set, del, keys, createStore } from "idb-keyval";
-import { FileSync } from "./data/FileSync";
+import { FileManager } from "./data/FileManager";
 import { mutateElement } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
@@ -87,7 +86,7 @@ const clearObsoleteFilesFromIndexedDB = async (opts: {
   }
 };
 
-const localFileStorage = new FileSync({
+const localFileStorage = new FileManager({
   getFiles(ids) {
     return getMany(ids, filesStore).then(
       (filesData: (BinaryFileData | undefined)[]) => {
@@ -306,15 +305,6 @@ const ExcalidrawWrapper = () => {
     setTimeout(() => {
       trackEvent("load", "version", getVersion());
     }, VERSION_TIMEOUT);
-
-    const onRoomCreate = (() => {
-      localFileStorage.reset();
-    }) as EventListener;
-
-    window.addEventListener(APP_EVENTS.COLLAB_ROOM_CLOSE, onRoomCreate);
-    return () => {
-      window.removeEventListener(APP_EVENTS.COLLAB_ROOM_CLOSE, onRoomCreate);
-    };
   }, []);
 
   const [
@@ -339,7 +329,7 @@ const ExcalidrawWrapper = () => {
                 appState: { files: data.scene.appState?.files || {} },
               })
               .then(({ loadedFiles }) => {
-                excalidrawAPI.setFiles(loadedFiles);
+                excalidrawAPI.addFiles(loadedFiles);
               });
           }
         } else {
@@ -357,13 +347,13 @@ const ExcalidrawWrapper = () => {
               data.key,
               fileIds,
             ).then(({ loadedFiles }) => {
-              excalidrawAPI.setFiles(loadedFiles);
+              excalidrawAPI.addFiles(loadedFiles);
             });
           } else {
             if (fileIds.length) {
               localFileStorage.getFiles(fileIds).then(({ loadedFiles }) => {
                 if (loadedFiles.length) {
-                  excalidrawAPI.setFiles(loadedFiles);
+                  excalidrawAPI.addFiles(loadedFiles);
                 }
               });
             }
@@ -613,6 +603,10 @@ const ExcalidrawWrapper = () => {
     localStorage.setItem(STORAGE_KEYS.LOCAL_STORAGE_LIBRARY, serializedItems);
   };
 
+  const onRoomClose = useCallback(() => {
+    localFileStorage.reset();
+  }, []);
+
   return (
     <>
       <Excalidraw
@@ -653,7 +647,12 @@ const ExcalidrawWrapper = () => {
         onLibraryChange={onLibraryChange}
         autoFocus={true}
       />
-      {excalidrawAPI && <CollabWrapper excalidrawAPI={excalidrawAPI} />}
+      {excalidrawAPI && (
+        <CollabWrapper
+          excalidrawAPI={excalidrawAPI}
+          onRoomClose={onRoomClose}
+        />
+      )}
       {errorMessage && (
         <ErrorDialog
           message={errorMessage}

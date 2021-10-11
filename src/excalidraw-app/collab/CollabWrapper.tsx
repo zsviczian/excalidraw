@@ -19,7 +19,6 @@ import {
   withBatchedUpdates,
 } from "../../utils";
 import {
-  APP_EVENTS,
   FILE_UPLOAD_MAX_BYTES,
   FIREBASE_STORAGE_PREFIXES,
   INITIAL_SCENE_UPDATE_TIMEOUT,
@@ -54,7 +53,7 @@ import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
 import { trackEvent } from "../../analytics";
 import { isInvisiblySmallElement } from "../../element";
-import { FileSync } from "../data/FileSync";
+import { FileManager } from "../data/FileManager";
 import { AbortError } from "../../errors";
 import {
   isImageElement,
@@ -90,6 +89,7 @@ type ReconciledElements = readonly ExcalidrawElement[] & {
 
 interface Props {
   excalidrawAPI: ExcalidrawImperativeAPI;
+  onRoomClose?: () => void;
 }
 
 const {
@@ -102,7 +102,7 @@ export { CollabContext, CollabContextConsumer };
 
 class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;
-  fileSync: FileSync;
+  fileManager: FileManager;
   excalidrawAPI: Props["excalidrawAPI"];
   isCollaborating: boolean = false;
   activeIntervalId: number | null;
@@ -122,7 +122,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       activeRoomLink: "",
     };
     this.portal = new Portal(this);
-    this.fileSync = new FileSync({
+    this.fileManager = new FileManager({
       getFiles: async (fileIds) => {
         const { roomId, roomKey } = this.portal;
         if (!roomId || !roomKey) {
@@ -249,7 +249,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       this.destroySocketClient();
       trackEvent("share", "room closed");
 
-      window.dispatchEvent(new CustomEvent(APP_EVENTS.COLLAB_ROOM_CLOSE));
+      this.props.onRoomClose?.();
 
       const elements = this.excalidrawAPI
         .getSceneElementsIncludingDeleted()
@@ -280,7 +280,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
     }
     this.lastBroadcastedOrReceivedSceneVersion = -1;
     this.portal.close();
-    this.fileSync.reset();
+    this.fileManager.reset();
   };
 
   private fetchImageFilesFromFirebase = async (scene: {
@@ -291,14 +291,14 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       .filter((element) => {
         return (
           isInitializedImageElement(element) &&
-          !this.fileSync.isFileHandled(element.fileId) &&
+          !this.fileManager.isFileHandled(element.fileId) &&
           !element.isDeleted &&
           element.status === "saved"
         );
       })
       .map((element) => (element as InitializedExcalidrawImageElement).fileId);
 
-    const { loadedFiles, erroredFiles } = await this.fileSync.getFiles(
+    const { loadedFiles, erroredFiles } = await this.fileManager.getFiles(
       unfetchedImages,
     );
     return {
@@ -567,7 +567,7 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       appState: this.excalidrawAPI.getAppState(),
     });
 
-    this.excalidrawAPI.setFiles(loadedFiles);
+    this.excalidrawAPI.addFiles(loadedFiles);
   }, LOAD_IMAGES_TIMEOUT);
 
   private handleRemoteSceneUpdate = (

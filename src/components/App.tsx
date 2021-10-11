@@ -44,6 +44,7 @@ import {
 import {
   APP_NAME,
   CURSOR_TYPE,
+  DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
   DEFAULT_UI_OPTIONS,
   DEFAULT_VERTICAL_ALIGN,
   DRAGGING_THRESHOLD,
@@ -203,7 +204,13 @@ import LayerUI from "./LayerUI";
 import { Stats } from "./Stats";
 import { Toast } from "./Toast";
 import { actionToggleViewMode } from "../actions/actionToggleViewMode";
-import { generateIdFromFile, getDataURL, isImageFile } from "../data/blob";
+import {
+  dataURLToFile,
+  generateIdFromFile,
+  getDataURL,
+  isImageFile,
+  resizeImageFile,
+} from "../data/blob";
 import {
   getInitializedImageElements,
   updateImageCache,
@@ -303,7 +310,7 @@ class App extends React.Component<AppProps, AppState> {
         ready: true,
         readyPromise,
         updateScene: this.updateScene,
-        setFiles: this.setFiles,
+        addFiles: this.addFiles,
         resetScene: this.resetScene,
         getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
         history: {
@@ -1491,7 +1498,8 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  public setFiles: ExcalidrawImperativeAPI["setFiles"] = withBatchedUpdates(
+  /** adds supplied files to existing files in the appState */
+  public addFiles: ExcalidrawImperativeAPI["addFiles"] = withBatchedUpdates(
     (files) => {
       this.setState(
         (state) => ({
@@ -3949,15 +3957,36 @@ class App extends React.Component<AppProps, AppState> {
   private initializeImage = async ({
     imageFile,
     imageElement: _imageElement,
+    showCursorImagePreview = false,
   }: {
     imageFile: File;
     imageElement: ExcalidrawImageElement;
+    showCursorImagePreview?: boolean;
   }) => {
+    setCursor(this.canvas, "wait");
+
     // generate image id (by default the file digest) before any
     // resizing/compression takes place to keep it more portable
     const fileId = await ((this.props.generateIdForFile?.(
       imageFile,
     ) as Promise<FileId>) || generateIdFromFile(imageFile));
+
+    if (!this.state.files[fileId]?.dataURL) {
+      imageFile = await resizeImageFile(
+        imageFile,
+        DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+      );
+    }
+
+    if (showCursorImagePreview) {
+      const dataURL = this.state.files[fileId]?.dataURL;
+      // optimization so that we don't unnecessarily resize the original
+      // full-size file for cursor preview
+      // (it's much faster to convert the resized dataURL to File)
+      const resizedFile = dataURL && dataURLToFile(dataURL);
+
+      this.setImagePreviewCursor(resizedFile || imageFile);
+    }
 
     const dataURL =
       this.state.files[fileId]?.dataURL || (await getDataURL(imageFile));
@@ -3986,13 +4015,17 @@ class App extends React.Component<AppProps, AppState> {
           }),
           async () => {
             try {
-              if (!this.imageCache.has(fileId)) {
+              const cachedImage = this.imageCache.get(fileId);
+              if (!cachedImage) {
                 await updateImageCache({
                   imageCache: this.imageCache,
                   fileIds: [imageElement.fileId],
                   files: this.state.files,
                 });
                 invalidateShapeForElement(imageElement);
+              }
+              if (cachedImage instanceof Promise) {
+                await cachedImage;
               }
               if (
                 this.state.pendingImageElement?.id !== imageElement.id &&
@@ -4004,6 +4037,8 @@ class App extends React.Component<AppProps, AppState> {
             } catch (error) {
               console.error(error);
               reject(new Error("Couldn't create image"));
+            } finally {
+              resetCursor(this.canvas);
             }
           },
         );
@@ -4017,6 +4052,7 @@ class App extends React.Component<AppProps, AppState> {
   private insertImageElement = (
     imageElement: ExcalidrawImageElement,
     imageFile: File,
+    showCursorImagePreview?: boolean,
   ) => {
     this.scene.replaceAllElements([
       ...this.scene.getElementsIncludingDeleted(),
@@ -4026,19 +4062,19 @@ class App extends React.Component<AppProps, AppState> {
     this.initializeImage({
       imageFile,
       imageElement,
+      showCursorImagePreview,
     });
 
     this.scene.informMutation();
   };
 
   private setImagePreviewCursor = async (imageFile: File) => {
-    setCursor(this.canvas, "wait");
-    const imageCompression = (await import("browser-image-compression"))
-      .default;
-    const imagePreview = await imageCompression(imageFile, {
-      maxWidthOrHeight: 100,
-      maxIteration: 1,
-    });
+    // mustn't be larger than 128 px
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Basic_User_Interface/Using_URL_values_for_the_cursor_property
+    const cursorImageSizePx = 96;
+
+    const imagePreview = await resizeImageFile(imageFile, cursorImageSizePx);
+
     const previewDataURL = await getDataURL(imagePreview);
     if (this.state.pendingImageElement) {
       setCursor(this.canvas, `url(${previewDataURL}) 4 4, auto`);
@@ -4062,8 +4098,6 @@ class App extends React.Component<AppProps, AppState> {
         extensions: ["jpg", "png", "svg"],
       });
 
-      this.setImagePreviewCursor(imageFile);
-
       const imageElement = this.createImageElement({
         sceneX: x,
         sceneY: y,
@@ -4086,7 +4120,11 @@ class App extends React.Component<AppProps, AppState> {
             pendingImageElement: imageElement,
           },
           () => {
-            this.insertImageElement(imageElement, imageFile);
+            this.insertImageElement(
+              imageElement,
+              imageFile,
+              /* showCursorImagePreview */ true,
+            );
           },
         );
       }

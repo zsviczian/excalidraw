@@ -131,14 +131,17 @@ type FileEncodingInfo = {
 };
 
 // -----------------------------------------------------------------------------
+const CONCAT_BUFFERS_VERSION = 1;
 /** how many bytes we use to encode how many bytes the next chunk has.
  * Corresponds to DataView setter methods (setUint32, setUint16, etc).
  *
  * NOTE ! values must not be changed, which would be backwards incompatible !
  */
+const VERSION_DATAVIEW_BYTES = 4;
 const NEXT_CHUNK_SIZE_DATAVIEW_BYTES = 4;
-const CHUNKS_COUNT_DATAVIEW_BYTES = 2;
 // -----------------------------------------------------------------------------
+
+const DATA_VIEW_BITS_MAP = { 1: 8, 2: 16, 4: 32 } as const;
 
 // getter
 function dataView(buffer: Uint8Array, bytes: 1 | 2 | 4, offset: number): number;
@@ -162,18 +165,17 @@ function dataView(
   offset: number,
   value?: number,
 ): Uint8Array | number {
-  const bits = { 1: 8, 2: 16, 4: 32 } as const;
   if (value != null) {
-    if (value > Math.pow(2, bits[bytes]) - 1) {
+    if (value > Math.pow(2, DATA_VIEW_BITS_MAP[bytes]) - 1) {
       throw new Error(
         `attempting to set value higher than the allocated bytes (value: ${value}, bytes: ${bytes})`,
       );
     }
-    const method = `setUint${bits[bytes]}` as const;
+    const method = `setUint${DATA_VIEW_BITS_MAP[bytes]}` as const;
     new DataView(buffer.buffer)[method](offset, value);
     return buffer;
   }
-  const method = `getUint${bits[bytes]}` as const;
+  const method = `getUint${DATA_VIEW_BITS_MAP[bytes]}` as const;
   return new DataView(buffer.buffer)[method](offset);
 }
 
@@ -183,48 +185,37 @@ function dataView(
  * Resulting concatenated buffer has this format:
  *
  * [
- *   COUNT chunk (number of DATA chunks — i.e. excludes this and LENGTH chunks)
+ *   VERSION chunk (4 bytes)
  *   LENGTH chunk 1 (4 bytes)
- *   DATA chunk 1 (up to by 2^32 bytes)
+ *   DATA chunk 1 (up to 2^32 bits)
  *   LENGTH chunk 2 (4 bytes)
- *   DATA chunk 2 (up to by 2^32 bytes)
+ *   DATA chunk 2 (up to 2^32 bits)
  *   ...
- *   LENGTH chunk N-1 (4 bytes)
- *   DATA chunk N-1 (up to by 2^32 bytes)
- *   DATA chunk N (any size)
  * ]
  *
- * The last chunk doesn't need to have a length header because the COUNT chunk
- * tells us whether we're reading the last chunk or not.
- *
- * @param buffers each buffer (chunk) must be at most 2^32 bytes large (~4MB),
- * except the last chunk which can be of any size
+ * @param buffers each buffer (chunk) must be at most 2^32 bits large (~4GB)
  */
 const concatBuffers = (...buffers: Uint8Array[]) => {
   const bufferView = new Uint8Array(
-    CHUNKS_COUNT_DATAVIEW_BYTES +
-      NEXT_CHUNK_SIZE_DATAVIEW_BYTES * Math.max(buffers.length - 1, 1) +
+    VERSION_DATAVIEW_BYTES +
+      NEXT_CHUNK_SIZE_DATAVIEW_BYTES * buffers.length +
       buffers.reduce((acc, buffer) => acc + buffer.byteLength, 0),
   );
 
   let cursor = 0;
 
-  // as the first chunk we'll encode how many chunks will follow
-  dataView(bufferView, CHUNKS_COUNT_DATAVIEW_BYTES, cursor, buffers.length);
-  cursor += CHUNKS_COUNT_DATAVIEW_BYTES;
+  // as the first chunk we'll encode the version for backwards compatibility
+  dataView(bufferView, VERSION_DATAVIEW_BYTES, cursor, CONCAT_BUFFERS_VERSION);
+  cursor += VERSION_DATAVIEW_BYTES;
 
-  let i = 0;
   for (const buffer of buffers) {
-    i++;
-    if (i < buffers.length) {
-      dataView(
-        bufferView,
-        NEXT_CHUNK_SIZE_DATAVIEW_BYTES,
-        cursor,
-        buffer.byteLength,
-      );
-      cursor += NEXT_CHUNK_SIZE_DATAVIEW_BYTES;
-    }
+    dataView(
+      bufferView,
+      NEXT_CHUNK_SIZE_DATAVIEW_BYTES,
+      cursor,
+      buffer.byteLength,
+    );
+    cursor += NEXT_CHUNK_SIZE_DATAVIEW_BYTES;
 
     bufferView.set(buffer, cursor);
     cursor += buffer.byteLength;
@@ -239,32 +230,20 @@ const splitBuffers = (concatenatedBuffer: Uint8Array) => {
 
   let cursor = 0;
 
-  // first chunk tells us how many other chunks there are
-  const chunkCount = dataView(
-    concatenatedBuffer,
-    CHUNKS_COUNT_DATAVIEW_BYTES,
-    cursor,
-  );
-  cursor += CHUNKS_COUNT_DATAVIEW_BYTES;
+  // first chunk is the version (ignored for now)
+  cursor += VERSION_DATAVIEW_BYTES;
 
-  let i = 0;
   while (true) {
-    i++;
-    if (i < chunkCount) {
-      const chunkSize = dataView(
-        concatenatedBuffer,
-        NEXT_CHUNK_SIZE_DATAVIEW_BYTES,
-        cursor,
-      );
-      cursor += NEXT_CHUNK_SIZE_DATAVIEW_BYTES;
+    const chunkSize = dataView(
+      concatenatedBuffer,
+      NEXT_CHUNK_SIZE_DATAVIEW_BYTES,
+      cursor,
+    );
+    cursor += NEXT_CHUNK_SIZE_DATAVIEW_BYTES;
 
-      buffers.push(concatenatedBuffer.slice(cursor, cursor + chunkSize));
-      cursor += chunkSize;
-      if (cursor >= concatenatedBuffer.byteLength) {
-        break;
-      }
-    } else {
-      buffers.push(concatenatedBuffer.slice(cursor));
+    buffers.push(concatenatedBuffer.slice(cursor, cursor + chunkSize));
+    cursor += chunkSize;
+    if (cursor >= concatenatedBuffer.byteLength) {
       break;
     }
   }
@@ -272,34 +251,39 @@ const splitBuffers = (concatenatedBuffer: Uint8Array) => {
   return buffers;
 };
 
-/** @private */
-const _compress = async <K extends string>(
-  data: Uint8Array | string,
-  encryptionKey?: K,
-): Promise<Uint8Array> => {
-  const deflated = new Uint8Array(deflate(data));
-  if (encryptionKey) {
-    const { encryptedBuffer, iv } = await encryptData(encryptionKey, deflated);
+// helpers for (de)compressing data with JSON metadata including encryption
+// -----------------------------------------------------------------------------
 
-    return concatBuffers(iv, new Uint8Array(encryptedBuffer));
-  }
-  return deflated;
+/** @private */
+const _encryptAndCompress = async (
+  data: Uint8Array | string,
+  encryptionKey: string,
+) => {
+  const { encryptedBuffer, iv } = await encryptData(
+    encryptionKey,
+    deflate(data),
+  );
+
+  return { iv, buffer: new Uint8Array(encryptedBuffer) };
 };
 
-// Format of the returned Uint8Array buffer.
-// `[]` represents a buffer chunk. Some chunks are nested.
-//
-// [
-//   /* encodingMetadata */ [ data ]
-//   /* contentsMetadata */ [ [iv] [data] ]
-//   /* contents */         [ [iv] [data] ]
-// ]
+/**
+ * The returned buffer has following format:
+ * `[]` refers to a buffers wrapper (see `concatBuffers`)
+ *
+ * [
+ *   encodingMetadataBuffer,
+ *   iv,
+ *   [
+ *      contentsMetadataBuffer
+ *      contentsBuffer
+ *   ]
+ * ]
+ */
 export const compressData = async <T extends Record<string, any> = never>(
-  data: Uint8Array,
-  options?: {
-    /** if supplied, the data will be encrypted using (otherwise no
-     *  encryption will take place) */
-    encryptionKey?: string;
+  dataBuffer: Uint8Array,
+  options: {
+    encryptionKey: string;
   } & ([T] extends [never]
     ? {
         metadata?: T;
@@ -311,75 +295,48 @@ export const compressData = async <T extends Record<string, any> = never>(
   const fileInfo: FileEncodingInfo = {
     version: 1,
     compression: "pako@1",
-    encryption: options?.encryptionKey ? "AES-GCM" : null,
+    encryption: "AES-GCM",
   };
 
   const encodingMetadataBuffer = new TextEncoder().encode(
     JSON.stringify(fileInfo),
   );
 
-  const contentsMetadataBuffer = await _compress(
-    JSON.stringify(options?.metadata || null),
-    options?.encryptionKey,
+  const contentsMetadataBuffer = new TextEncoder().encode(
+    JSON.stringify(options.metadata || null),
   );
 
-  const contentsBuffer = await _compress(data, options?.encryptionKey);
-
-  return concatBuffers(
-    encodingMetadataBuffer,
-    contentsMetadataBuffer,
-    contentsBuffer,
+  const { iv, buffer } = await _encryptAndCompress(
+    concatBuffers(contentsMetadataBuffer, dataBuffer),
+    options.encryptionKey,
   );
+
+  return concatBuffers(encodingMetadataBuffer, iv, buffer);
 };
 
 /** @private */
-const _decompress = async (bufferView: Uint8Array, decryptionKey?: string) => {
-  if (decryptionKey) {
-    const [iv, encryptedBuffer] = splitBuffers(bufferView);
-    bufferView = new Uint8Array(
-      await decryptData(
-        // the iv was deserialized to array so we need convert it to typed array
-        iv,
-        encryptedBuffer,
-        decryptionKey,
-      ),
-    );
-  }
+const _decryptAndDecompress = async (
+  iv: Uint8Array,
+  encryptedBuffer: Uint8Array,
+  decryptionKey: string,
+) => {
+  encryptedBuffer = new Uint8Array(
+    await decryptData(iv, encryptedBuffer, decryptionKey),
+  );
 
-  return inflate(bufferView);
+  return inflate(encryptedBuffer);
 };
 
 export const decompressData = async <T extends Record<string, any>>(
   bufferView: Uint8Array,
-  options?: { decryptionKey: string },
+  options: { decryptionKey: string },
 ) => {
-  let [
-    encodingMetadataBuffer,
-    contentsMetadataBuffer,
-    contentsBuffer,
-  ] = splitBuffers(bufferView);
+  // first chunk is encoding metadata (ignored for now)
+  const [, iv, buffer] = splitBuffers(bufferView);
 
-  const encodingMetadata: FileEncodingInfo = JSON.parse(
-    new TextDecoder().decode(encodingMetadataBuffer),
+  const [contentsMetadataBuffer, contentsBuffer] = splitBuffers(
+    await _decryptAndDecompress(iv, buffer, options.decryptionKey),
   );
-
-  if (options?.decryptionKey && !encodingMetadata.encryption) {
-    throw new Error(
-      "`options.decryptionKey` was supplied but the data is not encrypted.",
-    );
-  }
-  if (encodingMetadata.encryption && !options?.decryptionKey) {
-    throw new Error(
-      "The data is encrypted but `options.decryptionKey` was not supplied.",
-    );
-  }
-
-  contentsMetadataBuffer = await _decompress(
-    contentsMetadataBuffer,
-    options?.decryptionKey,
-  );
-
-  contentsBuffer = await _decompress(contentsBuffer, options?.decryptionKey);
 
   return {
     /** metadata source is always JSON so we can decode it here */
@@ -388,3 +345,5 @@ export const decompressData = async <T extends Record<string, any>>(
     data: contentsBuffer,
   };
 };
+
+// -----------------------------------------------------------------------------

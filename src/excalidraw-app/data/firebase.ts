@@ -16,7 +16,7 @@ let firebasePromise: Promise<
   typeof import("firebase/app").default
 > | null = null;
 let firestorePromise: Promise<any> | null | true = null;
-let firebseStoragePromise: Promise<any> | null | true = null;
+let firebaseStoragePromise: Promise<any> | null | true = null;
 
 let isFirebaseInitialized = false;
 
@@ -70,14 +70,14 @@ const loadFirestore = async () => {
 
 export const loadFirebaseStorage = async () => {
   const firebase = await _getFirebase();
-  if (!firebseStoragePromise) {
-    firebseStoragePromise = import(
+  if (!firebaseStoragePromise) {
+    firebaseStoragePromise = import(
       /* webpackChunkName: "storage" */ "firebase/storage"
     );
   }
-  if (firebseStoragePromise !== true) {
-    await firebseStoragePromise;
-    firebseStoragePromise = true;
+  if (firebaseStoragePromise !== true) {
+    await firebaseStoragePromise;
+    firebaseStoragePromise = true;
   }
   return firebase;
 };
@@ -111,7 +111,7 @@ const encryptElements = async (
 const decryptElements = async (
   key: string,
   iv: Uint8Array,
-  ciphertext: ArrayBuffer,
+  ciphertext: ArrayBuffer | Uint8Array,
 ): Promise<readonly ExcalidrawElement[]> => {
   const importedKey = await getImportedKey(key, "decrypt");
   const decrypted = await window.crypto.subtle.decrypt(
@@ -124,7 +124,7 @@ const decryptElements = async (
   );
 
   const decodedData = new TextDecoder("utf-8").decode(
-    new Uint8Array(decrypted) as any,
+    new Uint8Array(decrypted),
   );
   return JSON.parse(decodedData);
 };
@@ -146,7 +146,7 @@ export const isSavedToFirebase = (
 };
 
 const getDataURLMimeType = (dataURL: DataURL): string => {
-  return dataURL.split(",")[0].split(":")[1].split(";")[0];
+  return dataURL.match(/^data:([^;,]+);base64,/)?.[1] || "";
 };
 
 const getFileTypeFromMimeType = (mimeType: string): BinaryFileData["type"] => {
@@ -197,7 +197,7 @@ export const saveFilesToFirebase = async ({
           .storage()
           .ref(`${prefix}/${id}`)
           .put(
-            new Blob([new Uint8Array(encodedFile)], {
+            new Blob([encodedFile], {
               type: mimeType,
             }),
             {
