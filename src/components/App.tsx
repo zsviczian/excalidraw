@@ -55,6 +55,7 @@ import {
   GRID_SIZE,
   IMAGE_RENDER_TIMEOUT,
   LINE_CONFIRM_THRESHOLD,
+  MAX_ALLOWED_FILE_BYTES,
   MIME_TYPES,
   MQ_MAX_HEIGHT_LANDSCAPE,
   MQ_MAX_WIDTH_LANDSCAPE,
@@ -63,6 +64,7 @@ import {
   SCROLL_TIMEOUT,
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
+  THEME,
   TOUCH_CTX_MENU_TIMEOUT,
   URL_HASH_KEYS,
   URL_QUERY_KEYS,
@@ -176,6 +178,7 @@ import {
   AppClassProperties,
   AppProps,
   AppState,
+  BinaryFileData,
   ExcalidrawImperativeAPI,
   Gesture,
   GestureEvent,
@@ -208,7 +211,7 @@ import {
   dataURLToFile,
   generateIdFromFile,
   getDataURL,
-  isImageFile,
+  isSupportedImageFile,
   resizeImageFile,
 } from "../data/blob";
 import {
@@ -540,7 +543,7 @@ class App extends React.Component<AppProps, AppState> {
         let viewModeEnabled = actionResult?.appState?.viewModeEnabled || false;
         let zenModeEnabled = actionResult?.appState?.zenModeEnabled || false;
         let gridSize = actionResult?.appState?.gridSize || null;
-        let theme = actionResult?.appState?.theme || "light";
+        let theme = actionResult?.appState?.theme || THEME.LIGHT;
         let name = actionResult?.appState?.name ?? this.state.name;
         if (typeof this.props.viewModeEnabled !== "undefined") {
           viewModeEnabled = this.props.viewModeEnabled;
@@ -1243,7 +1246,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       const file = event?.clipboardData?.files[0];
-      if (isImageFile(file)) {
+      if (isSupportedImageFile(file)) {
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
           { clientX: cursorX, clientY: cursorY },
           this.state,
@@ -1508,7 +1511,7 @@ class App extends React.Component<AppProps, AppState> {
             ...files.reduce((acc, fileData) => {
               acc[fileData.id] = fileData;
               return acc;
-            }, {} as Record<string, AppState["files"][number]>),
+            }, {} as Record<string, BinaryFileData>),
           },
         }),
         () => {
@@ -3972,10 +3975,25 @@ class App extends React.Component<AppProps, AppState> {
       imageFile,
     ) as Promise<FileId>) || generateIdFromFile(imageFile));
 
+    if (!fileId) {
+      console.warn(
+        "Couldn't generate file id or the supplied `generateIdForFile` didn't resolve to one.",
+      );
+      throw new Error(t("errors.imageInsertError"));
+    }
+
     if (!this.state.files[fileId]?.dataURL) {
       imageFile = await resizeImageFile(
         imageFile,
         DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+      );
+    }
+
+    if (imageFile.size > MAX_ALLOWED_FILE_BYTES) {
+      throw new Error(
+        t("errors.fileTooBig", {
+          maxSize: `${Math.trunc(MAX_ALLOWED_FILE_BYTES / 1024 / 1024)}MB`,
+        }),
       );
     }
 
@@ -4037,7 +4055,7 @@ class App extends React.Component<AppProps, AppState> {
               resolve(imageElement);
             } catch (error) {
               console.error(error);
-              reject(new Error("Couldn't create image"));
+              reject(new Error(t("errors.imageInsertError")));
             } finally {
               resetCursor(this.canvas);
             }
@@ -4050,7 +4068,7 @@ class App extends React.Component<AppProps, AppState> {
   /**
    * inserts image into elements array and rerenders
    */
-  private insertImageElement = (
+  private insertImageElement = async (
     imageElement: ExcalidrawImageElement,
     imageFile: File,
     showCursorImagePreview?: boolean,
@@ -4060,13 +4078,21 @@ class App extends React.Component<AppProps, AppState> {
       imageElement,
     ]);
 
-    this.initializeImage({
-      imageFile,
-      imageElement,
-      showCursorImagePreview,
-    });
-
-    this.scene.informMutation();
+    try {
+      await this.initializeImage({
+        imageFile,
+        imageElement,
+        showCursorImagePreview,
+      });
+    } catch (error) {
+      mutateElement(imageElement, {
+        isDeleted: true,
+      });
+      this.actionManager.executeAction(actionFinalize);
+      this.setState({
+        errorMessage: error.message || t("errors.imageInsertError"),
+      });
+    }
   };
 
   private setImagePreviewCursor = async (imageFile: File) => {
@@ -4340,7 +4366,7 @@ class App extends React.Component<AppProps, AppState> {
       }
       const file = event.dataTransfer.files[0];
 
-      if (isImageFile(file)) {
+      if (isSupportedImageFile(file)) {
         // first attempt to decode scene from the image if it's embedded
         // ---------------------------------------------------------------------
 
@@ -4352,7 +4378,7 @@ class App extends React.Component<AppProps, AppState> {
                 // but can be safely ignored on older releases.
                 const item = event.dataTransfer.items[0];
                 (file as any).handle = await (item as any).getAsFileSystemHandle();
-              } catch (error) {
+              } catch (error: any) {
                 console.warn(error.name, error.message);
               }
             }
@@ -4371,7 +4397,7 @@ class App extends React.Component<AppProps, AppState> {
               commitToHistory: true,
             });
             return;
-          } catch (error) {
+          } catch (error: any) {
             if (error.name !== "EncodingError") {
               throw error;
             }

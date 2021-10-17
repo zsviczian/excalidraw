@@ -1,10 +1,11 @@
 import { Point } from "../types";
-import { FONT_FAMILY } from "../constants";
+import { FONT_FAMILY, THEME } from "../constants";
 
 export type ChartType = "bar" | "line";
 export type FillStyle = "hachure" | "cross-hatch" | "solid";
 export type FontFamilyKeys = keyof typeof FONT_FAMILY;
 export type FontFamilyValues = typeof FONT_FAMILY[FontFamilyKeys];
+export type Theme = typeof THEME[keyof typeof THEME];
 export type FontString = string & { _brand: "fontString" };
 export type GroupId = string;
 export type PointerType = "mouse" | "pen" | "touch";
@@ -67,7 +68,7 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     type: "image";
     fileId: FileId | null;
     /** whether respective file is persisted */
-    status: "pending" | "saved";
+    status: "pending" | "saved" | "error";
     /** X and Y scale factors <-1, 1>, used for image axis flipping */
     scale: [number, number];
   }>;

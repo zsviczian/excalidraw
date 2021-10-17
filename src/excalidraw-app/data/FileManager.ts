@@ -1,3 +1,6 @@
+import { getDataURLMimeType } from "../../data/blob";
+import { compressData } from "../../data/encode";
+import { mutateElement } from "../../element/mutateElement";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import {
   ExcalidrawElement,
@@ -5,7 +8,14 @@ import {
   FileId,
   InitializedExcalidrawImageElement,
 } from "../../element/types";
-import { AppState, BinaryFileData, DataURL } from "../../types";
+import { t } from "../../i18n";
+import {
+  AppState,
+  BinaryFileData,
+  BinaryFileMetadata,
+  DataURL,
+  ExcalidrawImperativeAPI,
+} from "../../types";
 
 export class FileManager {
   /** files being fetched */
@@ -14,6 +24,7 @@ export class FileManager {
   private savingFiles = new Map<ExcalidrawImageElement["fileId"], true>();
   /* files already saved to persistent storage */
   private savedFiles = new Map<ExcalidrawImageElement["fileId"], true>();
+  private erroredFiles = new Map<ExcalidrawImageElement["fileId"], true>();
 
   private _getFiles;
   private _saveFiles;
@@ -26,7 +37,7 @@ export class FileManager {
       fileIds: FileId[],
     ) => Promise<{
       loadedFiles: BinaryFileData[];
-      erroredFiles: FileId[];
+      erroredFiles: Map<FileId, true>;
     }>;
     saveFiles: (data: {
       addedFiles: Map<FileId, DataURL>;
@@ -46,7 +57,8 @@ export class FileManager {
     return (
       this.savedFiles.has(id) ||
       this.fetchingFiles.has(id) ||
-      this.savingFiles.has(id)
+      this.savingFiles.has(id) ||
+      this.erroredFiles.has(id)
     );
   };
 
@@ -94,11 +106,16 @@ export class FileManager {
     }
   };
 
-  getFiles = async (ids: FileId[]) => {
+  getFiles = async (
+    ids: FileId[],
+  ): Promise<{
+    loadedFiles: BinaryFileData[];
+    erroredFiles: Map<FileId, true>;
+  }> => {
     if (!ids.length) {
       return {
         loadedFiles: [],
-        erroredFiles: [],
+        erroredFiles: new Map(),
       };
     }
     for (const id of ids) {
@@ -111,6 +128,9 @@ export class FileManager {
       for (const file of loadedFiles) {
         this.savedFiles.set(file.id, true);
       }
+      for (const [fileId] of erroredFiles) {
+        this.erroredFiles.set(fileId, true);
+      }
 
       return { loadedFiles, erroredFiles };
     } finally {
@@ -118,6 +138,23 @@ export class FileManager {
         this.fetchingFiles.delete(id);
       }
     }
+  };
+
+  /** a file element prevents unload only if it's being saved regardless of
+   *  its `status`. This ensures that elements who for any reason haven't
+   *  beed set to `saved` status don't prevent unload in future sessions.
+   *  Technically we should prevent unload when the origin client haven't
+   *  yet saved the `status` update to storage, but that should be taken care
+   *  of during regular beforeUnload unsaved files check.
+   */
+  shouldPreventUnload = (elements: readonly ExcalidrawElement[]) => {
+    return elements.some((element) => {
+      return (
+        isInitializedImageElement(element) &&
+        !element.isDeleted &&
+        this.savingFiles.has(element.fileId)
+      );
+    });
   };
 
   /**
@@ -139,3 +176,85 @@ export class FileManager {
     this.savedFiles.clear();
   }
 }
+
+export const encodeFilesForUpload = async <M extends readonly string[]>({
+  files,
+  maxBytes,
+  encryptionKey,
+  allowedMimeTypes,
+}: {
+  files: Map<FileId, DataURL>;
+  maxBytes: number;
+  encryptionKey: string;
+  allowedMimeTypes: M;
+}) => {
+  const processedFiles: {
+    id: FileId;
+    mimeType: M[number];
+    buffer: Uint8Array;
+  }[] = [];
+
+  for (const [id, dataURL] of files) {
+    const mimeType = getDataURLMimeType(dataURL);
+
+    if (!allowedMimeTypes.includes(mimeType)) {
+      throw new Error(t("errors.unsupportedFileType"));
+    }
+
+    const buffer = new TextEncoder().encode(dataURL);
+
+    const encodedFile = await compressData<BinaryFileMetadata>(buffer, {
+      encryptionKey,
+      metadata: {
+        id,
+        type: mimeType.includes("image/") ? "image" : "other",
+        created: Date.now(),
+      },
+    });
+
+    if (buffer.byteLength > maxBytes) {
+      throw new Error(
+        t("errors.fileTooBig", {
+          maxSize: `${Math.trunc(maxBytes / 1024 / 1024)}MB`,
+        }),
+      );
+    }
+
+    processedFiles.push({
+      id,
+      mimeType,
+      buffer: encodedFile,
+    });
+  }
+
+  return processedFiles;
+};
+
+export const updateStaleImageStatuses = (params: {
+  excalidrawAPI: ExcalidrawImperativeAPI;
+  erroredFiles: Map<FileId, true>;
+  elements: readonly ExcalidrawElement[];
+}) => {
+  if (!params.erroredFiles.size) {
+    return;
+  }
+  params.excalidrawAPI.updateScene({
+    elements: params.excalidrawAPI
+      .getSceneElementsIncludingDeleted()
+      .map((element) => {
+        if (
+          isInitializedImageElement(element) &&
+          params.erroredFiles.has(element.fileId)
+        ) {
+          return mutateElement(
+            element,
+            {
+              status: "error",
+            },
+            false,
+          );
+        }
+        return element;
+      }),
+  });
+};
