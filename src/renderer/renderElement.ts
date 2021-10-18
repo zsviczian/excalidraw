@@ -23,18 +23,12 @@ import { Drawable, Options } from "roughjs/bin/core";
 import { RoughSVG } from "roughjs/bin/svg";
 import { RoughGenerator } from "roughjs/bin/generator";
 import { SceneState } from "../scene/types";
-import {
-  SVG_NS,
-  distance,
-  getFontString,
-  getFontFamilyString,
-  isRTL,
-} from "../utils";
+import { distance, getFontString, getFontFamilyString, isRTL } from "../utils";
 import { isPathALoop } from "../math";
 import rough from "roughjs/bin/rough";
 import { AppState, Zoom } from "../types";
 import { getDefaultAppState } from "../appState";
-import { MAX_DECIMALS_FOR_SVG_EXPORT } from "../constants";
+import { MAX_DECIMALS_FOR_SVG_EXPORT, MIME_TYPES, SVG_NS } from "../constants";
 import { getStroke, StrokeOptions } from "perfect-freehand";
 
 const defaultAppState = getDefaultAppState();
@@ -44,7 +38,7 @@ const isPendingImageElement = (
   sceneState: SceneState,
 ) =>
   isInitializedImageElement(element) &&
-  !sceneState.imageCache.get(element.fileId);
+  !sceneState.imageCache.has(element.fileId);
 
 const getDashArrayDashed = (strokeWidth: number) => [8, 8 + strokeWidth];
 
@@ -125,7 +119,8 @@ const generateElementCanvas = (
   if (
     sceneState.theme === "dark" &&
     isInitializedImageElement(element) &&
-    !isPendingImageElement(element, sceneState)
+    !isPendingImageElement(element, sceneState) &&
+    sceneState.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
   ) {
     // using a stronger invert (100% vs our regular 93%) and saturate
     // as a temp hack to make images in dark theme look closer to original
@@ -148,23 +143,30 @@ const generateElementCanvas = (
 };
 
 const IMAGE_PLACEHOLDER_IMG = document.createElement("img");
-IMAGE_PLACEHOLDER_IMG.src = `data:image/svg+xml,${encodeURIComponent(
+IMAGE_PLACEHOLDER_IMG.src = `data:${MIME_TYPES.svg},${encodeURIComponent(
   `<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="image" class="svg-inline--fa fa-image fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="#888" d="M464 448H48c-26.51 0-48-21.49-48-48V112c0-26.51 21.49-48 48-48h416c26.51 0 48 21.49 48 48v288c0 26.51-21.49 48-48 48zM112 120c-30.928 0-56 25.072-56 56s25.072 56 56 56 56-25.072 56-56-25.072-56-56-56zM64 384h384V272l-87.515-87.515c-4.686-4.686-12.284-4.686-16.971 0L208 320l-55.515-55.515c-4.686-4.686-12.284-4.686-16.971 0L64 336v48z"></path></svg>`,
 )}`;
 
 const IMAGE_ERROR_PLACEHOLDER_IMG = document.createElement("img");
-IMAGE_ERROR_PLACEHOLDER_IMG.src = `data:image/svg+xml,${encodeURIComponent(
+IMAGE_ERROR_PLACEHOLDER_IMG.src = `data:${MIME_TYPES.svg},${encodeURIComponent(
   `<svg viewBox="0 0 668 668" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2"><path d="M464 448H48c-26.51 0-48-21.49-48-48V112c0-26.51 21.49-48 48-48h416c26.51 0 48 21.49 48 48v288c0 26.51-21.49 48-48 48ZM112 120c-30.928 0-56 25.072-56 56s25.072 56 56 56 56-25.072 56-56-25.072-56-56-56ZM64 384h384V272l-87.515-87.515c-4.686-4.686-12.284-4.686-16.971 0L208 320l-55.515-55.515c-4.686-4.686-12.284-4.686-16.971 0L64 336v48Z" style="fill:#888;fill-rule:nonzero" transform="matrix(.81709 0 0 .81709 124.825 145.825)"/><path d="M256 8C119.034 8 8 119.033 8 256c0 136.967 111.034 248 248 248s248-111.034 248-248S392.967 8 256 8Zm130.108 117.892c65.448 65.448 70 165.481 20.677 235.637L150.47 105.216c70.204-49.356 170.226-44.735 235.638 20.676ZM125.892 386.108c-65.448-65.448-70-165.481-20.677-235.637L361.53 406.784c-70.203 49.356-170.226 44.736-235.638-20.676Z" style="fill:#888;fill-rule:nonzero" transform="matrix(.30366 0 0 .30366 506.822 60.065)"/></svg>`,
 )}`;
 
 const drawImagePlaceholder = (
   element: ExcalidrawImageElement,
   context: CanvasRenderingContext2D,
+  zoomValue: AppState["zoom"]["value"],
 ) => {
   context.fillStyle = "#E7E7E7";
   context.fillRect(0, 0, element.width, element.height);
 
-  const size = Math.min(element.width, element.height, 60);
+  const imageMinWidthOrHeight = Math.min(element.width, element.height);
+
+  const size = Math.min(
+    imageMinWidthOrHeight,
+    Math.min(imageMinWidthOrHeight * 0.4, 100),
+  );
+
   context.drawImage(
     element.status === "error"
       ? IMAGE_ERROR_PLACEHOLDER_IMG
@@ -217,7 +219,7 @@ const drawElementOnCanvas = (
     }
     case "image": {
       const img = isInitializedImageElement(element)
-        ? sceneState.imageCache.get(element.fileId)
+        ? sceneState.imageCache.get(element.fileId)?.image
         : undefined;
       if (img != null && !(img instanceof Promise)) {
         context.drawImage(
@@ -228,7 +230,7 @@ const drawElementOnCanvas = (
           element.height,
         );
       } else {
-        drawImagePlaceholder(element, context);
+        drawImagePlaceholder(element, context, sceneState.zoom.value);
       }
       break;
     }
@@ -823,20 +825,37 @@ export const renderElementToSvg = (
       const fileData =
         isInitializedImageElement(element) && files[element.fileId];
       if (fileData) {
-        const image = document.createElement("image");
+        const symbolId = `image-${fileData.id}`;
+        let symbol = svgRoot.querySelector(`#${symbolId}`);
+        if (!symbol) {
+          symbol = svgRoot.ownerDocument!.createElementNS(SVG_NS, "symbol");
+          symbol.id = symbolId;
 
-        image.setAttribute(
+          const image = svgRoot.ownerDocument!.createElementNS(SVG_NS, "image");
+
+          image.setAttribute("width", "100%");
+          image.setAttribute("height", "100%");
+          image.setAttribute("href", fileData.dataURL);
+
+          symbol.appendChild(image);
+
+          svgRoot.prepend(symbol);
+        }
+
+        const use = svgRoot.ownerDocument!.createElementNS(SVG_NS, "use");
+        use.setAttribute("href", `#${symbolId}`);
+
+        use.setAttribute("width", `${Math.round(element.width)}`);
+        use.setAttribute("height", `${Math.round(element.height)}`);
+
+        use.setAttribute(
           "transform",
           `translate(${offsetX || 0} ${
             offsetY || 0
           }) rotate(${degree} ${cx} ${cy})`,
         );
 
-        image.setAttribute("width", `${Math.round(element.width)}`);
-        image.setAttribute("height", `${Math.round(element.height)}`);
-        image.setAttribute("href", fileData.dataURL);
-
-        svgRoot.appendChild(image);
+        svgRoot.appendChild(use);
       }
       break;
     }

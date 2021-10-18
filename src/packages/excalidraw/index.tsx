@@ -192,3 +192,9 @@ export {
   getFreeDrawSvgPath,
 } from "../../packages/utils";
 export { FONT_FAMILY, THEME } from "../../constants";
+
+export {
+  mutateElement,
+  newElementWith,
+  bumpVersion,
+} from "../../element/mutateElement";

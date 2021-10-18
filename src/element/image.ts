@@ -1,14 +1,29 @@
 // -----------------------------------------------------------------------------
-// ExcalidrawImageElement helpers
+// ExcalidrawImageElement & related helpers
 // -----------------------------------------------------------------------------
 
-import { AppClassProperties, AppState } from "../types";
+import { MIME_TYPES, SVG_NS } from "../constants";
+import { t } from "../i18n";
+import { AppClassProperties, AppState, DataURL } from "../types";
 import { isInitializedImageElement } from "./typeChecks";
 import {
   ExcalidrawElement,
   FileId,
   InitializedExcalidrawImageElement,
 } from "./types";
+
+export const loadHTMLImageElement = (dataURL: DataURL) => {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => {
+      resolve(image);
+    };
+    image.onerror = (error) => {
+      reject(error);
+    };
+    image.src = dataURL;
+  });
+};
 
 /** NOTE: updates cache even if already populated with given image. Thus,
  * you should filter out the images upstream if you want to optimize this. */
@@ -22,6 +37,7 @@ export const updateImageCache = async ({
   imageCache: AppClassProperties["imageCache"];
 }) => {
   const updatedFiles = new Map<FileId, true>();
+  const erroredFiles = new Map<FileId, true>();
 
   await Promise.all(
     fileIds.reduce((promises, fileId) => {
@@ -30,18 +46,26 @@ export const updateImageCache = async ({
         updatedFiles.set(fileId, true);
         return promises.concat(
           (async () => {
-            const imagePromise = new Promise<HTMLImageElement>((resolve) => {
-              const image = new Image();
-              image.onload = () => {
-                imageCache.set(fileId, image);
-                resolve(image);
-              };
-              image.src = fileData.dataURL;
-            });
+            try {
+              if (fileData.mimeType === MIME_TYPES.binary) {
+                throw new Error("Only images can be added to ImageCache");
+              }
 
-            // TODO limit the size of the imageCache
-            imageCache.set(fileId, imagePromise);
-            await imagePromise;
+              const imagePromise = loadHTMLImageElement(fileData.dataURL);
+              const data = {
+                image: imagePromise,
+                mimeType: fileData.mimeType,
+              } as const;
+              // store the promise immediately to indicate there's an in-progress
+              // initialization
+              imageCache.set(fileId, data);
+
+              const image = await imagePromise;
+
+              imageCache.set(fileId, { ...data, image });
+            } catch (error) {
+              erroredFiles.set(fileId, true);
+            }
           })(),
         );
       }
@@ -49,7 +73,13 @@ export const updateImageCache = async ({
     }, [] as Promise<any>[]),
   );
 
-  return { imageCache, updatedFiles };
+  return {
+    imageCache,
+    /** includes errored files because they cache was updated nonetheless */
+    updatedFiles,
+    /** files that failed when creating HTMLImageElement */
+    erroredFiles,
+  };
 };
 
 export const getInitializedImageElements = (
@@ -58,3 +88,24 @@ export const getInitializedImageElements = (
   elements.filter((element) =>
     isInitializedImageElement(element),
   ) as InitializedExcalidrawImageElement[];
+
+export const isHTMLSVGElement = (node: Node | null): node is SVGElement => {
+  // lower-casing due to XML/HTML convention differences
+  // https://johnresig.com/blog/nodename-case-sensitivity
+  return node?.nodeName.toLowerCase() === "svg";
+};
+
+export const normalizeSVG = async (SVGString: string) => {
+  const doc = new DOMParser().parseFromString(SVGString, MIME_TYPES.svg);
+  const svg = doc.querySelector("svg");
+  const errorNode = doc.querySelector("parsererror");
+  if (errorNode || !isHTMLSVGElement(svg)) {
+    throw new Error(t("errors.invalidSVGString"));
+  } else {
+    if (!svg.hasAttribute("xmlns")) {
+      svg.setAttribute("xmlns", SVG_NS);
+    }
+
+    return svg.outerHTML;
+  }
+};

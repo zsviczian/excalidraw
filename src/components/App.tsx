@@ -179,6 +179,7 @@ import {
   AppProps,
   AppState,
   BinaryFileData,
+  DataURL,
   ExcalidrawImperativeAPI,
   Gesture,
   GestureEvent,
@@ -213,10 +214,13 @@ import {
   getDataURL,
   isSupportedImageFile,
   resizeImageFile,
+  SVGStringToFile,
 } from "../data/blob";
 import {
   getInitializedImageElements,
-  updateImageCache,
+  loadHTMLImageElement,
+  normalizeSVG,
+  updateImageCache as _updateImageCache,
 } from "../element/image";
 import throttle from "lodash.throttle";
 import { fileOpen, nativeFileSystemSupported } from "../data/filesystem";
@@ -759,7 +763,7 @@ class App extends React.Component<AppProps, AppState> {
       commitToHistory: true,
     });
 
-    this.refreshImages(
+    this.addNewImagesToImageCache(
       getInitializedImageElements(scene.elements),
       scene.appState.files,
     );
@@ -1245,7 +1249,19 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const file = event?.clipboardData?.files[0];
+      const data = await parseClipboard(event);
+
+      let file = event?.clipboardData?.files[0];
+
+      if (!file && data.text) {
+        const string = data.text.trim();
+        if (string.startsWith("<svg") && string.endsWith("</svg>")) {
+          // ignore SVG validation/normalization which will be done during image
+          // initialization
+          file = SVGStringToFile(string);
+        }
+      }
+
       if (isSupportedImageFile(file)) {
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
           { clientX: cursorX, clientY: cursorY },
@@ -1260,7 +1276,6 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const data = await parseClipboard(event);
       if (this.props.onPaste) {
         try {
           if ((await this.props.onPaste(data, event)) === false) {
@@ -1368,7 +1383,7 @@ class App extends React.Component<AppProps, AppState> {
       ),
       () => {
         if (opts.files) {
-          this.refreshImages();
+          this.addNewImagesToImageCache();
         }
       },
     );
@@ -1515,7 +1530,7 @@ class App extends React.Component<AppProps, AppState> {
           },
         }),
         () => {
-          this.refreshImages();
+          this.addNewImagesToImageCache();
         },
       );
     },
@@ -3967,7 +3982,26 @@ class App extends React.Component<AppProps, AppState> {
     imageElement: ExcalidrawImageElement;
     showCursorImagePreview?: boolean;
   }) => {
+    // at this point this should be guaranteed image file, but we do this check
+    // to satisfy TS down the line
+    if (!isSupportedImageFile(imageFile)) {
+      throw new Error(t("errors.unsupportedFileType"));
+    }
+    const mimeType = imageFile.type;
+
     setCursor(this.canvas, "wait");
+
+    if (mimeType === MIME_TYPES.svg) {
+      try {
+        imageFile = SVGStringToFile(
+          await normalizeSVG(await imageFile.text()),
+          imageFile.name,
+        );
+      } catch (error) {
+        console.warn(error);
+        throw new Error(t("errors.svgImageInsertError"));
+      }
+    }
 
     // generate image id (by default the file digest) before any
     // resizing/compression takes place to keep it more portable
@@ -3982,19 +4016,24 @@ class App extends React.Component<AppProps, AppState> {
       throw new Error(t("errors.imageInsertError"));
     }
 
-    if (!this.state.files[fileId]?.dataURL) {
-      imageFile = await resizeImageFile(
-        imageFile,
-        DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
-      );
-    }
+    const existingFileData = this.state.files[fileId];
+    if (!existingFileData?.dataURL) {
+      try {
+        imageFile = await resizeImageFile(
+          imageFile,
+          DEFAULT_MAX_IMAGE_WIDTH_OR_HEIGHT,
+        );
+      } catch (error) {
+        console.error("error trying to resing image file on insertion", error);
+      }
 
-    if (imageFile.size > MAX_ALLOWED_FILE_BYTES) {
-      throw new Error(
-        t("errors.fileTooBig", {
-          maxSize: `${Math.trunc(MAX_ALLOWED_FILE_BYTES / 1024 / 1024)}MB`,
-        }),
-      );
+      if (imageFile.size > MAX_ALLOWED_FILE_BYTES) {
+        throw new Error(
+          t("errors.fileTooBig", {
+            maxSize: `${Math.trunc(MAX_ALLOWED_FILE_BYTES / 1024 / 1024)}MB`,
+          }),
+        );
+      }
     }
 
     if (showCursorImagePreview) {
@@ -4025,7 +4064,7 @@ class App extends React.Component<AppProps, AppState> {
             files: {
               ...state.files,
               [fileId]: {
-                type: "image",
+                mimeType,
                 id: fileId,
                 dataURL,
                 created: Date.now(),
@@ -4034,17 +4073,13 @@ class App extends React.Component<AppProps, AppState> {
           }),
           async () => {
             try {
-              const cachedImage = this.imageCache.get(fileId);
-              if (!cachedImage) {
-                await updateImageCache({
-                  imageCache: this.imageCache,
-                  fileIds: [imageElement.fileId],
-                  files: this.state.files,
-                });
-                invalidateShapeForElement(imageElement);
+              const cachedImageData = this.imageCache.get(fileId);
+              if (!cachedImageData) {
+                this.addNewImagesToImageCache();
+                await this.updateImageCache([imageElement]);
               }
-              if (cachedImage instanceof Promise) {
-                await cachedImage;
+              if (cachedImageData?.image instanceof Promise) {
+                await cachedImageData.image;
               }
               if (
                 this.state.pendingImageElement?.id !== imageElement.id &&
@@ -4057,7 +4092,9 @@ class App extends React.Component<AppProps, AppState> {
               console.error(error);
               reject(new Error(t("errors.imageInsertError")));
             } finally {
-              resetCursor(this.canvas);
+              if (!showCursorImagePreview) {
+                resetCursor(this.canvas);
+              }
             }
           },
         );
@@ -4102,7 +4139,31 @@ class App extends React.Component<AppProps, AppState> {
 
     const imagePreview = await resizeImageFile(imageFile, cursorImageSizePx);
 
-    const previewDataURL = await getDataURL(imagePreview);
+    let previewDataURL = await getDataURL(imagePreview);
+
+    // SVG cannot be resized via `resizeImageFile` so we resize by rendering to
+    // a small canvas
+    if (imageFile.type === MIME_TYPES.svg) {
+      const img = await loadHTMLImageElement(previewDataURL);
+
+      let height = Math.min(img.height, cursorImageSizePx);
+      let width = height * (img.width / img.height);
+
+      if (width > cursorImageSizePx) {
+        width = cursorImageSizePx;
+        height = width * (img.height / img.width);
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.height = height;
+      canvas.width = width;
+      const context = canvas.getContext("2d")!;
+
+      context.drawImage(img, 0, 0, width, height);
+
+      previewDataURL = canvas.toDataURL(MIME_TYPES.svg) as DataURL;
+    }
+
     if (this.state.pendingImageElement) {
       setCursor(this.canvas, `url(${previewDataURL}) 4 4, auto`);
     }
@@ -4178,14 +4239,14 @@ class App extends React.Component<AppProps, AppState> {
   ) => {
     const image =
       isInitializedImageElement(imageElement) &&
-      this.imageCache.get(imageElement.fileId);
+      this.imageCache.get(imageElement.fileId)?.image;
 
     if (!image || image instanceof Promise) {
       if (
         imageElement.width < DRAGGING_THRESHOLD / this.state.zoom.value &&
         imageElement.height < DRAGGING_THRESHOLD / this.state.zoom.value
       ) {
-        const placeholderSize = 100;
+        const placeholderSize = 100 / this.state.zoom.value;
         mutateElement(imageElement, {
           x: imageElement.x - placeholderSize / 2,
           y: imageElement.y - placeholderSize / 2,
@@ -4224,8 +4285,37 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
-  /** populates image cache and re-renders if needed */
-  private refreshImages = async (
+  /** updates image cache, refreshing updated elements and/or setting status
+      to error for images that fail during <img> element creation */
+  private updateImageCache = async (
+    elements: readonly InitializedExcalidrawImageElement[],
+    files = this.state.files,
+  ) => {
+    const { updatedFiles, erroredFiles } = await _updateImageCache({
+      imageCache: this.imageCache,
+      fileIds: elements.map((element) => element.fileId),
+      files,
+    });
+    if (updatedFiles.size || erroredFiles.size) {
+      for (const element of elements) {
+        if (updatedFiles.has(element.fileId)) {
+          invalidateShapeForElement(element);
+        }
+
+        if (erroredFiles.has(element.fileId)) {
+          mutateElement(
+            element,
+            { status: "error" },
+            /* informMutation */ false,
+          );
+        }
+      }
+    }
+    return { updatedFiles, erroredFiles };
+  };
+
+  /** adds new images to imageCache and re-renders if needed */
+  private addNewImagesToImageCache = async (
     imageElements: InitializedExcalidrawImageElement[] = getInitializedImageElements(
       this.scene.getElements(),
     ),
@@ -4236,26 +4326,20 @@ class App extends React.Component<AppProps, AppState> {
     );
 
     if (uncachedImageElements.length) {
-      const { updatedFiles } = await updateImageCache({
-        imageCache: this.imageCache,
-        fileIds: uncachedImageElements.map((element) => element.fileId),
+      const { updatedFiles } = await this.updateImageCache(
+        uncachedImageElements,
         files,
-      });
+      );
       if (updatedFiles.size) {
-        for (const element of uncachedImageElements) {
-          if (updatedFiles.has(element.fileId)) {
-            invalidateShapeForElement(element);
-          }
-        }
         this.scene.informMutation();
       }
     }
   };
 
-  /** generally you should use `refreshImages()` directly if you need to render
-   * new images. This is just a failsafe  */
+  /** generally you should use `addNewImagesToImageCache()` directly if you need
+   *  to render new images. This is just a failsafe  */
   private scheduleImageRefresh = throttle(() => {
-    this.refreshImages();
+    this.addNewImagesToImageCache();
   }, IMAGE_RENDER_TIMEOUT);
 
   private updateBindingEnabledOnPointerMove = (
@@ -4370,7 +4454,7 @@ class App extends React.Component<AppProps, AppState> {
         // first attempt to decode scene from the image if it's embedded
         // ---------------------------------------------------------------------
 
-        if (file?.type === "image/png" || file?.type === "image/svg+xml") {
+        if (file?.type === MIME_TYPES.png || file?.type === MIME_TYPES.svg) {
           try {
             if (nativeFileSystemSupported) {
               try {
@@ -4543,7 +4627,7 @@ class App extends React.Component<AppProps, AppState> {
 
       const image =
         isInitializedImageElement(draggingElement) &&
-        this.imageCache.get(draggingElement.fileId);
+        this.imageCache.get(draggingElement.fileId)?.image;
       const aspectRatio =
         image && !(image instanceof Promise)
           ? image.width / image.height

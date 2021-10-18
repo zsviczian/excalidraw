@@ -1,4 +1,3 @@
-import { getDataURLMimeType } from "../../data/blob";
 import { compressData } from "../../data/encode";
 import { mutateElement } from "../../element/mutateElement";
 import { isInitializedImageElement } from "../../element/typeChecks";
@@ -13,7 +12,6 @@ import {
   AppState,
   BinaryFileData,
   BinaryFileMetadata,
-  DataURL,
   ExcalidrawImperativeAPI,
 } from "../../types";
 
@@ -40,7 +38,7 @@ export class FileManager {
       erroredFiles: Map<FileId, true>;
     }>;
     saveFiles: (data: {
-      addedFiles: Map<FileId, DataURL>;
+      addedFiles: Map<FileId, BinaryFileData>;
     }) => Promise<{
       savedFiles: Map<FileId, true>;
       erroredFiles: Map<FileId, true>;
@@ -73,7 +71,7 @@ export class FileManager {
     elements: readonly ExcalidrawElement[];
     appState: Pick<AppState, "files">;
   }) => {
-    const addedFiles: Map<FileId, DataURL> = new Map();
+    const addedFiles: Map<FileId, BinaryFileData> = new Map();
 
     for (const element of elements) {
       if (
@@ -81,7 +79,7 @@ export class FileManager {
         appState.files[element.fileId] &&
         !this.isFileHandled(element.fileId)
       ) {
-        addedFiles.set(element.fileId, appState.files[element.fileId].dataURL);
+        addedFiles.set(element.fileId, appState.files[element.fileId]);
         this.savingFiles.set(element.fileId, true);
       }
     }
@@ -174,40 +172,32 @@ export class FileManager {
     this.fetchingFiles.clear();
     this.savingFiles.clear();
     this.savedFiles.clear();
+    this.erroredFiles.clear();
   }
 }
 
-export const encodeFilesForUpload = async <M extends readonly string[]>({
+export const encodeFilesForUpload = async ({
   files,
   maxBytes,
   encryptionKey,
-  allowedMimeTypes,
 }: {
-  files: Map<FileId, DataURL>;
+  files: Map<FileId, BinaryFileData>;
   maxBytes: number;
   encryptionKey: string;
-  allowedMimeTypes: M;
 }) => {
   const processedFiles: {
     id: FileId;
-    mimeType: M[number];
     buffer: Uint8Array;
   }[] = [];
 
-  for (const [id, dataURL] of files) {
-    const mimeType = getDataURLMimeType(dataURL);
-
-    if (!allowedMimeTypes.includes(mimeType)) {
-      throw new Error(t("errors.unsupportedFileType"));
-    }
-
-    const buffer = new TextEncoder().encode(dataURL);
+  for (const [id, fileData] of files) {
+    const buffer = new TextEncoder().encode(fileData.dataURL);
 
     const encodedFile = await compressData<BinaryFileMetadata>(buffer, {
       encryptionKey,
       metadata: {
         id,
-        type: mimeType.includes("image/") ? "image" : "other",
+        mimeType: fileData.mimeType,
         created: Date.now(),
       },
     });
@@ -222,7 +212,6 @@ export const encodeFilesForUpload = async <M extends readonly string[]>({
 
     processedFiles.push({
       id,
-      mimeType,
       buffer: encodedFile,
     });
   }
