@@ -6,7 +6,7 @@ import { BinaryFileData, BinaryFileMetadata, DataURL } from "../../types";
 import { FILE_CACHE_MAX_AGE_SEC } from "../app_constants";
 import { decompressData } from "../../data/encode";
 import { getImportedKey, createIV } from "../../data/encryption";
-import { getDataURLMimeType } from "../../data/blob";
+import { MIME_TYPES } from "../../constants";
 
 // private
 // -----------------------------------------------------------------------------
@@ -146,15 +146,12 @@ export const isSavedToFirebase = (
   return true;
 };
 
-const getFileTypeFromMimeType = (mimeType: string): BinaryFileData["type"] => {
-  return mimeType.includes("image/") ? "image" : "other";
-};
 export const saveFilesToFirebase = async ({
   prefix,
   files,
 }: {
   prefix: string;
-  files: { id: FileId; buffer: Uint8Array; mimeType: string }[];
+  files: { id: FileId; buffer: Uint8Array }[];
 }) => {
   const firebase = await loadFirebaseStorage();
 
@@ -162,14 +159,14 @@ export const saveFilesToFirebase = async ({
   const savedFiles = new Map<FileId, true>();
 
   await Promise.all(
-    files.map(async ({ id, buffer, mimeType }) => {
+    files.map(async ({ id, buffer }) => {
       try {
         await firebase
           .storage()
           .ref(`${prefix}/${id}`)
           .put(
             new Blob([buffer], {
-              type: mimeType,
+              type: MIME_TYPES.binary,
             }),
             {
               cacheControl: `public, max-age=${FILE_CACHE_MAX_AGE_SEC}`,
@@ -292,12 +289,7 @@ export const loadFilesFromFirebase = async (
           const dataURL = new TextDecoder().decode(data) as DataURL;
 
           loadedFiles.push({
-            type:
-              metadata?.type ||
-              getFileTypeFromMimeType(
-                response.headers.get("content-type") ||
-                  getDataURLMimeType(dataURL),
-              ),
+            mimeType: metadata.mimeType || MIME_TYPES.binary,
             id,
             dataURL,
             created: metadata?.created || Date.now(),

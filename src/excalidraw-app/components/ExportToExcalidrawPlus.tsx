@@ -4,15 +4,15 @@ import { ToolButton } from "../../components/ToolButton";
 import { serializeAsJSON } from "../../data/json";
 import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
 import { FileId, NonDeletedExcalidrawElement } from "../../element/types";
-import { AppState, DataURL } from "../../types";
+import { AppState, BinaryFileData } from "../../types";
 import { nanoid } from "nanoid";
 import { t } from "../../i18n";
 import { excalidrawPlusIcon } from "./icons";
 import { encryptData, generateEncryptionKey } from "../../data/encryption";
-import { ALLOWED_IMAGE_MIME_TYPES } from "../../constants";
 import { isInitializedImageElement } from "../../element/typeChecks";
 import { FILE_UPLOAD_MAX_BYTES } from "../app_constants";
 import { encodeFilesForUpload } from "../data/FileManager";
+import { MIME_TYPES } from "../../constants";
 
 const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -31,7 +31,7 @@ const exportToExcalidrawPlus = async (
   const blob = new Blob(
     [encryptedData.iv, new Uint8Array(encryptedData.encryptedBuffer)],
     {
-      type: "application/octet-stream",
+      type: MIME_TYPES.binary,
     },
   );
 
@@ -45,10 +45,10 @@ const exportToExcalidrawPlus = async (
       },
     });
 
-  const files = new Map<FileId, DataURL>();
+  const files = new Map<FileId, BinaryFileData>();
   for (const element of elements) {
     if (isInitializedImageElement(element) && appState.files[element.fileId]) {
-      files.set(element.fileId, appState.files[element.fileId].dataURL);
+      files.set(element.fileId, appState.files[element.fileId]);
     }
   }
 
@@ -57,7 +57,6 @@ const exportToExcalidrawPlus = async (
       files,
       encryptionKey,
       maxBytes: FILE_UPLOAD_MAX_BYTES,
-      allowedMimeTypes: ALLOWED_IMAGE_MIME_TYPES,
     });
 
     await saveFilesToFirebase({

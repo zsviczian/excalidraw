@@ -2,12 +2,7 @@ import throttle from "lodash.throttle";
 import { PureComponent } from "react";
 import { AppState, ExcalidrawImperativeAPI } from "../../types";
 import { ErrorDialog } from "../../components/ErrorDialog";
-import {
-  ALLOWED_IMAGE_MIME_TYPES,
-  APP_NAME,
-  ENV,
-  EVENT,
-} from "../../constants";
+import { APP_NAME, ENV, EVENT } from "../../constants";
 import { ImportedDataState } from "../../data/types";
 import {
   ExcalidrawElement,
@@ -152,7 +147,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
             files: addedFiles,
             encryptionKey: roomKey,
             maxBytes: FILE_UPLOAD_MAX_BYTES,
-            allowedMimeTypes: ALLOWED_IMAGE_MIME_TYPES,
           }),
         });
       },
@@ -322,8 +316,6 @@ class CollabWrapper extends PureComponent<Props, CollabState> {
       ({ roomId, roomKey } = existingRoomLinkData);
     } else {
       ({ roomId, roomKey } = await generateCollaborationLinkData());
-      roomId = "5f08678972010ce89c50";
-      roomKey = "u8x5c_6c--myu1ECtLadqw";
       window.history.pushState(
         {},
         APP_NAME,
