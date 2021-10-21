@@ -62,8 +62,9 @@ export type BinaryFileData = {
 
 export type BinaryFileMetadata = Omit<BinaryFileData, "dataURL">;
 
+export type BinaryFiles = Record<ExcalidrawElement["id"], BinaryFileData>;
+
 export type AppState = {
-  files: Record<ExcalidrawElement["id"], BinaryFileData>;
   isLoading: boolean;
   errorMessage: string | null;
   draggingElement: NonDeletedExcalidrawElement | null;
@@ -194,6 +195,7 @@ export interface ExcalidrawProps {
   onChange?: (
     elements: readonly ExcalidrawElement[],
     appState: AppState,
+    files: BinaryFiles,
   ) => void;
   initialData?: ImportedDataState | null | Promise<ImportedDataState | null>;
   excalidrawRef?: ForwardRef<ExcalidrawAPIRefValue>;
@@ -259,11 +261,13 @@ export type ExportOpts = {
   onExportToBackend?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
+    files: BinaryFiles,
     canvas: HTMLCanvasElement | null,
   ) => void;
   renderCustomUI?: (
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
+    files: BinaryFiles,
     canvas: HTMLCanvasElement | null,
   ) => JSX.Element;
 };
@@ -304,6 +308,7 @@ export type AppClassProperties = {
       mimeType: typeof ALLOWED_IMAGE_MIME_TYPES[number];
     }
   >;
+  files: BinaryFiles;
 };
 
 export type PointerDownState = Readonly<{
@@ -376,6 +381,7 @@ export type ExcalidrawImperativeAPI = {
   zoomToFit: InstanceType<typeof App>["zoomToFit"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
+  getFiles: () => InstanceType<typeof App>["files"];
   refresh: InstanceType<typeof App>["refresh"];
   importLibrary: InstanceType<typeof App>["importLibraryFromUrl"];
   setToastMessage: InstanceType<typeof App>["setToastMessage"];

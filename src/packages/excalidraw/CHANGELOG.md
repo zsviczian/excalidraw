@@ -13,9 +13,35 @@ Please add the latest change on the top under the correct section.
 
 ## Unreleased
 
+- Image support.
+
+  NOTE: the unreleased API is highly unstable and may change significantly before the next stable release. As such it's largely undocumented at this point. You are encouraged to read through the [PR](https://github.com/excalidraw/excalidraw/pull/4011) description if you want to know more about the internals.
+
+  General notes:
+
+  - File data are encoded as DataURLs (base64) for portability reasons.
+
+  [ExcalidrawAPI](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onLibraryChange):
+
+  - added `getFiles()` to get current `BinaryFiles` (`Record<FileId, BinaryFileData>`). It may contain files that aren't referenced by any element, so if you're persisting the files to a storage, you should compare them against stored elements.
+
+  Excalidraw app props:
+
+  - added `generateIdForFile(file: File)` optional prop so you can generate your own ids for added files.
+  - `onChange(elements, appState, files)` prop callback is now passed `BinaryFiles` as third argument.
+  - `onPaste(data, event)` data prop should contain `data.files` (`BinaryFiles`) if the elements pasted are referencing new files.
+  - `initialData` object now supports additional `files` (`BinaryFiles`) attribute.
+
+  Other notes:
+
+  - `.excalidraw` files may now contain top-level `files` key in format of `Record<FileId, BinaryFileData>` when exporting any (image) elements.
+  - Changes were made to various export utilityies exported from the package so that they take `files`. For now, TypeScript should help you figure the changes out.
+
 ## Excalidraw API
 
 ### Features
+
+- Export [`isLinearElement`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#isLinearElement) and [`getNonDeletedElements`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#getNonDeletedElements).
 
 - Support [`renderTopRightUI`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#renderTopRightUI) in mobile UI.
 
@@ -34,6 +60,8 @@ Please add the latest change on the top under the correct section.
 - Added `onDrop: (event: React.DragEvent<HTMLDivElement>) => Promise<boolean> | boolean` callback. This callback is triggered if passed when something is dropped into the scene. You can use this callback in case you want to do something additional when the drop event occurs. This callback must return a boolean value or a Promise<boolean> value. In case you want to prevent the excalidraw drop action you must return `false`, it will stop the native excalidraw onDrop flow (nothing will be added into the scene).
 
 ### Fixes
+
+- Don't show save file to disk button in export dialog when `saveFileToDisk` passed as `false` in [`UIOptions.canvasActions.export`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#exportOpts).
 
 - [`onPaste`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#onPaste) prop should return false to prevent the native excalidraw paste action [#3974](https://github.com/excalidraw/excalidraw/pull/3974).
 
