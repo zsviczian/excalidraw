@@ -690,7 +690,7 @@ The unique id of the excalidraw component. This can be used to identify the exca
 
 This prop implies whether to focus the Excalidraw component on page load. Defaults to false.
 
-### onBeforeTextEdit
+#### onBeforeTextEdit
 
 Callback to be triggered when a text element is about to be edited. The string returned will replace the element's text. If `null` is returned, the TextElement will not be changed. Use this to pre-process text before editing.
 
@@ -698,7 +698,7 @@ Callback to be triggered when a text element is about to be edited. The string r
 (textElement: ExcalidrawTextElement) => string
 </pre>
 
-### onBeforeTextSubmit
+#### onBeforeTextSubmit
 
 Callback to be triggered when the editing of a TextElement is finished, but right before the result is submitted. The string returned will replace the text element's text. Use this to post-process text after editing has finished.
 
@@ -706,7 +706,7 @@ Callback to be triggered when the editing of a TextElement is finished, but righ
 (textElement: ExcalidrawTextElement, textToSubmit:string, isDeleted:boolean) => string
 </pre>
 
-### `generateIdForFile`
+#### `generateIdForFile`
 
 Allows you to override `id` generation for files added on canvas (images). By default, an SHA-1 digest of the file is used.
 
