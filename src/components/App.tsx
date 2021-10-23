@@ -1259,9 +1259,12 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const data = await parseClipboard(event);
-
+      // must be called in the same frame (thus before any awaits) as the paste
+      // event else some browsers (FF...) will clear the clipboardData
+      // (something something security)
       let file = event?.clipboardData?.files[0];
+
+      const data = await parseClipboard(event);
 
       if (!file && data.text) {
         const string = data.text.trim();
@@ -1536,19 +1539,23 @@ class App extends React.Component<AppProps, AppState> {
       }, new Map<FileId, BinaryFileData>());
 
       this.files = { ...this.files, ...Object.fromEntries(filesMap) };
-      this.addNewImagesToImageCache();
 
       // bump versions for elements that reference added files so that
-      // we/host apps can detect the change
+      // we/host apps can detect the change, and invalidate the image & shape
+      // cache
       this.scene.getElements().forEach((element) => {
         if (
           isInitializedImageElement(element) &&
           filesMap.has(element.fileId)
         ) {
+          this.imageCache.delete(element.fileId);
+          invalidateShapeForElement(element);
           bumpVersion(element);
         }
       });
       this.scene.informMutation();
+
+      this.addNewImagesToImageCache();
     },
   );
 
