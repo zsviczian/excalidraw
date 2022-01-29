@@ -13,7 +13,7 @@ import {
   FontFamilyValues,
   ExcalidrawRectangleElement,
 } from "../element/types";
-import { getFontString, getUpdatedTimestamp } from "../utils";
+import { getFontString, getUpdatedTimestamp, isTestEnv } from "../utils";
 import { randomInteger, randomId } from "../random";
 import { mutateElement, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
@@ -21,9 +21,8 @@ import { AppState } from "../types";
 import { getElementAbsoluteCoords } from ".";
 import { adjustXYWithRotation } from "../math";
 import { getResizedElementAbsoluteCoords } from "./bounds";
-import { measureText } from "./textElement";
+import { getContainerElement, measureText, wrapText } from "./textElement";
 import { isBoundToContainer } from "./typeChecks";
-import Scene from "../scene/Scene";
 import { BOUND_TEXT_PADDING } from "../constants";
 
 type ElementConstructorOpts = MarkOptional<
@@ -118,6 +117,7 @@ const getTextElementPositionOffsets = (
 export const newTextElement = (
   opts: {
     text: string;
+    rawText: string;
     fontSize: number;
     fontFamily: FontFamilyValues;
     textAlign: TextAlign;
@@ -131,6 +131,7 @@ export const newTextElement = (
     {
       ..._newElementBase<ExcalidrawTextElement>("text", opts),
       text: opts.text,
+      rawText: opts.rawText,
       fontSize: opts.fontSize,
       fontFamily: opts.fontFamily,
       textAlign: opts.textAlign,
@@ -158,7 +159,11 @@ const getAdjustedDimensions = (
   height: number;
   baseline: number;
 } => {
-  const maxWidth = element.containerId ? element.width : null;
+  let maxWidth = null;
+  const container = getContainerElement(element);
+  if (container) {
+    maxWidth = container.width - BOUND_TEXT_PADDING * 2;
+  }
   const {
     width: nextWidth,
     height: nextHeight,
@@ -216,7 +221,7 @@ const getAdjustedDimensions = (
   // make sure container dimensions are set properly when
   // text editor overflows beyond viewport dimensions
   if (isBoundToContainer(element)) {
-    const container = Scene.getScene(element)!.getElement(element.containerId)!;
+    const container = getContainerElement(element)!;
     let height = container.height;
     let width = container.width;
     if (nextHeight > height - BOUND_TEXT_PADDING * 2) {
@@ -244,15 +249,22 @@ export const updateTextElement = (
     text,
     isDeleted,
     originalText,
-  }: { text: string; isDeleted?: boolean; originalText: string },
-
-  updateDimensions: boolean,
+    rawText,
+  }: {
+    text: string;
+    isDeleted?: boolean;
+    originalText: string;
+    rawText?: string;
+  },
 ): ExcalidrawTextElement => {
-  const dimensions = updateDimensions
-    ? getAdjustedDimensions(element, text)
-    : undefined;
+  const container = getContainerElement(element);
+  if (container) {
+    text = wrapText(text, getFontString(element), container.width);
+  }
+  const dimensions = getAdjustedDimensions(element, text);
   return newElementWith(element, {
     text,
+    rawText: rawText ?? originalText, //should this be rather originalText??
     originalText,
     isDeleted: isDeleted ?? element.isDeleted,
     ...dimensions,
@@ -369,7 +381,7 @@ export const duplicateElement = <TElement extends Mutable<ExcalidrawElement>>(
   overrides?: Partial<TElement>,
 ): TElement => {
   let copy: TElement = deepCopyElement(element);
-  if (process.env.NODE_ENV === "test") {
+  if (isTestEnv()) {
     copy.id = `${copy.id}_copy`;
     // `window.h` may not be defined in some unit tests
     if (

@@ -58,6 +58,7 @@ export const actionClearCanvas = register({
         files: {},
         theme: appState.theme,
         elementLocked: appState.elementLocked,
+        penLocked: appState.penLocked,
         exportBackground: appState.exportBackground,
         exportEmbedScene: appState.exportEmbedScene,
         gridSize: appState.gridSize,
@@ -183,6 +184,7 @@ export const actionResetZoom = register({
 const zoomValueToFitBoundsOnViewport = (
   bounds: [number, number, number, number],
   viewportDimensions: { width: number; height: number },
+  maxZoom: number = 1,
 ) => {
   const [x1, y1, x2, y2] = bounds;
   const commonBoundsWidth = x2 - x1;
@@ -194,15 +196,17 @@ const zoomValueToFitBoundsOnViewport = (
     Math.floor(smallestZoomValue / ZOOM_STEP) * ZOOM_STEP;
   const clampedZoomValueToFitElements = Math.min(
     Math.max(zoomAdjustedToSteps, ZOOM_STEP),
-    1,
+    maxZoom,
   );
   return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
 
-const zoomToFitElements = (
+export const zoomToFitElements = (
   elements: readonly ExcalidrawElement[],
   appState: Readonly<AppState>,
   zoomToSelection: boolean,
+  maxZoom: number = 1,
+  margin: number = 0,
 ) => {
   const nonDeletedElements = getNonDeletedElements(elements);
   const selectedElements = getSelectedElements(nonDeletedElements, appState);
@@ -261,7 +265,12 @@ export const actionZoomToFit = register({
 
 export const actionToggleTheme = register({
   name: "toggleTheme",
-  perform: (_, appState, value) => {
+  perform: (_, appState, value, app) => {
+    if (app.props.onThemeChange) {
+      app.props.onThemeChange(
+        value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
+      );
+    }
     return {
       appState: {
         ...appState,

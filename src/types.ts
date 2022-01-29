@@ -10,6 +10,7 @@ import {
   Arrowhead,
   ChartType,
   FontFamilyValues,
+  ExcalidrawTextElement,
   FileId,
   ExcalidrawImageElement,
   Theme,
@@ -79,6 +80,7 @@ export type AppState = {
   editingLinearElement: LinearElementEditor | null;
   elementType: typeof SHAPES[number]["value"];
   elementLocked: boolean;
+  penLocked: boolean;
   exportBackground: boolean;
   exportEmbedScene: boolean;
   exportWithDarkMode: boolean;
@@ -222,6 +224,9 @@ export interface ExcalidrawProps {
     data: ClipboardData,
     event: ClipboardEvent | null,
   ) => Promise<boolean> | boolean;
+  onDrop?: (
+    event: React.DragEvent<HTMLDivElement>,
+  ) => Promise<boolean> | boolean;
   renderTopRightUI?: (
     isMobile: boolean,
     appState: AppState,
@@ -243,7 +248,15 @@ export interface ExcalidrawProps {
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
+  onBeforeTextEdit?: (textElement: ExcalidrawTextElement) => string;
+  onBeforeTextSubmit?: (
+    textElement: ExcalidrawTextElement,
+    textToSubmit: string,
+    originalText: string,
+    isDeleted: boolean,
+  ) => [string, string];
   generateIdForFile?: (file: File) => string | Promise<string>;
+  onThemeChange?: (newTheme: string) => void;
 }
 
 export type SceneData = {
@@ -251,6 +264,7 @@ export type SceneData = {
   appState?: ImportedDataState["appState"];
   collaborators?: Map<string, Collaborator>;
   commitToHistory?: boolean;
+  libraryItems?: LibraryItems | LibraryItems_v1;
 };
 
 export enum UserIdleState {
@@ -295,6 +309,7 @@ export type AppProps = ExcalidrawProps & {
   };
   detectScroll: boolean;
   handleKeyboardGlobally: boolean;
+  isCollaborating: boolean;
 };
 
 /** A subset of App class properties that we need to use elsewhere
@@ -385,6 +400,7 @@ export type ExcalidrawImperativeAPI = {
     clear: InstanceType<typeof App>["resetHistory"];
   };
   scrollToContent: InstanceType<typeof App>["scrollToContent"];
+  zoomToFit: InstanceType<typeof App>["zoomToFit"];
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
@@ -392,7 +408,9 @@ export type ExcalidrawImperativeAPI = {
   importLibrary: InstanceType<typeof App>["importLibraryFromUrl"];
   setToastMessage: InstanceType<typeof App>["setToastMessage"];
   addFiles: (data: BinaryFileData[]) => void;
+  updateContainerSize: InstanceType<typeof App>["updateContainerSize"];
   readyPromise: ResolvablePromise<ExcalidrawImperativeAPI>;
   ready: true;
   id: string;
+  setLocalFont: (showOnPanel: boolean) => void;
 };

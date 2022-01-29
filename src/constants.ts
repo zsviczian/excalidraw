@@ -68,6 +68,7 @@ export const FONT_FAMILY = {
   Virgil: 1,
   Helvetica: 2,
   Cascadia: 3,
+  LocalFont: 4,
 };
 
 export const THEME = {
@@ -105,10 +106,6 @@ export const EXPORT_DATA_TYPES = {
 } as const;
 
 export const EXPORT_SOURCE = window.location.origin;
-
-export const STORAGE_KEYS = {
-  LOCAL_STORAGE_LIBRARY: "excalidraw-library",
-} as const;
 
 // time in milliseconds
 export const IMAGE_RENDER_TIMEOUT = 500;
@@ -182,4 +179,4 @@ export const VERSIONS = {
   excalidrawLibrary: 2,
 } as const;
 
-export const BOUND_TEXT_PADDING = 30;
+export const BOUND_TEXT_PADDING = 5;

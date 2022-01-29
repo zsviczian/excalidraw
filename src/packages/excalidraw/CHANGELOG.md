@@ -19,6 +19,8 @@ Please add the latest change on the top under the correct section.
 
 ### Features
 
+- Support updating library using [`updateScene`](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#updateScene) API [#4546](https://github.com/excalidraw/excalidraw/pull/4546).
+
 - Introduced primary colors to the app. The colors can be overriden. Check [readme](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#customizing-styles) on how to do so.
 
 - #### BREAKING CHANGE
@@ -66,9 +68,12 @@ Please add the latest change on the top under the correct section.
 
 ### Fixes
 
+- Panning the canvas using `mousewheel-drag` and `space-drag` now prevents the browser from scrolling the container/page [#4489](https://github.com/excalidraw/excalidraw/pull/4489).
 - Scope drag and drop events to Excalidraw container to prevent overriding host application drag and drop events.
 
 ### Build
+
+- Added an example to test and develop the package [locally](https://github.com/excalidraw/excalidraw/blob/master/src/packages/excalidraw/README.md#Development) using `yarn start`
 
 - Remove `file-loader` so font assets are not duplicated by webpack and use webpack asset modules for font generation [#4380](https://github.com/excalidraw/excalidraw/pull/4380)
 
@@ -79,6 +84,8 @@ Please add the latest change on the top under the correct section.
 ## 0.10.0 (2021-10-13)
 
 ## Excalidraw API
+
+- Added `onDrop: (event: React.DragEvent<HTMLDivElement>) => Promise<boolean> | boolean` callback. This callback is triggered if passed when something is dropped into the scene. You can use this callback in case you want to do something additional when the drop event occurs. This callback must return a boolean value or a Promise<boolean> value. In case you want to prevent the excalidraw drop action you must return `false`, it will stop the native excalidraw onDrop flow (nothing will be added into the scene).
 
 ### Fixes
 
@@ -141,6 +148,10 @@ Please add the latest change on the top under the correct section.
 ## 0.9.0 (2021-07-10)
 
 ## Excalidraw API
+
+- Added `onBeforeTextEdit` and `onBeforeTextSubmit` callback functions.
+  - The `onBeforeTextEdit: (textElement: ExcalidrawTextElement) => string` callback is triggered when a text element is about to be edited. The string returned will replace the element's text. If null is returned, the TextElement will not be changed. Use this to pre-process text before editing.
+  - The `onBeforeTextSubmit: (textElement: ExcalidrawTextElement, textToSubmit:string, isDeleted:boolean) => string` callback is triggered when the editing of a TextElement is finished, but right before the result is submitted. The string returned will replace the text element's text. Use this to post-process text after editing has finished.
 
 ### Features
 

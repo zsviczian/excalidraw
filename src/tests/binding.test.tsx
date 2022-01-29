@@ -130,6 +130,7 @@ describe("element binding", () => {
     const text = API.createElement({
       type: "text",
       text: "ola",
+      rawText: "ola",
       x: 60,
       y: 0,
       width: 100,
@@ -158,11 +159,8 @@ describe("element binding", () => {
 
     expect(editor).not.toBe(null);
 
-    // we defer binding blur event on wysiwyg, hence wait a bit
-    await new Promise((r) => setTimeout(r, 30));
-
     fireEvent.change(editor, { target: { value: "" } });
-    editor.blur();
+    fireEvent.keyDown(editor, { key: KEYS.ESCAPE });
 
     expect(
       document.querySelector(".excalidraw-textEditorContainer > textarea"),
@@ -174,6 +172,7 @@ describe("element binding", () => {
     const text = API.createElement({
       type: "text",
       text: "ola",
+      rawText: "ola",
       x: 60,
       y: 0,
       width: 100,
@@ -202,11 +201,8 @@ describe("element binding", () => {
 
     expect(editor).not.toBe(null);
 
-    // we defer binding blur event on wysiwyg, hence wait a bit
-    await new Promise((r) => setTimeout(r, 30));
-
     fireEvent.change(editor, { target: { value: "asdasdasdasdas" } });
-    editor.blur();
+    fireEvent.keyDown(editor, { key: KEYS.ESCAPE });
 
     expect(
       document.querySelector(".excalidraw-textEditorContainer > textarea"),

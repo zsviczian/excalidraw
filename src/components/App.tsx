@@ -27,6 +27,7 @@ import {
   actionToggleStats,
   actionToggleZenMode,
   actionUngroup,
+  zoomToFitElements,
 } from "../actions";
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
@@ -140,6 +141,7 @@ import {
   InitializedExcalidrawImageElement,
   ExcalidrawImageElement,
   FileId,
+  NonDeletedExcalidrawElement,
 } from "../element/types";
 import { getCenter, getDistance } from "../gesture";
 import {
@@ -161,7 +163,7 @@ import {
   isArrowKey,
   KEYS,
 } from "../keys";
-import { distance2d, getGridPoint, isPathALoop } from "../math";
+import { distance2d, getGridPoint, isPathALoop, rotate } from "../math";
 import { renderScene } from "../renderer";
 import { invalidateShapeForElement } from "../renderer/renderElement";
 import {
@@ -238,7 +240,9 @@ import {
   getBoundTextElementId,
 } from "../element/textElement";
 import { isHittingElementNotConsideringBoundingBox } from "../element/collision";
+import { resizeSingleElement } from "../element/resizeElements";
 
+export let showFourthFont: boolean = false;
 const IsMobileContext = React.createContext(false);
 export const useIsMobile = () => useContext(IsMobileContext);
 const ExcalidrawContainerContext = React.createContext<{
@@ -339,13 +343,16 @@ class App extends React.Component<AppProps, AppState> {
           clear: this.resetHistory,
         },
         scrollToContent: this.scrollToContent,
+        zoomToFit: this.zoomToFit,
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
         refresh: this.refresh,
         importLibrary: this.importLibraryFromUrl,
         setToastMessage: this.setToastMessage,
+        updateContainerSize: this.updateContainerSize,
         id: this.id,
+        setLocalFont: this.setLocalFont,
       } as const;
       if (typeof excalidrawRef === "function") {
         excalidrawRef(api);
@@ -466,6 +473,7 @@ class App extends React.Component<AppProps, AppState> {
               elements={this.scene.getElements()}
               onCollabButtonClick={onCollabButtonClick}
               onLockToggle={this.toggleLock}
+              onPenLockToggle={this.togglePenLock}
               onInsertElements={(elements) =>
                 this.addElementsFromPasteOrLibrary({
                   elements,
@@ -476,7 +484,7 @@ class App extends React.Component<AppProps, AppState> {
               zenModeEnabled={zenModeEnabled}
               toggleZenMode={this.toggleZenMode}
               langCode={getLanguage().code}
-              isCollaborating={this.props.isCollaborating || false}
+              isCollaborating={this.props.isCollaborating}
               renderTopRightUI={renderTopRightUI}
               renderCustomFooter={renderFooter}
               viewModeEnabled={viewModeEnabled}
@@ -1306,7 +1314,8 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (isSupportedImageFile(file)) {
+      // prefer spreadsheet data over image file (MS Office/Libre Office)
+      if (isSupportedImageFile(file) && !data.spreadsheet) {
         const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
           { clientX: cursorX, clientY: cursorY },
           this.state,
@@ -1456,6 +1465,7 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       strokeSharpness: this.state.currentItemStrokeSharpness,
       text,
+      rawText: text,
       fontSize: this.state.currentItemFontSize,
       fontFamily: this.state.currentItemFontFamily,
       textAlign: this.state.currentItemTextAlign,
@@ -1498,6 +1508,14 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
+  togglePenLock = () => {
+    this.setState((prevState) => {
+      return {
+        penLocked: !prevState.penLocked,
+      };
+    });
+  };
+
   toggleZenMode = () => {
     this.actionManager.executeAction(actionToggleZenMode);
   };
@@ -1522,6 +1540,37 @@ class App extends React.Component<AppProps, AppState> {
       ),
     });
   };
+
+  zoomToFit = (
+    target: readonly ExcalidrawElement[] = this.scene.getElements(),
+    maxZoom: number = 1, //null will zoom to max based on viewport
+    margin: number = 0.03, //percentage of viewport width&height
+  ) => {
+    if (!target) {
+      target = this.scene.getElements();
+    }
+    if (target.length === 0) {
+      maxZoom = 1;
+    }
+    this.setState(
+      zoomToFitElements(target, this.state, false, maxZoom, margin).appState,
+    );
+  };
+
+  updateContainerSize = withBatchedUpdates(
+    (containers: NonDeletedExcalidrawElement[]) => {
+      containers.forEach((el: ExcalidrawElement) => {
+        const [x, y] = rotate(
+          el.x + el.width,
+          el.y + el.height,
+          el.x + el.width / 2,
+          el.y + el.height / 2,
+          el.angle,
+        );
+        resizeSingleElement(el, true, el, "se", true, x, y);
+      });
+    },
+  );
 
   clearToast = () => {
     this.setState({ toastMessage: null });
@@ -1576,12 +1625,19 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
+  public setLocalFont: ExcalidrawImperativeAPI["setLocalFont"] = (
+    showOnPanel: boolean,
+  ) => {
+    showFourthFont = showOnPanel;
+  };
+
   public updateScene = withBatchedUpdates(
     <K extends keyof AppState>(sceneData: {
       elements?: SceneData["elements"];
       appState?: Pick<AppState, K> | null;
       collaborators?: SceneData["collaborators"];
       commitToHistory?: SceneData["commitToHistory"];
+      libraryItems?: SceneData["libraryItems"];
     }) => {
       if (sceneData.commitToHistory) {
         this.history.resumeRecording();
@@ -1597,6 +1653,12 @@ class App extends React.Component<AppProps, AppState> {
 
       if (sceneData.collaborators) {
         this.setState({ collaborators: sceneData.collaborators });
+      }
+
+      if (sceneData.libraryItems) {
+        this.library.saveLibrary(
+          restoreLibraryItems(sceneData.libraryItems, "unpublished"),
+        );
       }
     },
   );
@@ -1765,6 +1827,7 @@ class App extends React.Component<AppProps, AppState> {
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
         isHoldingSpace = true;
         setCursor(this.canvas, CURSOR_TYPE.GRABBING);
+        event.preventDefault();
       }
 
       if (event.key === KEYS.G || event.key === KEYS.S) {
@@ -1904,26 +1967,42 @@ class App extends React.Component<AppProps, AppState> {
     const updateElement = (
       text: string,
       originalText: string,
-      isDeleted = false,
-      updateDimensions = false,
+      isDeleted: boolean,
+      rawText?: string,
     ) => {
       this.scene.replaceAllElements([
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
-            return updateTextElement(
-              _element,
-              {
-                text,
-                isDeleted,
-                originalText,
-              },
-              updateDimensions,
-            );
+            return updateTextElement(_element, {
+              text,
+              isDeleted,
+              originalText,
+              rawText: rawText ?? originalText,
+            });
           }
           return _element;
         }),
       ]);
     };
+
+    if (isExistingElement && this.props.onBeforeTextEdit) {
+      const text = this.props.onBeforeTextEdit(element);
+      if (text) {
+        this.scene.replaceAllElements([
+          ...this.scene.getElementsIncludingDeleted().map((_element) => {
+            if (_element.id === element.id && isTextElement(_element)) {
+              element = updateTextElement(_element, {
+                text,
+                isDeleted: false,
+                originalText: text,
+              });
+              return element;
+            }
+            return _element;
+          }),
+        ]);
+      }
+    }
 
     textWysiwyg({
       id: element.id,
@@ -1943,14 +2022,26 @@ class App extends React.Component<AppProps, AppState> {
         ];
       },
       onChange: withBatchedUpdates((text) => {
-        updateElement(text, text, false, !element.containerId);
+        updateElement(text, text, false);
         if (isNonDeletedElement(element)) {
           updateBoundElements(element);
         }
       }),
       onSubmit: withBatchedUpdates(({ text, viaKeyboard, originalText }) => {
         const isDeleted = !text.trim();
-        updateElement(text, originalText, isDeleted, true);
+        const rawText = originalText; //should this be originalText??
+        if (this.props.onBeforeTextSubmit) {
+          const [updatedText, updatedOriginalText] =
+            this.props.onBeforeTextSubmit(
+              element,
+              text,
+              originalText,
+              isDeleted,
+            );
+          text = updatedText ?? text;
+          originalText = updatedOriginalText ?? originalText;
+        }
+        updateElement(text, originalText, isDeleted, rawText);
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -1983,13 +2074,14 @@ class App extends React.Component<AppProps, AppState> {
       }),
       element,
       excalidrawContainer: this.excalidrawContainerRef.current,
+      app: this,
     });
     // deselect all other elements when inserting text
     this.deselectElements();
 
     // do an initial update to re-initialize element position since we were
     // modifying element's x/y for sake of editor (case: syncing to remote)
-    updateElement(element.text, element.originalText);
+    updateElement(element.text, element.originalText, false);
   }
 
   private deselectElements() {
@@ -2102,10 +2194,9 @@ class App extends React.Component<AppProps, AppState> {
     const container =
       shouldBind || parentCenterPosition
         ? getElementContainingPosition(
-            this.scene.getElements(),
+            this.scene.getElements().filter((ele) => !isTextElement(ele)),
             sceneX,
             sceneY,
-            "text",
           )
         : null;
 
@@ -2161,6 +2252,7 @@ class App extends React.Component<AppProps, AppState> {
           opacity: this.state.currentItemOpacity,
           strokeSharpness: this.state.currentItemStrokeSharpness,
           text: "",
+          rawText: "",
           fontSize: this.state.currentItemFontSize,
           fontFamily: this.state.currentItemFontFamily,
           textAlign: parentCenterPosition
@@ -2170,6 +2262,7 @@ class App extends React.Component<AppProps, AppState> {
             ? "middle"
             : DEFAULT_VERTICAL_ALIGN,
           containerId: container?.id ?? undefined,
+          groupIds: container?.groupIds ?? [],
         });
 
     this.setState({ editingElement: element });
@@ -2318,7 +2411,10 @@ class App extends React.Component<AppProps, AppState> {
       gesture.lastCenter = center;
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
-      const scaleFactor = distance / gesture.initialDistance;
+      const scaleFactor =
+        this.state.elementType === "freedraw" && this.state.penLocked
+          ? 1
+          : distance / gesture.initialDistance;
 
       const nextZoom = getNormalizedZoom(initialScale * scaleFactor);
 
@@ -2655,11 +2751,16 @@ class App extends React.Component<AppProps, AppState> {
         y,
       });
     } else if (this.state.elementType === "freedraw") {
-      this.handleFreeDrawElementOnPointerDown(
-        event,
-        this.state.elementType,
-        pointerDownState,
-      );
+      if (
+        (this.state.penLocked && event.pointerType === "pen") ||
+        !this.state.penLocked
+      ) {
+        this.handleFreeDrawElementOnPointerDown(
+          event,
+          this.state.elementType,
+          pointerDownState,
+        );
+      }
     } else {
       this.createGenericElementOnPointerDown(
         this.state.elementType,
@@ -2736,11 +2837,13 @@ class App extends React.Component<AppProps, AppState> {
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           this.state.viewModeEnabled)
-      )
+      ) ||
+      isTextElement(this.state.editingElement)
     ) {
       return false;
     }
     isPanning = true;
+    event.preventDefault();
 
     let nextPastePrevented = false;
     const isLinux = /Linux/.test(window.navigator.platform);
@@ -4662,6 +4765,15 @@ class App extends React.Component<AppProps, AppState> {
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     try {
+      if (this.props.onDrop) {
+        try {
+          if ((await this.props.onDrop(event)) === false) {
+            return;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
       const file = event.dataTransfer.files[0];
 
       if (isSupportedImageFile(file)) {
@@ -4977,6 +5089,7 @@ class App extends React.Component<AppProps, AppState> {
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
+          elements,
         });
       } else {
         ContextMenu.push({
@@ -5017,6 +5130,7 @@ class App extends React.Component<AppProps, AppState> {
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
+          elements,
         });
       }
     } else if (type === "element") {
@@ -5028,6 +5142,7 @@ class App extends React.Component<AppProps, AppState> {
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
+          elements,
         });
       } else {
         ContextMenu.push({
@@ -5072,6 +5187,7 @@ class App extends React.Component<AppProps, AppState> {
           actionManager: this.actionManager,
           appState: this.state,
           container: this.excalidrawContainerRef.current!,
+          elements,
         });
       }
     }
