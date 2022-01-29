@@ -14,7 +14,6 @@ import util from "util";
 import path from "path";
 import { getMimeType } from "../../data/blob";
 import { newFreeDrawElement } from "../../element/newElement";
-import { Excalidraw } from "../../packages/excalidraw/dist/excalidraw.production.min";
 
 const readFile = util.promisify(fs.readFile);
 
