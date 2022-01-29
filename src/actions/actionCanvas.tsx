@@ -221,6 +221,7 @@ export const zoomToFitElements = (
       width: appState.width,
       height: appState.height,
     }),
+    maxZoom,
   };
 
   const [x1, y1, x2, y2] = commonBounds;
