@@ -48,7 +48,7 @@ import {
 import CollabWrapper, {
   CollabAPI,
   CollabContext,
-  CollabContextConsumer,
+  //CollabContextConsumer,
 } from "./collab/CollabWrapper";
 import { LanguageList } from "./components/LanguageList";
 import { exportToBackend, getCollaborationLinkData, loadScene } from "./data";
@@ -748,9 +748,7 @@ const ExcalidrawWrapper = () => {
 const ExcalidrawApp = () => {
   return (
     <TopErrorBoundary>
-      <CollabContextConsumer>
-        <ExcalidrawWrapper />
-      </CollabContextConsumer>
+      <ExcalidrawWrapper />
     </TopErrorBoundary>
   );
 };

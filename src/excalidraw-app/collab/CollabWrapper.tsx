@@ -44,7 +44,7 @@ import {
 } from "../data/localStorage";
 import Portal from "./Portal";
 import RoomDialog from "./RoomDialog";
-import { createInverseContext } from "../../createInverseContext";
+//import { createInverseContext } from "../../createInverseContext"; //zsviczian
 import { t } from "../../i18n";
 import { UserIdleState } from "../../types";
 import { IDLE_THRESHOLD, ACTIVE_THRESHOLD } from "../../constants";
@@ -67,6 +67,7 @@ import {
 } from "./reconciliation";
 import { decryptData } from "../../data/encryption";
 import { resetBrowserStateVersions } from "../data/tabSync";
+import React from "react";
 
 interface CollabState {
   modalIsShown: boolean;
@@ -75,6 +76,47 @@ interface CollabState {
   userState: UserIdleState;
   activeRoomLink: string;
 }
+
+const createInverseContext = <T extends unknown = null>( //zsviczian
+  initialValue: T,
+) => {
+  const Context = React.createContext(initialValue) as React.Context<T> & {
+    _updateProviderValue?: (value: T) => void;
+  };
+
+  class InverseConsumer extends React.Component {
+    state = { value: initialValue };
+    constructor(props: any) {
+      super(props);
+      Context._updateProviderValue = (value: T) => this.setState({ value });
+    }
+    render() {
+      return (
+        <Context.Provider value={this.state.value}>
+          {this.props.children}
+        </Context.Provider>
+      );
+    }
+  }
+
+  class InverseProvider extends React.Component<{ value: T }> {
+    componentDidMount() {
+      Context._updateProviderValue?.(this.props.value);
+    }
+    componentDidUpdate() {
+      Context._updateProviderValue?.(this.props.value);
+    }
+    render() {
+      return <Context.Consumer>{() => this.props.children}</Context.Consumer>;
+    }
+  }
+
+  return {
+    Context,
+    Consumer: InverseConsumer,
+    Provider: InverseProvider,
+  };
+};
 
 type CollabInstance = InstanceType<typeof CollabWrapper>;
 
@@ -98,11 +140,11 @@ interface Props {
 
 const {
   Context: CollabContext,
-  Consumer: CollabContextConsumer,
+  //Consumer: CollabContextConsumer,
   Provider: CollabContextProvider,
 } = createInverseContext<{ api: CollabAPI | null }>({ api: null });
 
-export { CollabContext, CollabContextConsumer };
+export { CollabContext }; //, CollabContextConsumer };
 
 class CollabWrapper extends PureComponent<Props, CollabState> {
   portal: Portal;

@@ -125,7 +125,10 @@ const RoomDialog = ({
               </Stack.Row>
               <input
                 type="text"
-                value={activeRoomLink}
+                value={activeRoomLink.replace(
+                  /^.*#/,
+                  "https://excalidraw.com/#",
+                )}
                 readOnly={true}
                 className="RoomDialog-link"
                 ref={roomLinkInput}
