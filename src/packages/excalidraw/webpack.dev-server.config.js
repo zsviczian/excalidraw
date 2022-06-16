@@ -5,7 +5,7 @@ const devConfig = require("./webpack.dev.config");
 
 const devServerConfig = {
   entry: {
-    bundle: "./example/index.tsx",
+    bundle: "./example/index.js",
   },
   // Server Configuration options
   devServer: {

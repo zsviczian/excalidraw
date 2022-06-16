@@ -31,7 +31,16 @@ export const actionGoToCollaborator = register({
     };
   },
   PanelComponent: ({ appState, updateData, data }) => {
-    const [clientId, collaborator] = data as [string, Collaborator];
+    const clientId: string | undefined = data?.id;
+    if (!clientId) {
+      return null;
+    }
+
+    const collaborator = appState.collaborators.get(clientId);
+
+    if (!collaborator) {
+      return null;
+    }
 
     const { background, stroke } = getClientColors(clientId, appState);
 

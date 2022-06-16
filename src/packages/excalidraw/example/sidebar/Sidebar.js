@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./Sidebar.scss";
-export default function Sidebar({ children }: { children: React.ReactNode }) {
+export default function Sidebar(props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -23,7 +23,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
         >
           Open Sidebar
         </button>
-        {children}
+        {props.children}
       </div>
     </>
   );

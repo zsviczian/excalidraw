@@ -32,10 +32,7 @@ type MobileMenuProps = {
   onPenModeToggle: () => void;
   canvas: HTMLCanvasElement | null;
   isCollaborating: boolean;
-  renderCustomFooter?: (
-    isMobile: boolean,
-    appState: AppState,
-  ) => JSX.Element | null;
+  renderCustomFooter?: (isMobile: boolean, appState: AppState) => JSX.Element;
   viewModeEnabled: boolean;
   showThemeBtn: boolean;
   onImageAction: (data: { insertOnCanvasDirectly: boolean }) => void;
@@ -202,11 +199,20 @@ export const MobileMenu = ({
                   {appState.collaborators.size > 0 && (
                     <fieldset>
                       <legend>{t("labels.collaborators")}</legend>
-                      <UserList
-                        mobile
-                        collaborators={appState.collaborators}
-                        actionManager={actionManager}
-                      />
+                      <UserList mobile>
+                        {Array.from(appState.collaborators)
+                          // Collaborator is either not initialized or is actually the current user.
+                          .filter(
+                            ([_, client]) => Object.keys(client).length !== 0,
+                          )
+                          .map(([clientId, client]) => (
+                            <React.Fragment key={clientId}>
+                              {actionManager.renderAction("goToCollaborator", {
+                                id: clientId,
+                              })}
+                            </React.Fragment>
+                          ))}
+                      </UserList>
                     </fieldset>
                   )}
                 </Stack.Col>
