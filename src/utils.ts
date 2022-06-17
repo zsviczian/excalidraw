@@ -544,8 +544,9 @@ export const getNearestScrollableContainer = (
 ): HTMLElement | Document => {
   let parent = element.parentElement;
   while (parent) {
-    if (parent === document.body) {
-      return document;
+    if (parent === element.ownerDocument.body) {
+      //zsviczian
+      return element.ownerDocument; //zsviczian
     }
     const { overflowY } = window.getComputedStyle(parent);
     const hasScrollableContent = parent.scrollHeight > parent.clientHeight;
@@ -559,7 +560,7 @@ export const getNearestScrollableContainer = (
     }
     parent = parent.parentElement;
   }
-  return document;
+  return element.ownerDocument;
 };
 
 export const focusNearestParent = (element: HTMLInputElement) => {

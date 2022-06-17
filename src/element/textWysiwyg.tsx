@@ -582,10 +582,10 @@ export const textWysiwyg = ({
       isTargetColorPicker
     ) {
       editable.onblur = null;
-      window.addEventListener("pointerup", bindBlurEvent);
+      app.ownerWindow.addEventListener("pointerup", bindBlurEvent);
       // handle edge-case where pointerup doesn't fire e.g. due to user
       // alt-tabbing away
-      window.addEventListener("blur", handleSubmit);
+      app.ownerWindow.addEventListener("blur", handleSubmit);
     }
   };
 
@@ -618,11 +618,11 @@ export const textWysiwyg = ({
     });
     observer.observe(canvas);
   } else {
-    window.addEventListener("resize", updateWysiwygStyle);
+    app.ownerWindow.addEventListener("resize", updateWysiwygStyle);
   }
 
-  window.addEventListener("pointerdown", onPointerDown);
-  window.addEventListener("wheel", stopEvent, {
+  app.ownerWindow.addEventListener("pointerdown", onPointerDown);
+  app.ownerWindow.addEventListener("wheel", stopEvent, {
     passive: false,
     capture: true,
   });
