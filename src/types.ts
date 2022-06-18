@@ -286,6 +286,8 @@ export interface ExcalidrawProps {
   onDrop?: (
     event: React.DragEvent<HTMLDivElement>,
   ) => Promise<boolean> | boolean; //zsviczian
+  ownerDocument: Document; //zsviczian
+  ownerWindow: Window; //zsviczian
   renderTopRightUI?: (
     isMobile: boolean,
     appState: AppState,

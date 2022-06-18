@@ -1,6 +1,10 @@
 import { KEYS } from "../keys";
 import { isInvisiblySmallElement } from "../element";
-import { updateActiveTool, resetCursor } from "../utils";
+import {
+  updateActiveTool,
+  resetCursor,
+  cloneHTMLElementToDocument,
+} from "../utils";
 import { ToolButton } from "../components/ToolButton";
 import { done } from "../components/icons";
 import { t } from "../i18n";
@@ -19,7 +23,8 @@ import { AppState } from "../types";
 export const actionFinalize = register({
   name: "finalize",
   trackEvent: false,
-  perform: (elements, appState, _, { canvas, focusContainer }) => {
+  perform: (elements, appState, _, { canvas, focusContainer, props }) => {
+    //zsviczian
     if (appState.editingLinearElement) {
       const { elementId, startBindingElement, endBindingElement } =
         appState.editingLinearElement;
@@ -54,7 +59,12 @@ export const actionFinalize = register({
       mutateElement(appState.pendingImageElement, { isDeleted: true }, false);
     }
 
-    if (window.document.activeElement instanceof HTMLElement) {
+    if (
+      cloneHTMLElementToDocument(
+        //zsviczian
+        props.ownerDocument.activeElement,
+      ) instanceof HTMLElement
+    ) {
       focusContainer();
     }
 

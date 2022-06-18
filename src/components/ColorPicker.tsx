@@ -8,7 +8,7 @@ import { t, getLanguage } from "../i18n";
 import { isWritableElement } from "../utils";
 import colors from "../colors";
 import { ExcalidrawElement } from "../element/types";
-import { AppState } from "../types";
+import { AppState, ExcalidrawProps } from "../types";
 
 const MAX_CUSTOM_COLORS = 5;
 const MAX_DEFAULT_COLORS = 15;
@@ -97,6 +97,7 @@ const Picker = ({
   showInput = true,
   type,
   elements,
+  ownerDocument, //zsviczian
 }: {
   colors: string[];
   customPalette: boolean; //zsviczian
@@ -107,6 +108,7 @@ const Picker = ({
   showInput: boolean;
   type: "canvasBackground" | "elementBackground" | "elementStroke";
   elements: readonly ExcalidrawElement[];
+  ownerDocument: Document; //zsviczian
 }) => {
   const firstItem = React.useRef<HTMLButtonElement>();
   const activeItem = React.useRef<HTMLButtonElement>();
@@ -133,7 +135,7 @@ const Picker = ({
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === KEYS.TAB) {
-      const { activeElement } = document;
+      const { activeElement } = ownerDocument; //zsviczian
       if (event.shiftKey) {
         if (activeElement === firstItem.current) {
           colorInput.current?.focus();
@@ -144,7 +146,7 @@ const Picker = ({
         event.preventDefault();
       }
     } else if (isArrowKey(event.key)) {
-      const { activeElement } = document;
+      const { activeElement } = ownerDocument; //zsviczian
       const isRTL = getLanguage().rtl;
       let isCustom = false;
       let index = Array.prototype.indexOf.call(
@@ -366,6 +368,7 @@ export const ColorPicker = ({
   colorPalette, //zsviczian
   elements,
   appState,
+  appProps,
 }: {
   type: "canvasBackground" | "elementBackground" | "elementStroke";
   color: string | null;
@@ -380,6 +383,7 @@ export const ColorPicker = ({
   }; //zsviczian
   elements: readonly ExcalidrawElement[];
   appState: AppState;
+  appProps: ExcalidrawProps; //zsviczian
 }) => {
   const pickerButton = React.useRef<HTMLButtonElement>(null);
   const customPalette = typeof colorPalette[type] !== "undefined"; //zsviczian
@@ -426,6 +430,7 @@ export const ColorPicker = ({
               showInput={false}
               type={type}
               elements={elements}
+              ownerDocument={appProps.ownerDocument}
             />
           </Popover>
         ) : null}

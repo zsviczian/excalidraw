@@ -33,6 +33,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
     renderCustomStats,
     onPaste,
     onDrop, //zsviczian
+    ownerDocument, //zsviczian
+    ownerWindow, //zsviczian
     detectScroll = true,
     handleKeyboardGlobally = false,
     onLibraryChange,
@@ -72,14 +74,15 @@ const Excalidraw = (props: ExcalidrawProps) => {
       }
     };
 
-    document.addEventListener("touchmove", handleTouchMove, {
+    ownerDocument.addEventListener("touchmove", handleTouchMove, {
+      //zsviczian
       passive: false,
     });
 
     return () => {
-      document.removeEventListener("touchmove", handleTouchMove);
+      ownerDocument.removeEventListener("touchmove", handleTouchMove); //zsviczian
     };
-  }, []);
+  }, [ownerDocument]); //zsviczian
 
   return (
     <InitializeApp langCode={langCode}>
@@ -104,6 +107,8 @@ const Excalidraw = (props: ExcalidrawProps) => {
           UIOptions={UIOptions}
           onPaste={onPaste}
           onDrop={onDrop} //zsviczian
+          ownerDocument={ownerDocument} //zsviczian
+          ownerWindow={ownerWindow} //zsviczian
           detectScroll={detectScroll}
           handleKeyboardGlobally={handleKeyboardGlobally}
           onLibraryChange={onLibraryChange}

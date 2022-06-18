@@ -19,6 +19,7 @@ import { CheckboxItem } from "./CheckboxItem";
 import { DEFAULT_EXPORT_PADDING } from "../constants";
 import { nativeFileSystemSupported } from "../data/filesystem";
 import { ActionManager } from "../actions/manager";
+import { cloneHTMLElementToDocument } from "../utils";
 
 const supportsContextFilters =
   "filter" in document.createElement("canvas").getContext("2d")!;
@@ -41,7 +42,10 @@ const renderPreview = (
 ) => {
   unmountComponentAtNode(previewNode);
   previewNode.innerHTML = "";
-  if (content instanceof HTMLCanvasElement) {
+  if (
+    !(content instanceof Error) && //zsviczian
+    cloneHTMLElementToDocument(content) instanceof HTMLCanvasElement
+  ) {
     previewNode.appendChild(content);
   } else {
     render(<ErrorCanvasPreview />, previewNode);

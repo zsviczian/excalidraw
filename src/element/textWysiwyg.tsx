@@ -4,6 +4,7 @@ import {
   getFontString,
   getFontFamilyString,
   isTestEnv,
+  cloneHTMLElementToDocument,
 } from "../utils";
 import Scene from "../scene/Scene";
 import { isBoundToContainer, isTextElement } from "./typeChecks";
@@ -82,6 +83,7 @@ export const textWysiwyg = ({
   excalidrawContainer: HTMLDivElement | null;
   app: App;
 }) => {
+  const win = app.props.ownerWindow; //zsviczian
   const textPropertiesUpdated = (
     updatedElement: ExcalidrawTextElement,
     editable: HTMLTextAreaElement,
@@ -237,7 +239,8 @@ export const textWysiwyg = ({
     }
   };
 
-  const editable = document.createElement("textarea");
+  const doc = app.props.ownerDocument; //zsviczian
+  const editable = doc.createElement("textarea"); //zsviczian
 
   editable.dir = "auto";
   editable.tabIndex = 0;
@@ -524,11 +527,11 @@ export const textWysiwyg = ({
       observer.disconnect();
     }
 
-    window.removeEventListener("resize", updateWysiwygStyle);
-    window.removeEventListener("wheel", stopEvent, true);
-    window.removeEventListener("pointerdown", onPointerDown);
-    window.removeEventListener("pointerup", bindBlurEvent);
-    window.removeEventListener("blur", handleSubmit);
+    win.removeEventListener("resize", updateWysiwygStyle); //zsviczian
+    win.removeEventListener("wheel", stopEvent, true); //zsviczian
+    win.removeEventListener("pointerdown", onPointerDown); //zsviczian
+    win.removeEventListener("pointerup", bindBlurEvent); //zsviczian
+    win.removeEventListener("blur", handleSubmit); //zsviczian
 
     unbindUpdate();
 
@@ -536,7 +539,7 @@ export const textWysiwyg = ({
   };
 
   const bindBlurEvent = (event?: MouseEvent) => {
-    window.removeEventListener("pointerup", bindBlurEvent);
+    win.removeEventListener("pointerup", bindBlurEvent); //zsviczian
     // Deferred so that the pointerdown that initiates the wysiwyg doesn't
     // trigger the blur on ensuing pointerup.
     // Also to handle cases such as picking a color which would trigger a blur
@@ -544,8 +547,10 @@ export const textWysiwyg = ({
     const target = event?.target;
 
     const isTargetColorPicker =
-      target instanceof HTMLInputElement &&
+      cloneHTMLElementToDocument(target) instanceof HTMLInputElement && //zsviczian
+      //@ts-ignore
       target.closest(".color-picker-input") &&
+      //@ts-ignore
       isWritableElement(target);
 
     setTimeout(() => {
@@ -565,27 +570,32 @@ export const textWysiwyg = ({
   // prevent blur when changing properties from the menu
   const onPointerDown = (event: MouseEvent) => {
     const isTargetColorPicker =
-      event.target instanceof HTMLInputElement &&
+      cloneHTMLElementToDocument(event.target) instanceof HTMLInputElement && //zsviczian
+      //@ts-ignore
       event.target.closest(".color-picker-input") &&
       isWritableElement(event.target);
+    const clonetarget = cloneHTMLElementToDocument(event.target); //zsviczian
     const isShapeActionsPanel = //zsviczian
-      (event.target instanceof HTMLElement ||
-        event.target instanceof SVGElement) &&
+      (clonetarget instanceof HTMLElement || //zsviczian
+        clonetarget instanceof SVGElement) &&
+      //@ts-ignore
       (event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
+        //@ts-ignore
         event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MOBILE_MENU}`) ||
+        //@ts-ignore
         event.target.closest(`.${CLASSES.MOBILE_TOOLBAR}`));
     if (
-      ((event.target instanceof HTMLElement ||
-        event.target instanceof SVGElement) &&
+      ((clonetarget instanceof HTMLElement || //zsviczian
+        clonetarget instanceof SVGElement) &&
         isShapeActionsPanel && //zsviczian
         !isWritableElement(event.target)) ||
       isTargetColorPicker
     ) {
       editable.onblur = null;
-      window.addEventListener("pointerup", bindBlurEvent);
+      win.addEventListener("pointerup", bindBlurEvent); //zsviczian
       // handle edge-case where pointerup doesn't fire e.g. due to user
       // alt-tabbing away
-      window.addEventListener("blur", handleSubmit);
+      win.addEventListener("blur", handleSubmit); //zsviczian
     }
   };
 
@@ -612,17 +622,20 @@ export const textWysiwyg = ({
   // reposition wysiwyg in case of canvas is resized. Using ResizeObserver
   // is preferred so we catch changes from host, where window may not resize.
   let observer: ResizeObserver | null = null;
-  if (canvas && "ResizeObserver" in window) {
-    observer = new window.ResizeObserver(() => {
+  if (canvas && "ResizeObserver" in win) {
+    //zsviczian
+    observer = new win.ResizeObserver(() => {
+      //zsviczian
       updateWysiwygStyle();
     });
     observer.observe(canvas);
   } else {
-    window.addEventListener("resize", updateWysiwygStyle);
+    win.addEventListener("resize", updateWysiwygStyle); //zsviczian
   }
 
-  window.addEventListener("pointerdown", onPointerDown);
-  window.addEventListener("wheel", stopEvent, {
+  win.addEventListener("pointerdown", onPointerDown); //zsviczian
+  win.addEventListener("wheel", stopEvent, {
+    //zsviczian
     passive: false,
     capture: true,
   });

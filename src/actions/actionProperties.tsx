@@ -220,7 +220,9 @@ export const actionChangeStrokeColor = register({
       commitToHistory: !!value.currentItemStrokeColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: (
+    { elements, appState, updateData, appProps }, //zsviczian
+  ) => (
     <>
       <h3 aria-hidden="true">{t("labels.stroke")}</h3>
       {
@@ -245,6 +247,7 @@ export const actionChangeStrokeColor = register({
             colorPalette={appState.colorPalette} //zsviczian
             elements={elements}
             appState={appState}
+            appProps={appProps} //zsviczian
           />
         </div>
       </div>
@@ -271,7 +274,9 @@ export const actionChangeBackgroundColor = register({
       commitToHistory: !!value.currentItemBackgroundColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => (
+  PanelComponent: (
+    { elements, appState, updateData, appProps }, //zsviczian
+  ) => (
     <>
       <h3 aria-hidden="true">{t("labels.background")}</h3>
       {
@@ -298,6 +303,7 @@ export const actionChangeBackgroundColor = register({
             colorPalette={appState.colorPalette} //zsviczian
             elements={elements}
             appState={appState}
+            appProps={appProps} //zsviczian
           />
         </div>
       </div>

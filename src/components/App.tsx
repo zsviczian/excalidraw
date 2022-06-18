@@ -218,6 +218,7 @@ import {
   updateObject,
   setEraserCursor,
   updateActiveTool,
+  cloneHTMLElementToDocument,
 } from "../utils";
 import ContextMenu, { ContextMenuOption } from "./ContextMenu";
 import LayerUI from "./LayerUI";
@@ -345,6 +346,7 @@ class App extends React.Component<AppProps, AppState> {
       gridModeEnabled = false,
       theme = defaultAppState.theme,
       name = defaultAppState.name,
+      ownerWindow, //zsviczian
     } = props;
     this.state = {
       ...defaultAppState,
@@ -355,8 +357,8 @@ class App extends React.Component<AppProps, AppState> {
       zenModeEnabled,
       gridSize: gridModeEnabled ? GRID_SIZE : null,
       name,
-      width: window.innerWidth,
-      height: window.innerHeight,
+      width: ownerWindow.innerWidth, //zsviczian
+      height: ownerWindow.innerHeight, //zsviczian
       showHyperlinkPopup: false,
     };
 
@@ -429,7 +431,8 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private renderCanvas() {
-    const canvasScale = window.devicePixelRatio;
+    const win = this.props.ownerWindow; //zsviczian
+    const canvasScale = win.devicePixelRatio; //zsviczian
     const {
       width: canvasDOMWidth,
       height: canvasDOMHeight,
@@ -736,8 +739,11 @@ class App extends React.Component<AppProps, AppState> {
   );
 
   private initializeScene = async () => {
-    if ("launchQueue" in window && "LaunchParams" in window) {
-      (window as any).launchQueue.setConsumer(
+    const win = this.props.ownerWindow; //zsviczian
+    if ("launchQueue" in win && "LaunchParams" in win) {
+      //zsviczian
+      (win as any).launchQueue.setConsumer(
+        //zsviczian
         async (launchParams: { files: any[] }) => {
           if (!launchParams.files.length) {
             return;
@@ -816,7 +822,7 @@ class App extends React.Component<AppProps, AppState> {
     this.unmounted = false;
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
-
+    const win = this.props.ownerWindow; //zsviczian
     if (
       process.env.NODE_ENV === ENV.TEST ||
       process.env.NODE_ENV === ENV.DEVELOPMENT
@@ -853,7 +859,8 @@ class App extends React.Component<AppProps, AppState> {
       this.focusContainer();
     }
 
-    if ("ResizeObserver" in window && this.excalidrawContainerRef?.current) {
+    if ("ResizeObserver" in win && this.excalidrawContainerRef?.current) {
+      //zsviczian
       this.resizeObserver = new ResizeObserver(() => {
         // compute isMobile state
         // ---------------------------------------------------------------------
@@ -871,8 +878,10 @@ class App extends React.Component<AppProps, AppState> {
         this.updateDOMRect();
       });
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
-    } else if (window.matchMedia) {
-      const mediaQuery = window.matchMedia(
+    } else if (win.matchMedia) {
+      //zsviczian
+      const mediaQuery = win.matchMedia(
+        //zsviczian
         `(max-width: ${MQ_MAX_WIDTH_PORTRAIT}px), (max-height: ${MQ_MAX_HEIGHT_LANDSCAPE}px) and (max-width: ${MQ_MAX_WIDTH_LANDSCAPE}px)`,
       );
       const handler = () => {
@@ -884,7 +893,7 @@ class App extends React.Component<AppProps, AppState> {
       this.detachIsMobileMqHandler = () => mediaQuery.removeListener(handler);
     }
 
-    const searchParams = new URLSearchParams(window.location.search.slice(1));
+    const searchParams = new URLSearchParams(win.location.search.slice(1)); //zsviczian
 
     if (searchParams.has("web-share-target")) {
       // Obtain a file that was shared via the Web Share Target API.
@@ -913,24 +922,27 @@ class App extends React.Component<AppProps, AppState> {
   });
 
   private removeEventListeners() {
-    document.removeEventListener(EVENT.POINTER_UP, this.removePointer);
-    document.removeEventListener(EVENT.COPY, this.onCopy);
-    document.removeEventListener(EVENT.PASTE, this.pasteFromClipboard);
-    document.removeEventListener(EVENT.CUT, this.onCut);
+    const doc = this.props.ownerDocument; //zsviczian
+    const win = this.props.ownerWindow; //zsviczain
+    doc.removeEventListener(EVENT.POINTER_UP, this.removePointer); //zsviczian
+    doc.removeEventListener(EVENT.COPY, this.onCopy); //zsviczian
+    doc.removeEventListener(EVENT.PASTE, this.pasteFromClipboard); //zsviczian
+    doc.removeEventListener(EVENT.CUT, this.onCut); //zsviczian
     this.nearestScrollableContainer?.removeEventListener(
       EVENT.SCROLL,
       this.onScroll,
     );
-    document.removeEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
-    document.removeEventListener(
+    doc.removeEventListener(EVENT.KEYDOWN, this.onKeyDown, false); //zsviczian
+    doc.removeEventListener(
+      //zsviczian
       EVENT.MOUSE_MOVE,
       this.updateCurrentCursorPosition,
       false,
     );
-    document.removeEventListener(EVENT.KEYUP, this.onKeyUp);
-    window.removeEventListener(EVENT.RESIZE, this.onResize, false);
-    window.removeEventListener(EVENT.UNLOAD, this.onUnload, false);
-    window.removeEventListener(EVENT.BLUR, this.onBlur, false);
+    doc.removeEventListener(EVENT.KEYUP, this.onKeyUp); //zsviczian
+    win.removeEventListener(EVENT.RESIZE, this.onResize, false); //zsviczian
+    win.removeEventListener(EVENT.UNLOAD, this.onUnload, false); //zsviczian
+    win.removeEventListener(EVENT.BLUR, this.onBlur, false); //zsviczian
     this.excalidrawContainerRef.current?.removeEventListener(
       EVENT.DRAG_OVER,
       this.disableEvent,
@@ -942,17 +954,20 @@ class App extends React.Component<AppProps, AppState> {
       false,
     );
 
-    document.removeEventListener(
+    doc.removeEventListener(
+      //zsviczian
       EVENT.GESTURE_START,
       this.onGestureStart as any,
       false,
     );
-    document.removeEventListener(
+    doc.removeEventListener(
+      //zsviczian
       EVENT.GESTURE_CHANGE,
       this.onGestureChange as any,
       false,
     );
-    document.removeEventListener(
+    doc.removeEventListener(
+      //zsviczian
       EVENT.GESTURE_END,
       this.onGestureEnd as any,
       false,
@@ -962,31 +977,37 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private addEventListeners() {
+    const doc = this.props.ownerDocument; //zsviczian
+    const win = this.props.ownerWindow; //zsviczain
     this.removeEventListeners();
-    document.addEventListener(EVENT.POINTER_UP, this.removePointer); // #3553
-    document.addEventListener(EVENT.COPY, this.onCopy);
+    doc.addEventListener(EVENT.POINTER_UP, this.removePointer); //zsviczian // #3553
+    doc.addEventListener(EVENT.COPY, this.onCopy); //zsviczian
     if (this.props.handleKeyboardGlobally) {
-      document.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false);
+      doc.addEventListener(EVENT.KEYDOWN, this.onKeyDown, false); //zsviczian
     }
-    document.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true });
-    document.addEventListener(
+    doc.addEventListener(EVENT.KEYUP, this.onKeyUp, { passive: true }); //zsviczian
+    doc.addEventListener(
+      //zsviczian
       EVENT.MOUSE_MOVE,
       this.updateCurrentCursorPosition,
     );
     // rerender text elements on font load to fix #637 && #1553
-    document.fonts?.addEventListener?.("loadingdone", this.onFontLoaded);
+    doc.fonts?.addEventListener?.("loadingdone", this.onFontLoaded); //zsviczian
     // Safari-only desktop pinch zoom
-    document.addEventListener(
+    doc.addEventListener(
+      //zsviczian
       EVENT.GESTURE_START,
       this.onGestureStart as any,
       false,
     );
-    document.addEventListener(
+    doc.addEventListener(
+      //zsviczian
       EVENT.GESTURE_CHANGE,
       this.onGestureChange as any,
       false,
     );
-    document.addEventListener(
+    doc.addEventListener(
+      //zsviczian
       EVENT.GESTURE_END,
       this.onGestureEnd as any,
       false,
@@ -995,8 +1016,8 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    document.addEventListener(EVENT.PASTE, this.pasteFromClipboard);
-    document.addEventListener(EVENT.CUT, this.onCut);
+    doc.addEventListener(EVENT.PASTE, this.pasteFromClipboard); //zsviczian
+    doc.addEventListener(EVENT.CUT, this.onCut); //zsviczian
     if (this.props.detectScroll) {
       this.nearestScrollableContainer = getNearestScrollableContainer(
         this.excalidrawContainerRef.current!,
@@ -1006,9 +1027,9 @@ class App extends React.Component<AppProps, AppState> {
         this.onScroll,
       );
     }
-    window.addEventListener(EVENT.RESIZE, this.onResize, false);
-    window.addEventListener(EVENT.UNLOAD, this.onUnload, false);
-    window.addEventListener(EVENT.BLUR, this.onBlur, false);
+    win.addEventListener(EVENT.RESIZE, this.onResize, false); //zsviczian
+    win.addEventListener(EVENT.UNLOAD, this.onUnload, false); //zsviczian
+    win.addEventListener(EVENT.BLUR, this.onBlur, false); //zsviczian
     this.excalidrawContainerRef.current?.addEventListener(
       EVENT.DRAG_OVER,
       this.disableEvent,
@@ -1242,7 +1263,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private onCut = withBatchedUpdates((event: ClipboardEvent) => {
     const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
-      document.activeElement,
+      this.props.ownerDocument.activeElement, //zsviczian
     );
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
@@ -1254,7 +1275,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private onCopy = withBatchedUpdates((event: ClipboardEvent) => {
     const isExcalidrawActive = this.excalidrawContainerRef.current?.contains(
-      document.activeElement,
+      this.props.ownerDocument.activeElement, //zsviczian
     );
     if (!isExcalidrawActive || isWritableElement(event.target)) {
       return;
@@ -1329,20 +1350,27 @@ class App extends React.Component<AppProps, AppState> {
 
   private pasteFromClipboard = withBatchedUpdates(
     async (event: ClipboardEvent | null) => {
+      const doc = this.props.ownerDocument; //zsviczian
       // #686
-      const target = document.activeElement;
+      const target = doc.activeElement; //zsviczian
       const isExcalidrawActive =
         this.excalidrawContainerRef.current?.contains(target);
       if (!isExcalidrawActive) {
         return;
       }
 
-      const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
+      const elementUnderCursor = doc.elementFromPoint(cursorX, cursorY); //zsviczian
       if (
         // if no ClipboardEvent supplied, assume we're pasting via contextMenu
         // thus these checks don't make sense
         event &&
-        (!(elementUnderCursor instanceof HTMLCanvasElement) ||
+        (!(
+          //zsviczian
+          (
+            cloneHTMLElementToDocument(elementUnderCursor) instanceof
+            HTMLCanvasElement
+          )
+        ) ||
           isWritableElement(target))
       ) {
         return;
@@ -1824,9 +1852,10 @@ class App extends React.Component<AppProps, AppState> {
 
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
+      const win = this.props.ownerWindow; //zsviczian
       // normalize `event.key` when CapsLock is pressed #2372
       if (
-        "Proxy" in window &&
+        "Proxy" in win && //zsviczian
         ((!event.shiftKey && /^[A-Z]$/.test(event.key)) ||
           (event.shiftKey && /^[a-z]$/.test(event.key)))
       ) {
@@ -2057,7 +2086,8 @@ class App extends React.Component<AppProps, AppState> {
     if (!isHoldingSpace) {
       setCursorForShape(this.canvas, this.state);
     }
-    if (isToolIcon(document.activeElement)) {
+    if (isToolIcon(this.props.ownerDocument.activeElement)) {
+      //zsviczian
       this.focusContainer();
     }
     if (!isLinearElementType(nextActiveTool.type)) {
@@ -3095,11 +3125,11 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
   ) => {
     this.focusContainer(); //zsviczian
-
+    const doc = this.props.ownerDocument; //zsviczian
     // remove any active selection when we start to interact with canvas
     // (mainly, we care about removing selection outside the component which
     //  would prevent our copy handling otherwise)
-    const selection = document.getSelection();
+    const selection = doc.getSelection(); //zsviczian
     if (selection?.anchorNode) {
       selection.removeAllRanges();
     }
@@ -3243,10 +3273,11 @@ class App extends React.Component<AppProps, AppState> {
     lastPointerUp = onPointerUp;
 
     if (!this.state.viewModeEnabled) {
-      window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
-      window.addEventListener(EVENT.POINTER_UP, onPointerUp);
-      window.addEventListener(EVENT.KEYDOWN, onKeyDown);
-      window.addEventListener(EVENT.KEYUP, onKeyUp);
+      const win = this.props.ownerWindow; //zsviczian
+      win.addEventListener(EVENT.POINTER_MOVE, onPointerMove); //zsviczian
+      win.addEventListener(EVENT.POINTER_UP, onPointerUp); //zsviczian
+      win.addEventListener(EVENT.KEYDOWN, onKeyDown); //zsviczian
+      win.addEventListener(EVENT.KEYUP, onKeyUp); //zsviczian
       pointerDownState.eventListeners.onMove = onPointerMove;
       pointerDownState.eventListeners.onUp = onPointerUp;
       pointerDownState.eventListeners.onKeyUp = onKeyUp;
@@ -3328,6 +3359,8 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPanUsingWheelOrSpaceDrag = (
     event: React.PointerEvent<HTMLCanvasElement>,
   ): boolean => {
+    const doc = this.props.ownerDocument; //zsviczian
+    const win = this.props.ownerWindow; //zsviczian
     if (
       !(
         gesture.pointers.size <= 1 &&
@@ -3366,7 +3399,7 @@ class App extends React.Component<AppProps, AppState> {
 
         /* Prevent the next paste event */
         const preventNextPaste = (event: ClipboardEvent) => {
-          document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
+          doc.body.removeEventListener(EVENT.PASTE, preventNextPaste); //zsviczian
           event.stopPropagation();
         };
 
@@ -3378,13 +3411,13 @@ class App extends React.Component<AppProps, AppState> {
          */
         const enableNextPaste = () => {
           setTimeout(() => {
-            document.body.removeEventListener(EVENT.PASTE, preventNextPaste);
-            window.removeEventListener(EVENT.POINTER_UP, enableNextPaste);
+            doc.body.removeEventListener(EVENT.PASTE, preventNextPaste); //zsviczian
+            win.removeEventListener(EVENT.POINTER_UP, enableNextPaste); //zsviczian
           }, 100);
         };
 
-        document.body.addEventListener(EVENT.PASTE, preventNextPaste);
-        window.addEventListener(EVENT.POINTER_UP, enableNextPaste);
+        doc.body.addEventListener(EVENT.PASTE, preventNextPaste); //zsviczian
+        win.addEventListener(EVENT.POINTER_UP, enableNextPaste); //zsviczian
       }
 
       this.setState({
@@ -3407,17 +3440,18 @@ class App extends React.Component<AppProps, AppState> {
           cursorButton: "up",
         });
         this.savePointer(event.clientX, event.clientY, "up");
-        window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-        window.removeEventListener(EVENT.POINTER_UP, teardown);
-        window.removeEventListener(EVENT.BLUR, teardown);
+        win.removeEventListener(EVENT.POINTER_MOVE, onPointerMove); //zsviczian
+        win.removeEventListener(EVENT.POINTER_UP, teardown); //zsviczian
+        win.removeEventListener(EVENT.BLUR, teardown); //zsviczian
         onPointerMove.flush();
       }),
     );
-    window.addEventListener(EVENT.BLUR, teardown);
-    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
+    win.addEventListener(EVENT.BLUR, teardown); //zsviczian
+    win.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
+      //zsviczian
       passive: true,
     });
-    window.addEventListener(EVENT.POINTER_UP, teardown);
+    win.addEventListener(EVENT.POINTER_UP, teardown); //zsviczian
     return true;
   };
 
@@ -3508,6 +3542,7 @@ class App extends React.Component<AppProps, AppState> {
     event: React.PointerEvent<HTMLCanvasElement>,
     pointerDownState: PointerDownState,
   ): boolean {
+    const win = this.props.ownerWindow; //zsviczian
     if (
       !(pointerDownState.scrollbars.isOverEither && !this.state.multiElement)
     ) {
@@ -3517,7 +3552,7 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState.lastCoords.x = event.clientX;
     pointerDownState.lastCoords.y = event.clientY;
     const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
-      const target = event.target;
+      const target = cloneHTMLElementToDocument(event.target); //zsviczian;
       if (!(target instanceof HTMLElement)) {
         return;
       }
@@ -3533,15 +3568,15 @@ class App extends React.Component<AppProps, AppState> {
         cursorButton: "up",
       });
       this.savePointer(event.clientX, event.clientY, "up");
-      window.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-      window.removeEventListener(EVENT.POINTER_UP, onPointerUp);
+      win.removeEventListener(EVENT.POINTER_MOVE, onPointerMove); //zsviczian
+      win.removeEventListener(EVENT.POINTER_UP, onPointerUp); //zsviczian
       onPointerMove.flush();
     });
 
     lastPointerUp = onPointerUp;
 
-    window.addEventListener(EVENT.POINTER_MOVE, onPointerMove);
-    window.addEventListener(EVENT.POINTER_UP, onPointerUp);
+    win.addEventListener(EVENT.POINTER_MOVE, onPointerMove); //zsviczian
+    win.addEventListener(EVENT.POINTER_UP, onPointerUp); //zsviczian
     return true;
   }
 
@@ -4092,7 +4127,7 @@ class App extends React.Component<AppProps, AppState> {
           ),
         );
       }
-      const target = event.target;
+      const target = cloneHTMLElementToDocument(event.target); //zsviczian;
       if (!(target instanceof HTMLElement)) {
         return;
       }
@@ -4453,6 +4488,7 @@ class App extends React.Component<AppProps, AppState> {
   private onPointerUpFromPointerDownHandler(
     pointerDownState: PointerDownState,
   ): (event: PointerEvent) => void {
+    const win = this.props.ownerWindow; //zsviczian
     return withBatchedUpdates((childEvent: PointerEvent) => {
       const {
         draggingElement,
@@ -4509,19 +4545,23 @@ class App extends React.Component<AppProps, AppState> {
         pointerDownState.eventListeners.onMove.flush();
       }
 
-      window.removeEventListener(
+      win.removeEventListener(
+        //zsviczian
         EVENT.POINTER_MOVE,
         pointerDownState.eventListeners.onMove!,
       );
-      window.removeEventListener(
+      win.removeEventListener(
+        //zsviczian
         EVENT.POINTER_UP,
         pointerDownState.eventListeners.onUp!,
       );
-      window.removeEventListener(
+      win.removeEventListener(
+        //zsviczian
         EVENT.KEYDOWN,
         pointerDownState.eventListeners.onKeyDown!,
       );
-      window.removeEventListener(
+      win.removeEventListener(
+        //zsviczian
         EVENT.KEYUP,
         pointerDownState.eventListeners.onKeyUp!,
       );
@@ -5087,7 +5127,8 @@ class App extends React.Component<AppProps, AppState> {
         height = width * (img.height / img.width);
       }
 
-      const canvas = document.createElement("canvas");
+      const doc = this.props.ownerDocument; //zsviczian
+      const canvas = doc.createElement("canvas"); //zsviczian
       canvas.height = height;
       canvas.width = width;
       const context = canvas.getContext("2d")!;

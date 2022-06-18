@@ -40,10 +40,34 @@ export const getDateTime = () => {
 export const capitalizeString = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
+//zsviczian - Obsidian 15
+//Resolve issue with instanceof when object is from other document
+export const cloneHTMLElementToDocument = (
+  el: Element | EventTarget | null | undefined,
+): any => {
+  if (!el) {
+    return el;
+  }
+  try {
+    //@ts-ignore
+    const foreign = el.ownerDocument !== document;
+    if (!foreign) {
+      return el;
+    }
+    //@ts-ignore
+    return document.importNode(el);
+  } catch (e) {
+    return el;
+  }
+};
+
 export const isToolIcon = (
   target: Element | EventTarget | null,
-): target is HTMLElement =>
-  target instanceof HTMLElement && target.className.includes("ToolIcon");
+): target is HTMLElement => {
+  //zsviczian (obsidian 15, issue with instanceof)
+  target = cloneHTMLElementToDocument(target);
+  return target instanceof HTMLElement && target.className.includes("ToolIcon");
+};
 
 export const isInputLike = (
   target: Element | EventTarget | null,
@@ -52,12 +76,17 @@ export const isInputLike = (
   | HTMLTextAreaElement
   | HTMLSelectElement
   | HTMLBRElement
-  | HTMLDivElement =>
-  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-  target instanceof HTMLBRElement || // newline in wysiwyg
-  target instanceof HTMLInputElement ||
-  target instanceof HTMLTextAreaElement ||
-  target instanceof HTMLSelectElement;
+  | HTMLDivElement => {
+  //zsviczian (obsidian 15, issue with instanceof)
+  target = cloneHTMLElementToDocument(target);
+  return (
+    (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+    target instanceof HTMLBRElement || // newline in wysiwyg
+    target instanceof HTMLInputElement ||
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement
+  );
+};
 
 export const isWritableElement = (
   target: Element | EventTarget | null,
@@ -65,12 +94,17 @@ export const isWritableElement = (
   | HTMLInputElement
   | HTMLTextAreaElement
   | HTMLBRElement
-  | HTMLDivElement =>
-  (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
-  target instanceof HTMLBRElement || // newline in wysiwyg
-  target instanceof HTMLTextAreaElement ||
-  (target instanceof HTMLInputElement &&
-    (target.type === "text" || target.type === "number"));
+  | HTMLDivElement => {
+  //zsviczian (obsidian 15, issue with instanceof)
+  target = cloneHTMLElementToDocument(target);
+  return (
+    (target instanceof HTMLElement && target.dataset.type === "wysiwyg") ||
+    target instanceof HTMLBRElement || // newline in wysiwyg
+    target instanceof HTMLTextAreaElement ||
+    (target instanceof HTMLInputElement &&
+      (target.type === "text" || target.type === "number"))
+  );
+};
 
 export const getFontFamilyString = ({
   fontFamily,

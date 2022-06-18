@@ -28,7 +28,8 @@ export const actionChangeViewBackgroundColor = register({
       commitToHistory: !!value.viewBackgroundColor,
     };
   },
-  PanelComponent: ({ elements, appState, updateData }) => {
+  PanelComponent: ({ elements, appState, updateData, appProps }) => {
+    //zsviczian
     return (
       <div style={{ position: "relative" }}>
         <ColorPicker
@@ -44,6 +45,7 @@ export const actionChangeViewBackgroundColor = register({
           colorPalette={appState.colorPalette} //zsviczian
           elements={elements}
           appState={appState}
+          appProps={appProps} //zsviczian (obsidian 15 ownerWindow)
         />
       </div>
     );
