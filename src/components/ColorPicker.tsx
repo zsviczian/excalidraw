@@ -134,7 +134,9 @@ const Picker = ({
   }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
+    let handled = false;
     if (event.key === KEYS.TAB) {
+      handled = true;
       const { activeElement } = ownerDocument; //zsviczian
       if (event.shiftKey) {
         if (activeElement === firstItem.current) {
@@ -146,19 +148,19 @@ const Picker = ({
         event.preventDefault();
       }
     } else if (isArrowKey(event.key)) {
+      handled = true;
       const { activeElement } = ownerDocument; //zsviczian
       const isRTL = getLanguage().rtl;
       let isCustom = false;
       let index = Array.prototype.indexOf.call(
-        gallery.current!.querySelector(".color-picker-content--default")!
-          .children,
+        gallery.current!.querySelector(".color-picker-content--default")
+          ?.children,
         activeElement,
       );
       if (index === -1) {
         index = Array.prototype.indexOf.call(
-          gallery.current!.querySelector(
-            ".color-picker-content--canvas-colors",
-          )!.children,
+          gallery.current!.querySelector(".color-picker-content--canvas-colors")
+            ?.children,
           activeElement,
         );
         if (index !== -1) {
@@ -186,8 +188,11 @@ const Picker = ({
       event.preventDefault();
     } else if (
       keyBindings.includes(event.key.toLowerCase()) &&
+      !event[KEYS.CTRL_OR_CMD] &&
+      !event.altKey &&
       !isWritableElement(event.target)
     ) {
+      handled = true;
       const index = keyBindings.indexOf(event.key.toLowerCase());
       const isCustom = index >= MAX_DEFAULT_COLORS;
       const parentElement = isCustom
@@ -202,11 +207,14 @@ const Picker = ({
 
       event.preventDefault();
     } else if (event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) {
+      handled = true;
       event.preventDefault();
       onClose();
     }
-    event.nativeEvent.stopImmediatePropagation();
-    event.stopPropagation();
+    if (handled) {
+      event.nativeEvent.stopImmediatePropagation();
+      event.stopPropagation();
+    }
   };
 
   const renderColors = (colors: Array<string>, custom: boolean = false) => {
