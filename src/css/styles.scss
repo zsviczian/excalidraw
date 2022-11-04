@@ -247,7 +247,7 @@
     overflow-y: auto;
     box-sizing: border-box;
     margin-bottom: var(--bar-padding);
-    min-height: 250px; /* //zsviczian */
+    //min-height: 250px; //zsviczian
   }
 
   .App-menu {
@@ -440,13 +440,6 @@
     margin-top: auto;
     margin-bottom: auto;
     margin-inline-start: 0.6em;
-  }
-
-  /*zsvcziain*/
-  .tray-zoom {
-    pointer-events: initial;
-    padding-bottom: 0.25rem;
-    padding-top: 0.25rem;
   }
 
   .undo-redo-buttons,

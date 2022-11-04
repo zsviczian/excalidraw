@@ -71,6 +71,7 @@ interface LayerUIProps {
   langCode: Language["code"];
   isCollaborating: boolean;
   renderTopRightUI?: ExcalidrawProps["renderTopRightUI"];
+  renderMenuLinks?: ExcalidrawProps["renderMenuLinks"]; //zsviczian
   renderCustomFooter?: ExcalidrawProps["renderFooter"];
   renderCustomStats?: ExcalidrawProps["renderCustomStats"];
   renderCustomSidebar?: ExcalidrawProps["renderSidebar"];
@@ -96,6 +97,7 @@ const LayerUI = ({
   showExitZenModeBtn,
   isCollaborating,
   renderTopRightUI,
+  renderMenuLinks, //zsviczian
   renderCustomFooter,
   renderCustomStats,
   renderCustomSidebar,
@@ -240,8 +242,16 @@ const LayerUI = ({
               {actionManager.renderAction("toggleShortcuts", undefined, true)}
               {!appState.viewModeEnabled &&
                 actionManager.renderAction("clearCanvas")}
-              <Separator />
-              <MenuLinks />
+              {typeof renderMenuLinks === "undefined" ? ( //zsviczian
+                <Separator />
+              ) : (
+                renderMenuLinks && <Separator />
+              )}
+              {typeof renderMenuLinks === "undefined" ? ( //zsviczian
+                <MenuLinks />
+              ) : (
+                renderMenuLinks && renderMenuLinks(device.isMobile, appState)
+              )}
               <Separator />
               <div
                 style={{
@@ -251,9 +261,11 @@ const LayerUI = ({
                 }}
               >
                 <div>{actionManager.renderAction("toggleTheme")}</div>
-                <div style={{ padding: "0 0.625rem" }}>
-                  <LanguageList style={{ width: "100%" }} />
-                </div>
+                {UIOptions.canvasActions.languageList !== false && (
+                  <div style={{ padding: "0 0.625rem" }}>
+                    <LanguageList style={{ width: "100%" }} />
+                  </div>
+                )}
                 {!appState.viewModeEnabled && (
                   <div>
                     <div style={{ fontSize: ".75rem", marginBottom: ".5rem" }}>
@@ -495,9 +507,11 @@ const LayerUI = ({
           renderCustomFooter={renderCustomFooter}
           onImageAction={onImageAction}
           renderTopRightUI={renderTopRightUI}
+          renderMenuLinks={renderMenuLinks} //zsviczian
           renderCustomStats={renderCustomStats}
           renderSidebars={renderSidebars}
           device={device}
+          UIOptions={UIOptions} //zsviczian
         />
       )}
 
