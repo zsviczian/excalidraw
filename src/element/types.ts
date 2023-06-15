@@ -84,6 +84,11 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
   type: "ellipse";
 };
 
+export type ExcalidrawIFrameElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "iframe";
+  }>;
+
 export type ExcalidrawImageElement = _ExcalidrawElementBase &
   Readonly<{
     type: "image";
@@ -110,6 +115,7 @@ export type ExcalidrawFrameElement = _ExcalidrawElementBase & {
 export type ExcalidrawGenericElement =
   | ExcalidrawSelectionElement
   | ExcalidrawRectangleElement
+  | ExcalidrawIFrameElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement;
 
@@ -157,6 +163,7 @@ export type ExcalidrawBindableElement =
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
   | ExcalidrawImageElement
+  | ExcalidrawIFrameElement
   | ExcalidrawFrameElement;
 
 export type ExcalidrawTextContainer =
@@ -164,7 +171,8 @@ export type ExcalidrawTextContainer =
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawImageElement
-  | ExcalidrawArrowElement;
+  | ExcalidrawArrowElement
+  | ExcalidrawIFrameElement;
 
 export type ExcalidrawTextElementWithContainer = {
   containerId: ExcalidrawTextContainer["id"];

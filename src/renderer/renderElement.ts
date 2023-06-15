@@ -15,6 +15,7 @@ import {
   isInitializedImageElement,
   isArrowElement,
   hasBoundTextElement,
+  isIFrameElement,
 } from "../element/typeChecks";
 import {
   getDiamondPoints,
@@ -49,6 +50,7 @@ import {
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
+import { createPlaceholderiFrameLabel } from "../element/iframe";
 import easingsFunctions from "./easingFunctions";
 import { getContainingFrame } from "../frame";
 
@@ -262,6 +264,7 @@ const drawElementOnCanvas = (
     ((getContainingFrame(element)?.opacity ?? 100) * element.opacity) / 10000;
   switch (element.type) {
     case "rectangle":
+    case "iframe":
     case "diamond":
     case "ellipse": {
       context.lineJoin = "round";
@@ -437,6 +440,7 @@ export const generateRoughOptions = (
 
   switch (element.type) {
     case "rectangle":
+    case "iframe":
     case "diamond":
     case "ellipse": {
       options.fillStyle = element.fillStyle;
@@ -444,6 +448,10 @@ export const generateRoughOptions = (
         element.backgroundColor === "transparent"
           ? undefined
           : element.backgroundColor;
+      if (isIFrameElement(element) && !options.fill) {
+        options.fill = "gray";
+        options.fillStyle = "solid";
+      }
       if (element.type === "ellipse") {
         options.curveFitting = 1;
       }
@@ -485,7 +493,8 @@ const generateElementShape = (
     elementWithCanvasCache.delete(element);
 
     switch (element.type) {
-      case "rectangle": {
+      case "rectangle":
+      case "iframe": {
         if (element.roundness) {
           const w = element.width;
           const h = element.height;
@@ -1002,7 +1011,8 @@ export const renderElement = (
     case "line":
     case "arrow":
     case "image":
-    case "text": {
+    case "text":
+    case "iframe": {
       generateElementShape(element, generator);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
@@ -1187,6 +1197,7 @@ export const renderElementToSvg = (
   exportWithDarkMode?: boolean,
   exportingFrameId?: string | null,
 ) => {
+  const offset = { x: offsetX, y: offsetY };
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
   let cx = (x2 - x1) / 2 - (element.x - x1);
   let cy = (y2 - y1) / 2 - (element.y - y1);
@@ -1257,6 +1268,88 @@ export const renderElementToSvg = (
       );
 
       g ? root.appendChild(g) : root.appendChild(node);
+      break;
+    }
+    case "iframe": {
+      // render placeholder rectangle
+      generateElementShape(element, generator);
+      const node = roughSVGDrawWithPrecision(
+        rsvg,
+        getShapeForElement(element)!,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
+      const opacity = element.opacity / 100;
+      if (opacity !== 1) {
+        node.setAttribute("stroke-opacity", `${opacity}`);
+        node.setAttribute("fill-opacity", `${opacity}`);
+      }
+      node.setAttribute("stroke-linecap", "round");
+      node.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      root.appendChild(node);
+
+      // render iframe ALT label
+      const label: ExcalidrawElement =
+        getBoundTextElement(element) ?? createPlaceholderiFrameLabel(element);
+      renderElementToSvg(
+        label,
+        rsvg,
+        root,
+        files,
+        label.x + offset.x - element.x,
+        label.y + offset.y - element.y,
+        exportWithDarkMode,
+        exportingFrameId,
+      );
+
+      // render iframe
+      const iframeNode = roughSVGDrawWithPrecision(
+        rsvg,
+        getShapeForElement(element)!,
+        MAX_DECIMALS_FOR_SVG_EXPORT,
+      );
+      iframeNode.setAttribute("stroke-linecap", "round");
+      iframeNode.setAttribute(
+        "transform",
+        `translate(${offsetX || 0} ${
+          offsetY || 0
+        }) rotate(${degree} ${cx} ${cy})`,
+      );
+      while (iframeNode.firstChild) {
+        iframeNode.removeChild(iframeNode.firstChild);
+      }
+      const radius = getCornerRadius(
+        Math.min(element.width, element.height),
+        element,
+      );
+      const foreignObject = svgRoot.ownerDocument!.createElementNS(
+        SVG_NS,
+        "foreignObject",
+      );
+      foreignObject.style.width = `${element.width}px`;
+      foreignObject.style.height = `${element.height}px`;
+      foreignObject.style.border = "none";
+      const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
+      div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+      div.style.width = "100%";
+      div.style.height = "100%";
+      const iframe = div.ownerDocument!.createElement("iframe");
+      iframe.src = element.link ?? "";
+      iframe.style.width = "100%";
+      iframe.style.height = "100%";
+      iframe.style.border = "none";
+      iframe.style.borderRadius = `${radius}px`;
+      iframe.style.top = "0";
+      iframe.style.left = "0";
+      iframe.allowFullscreen = true;
+      div.appendChild(iframe);
+      foreignObject.appendChild(div);
+      iframeNode.appendChild(foreignObject);
+      root.appendChild(iframeNode);
       break;
     }
     case "line":

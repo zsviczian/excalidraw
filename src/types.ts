@@ -109,6 +109,7 @@ export type AppState = {
   showWelcomeScreen: boolean;
   isLoading: boolean;
   errorMessage: React.ReactNode;
+  activeIFrameElement: NonDeletedExcalidrawElement | null;
   draggingElement: NonDeletedExcalidrawElement | null;
   resizingElement: NonDeletedExcalidrawElement | null;
   multiElement: NonDeleted<ExcalidrawLinearElement> | null;
@@ -397,6 +398,12 @@ export interface ExcalidrawProps {
   ) => void;
   onScrollChange?: (scrollX: number, scrollY: number) => void;
   children?: React.ReactNode;
+  iframeURLWhitelist?: RegExp[];
+  renderCustomIFrame?: (
+    element: NonDeletedExcalidrawElement,
+    radius: number,
+    appState: UIAppState,
+  ) => JSX.Element | null;
 }
 
 export type SceneData = {
