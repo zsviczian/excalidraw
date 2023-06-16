@@ -30,7 +30,11 @@ import {
 } from "../scene/scrollbars";
 import { getSelectedElements } from "../scene/selection";
 
-import { renderElement, renderElementToSvg } from "./renderElement";
+import {
+  invalidateShapeForElement,
+  renderElement,
+  renderElementToSvg,
+} from "./renderElement";
 import { getClientColor } from "../clients";
 import { LinearElementEditor } from "../element/linearElementEditor";
 import {
@@ -520,7 +524,13 @@ export const _renderScene = ({
       .forEach((element) => {
         try {
           const render = () => {
-            renderElement(element, rc, context, renderConfig, appState);
+            if (isExporting && isIFrameElement(element)) {
+              invalidateShapeForElement(element); //add gray placeholder background
+              renderElement(element, rc, context, renderConfig, appState);
+              invalidateShapeForElement(element); //revert to transparent
+            } else {
+              renderElement(element, rc, context, renderConfig, appState);
+            }
             if (
               isExporting &&
               isIFrameElement(element) &&
@@ -1432,6 +1442,9 @@ export const renderSceneToSvg = (
     .forEach((element) => {
       if (!element.isDeleted) {
         try {
+          if (element.backgroundColor === "transparent") {
+            invalidateShapeForElement(element); //add gray placeholder background
+          }
           renderElementToSvg(
             element,
             rsvg,
@@ -1442,6 +1455,9 @@ export const renderSceneToSvg = (
             exportWithDarkMode,
             exportingFrameId,
           );
+          if (element.backgroundColor === "transparent") {
+            invalidateShapeForElement(element); //revert to transparent
+          }
         } catch (error: any) {
           console.error(error);
         }

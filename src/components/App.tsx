@@ -697,7 +697,6 @@ class App extends React.Component<AppProps, AppState> {
               { sceneX: el.x, sceneY: el.y },
               this.state,
             );
-
             const embedLink = getEmbedLink(el.link);
             const src = embedLink?.link ?? "";
             const isVisible = isVisibleElement(
@@ -776,6 +775,8 @@ class App extends React.Component<AppProps, AppState> {
               }
             };
 
+            const borderWidth = el.strokeWidth;
+
             return (
               <div
                 className="excalidraw__iframe-container"
@@ -784,13 +785,16 @@ class App extends React.Component<AppProps, AppState> {
                   left: `${x - this.state.offsetLeft}px`,
                   transform: `scale(${scale})`,
                   display: isVisible ? "block" : "none",
+                  opacity: el.opacity / 100,
                 }}
               >
                 <div
                   style={{
                     width: `${el.width}px`,
                     height: `${el.height}px`,
-                    border: 0,
+                    borderWidth: `${borderWidth}px`,
+                    borderStyle: "solid",
+                    borderColor: el.strokeColor,
                     transform: `rotate(${el.angle}rad)`,
                     borderRadius: `${radius}px`,
                     pointerEvents: isSelected ? "auto" : "none",
@@ -5338,13 +5342,13 @@ class App extends React.Component<AppProps, AppState> {
       type: "iframe",
       x: gridX,
       y: gridY,
-      strokeColor: this.state.currentItemStrokeColor,
-      backgroundColor: this.state.currentItemBackgroundColor,
+      strokeColor: "transparent",
+      backgroundColor: "transparent",
       fillStyle: this.state.currentItemFillStyle,
       strokeWidth: this.state.currentItemStrokeWidth,
       strokeStyle: this.state.currentItemStrokeStyle,
       roughness: this.state.currentItemRoughness,
-      roundness: this.getCurrentItemRoundness("rectangle"),
+      roundness: this.getCurrentItemRoundness("iframe"),
       opacity: this.state.currentItemOpacity,
       locked: false,
       width: embedLink.aspectRatio.w,
