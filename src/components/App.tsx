@@ -7391,6 +7391,10 @@ class App extends React.Component<AppProps, AppState> {
 
     // must be retrieved first, in the same frame
     const { file, fileHandle } = await getFileFromEvent(event);
+    const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
+      event,
+      this.state,
+    );
 
     try {
       if (isSupportedImageFile(file)) {
@@ -7426,11 +7430,6 @@ class App extends React.Component<AppProps, AppState> {
         // to importing as regular image
         // ---------------------------------------------------------------------
 
-        const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
-          event,
-          this.state,
-        );
-
         const imageElement = this.createImageElement({ sceneX, sceneY });
         this.insertImageElement(imageElement, file);
         this.initializeImageDimensions(imageElement);
@@ -7443,6 +7442,26 @@ class App extends React.Component<AppProps, AppState> {
         isLoading: false,
         errorMessage: error.message,
       });
+    }
+
+    if (event.dataTransfer.types.includes("text/plain")) {
+      const text = event.dataTransfer.getData("text");
+      if (
+        text &&
+        isURLOnWhiteList(text, this.props.iframeURLWhitelist) &&
+        (/^(http|https):\/\/[^\s/$.?#].[^\s]*$/.test(text) ||
+          getEmbedLink(text)?.type === "video")
+      ) {
+        const rectangle = this.insertEmbeddedRectangleElement({
+          sceneX,
+          sceneY,
+          link: text,
+        });
+        if (rectangle) {
+          this.setState({ selectedElementIds: { [rectangle.id]: true } });
+          return;
+        }
+      }
     }
 
     const libraryJSON = event.dataTransfer.getData(MIME_TYPES.excalidrawlib);
