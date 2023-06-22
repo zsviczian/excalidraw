@@ -94,18 +94,49 @@ export const Hyperlink = ({
       trackEvent("hyperlink", "create");
     }
 
-    if (
-      isIFrameElement(element) &&
-      !isURLOnWhiteList(link, appProps.iframeURLWhitelist)
-    ) {
-      setToast({ message: t("toast.unableToEmbed"), closable: true });
-      element.link && iframeLinkCache.set(element.id, element.link);
-      mutateElement(element, {
-        //@ts-ignore
-        type: "rectangle",
-        link,
-      });
-      invalidateShapeForElement(element);
+    if (isIFrameElement(element)) {
+      if (!isURLOnWhiteList(link, appProps.iframeURLWhitelist)) {
+        if (link && link !== "") {
+          setToast({ message: t("toast.unableToEmbed"), closable: true });
+        }
+        element.link && iframeLinkCache.set(element.id, element.link);
+        mutateElement(element, {
+          whitelisted: false,
+          link,
+        });
+        invalidateShapeForElement(element);
+      } else {
+        const { width, height } = element;
+        const embedLink = getEmbedLink(link);
+        const ar = embedLink
+          ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
+          : 1;
+        const hasLinkChanged = iframeLinkCache.get(element.id) !== element.link;
+        mutateElement(element, {
+          ...(hasLinkChanged
+            ? {
+                width:
+                  embedLink?.type === "video"
+                    ? width > height
+                      ? width
+                      : height * ar
+                    : width,
+                height:
+                  embedLink?.type === "video"
+                    ? width > height
+                      ? width / ar
+                      : height
+                    : height,
+              }
+            : {}),
+          whitelisted: true,
+          link,
+        });
+        invalidateShapeForElement(element);
+        if (iframeLinkCache.has(element.id)) {
+          iframeLinkCache.delete(element.id);
+        }
+      }
     } else {
       mutateElement(element, { link });
     }
@@ -224,6 +255,7 @@ export const Hyperlink = ({
   ) {
     return null;
   }
+
   return (
     <div
       className="excalidraw-hyperlinkContainer"
@@ -289,20 +321,7 @@ export const Hyperlink = ({
             icon={FreedrawIcon}
           />
         )}
-        {((linkVal && element.type === "rectangle") ||
-          isIFrameElement(element)) && (
-          <ToolButton
-            type="radio"
-            title={t("buttons.embed")}
-            aria-label={t("buttons.embed")}
-            label={t("buttons.embed")}
-            checked={isIFrameElement(element)}
-            onPointerDown={handleEmbed}
-            className="excalidraw-hyperlinkContainer--embed"
-            icon={EmbedIcon}
-          />
-        )}
-        {linkVal && (
+        {linkVal && !isIFrameElement(element) && (
           <ToolButton
             type="button"
             title={t("buttons.remove")}
@@ -381,7 +400,8 @@ export const actionLink = register({
         icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
         title={`${
-          selectedElements[0].type === "rectangle"
+          selectedElements[0].type === "rectangle" ||
+          isIFrameElement(elements[0])
             ? t("labels.link.labelEmbed")
             : t("labels.link.label")
         } - ${getShortcutKey("CtrlOrCmd+K")}`}
@@ -398,10 +418,10 @@ export const getContextMenuLabel = (
 ) => {
   const selectedElements = getSelectedElements(elements, appState);
   const label = selectedElements[0]!.link
-    ? selectedElements[0]!.type === "rectangle"
+    ? isIFrameElement(selectedElements[0])
       ? "labels.link.editEmbed"
       : "labels.link.edit"
-    : selectedElements[0]!.type === "rectangle"
+    : isIFrameElement(selectedElements[0])
     ? "labels.link.createEmbed"
     : "labels.link.create";
   return label;
@@ -445,6 +465,26 @@ export const isPointHittingLinkIcon = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   [x, y]: Point,
+) => {
+  const threshold = 4 / appState.zoom.value;
+  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
+  const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
+    [x1, y1, x2, y2],
+    element.angle,
+    appState,
+  );
+  const hitLink =
+    x > linkX - threshold &&
+    x < linkX + threshold + linkWidth &&
+    y > linkY - threshold &&
+    y < linkY + linkHeight + threshold;
+  return hitLink;
+};
+
+export const isPointHittingLink = (
+  element: NonDeletedExcalidrawElement,
+  appState: AppState,
+  [x, y]: Point,
   isMobile: boolean,
 ) => {
   if (!element.link || appState.selectedElementIds[element.id]) {
@@ -458,19 +498,7 @@ export const isPointHittingLinkIcon = (
   ) {
     return true;
   }
-  const [x1, y1, x2, y2] = getElementAbsoluteCoords(element);
-
-  const [linkX, linkY, linkWidth, linkHeight] = getLinkHandleFromCoords(
-    [x1, y1, x2, y2],
-    element.angle,
-    appState,
-  );
-  const hitLink =
-    x > linkX - threshold &&
-    x < linkX + threshold + linkWidth &&
-    y > linkY - threshold &&
-    y < linkY + linkHeight + threshold;
-  return hitLink;
+  return isPointHittingLinkIcon(element, appState, [x, y]);
 };
 
 let HYPERLINK_TOOLTIP_TIMEOUT_ID: number | null = null;

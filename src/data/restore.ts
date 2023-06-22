@@ -8,6 +8,7 @@ import {
 import {
   AppState,
   BinaryFiles,
+  ExcalidrawProps,
   LibraryItem,
   NormalizedZoomValue,
 } from "../types";
@@ -41,6 +42,7 @@ import {
   measureBaseline,
 } from "../element/textElement";
 import { COLOR_PALETTE } from "../colors";
+import { isURLOnWhiteList } from "../element/iframe";
 
 type RestoredAppState = Omit<
   AppState,
@@ -63,6 +65,7 @@ export const AllowedExcalidrawActiveTools: Record<
   eraser: false,
   custom: true,
   frame: true,
+  iframe: true,
   hand: true,
 };
 
@@ -164,6 +167,7 @@ const restoreElementWithProperties = <
 const restoreElement = (
   element: Exclude<ExcalidrawElement, ExcalidrawSelectionElement>,
   refreshDimensions = false,
+  appProps?: ExcalidrawProps,
 ): typeof element | null => {
   switch (element.type) {
     case "text":
@@ -276,6 +280,13 @@ const restoreElement = (
       return restoreElementWithProperties(element, {});
     case "diamond":
       return restoreElementWithProperties(element, {});
+    case "iframe":
+      return restoreElementWithProperties(element, {
+        whitelisted: isURLOnWhiteList(
+          element.link,
+          appProps?.iframeURLWhitelist,
+        ),
+      });
     case "frame":
       return restoreElementWithProperties(element, {
         name: element.name ?? null,
@@ -377,6 +388,7 @@ export const restoreElements = (
   /** NOTE doesn't serve for reconciliation */
   localElements: readonly ExcalidrawElement[] | null | undefined,
   opts?: { refreshDimensions?: boolean; repairBindings?: boolean } | undefined,
+  appProps?: ExcalidrawProps | undefined,
 ): ExcalidrawElement[] => {
   // used to detect duplicate top-level element ids
   const existingIds = new Set<string>();
@@ -389,6 +401,7 @@ export const restoreElements = (
       let migratedElement: ExcalidrawElement | null = restoreElement(
         element,
         opts?.refreshDimensions,
+        appProps,
       );
       if (migratedElement) {
         const localElement = localElementsMap?.get(element.id);

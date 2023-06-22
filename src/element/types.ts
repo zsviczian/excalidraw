@@ -86,6 +86,7 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
 
 export type ExcalidrawIFrameElement = _ExcalidrawElementBase &
   Readonly<{
+    whitelisted?: boolean;
     type: "iframe";
   }>;
 
@@ -170,7 +171,6 @@ export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
-  | ExcalidrawImageElement
   | ExcalidrawArrowElement
   | ExcalidrawIFrameElement;
 

@@ -5,6 +5,10 @@
   --zIndex-canvas: 1;
   --zIndex-wysiwyg: 2;
   --zIndex-layerUI: 3;
+
+  --zIndex-modal: 1000;
+  --zIndex-popup: 1001;
+  --zIndex-toast: 999999;
 }
 
 .excalidraw {
@@ -79,16 +83,6 @@
     z-index: 2;
     transform-origin: top left;
     pointer-events: none;
-  }
-
-  &__iframe-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    border-style: none;
-    cursor: pointer;
   }
 
   &.theme--dark {

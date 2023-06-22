@@ -524,7 +524,10 @@ export const _renderScene = ({
       .forEach((element) => {
         try {
           const render = () => {
-            if (isExporting && isIFrameElement(element)) {
+            if (
+              isIFrameElement(element) &&
+              (isExporting || !element.whitelisted)
+            ) {
               invalidateShapeForElement(element); //add gray placeholder background
               renderElement(element, rc, context, renderConfig, appState);
               invalidateShapeForElement(element); //revert to transparent
@@ -532,8 +535,8 @@ export const _renderScene = ({
               renderElement(element, rc, context, renderConfig, appState);
             }
             if (
-              isExporting &&
               isIFrameElement(element) &&
+              (isExporting || !element.whitelisted) &&
               !getBoundTextElement(element)
             ) {
               const label = createPlaceholderiFrameLabel(element);

@@ -43,7 +43,7 @@ export const isImageElement = (
 };
 
 export const isIFrameElement = (
-  element: ExcalidrawElement | null,
+  element: ExcalidrawElement | null | undefined,
 ): element is ExcalidrawIFrameElement => {
   return !!element && element.type === "iframe";
 };
@@ -135,7 +135,6 @@ export const isTextBindableContainer = (
     (element.type === "rectangle" ||
       element.type === "diamond" ||
       element.type === "ellipse" ||
-      element.type === "image" ||
       element.type === "iframe" ||
       isArrowElement(element))
   );
