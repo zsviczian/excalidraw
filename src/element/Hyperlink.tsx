@@ -11,7 +11,12 @@ import { NonDeletedExcalidrawElement } from "./types";
 
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
-import { FreedrawIcon, LinkIcon, TrashIcon } from "../components/icons";
+import {
+  EmbedIcon,
+  FreedrawIcon,
+  LinkIcon,
+  TrashIcon,
+} from "../components/icons";
 import { t } from "../i18n";
 import {
   useCallback,
@@ -171,6 +176,62 @@ export const Hyperlink = ({
       }
     };
   }, [appState, element, isEditing, setAppState]);
+
+  const handleEmbed = useCallback(() => {
+    trackEvent("hyperlink", "embed");
+    if (!element.link) {
+      if (iframeLinkCache.has(element.id)) {
+        iframeLinkCache.delete(element.id);
+      }
+      return;
+    }
+
+    if (isIFrameElement(element)) {
+      iframeLinkCache.set(element.id, element.link);
+      mutateElement(element, {
+        //@ts-ignore
+        type: "rectangle",
+      });
+      invalidateShapeForElement(element);
+      return;
+    }
+
+    if (!isURLOnWhiteList(element.link, iframeURLWhitelist)) {
+      setToast({ message: t("toast.unableToEmbed"), closable: true });
+      return;
+    }
+
+    const { width, height } = element;
+    const embedLink = getEmbedLink(element.link);
+    const ar = embedLink
+      ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
+      : 1;
+    const hasLinkChanged = iframeLinkCache.get(element.id) !== element.link;
+    mutateElement(element, {
+      //@ts-ignore
+      type: "iframe",
+      ...(hasLinkChanged
+        ? {
+            width:
+              embedLink?.type === "video"
+                ? width > height
+                  ? width
+                  : height * ar
+                : width,
+            height:
+              embedLink?.type === "video"
+                ? width > height
+                  ? width / ar
+                  : height
+                : height,
+          }
+        : {}),
+    });
+    invalidateShapeForElement(element);
+    if (iframeLinkCache.has(element.id)) {
+      iframeLinkCache.delete(element.id);
+    }
+  }, [element, iframeURLWhitelist, setToast]);
 
   const handleRemove = useCallback(() => {
     trackEvent("hyperlink", "delete");
@@ -372,13 +433,14 @@ export const getLinkHandleFromCoords = (
   appState: UIAppState,
 ): [x: number, y: number, width: number, height: number] => {
   const size = DEFAULT_LINK_SIZE;
-  const linkWidth = size / appState.zoom.value;
-  const linkHeight = size / appState.zoom.value;
-  const linkMarginY = size / appState.zoom.value;
+  const zoom = appState.zoom.value > 1 ? appState.zoom.value : 1; //zsviczian
+  const linkWidth = size / zoom; //zsviczian
+  const linkHeight = size / zoom; //zsviczian
+  const linkMarginY = size / zoom; //zsviczian
   const centerX = (x1 + x2) / 2;
   const centerY = (y1 + y2) / 2;
-  const centeringOffset = (size - 8) / (2 * appState.zoom.value);
-  const dashedLineMargin = 4 / appState.zoom.value;
+  const centeringOffset = (size - 8) / (2 * zoom); //zsviczian
+  const dashedLineMargin = 4 / zoom; //zsviczian
 
   // Same as `ne` resize handle
   const x = x2 + dashedLineMargin - centeringOffset;

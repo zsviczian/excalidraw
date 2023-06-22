@@ -5,9 +5,8 @@
   --ui-font: Assistant, system-ui, BlinkMacSystemFont, -apple-system, Segoe UI,
     Roboto, Helvetica, Arial, sans-serif;
   font-family: var(--ui-font);
-  position: fixed;
-  z-index: var(--zIndex-popup);
-
+  position: absolute; //zsviczian was fixed
+  z-index: 1000; //zsviczian was var(--zIndex-popup)
   padding: 8px;
   border-radius: 6px;
   box-sizing: border-box;
