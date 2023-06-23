@@ -176,62 +176,6 @@ export const Hyperlink = ({
     };
   }, [appState, element, isEditing, setAppState]);
 
-  const handleEmbed = useCallback(() => {
-    trackEvent("hyperlink", "embed");
-    if (!element.link) {
-      if (iframeLinkCache.has(element.id)) {
-        iframeLinkCache.delete(element.id);
-      }
-      return;
-    }
-
-    if (isIFrameElement(element)) {
-      iframeLinkCache.set(element.id, element.link);
-      mutateElement(element, {
-        //@ts-ignore
-        type: "rectangle",
-      });
-      invalidateShapeForElement(element);
-      return;
-    }
-
-    if (!isURLOnWhiteList(element.link, iframeURLWhitelist)) {
-      setToast({ message: t("toast.unableToEmbed"), closable: true });
-      return;
-    }
-
-    const { width, height } = element;
-    const embedLink = getEmbedLink(element.link);
-    const ar = embedLink
-      ? embedLink.aspectRatio.w / embedLink.aspectRatio.h
-      : 1;
-    const hasLinkChanged = iframeLinkCache.get(element.id) !== element.link;
-    mutateElement(element, {
-      //@ts-ignore
-      type: "iframe",
-      ...(hasLinkChanged
-        ? {
-            width:
-              embedLink?.type === "video"
-                ? width > height
-                  ? width
-                  : height * ar
-                : width,
-            height:
-              embedLink?.type === "video"
-                ? width > height
-                  ? width / ar
-                  : height
-                : height,
-          }
-        : {}),
-    });
-    invalidateShapeForElement(element);
-    if (iframeLinkCache.has(element.id)) {
-      iframeLinkCache.delete(element.id);
-    }
-  }, [element, iframeURLWhitelist, setToast]);
-
   const handleRemove = useCallback(() => {
     trackEvent("hyperlink", "delete");
     mutateElement(element, { link: null });
