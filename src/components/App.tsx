@@ -698,7 +698,10 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private handleIFrameCenterClick(element: NonDeletedExcalidrawElement) {
-    if (this.state.activeIFrameElement === element) {
+    if (
+      this.state.activeIFrame?.element === element &&
+      this.state.activeIFrame?.state === "active"
+    ) {
       return;
     }
 
@@ -710,7 +713,7 @@ class App extends React.Component<AppProps, AppState> {
     //    in fullscreen mode
     setTimeout(() => {
       this.setState({
-        activeIFrameElement: element,
+        activeIFrame: { element, state: "active" },
         selectedElementIds: { [element.id]: true },
         draggingElement: null,
         selectionElement: null,
@@ -782,7 +785,9 @@ class App extends React.Component<AppProps, AppState> {
       !event.metaKey &&
       !event.ctrlKey &&
       el.type === "iframe" &&
-      this.state.activeIFrameElement !== el &&
+      (this.state.activeIFrame?.element !== el ||
+        this.state.activeIFrame?.state === "hover" ||
+        !this.state.activeIFrame) &&
       sceneX >= el.x + el.width / 3 &&
       sceneX <= el.x + (2 * el.width) / 3 &&
       sceneY >= el.y + el.height / 3 &&
@@ -817,13 +822,20 @@ class App extends React.Component<AppProps, AppState> {
             normalizedHeight,
             this.state,
           );
-          const isSelected = this.state.activeIFrameElement === el;
+          const isActive =
+            this.state.activeIFrame?.element === el &&
+            this.state.activeIFrame?.state === "active";
+          const isHovered =
+            this.state.activeIFrame?.element === el &&
+            this.state.activeIFrame?.state === "hover";
           const radius = getCornerRadius(Math.min(el.width, el.height), el);
 
           return (
             <div
               key={el.id}
-              className="excalidraw__iframe-container"
+              className={clsx("excalidraw__iframe-container", {
+                "is-hovered": isHovered,
+              })}
               style={{
                 top: isVisible ? `${y - this.state.offsetTop}px` : 0,
                 left: isVisible ? `${x - this.state.offsetLeft}px` : 0,
@@ -833,12 +845,13 @@ class App extends React.Component<AppProps, AppState> {
               }}
             >
               <div
+                className="excalidraw__iframe-container__inner"
                 style={{
                   width: isVisible ? `${el.width}px` : 0,
                   height: isVisible ? `${el.height}px` : 0,
                   transform: isVisible ? `rotate(${el.angle}rad)` : "none",
                   borderRadius: `${radius}px`,
-                  pointerEvents: isSelected ? "auto" : "none",
+                  pointerEvents: isActive ? "auto" : "none",
                 }}
               >
                 <div
@@ -1153,7 +1166,6 @@ class App extends React.Component<AppProps, AppState> {
                               element={selectedElement[0]}
                               setAppState={this.setAppState}
                               onLinkOpen={this.props.onLinkOpen}
-                              iframeURLWhitelist={this.props.iframeURLWhitelist}
                               setToast={this.setToast}
                             />
                           )}
@@ -2120,7 +2132,7 @@ class App extends React.Component<AppProps, AppState> {
     if (event.touches.length === 2) {
       this.setState({
         selectedElementIds: {},
-        activeIFrameElement: null,
+        activeIFrame: null,
       });
     }
   };
@@ -3174,7 +3186,7 @@ class App extends React.Component<AppProps, AppState> {
           selectedElementIds: {},
           selectedGroupIds: {},
           editingGroupId: null,
-          activeIFrameElement: null,
+          activeIFrame: null,
         });
       }
       isHoldingSpace = false;
@@ -3227,7 +3239,7 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
-        activeIFrameElement: null,
+        activeIFrame: null,
       });
     } else {
       this.setState({ activeTool: nextActiveTool });
@@ -3263,7 +3275,7 @@ class App extends React.Component<AppProps, AppState> {
     if (this.isTouchScreenMultiTouchGesture()) {
       this.setState({
         selectedElementIds: {},
-        activeIFrameElement: null,
+        activeIFrame: null,
       });
     }
     gesture.initialScale = this.state.zoom.value;
@@ -3452,7 +3464,7 @@ class App extends React.Component<AppProps, AppState> {
       selectedElementIds: {},
       selectedGroupIds: {},
       editingGroupId: null,
-      activeIFrameElement: null,
+      activeIFrame: null,
     });
   }
 
@@ -3795,7 +3807,9 @@ class App extends React.Component<AppProps, AppState> {
       }
       if (isIFrameElement(container as ExcalidrawGenericElement)) {
         this.setState({
-          activeIFrameElement: container,
+          activeIFrame: container
+            ? { element: container, state: "active" }
+            : null,
         });
       } else {
         this.startTextEditing({
@@ -4206,7 +4220,7 @@ class App extends React.Component<AppProps, AppState> {
       hideHyperlinkToolip();
       if (
         hitElement &&
-        hitElement.link &&
+        (hitElement.link || isIFrameElement(hitElement)) &&
         this.state.selectedElementIds[hitElement.id] &&
         !this.state.contextMenu &&
         !this.state.showHyperlinkPopup
@@ -4240,11 +4254,18 @@ class App extends React.Component<AppProps, AppState> {
           !hitElement?.locked
         ) {
           if (
+            hitElement &&
             this.isIFrameCenter(hitElement, event, scenePointerX, scenePointerY)
           ) {
             setCursor(this.canvas, CURSOR_TYPE.POINTER);
+            this.setState({
+              activeIFrame: { element: hitElement, state: "hover" },
+            });
           } else {
             setCursor(this.canvas, CURSOR_TYPE.MOVE);
+            if (this.state.activeIFrame?.state === "hover") {
+              this.setState({ activeIFrame: null });
+            }
           }
         }
       } else {
@@ -4714,7 +4735,7 @@ class App extends React.Component<AppProps, AppState> {
       }
     } else if (this.state.viewModeEnabled) {
       this.setState({
-        activeIFrameElement: null,
+        activeIFrame: null,
         selectedElementIds: {},
       });
     }
@@ -4989,7 +5010,7 @@ class App extends React.Component<AppProps, AppState> {
         selectedElementIds: {},
         selectedGroupIds: {},
         editingGroupId: null,
-        activeIFrameElement: null,
+        activeIFrame: null,
       });
     }
   };
@@ -5152,7 +5173,7 @@ class App extends React.Component<AppProps, AppState> {
                 selectedElementIds: {},
                 selectedGroupIds: {},
                 editingGroupId: null,
-                activeIFrameElement: null,
+                activeIFrame: null,
               });
             }
 
@@ -5241,7 +5262,10 @@ class App extends React.Component<AppProps, AppState> {
                   {
                     ...prevState,
                     selectedElementIds: nextSelectedElementIds,
-                    showHyperlinkPopup: hitElement.link ? "info" : false,
+                    showHyperlinkPopup:
+                      hitElement.link || isIFrameElement(hitElement)
+                        ? "info"
+                        : false,
                   },
                   this.scene.getNonDeletedElements(),
                 );
@@ -5920,7 +5944,7 @@ class App extends React.Component<AppProps, AppState> {
           selectedElements.length > 0 &&
           !pointerDownState.withCmdOrCtrl &&
           !this.state.editingElement &&
-          !this.state.activeIFrameElement
+          this.state.activeIFrame?.state !== "active"
         ) {
           const [dragX, dragY] = getGridPoint(
             pointerCoords.x - pointerDownState.drag.offset.x,
@@ -6123,7 +6147,7 @@ class App extends React.Component<AppProps, AppState> {
               selectedElementIds: {},
               selectedGroupIds: {},
               editingGroupId: null,
-              activeIFrameElement: null,
+              activeIFrame: null,
             });
           }
         }
@@ -6164,7 +6188,8 @@ class App extends React.Component<AppProps, AppState> {
                 },
                 showHyperlinkPopup:
                   elementsWithinSelection.length === 1 &&
-                  elementsWithinSelection[0].link
+                  (elementsWithinSelection[0].link ||
+                    isIFrameElement(elementsWithinSelection[0]))
                     ? "info"
                     : false,
                 // select linear element only when we haven't box-selected anything else
@@ -6818,7 +6843,10 @@ class App extends React.Component<AppProps, AppState> {
                 {
                   ...prevState,
                   selectedElementIds: nextSelectedElementIds,
-                  showHyperlinkPopup: hitElement.link ? "info" : false,
+                  showHyperlinkPopup:
+                    hitElement.link || isIFrameElement(hitElement)
+                      ? "info"
+                      : false,
                 },
                 this.scene.getNonDeletedElements(),
               );
@@ -6874,7 +6902,7 @@ class App extends React.Component<AppProps, AppState> {
             selectedElementIds: {},
             selectedGroupIds: {},
             editingGroupId: null,
-            activeIFrameElement: null,
+            activeIFrame: null,
           });
         }
         return;
@@ -7451,7 +7479,7 @@ class App extends React.Component<AppProps, AppState> {
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: {},
-      activeIFrameElement: null,
+      activeIFrame: null,
       selectedGroupIds: {},
       // Continue editing the same group if the user selected a different
       // element from it
@@ -7464,7 +7492,7 @@ class App extends React.Component<AppProps, AppState> {
     }));
     this.setState({
       selectedElementIds: {},
-      activeIFrameElement: null,
+      activeIFrame: null,
       previousSelectedElementIds: this.state.selectedElementIds,
     });
   }
@@ -7793,7 +7821,7 @@ class App extends React.Component<AppProps, AppState> {
       // rotating
       isResizing: transformHandleType && transformHandleType !== "rotation",
       isRotating: transformHandleType === "rotation",
-      activeIFrameElement: null,
+      activeIFrame: null,
     });
     const pointerCoords = pointerDownState.lastCoords;
     const [resizeX, resizeY] = getGridPoint(
