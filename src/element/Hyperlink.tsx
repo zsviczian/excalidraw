@@ -11,12 +11,7 @@ import { NonDeletedExcalidrawElement } from "./types";
 
 import { register } from "../actions/register";
 import { ToolButton } from "../components/ToolButton";
-import {
-  EmbedIcon,
-  FreedrawIcon,
-  LinkIcon,
-  TrashIcon,
-} from "../components/icons";
+import { FreedrawIcon, LinkIcon, TrashIcon } from "../components/icons";
 import { t } from "../i18n";
 import {
   useCallback,
