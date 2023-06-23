@@ -194,6 +194,7 @@ import {
   getCornerRadius,
   getGridPoint,
   isPathALoop,
+  rotate,
 } from "../math";
 import { isVisibleElement, renderScene } from "../renderer/renderScene";
 import { invalidateShapeForElement } from "../renderer/renderElement";

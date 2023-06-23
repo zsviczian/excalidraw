@@ -316,7 +316,7 @@ export const ShapesSwitcher = ({
                   multiElement: null,
                   selectedElementIds: {},
                   activeIFrameElement: null,
-                });
+                })
               ); //zsviczian added setTimeout wrapper because tools wouldn't select on first click
             }}
           />
