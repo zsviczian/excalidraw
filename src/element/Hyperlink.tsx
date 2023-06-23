@@ -400,7 +400,6 @@ export const actionLink = register({
         icon={LinkIcon}
         aria-label={t(getContextMenuLabel(elements, appState))}
         title={`${
-          selectedElements[0].type === "rectangle" ||
           isIFrameElement(elements[0])
             ? t("labels.link.labelEmbed")
             : t("labels.link.label")
