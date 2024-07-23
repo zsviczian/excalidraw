@@ -6,6 +6,7 @@ import { useUIAppState } from "../context/ui-appState";
 export const useCreatePortalContainer = (opts?: {
   className?: string;
   parentSelector?: string;
+  style?: { [x: string]: string }; //zsviczian - Obsidian Dynamic Style
 }) => {
   const [div, setDiv] = useState<HTMLDivElement | null>(null);
 
@@ -20,8 +21,16 @@ export const useCreatePortalContainer = (opts?: {
       div.classList.add("excalidraw", ...(opts?.className?.split(/\s+/) || []));
       div.classList.toggle("excalidraw--mobile", device.editor.isMobile);
       div.classList.toggle("theme--dark", theme === THEME.DARK);
+      if (opts?.style) {
+        //zsviczian
+        const style = opts.style;
+        const styleString = Object.keys(style)
+          .map((property) => `${property}: ${style[property]}`)
+          .join("; ");
+        div.setAttribute("style", styleString);
+      }
     }
-  }, [div, theme, device.editor.isMobile, opts?.className]);
+  }, [div, theme, device.editor.isMobile, opts?.className, opts?.style]); //zsviczian added opts?.style
 
   useLayoutEffect(() => {
     const container = opts?.parentSelector

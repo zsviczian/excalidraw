@@ -232,6 +232,7 @@ export class API {
         const fontFamily = rest.fontFamily ?? appState.currentItemFontFamily;
         element = newTextElement({
           ...base,
+          rawText: rest.text || "test", //zsviczian
           text: rest.text || "test",
           fontSize,
           fontFamily,

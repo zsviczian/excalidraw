@@ -62,7 +62,9 @@ export const shouldEnableBindingForPointerEvent = (
 };
 
 export const isBindingEnabled = (appState: AppState): boolean => {
-  return appState.isBindingEnabled;
+  return appState.invertBindingBehaviour //zsviczian
+    ? !appState.isBindingEnabled
+    : appState.isBindingEnabled;
 };
 
 const getNonDeletedElements = (
@@ -1041,7 +1043,7 @@ const coordsCenter = (
 // all focus points lie, so it's a number between -1 and 1.
 // The line going through `a` and `b` is a tangent to the "focus image"
 // of the element.
-const determineFocusDistance = (
+export const determineFocusDistance = ( //zsviczian added export
   element: ExcalidrawBindableElement,
   // Point on the line, in absolute coordinates
   a: Point,
@@ -1122,7 +1124,7 @@ const determineFocusPoint = (
 
 // Returns 2 or 0 intersection points between line going through `a` and `b`
 // and the `element`, in ascending order of distance from `a`.
-const intersectElementWithLine = (
+export const intersectElementWithLine = ( //zsviczian added export
   element: ExcalidrawBindableElement,
   // Point on the line, in absolute coordinates
   a: Point,
@@ -1353,7 +1355,7 @@ const findFocusPointForEllipse = (
   }
 
   const x = -(a ** 2 * m) / (n ** 2 * b ** 2 + m ** 2 * a ** 2);
-  return GA.point(x, (-m * x - 1) / n);
+  return GA.point(x, (-m * x - 1) / (n === 0 ? 0.0001 : n)); //zsviczian https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/1054
 };
 
 const findFocusPointForRectangulars = (

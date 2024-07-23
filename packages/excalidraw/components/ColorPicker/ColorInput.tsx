@@ -6,6 +6,7 @@ import { activeColorPickerSectionAtom } from "./colorPickerUtils";
 import { eyeDropperIcon } from "../icons";
 import { jotaiScope } from "../../jotai";
 import { KEYS } from "../../keys";
+import { COLOR_NAMES } from "../../constants"; //zsviczian
 import { activeEyeDropperAtom } from "../EyeDropper";
 import clsx from "clsx";
 import { t } from "../../i18n";
@@ -57,6 +58,36 @@ export const ColorInput = ({
     }
   }, [activeSection]);
 
+  //zsviczian
+  let opacity: string = "";
+  const hexColor = (color: string): string => {
+    if (Object.keys(COLOR_NAMES).includes(color)) {
+      return COLOR_NAMES[color];
+    }
+    const style = new Option().style;
+    style.color = color;
+    if (!!style.color) {
+      const digits = style.color.match(
+        /^[^\d]*(\d*)[^\d]*(\d*)[^\d]*(\d*)[^\d]*([\d.]*)?/,
+      );
+      if (!digits) {
+        return "#000000";
+      }
+      opacity = digits[4]
+        ? (Math.round(parseFloat(digits[4]) * 255) << 0)
+            .toString(16)
+            .padStart(2, "0")
+        : "";
+      return `#${(parseInt(digits[1]) << 0).toString(16).padStart(2, "0")}${(
+        parseInt(digits[2]) << 0
+      )
+        .toString(16)
+        .padStart(2, "0")}${(parseInt(digits[3]) << 0)
+        .toString(16)
+        .padStart(2, "0")}`;
+    }
+    return "#000000";
+  };
   const [eyeDropperState, setEyeDropperState] = useAtom(
     activeEyeDropperAtom,
     jotaiScope,
@@ -102,7 +133,7 @@ export const ColorInput = ({
             style={{
               width: "1px",
               height: "1.25rem",
-              backgroundColor: "var(--default-border-color)",
+              backgroundColor: "var(--icon-fill-color)", //zsviczian was: --default-border-color
             }}
           />
           <div
@@ -129,6 +160,18 @@ export const ColorInput = ({
           </div>
         </>
       )}
+      <input //zsviczian
+        type="color"
+        onChange={(event) => changeColor(event.target.value + opacity)}
+        value={hexColor(innerValue || "")}
+        onBlur={() => setInnerValue(color)}
+        style={{
+          marginTop: "auto",
+          marginLeft: "4px",
+          marginBottom: "auto",
+          marginRight: "-0.625rem",
+        }}
+      />
     </div>
   );
 };

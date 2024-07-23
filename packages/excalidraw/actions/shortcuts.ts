@@ -36,6 +36,7 @@ export type ShortcutName =
       | "flipVertical"
       | "hyperlink"
       | "toggleElementLock"
+      | "toggleLaserPointerTool" //zsviczian
       | "resetZoom"
       | "zoomOut"
       | "zoomIn"
@@ -100,6 +101,7 @@ const shortcutMap: Record<ShortcutName, string[]> = {
   viewMode: [getShortcutKey("Alt+R")],
   hyperlink: [getShortcutKey("CtrlOrCmd+K")],
   toggleElementLock: [getShortcutKey("CtrlOrCmd+Shift+L")],
+  toggleLaserPointerTool: [getShortcutKey("K")], //zsviczian
   resetZoom: [getShortcutKey("CtrlOrCmd+0")],
   zoomOut: [getShortcutKey("CtrlOrCmd+-")],
   zoomIn: [getShortcutKey("CtrlOrCmd++")],

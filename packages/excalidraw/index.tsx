@@ -32,25 +32,37 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     viewModeEnabled,
     zenModeEnabled,
     gridModeEnabled,
+    initState, //zsviczian
     libraryReturnUrl,
     theme,
     name,
     renderCustomStats,
     onPaste,
+    onDrop, //zsviczian
     detectScroll = true,
     handleKeyboardGlobally = false,
     onLibraryChange,
     autoFocus = false,
+    onBeforeTextEdit, //zsviczian
+    onBeforeTextSubmit, //zsviczian
     generateIdForFile,
+    onThemeChange, //zsviczian
     onLinkOpen,
+    onLinkHover, //zsviczian
+    onViewModeChange, //zsviczian
     onPointerDown,
     onPointerUp,
     onScrollChange,
     children,
     validateEmbeddable,
     renderEmbeddable,
+    renderWebview, //zsviczian
+    renderEmbeddableMenu, //zsviczian
+    renderMermaid, //zsviczian
+    onContextMenu, //zsviczian
     aiEnabled,
     showDeprecatedFonts,
+    obsidianHostPlugin,
   } = props;
 
   const canvasActions = props.UIOptions?.canvasActions;
@@ -120,25 +132,37 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           viewModeEnabled={viewModeEnabled}
           zenModeEnabled={zenModeEnabled}
           gridModeEnabled={gridModeEnabled}
+          initState={initState} //zsviczian
           libraryReturnUrl={libraryReturnUrl}
           theme={theme}
           name={name}
           renderCustomStats={renderCustomStats}
           UIOptions={UIOptions}
           onPaste={onPaste}
+          onDrop={onDrop} //zsviczian
           detectScroll={detectScroll}
           handleKeyboardGlobally={handleKeyboardGlobally}
           onLibraryChange={onLibraryChange}
           autoFocus={autoFocus}
+          onBeforeTextEdit={onBeforeTextEdit} //zsviczian
+          onBeforeTextSubmit={onBeforeTextSubmit} //zsviczian
           generateIdForFile={generateIdForFile}
+          onThemeChange={onThemeChange} //zsviczian
           onLinkOpen={onLinkOpen}
+          onLinkHover={onLinkHover} //zsviczian
+          onViewModeChange={onViewModeChange} //zsviczian
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
           onScrollChange={onScrollChange}
           validateEmbeddable={validateEmbeddable}
           renderEmbeddable={renderEmbeddable}
+          renderWebview={renderWebview} //zsviczian
+          renderEmbeddableMenu={renderEmbeddableMenu} //zsviczian
+          renderMermaid={renderMermaid} //zsviczian
+          onContextMenu={onContextMenu} //zsviczian
           aiEnabled={aiEnabled !== false}
           showDeprecatedFonts={showDeprecatedFonts}
+          obsidianHostPlugin={obsidianHostPlugin} //zsviczian
         >
           {children}
         </App>
@@ -229,7 +253,26 @@ export {
   exportToBlob,
   exportToSvg,
   exportToClipboard,
+  getCommonBoundingBox, //zsviczian
+  getMaximumGroups, //zsviczian
+  intersectElementWithLine, //zsviczian
+  determineFocusDistance, //zsviczian
+  measureText, //zsviczian
+  getDefaultLineHeight, //zsviczian
+  wrapText, //zsviczian
+  getFontString, //zsviczian
+  getBoundTextMaxWidth, //zsviczian
+  mermaidToExcalidraw, //zsviczian
+  destroyObsidianUtils, //zsviczian
 } from "../utils/export";
+
+export {
+  refreshTextDimensions, 
+} from "./element/newElement"; //zsviczian
+
+export {
+  getContainerElement,
+} from "./element/textElement"; //zsviczian
 
 export { serializeAsJSON, serializeLibraryAsJSON } from "./data/json";
 export {
@@ -264,6 +307,7 @@ export {
   viewportCoordsToSceneCoords,
 } from "./utils";
 
+export { getEmbedLink } from "./element/embeddable"; //zsviczian - not sure if I use it any more
 export { Sidebar } from "./components/Sidebar/Sidebar";
 export { Button } from "./components/Button";
 export { Footer };

@@ -1,5 +1,5 @@
-import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
-import { LaserPointer } from "@excalidraw/laser-pointer";
+import type { LaserPointerOptions } from "@zsviczian/laser-pointer";
+import { LaserPointer } from "@zsviczian/laser-pointer";
 import type { AnimationFrameHandler } from "./animation-frame-handler";
 import type { AppState } from "./types";
 import { getSvgPathFromStroke, sceneCoordsToViewportCoords } from "./utils";
@@ -74,6 +74,14 @@ export class AnimatedTrail implements Trail {
   }
 
   startPath(x: number, y: number) {
+    //zsviczian (fix offset)
+    if (this.container) {
+      this.container.style.top = "0px";
+      this.container.style.left = "0px";
+      const { x, y } = this.container.getBoundingClientRect();
+      this.container.style.top = `${-y}px`;
+      this.container.style.left = `${-x}px`;
+    }
     this.currentTrail = new LaserPointer(this.options);
 
     this.currentTrail.addPoint([x, y, performance.now()]);

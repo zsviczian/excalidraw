@@ -100,8 +100,8 @@ export const EyeDropper: React.FC<{
       altKey: boolean;
     }) => {
       // FIXME swap offset when the preview gets outside viewport
-      colorPreviewDiv.style.top = `${clientY + 20}px`;
-      colorPreviewDiv.style.left = `${clientX + 20}px`;
+      colorPreviewDiv.style.top = `${clientY - appState.offsetTop + 20}px`; //zsviczian added offset
+      colorPreviewDiv.style.left = `${clientX - appState.offsetLeft + 20}px`; //zsviczian added offset
 
       const currentColor = getCurrentColor({ clientX, clientY });
 

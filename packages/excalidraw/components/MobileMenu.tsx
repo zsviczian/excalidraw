@@ -10,13 +10,13 @@ import type {
 import type { ActionManager } from "../actions/manager";
 import { t } from "../i18n";
 import Stack from "./Stack";
-import { showSelectedShapeActions } from "../element";
+import { getNonDeletedElements, showSelectedShapeActions } from "../element";
 import type { NonDeletedExcalidrawElement } from "../element/types";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { Island } from "./Island";
 import { HintViewer } from "./HintViewer";
-import { calculateScrollCenter } from "../scene";
-import { SelectedShapeActions, ShapesSwitcher } from "./Actions";
+import { calculateScrollCenter, isSomeElementSelected } from "../scene";
+import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
 import { Section } from "./Section";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 import { LockButton } from "./LockButton";
@@ -24,6 +24,9 @@ import { PenModeButton } from "./PenModeButton";
 import { HandButton } from "./HandButton";
 import { isHandToolActive } from "../appState";
 import { useTunnels } from "../context/tunnels";
+import clsx from "clsx";
+import { Stats } from "./Stats";
+import { actionToggleStats } from "../actions";
 
 type MobileMenuProps = {
   appState: UIAppState;
@@ -71,6 +74,11 @@ export const MobileMenu = ({
     DefaultSidebarTriggerTunnel,
   } = useTunnels();
   const renderToolbar = () => {
+    const shouldShowStats = //zsviczian
+      appState.stats.open &&
+      !appState.zenModeEnabled &&
+      !appState.viewModeEnabled;
+
     return (
       <FixedSideContainer side="top" className="App-top-bar">
         {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
@@ -78,7 +86,12 @@ export const MobileMenu = ({
           {(heading: React.ReactNode) => (
             <Stack.Col gap={4} align="center">
               <Stack.Row gap={1} className="App-toolbar-container">
-                <Island padding={1} className="App-toolbar App-toolbar--mobile">
+                <Island
+                  padding={1}
+                  className={`App-toolbar${
+                    device.editor.isMobile ? " App-toolbar--mobile" : "" //zsviczian
+                  }`}
+                >
                   {heading}
                   <Stack.Row gap={1}>
                     <ShapesSwitcher
@@ -89,8 +102,9 @@ export const MobileMenu = ({
                     />
                   </Stack.Row>
                 </Island>
-                {renderTopRightUI && renderTopRightUI(true, appState)}
                 <div className="mobile-misc-tools-container">
+                  {!appState.viewModeEnabled && //zsviczian
+                    renderTopRightUI?.(true, appState)}
                   {!appState.viewModeEnabled && (
                     <DefaultSidebarTriggerTunnel.Out />
                   )}
@@ -124,29 +138,73 @@ export const MobileMenu = ({
           device={device}
           app={app}
         />
+        <div //zsviczian
+          className={clsx(
+            "layer-ui__wrapper__top-right zen-mode-transition",
+            {
+              "transition-right": appState.zenModeEnabled,
+            },
+          )}
+          style={{
+            marginRight: "4rem"
+          }}
+        >
+          {shouldShowStats && ( //zsviczian
+            <Stats
+              scene={app.scene}
+              onClose={() => {
+                actionManager.executeAction(actionToggleStats);
+              }}
+              renderCustomStats={renderCustomStats}
+            />
+          )}          
+        </div>
       </FixedSideContainer>
     );
   };
 
   const renderAppToolbar = () => {
     if (appState.viewModeEnabled) {
-      return (
+      return; //zsviczian
+      /*return (
         <div className="App-toolbar-content">
           <MainMenuTunnel.Out />
         </div>
-      );
+      );*/
     }
+
+    //zsviczian fix mobile menu button positions
+    const showEditMenu = showSelectedShapeActions(
+      appState,
+      getNonDeletedElements(elements),
+    );
+    const showElAction = isSomeElementSelected(
+      getNonDeletedElements(elements),
+      appState,
+    );
 
     return (
       <div className="App-toolbar-content">
         <MainMenuTunnel.Out />
-        {actionManager.renderAction("toggleEditMenu")}
+        {showEditMenu ? ( //zsviczian
+          actionManager.renderAction("toggleEditMenu")
+        ) : (
+          <div className="ToolIcon__icon" aria-hidden="true" />
+        )}
         {actionManager.renderAction("undo")}
         {actionManager.renderAction("redo")}
-        {actionManager.renderAction(
-          appState.multiElement ? "finalize" : "duplicateSelection",
+        {showElAction || appState.multiElement ? ( //zsviczian
+          actionManager.renderAction(
+            appState.multiElement ? "finalize" : "duplicateSelection",
+          )
+        ) : (
+          <div className="ToolIcon__icon" aria-hidden="true" />
         )}
-        {actionManager.renderAction("deleteSelectedElements")}
+        {showElAction ? ( //zsviczian
+          actionManager.renderAction("deleteSelectedElements")
+        ) : (
+          <div className="ToolIcon__icon" aria-hidden="true" />
+        )}
       </div>
     );
   };
@@ -158,7 +216,7 @@ export const MobileMenu = ({
       <div
         className="App-bottom-bar"
         style={{
-          marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
+          marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN, //* 2, zsviczian
           marginLeft: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
           marginRight: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN * 2,
         }}
@@ -194,6 +252,17 @@ export const MobileMenu = ({
               )}
           </footer>
         </Island>
+        {appState.trayModeEnabled ? ( //zsviczian display zoom menu in tray mode
+          <Island padding={1} style={{ marginLeft: `4px` }}>
+            <ZoomActions
+              renderAction={actionManager.renderAction}
+              zoom={appState.zoom}
+              trayMode={true}
+            />
+          </Island>
+        ) : (
+          ""
+        )}
       </div>
     </>
   );

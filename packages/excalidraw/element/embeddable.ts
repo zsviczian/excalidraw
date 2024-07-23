@@ -20,7 +20,7 @@ type IframeDataWithSandbox = MarkRequired<IframeData, "sandbox">;
 const embeddedLinkCache = new Map<string, IframeDataWithSandbox>();
 
 const RE_YOUTUBE =
-  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|&t=|\?start=|&start=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
+  /^(?:http(?:s)?:\/\/)?(?:www\.)?youtu(?:be\.com|\.be)\/(embed\/|watch\?v=|shorts\/|playlist\?list=|embed\/videoseries\?list=)?([a-zA-Z0-9_-]+)(?:\?t=|.*&t=|\?start=|.*&start=)?([a-zA-Z0-9_-]+)?[^\s]*$/;
 
 const RE_VIMEO =
   /^(?:http(?:s)?:\/\/)?(?:(?:w){3}\.)?(?:player\.)?vimeo\.com\/(?:video\/)?([^?\s]+)(?:\?.*)?$/;
@@ -84,15 +84,22 @@ export const getEmbedLink = (
     return null;
   }
 
+  const allowSameOrigin = true; //zsviczian I don't worry about same origin in Obsidian
+
+  if (link.startsWith("data:text/html")) { //zsviczian
+    return { link, intrinsicSize: { w: 550, h: 720 }, type: "generic", sandbox: { allowSameOrigin }, };
+  }
+
   if (embeddedLinkCache.has(link)) {
     return embeddedLinkCache.get(link)!;
   }
 
   const originalLink = link;
 
+  /* zsviczian
   const allowSameOrigin = ALLOW_SAME_ORIGIN.has(
     matchHostname(link, ALLOW_SAME_ORIGIN) || "",
-  );
+  );*/
 
   let type: "video" | "generic" = "generic";
   let aspectRatio = { w: 560, h: 840 };
@@ -286,6 +293,7 @@ export const createPlaceholderEmbeddableLabel = (
     fontFamily,
     fontSize,
     text: wrapText(text, fontString, element.width - 20),
+    rawText: text,
     textAlign: "center",
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     angle: element.angle ?? 0,

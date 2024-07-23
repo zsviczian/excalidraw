@@ -762,7 +762,7 @@ export const getFrameLikeTitle = (
   // TODO name frames "AI" only if specific to AI frames
   return element.name === null
     ? isFrameElement(element)
-      ? `Frame ${frameIdx}`
+      ? `Frame ${(frameIdx).toString().padStart(2, "0")}` //zsviczian ? `Frame ${frameIdx}`
       : `AI Frame $${frameIdx}`
     : element.name;
 };

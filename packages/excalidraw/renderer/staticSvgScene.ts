@@ -204,6 +204,8 @@ const renderElementToSvg = (
         renderConfig,
       );
 
+      const scaleX = element.scale?.[0] || 1; //zsviczian
+      const scaleY = element.scale?.[1] || 1; //zsviczian
       // render embeddable element + iframe
       const embeddableNode = roughSVGDrawWithPrecision(
         rsvg,
@@ -215,7 +217,7 @@ const renderElementToSvg = (
         "transform",
         `translate(${offsetX || 0} ${
           offsetY || 0
-        }) rotate(${degree} ${cx} ${cy})`,
+        }) rotate(${degree} ${cx} ${cy}) scale(${scaleX}, ${scaleY})`, //zsviczian
       );
       while (embeddableNode.firstChild) {
         embeddableNode.removeChild(embeddableNode.firstChild);
@@ -246,8 +248,8 @@ const renderElementToSvg = (
           SVG_NS,
           "foreignObject",
         );
-        foreignObject.style.width = `${element.width}px`;
-        foreignObject.style.height = `${element.height}px`;
+        foreignObject.style.width = `${element.width / scaleX}px`; //zsviczian
+        foreignObject.style.height = `${element.height / scaleY}px`; //zsviczian
         foreignObject.style.border = "none";
         const div = foreignObject.ownerDocument!.createElementNS(SVG_NS, "div");
         div.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
@@ -389,7 +391,24 @@ const renderElementToSvg = (
       );
       node.setAttribute("stroke", "none");
       const path = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
-      path.setAttribute("fill", element.strokeColor);
+      //zsviczian
+      if (element.customData?.strokeOptions?.hasOutline) {
+        node.setAttribute(
+          "stroke-width",
+          `${
+            element.strokeWidth *
+            (element.customData.strokeOptions.outlineWidth ?? 1)
+          }`,
+        );
+        const outline = svgRoot.ownerDocument!.createElementNS(SVG_NS, "path");
+        outline.setAttribute("fill", "none");
+        outline.setAttribute("stroke", element.strokeColor);
+        outline.setAttribute("d", getFreeDrawSvgPath(element));
+        node.appendChild(outline);
+        path.setAttribute("fill", element.backgroundColor);
+      } else {
+        path.setAttribute("fill", element.strokeColor);
+      }
       path.setAttribute("d", getFreeDrawSvgPath(element));
       node.appendChild(path);
 
@@ -421,6 +440,7 @@ const renderElementToSvg = (
           image.setAttribute("width", "100%");
           image.setAttribute("height", "100%");
           image.setAttribute("href", fileData.dataURL);
+          image.setAttribute("preserveAspectRatio", "none"); //zsviczian
 
           symbol.appendChild(image);
 
@@ -525,8 +545,20 @@ const renderElementToSvg = (
         rect.setAttribute("ry", FRAME_STYLE.radius.toString());
 
         rect.setAttribute("fill", "none");
-        rect.setAttribute("stroke", FRAME_STYLE.strokeColor);
-        rect.setAttribute("stroke-width", FRAME_STYLE.strokeWidth.toString());
+        //rect.setAttribute("stroke", FRAME_STYLE.strokeColor); //zsviczian
+        //rect.setAttribute("stroke-width", FRAME_STYLE.strokeWidth.toString()); //zsviczian
+        rect.setAttribute(
+          "stroke",
+          element.customData?.frameColor?.stroke ??
+            renderConfig.frameColor?.stroke ??
+            FRAME_STYLE.strokeColor,
+        ); //zsviczian
+        rect.setAttribute(
+          "stroke-width",
+          element.customData?.frameColor?.fill ??
+            renderConfig.frameColor?.fill ??
+            FRAME_STYLE.strokeWidth.toString(),
+        ); //zsviczian
 
         addToRoot(rect, element);
       }

@@ -94,6 +94,7 @@ export type ExcalidrawEllipseElement = _ExcalidrawElementBase & {
 export type ExcalidrawEmbeddableElement = _ExcalidrawElementBase &
   Readonly<{
     type: "embeddable";
+    scale: [number, number];
   }>;
 
 export type ExcalidrawIframeElement = _ExcalidrawElementBase &
@@ -101,6 +102,7 @@ export type ExcalidrawIframeElement = _ExcalidrawElementBase &
     type: "iframe";
     // TODO move later to AI-specific frame
     customData?: { generationData?: MagicCacheData };
+    scale: [number, number]; //zsviczian
   }>;
 
 export type ExcalidrawIframeLikeElement =
@@ -189,6 +191,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     fontSize: number;
     fontFamily: FontFamilyValues;
     text: string;
+    rawText: string;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
     containerId: ExcalidrawGenericElement["id"] | null;

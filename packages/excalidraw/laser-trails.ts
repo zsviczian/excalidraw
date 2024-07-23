@@ -1,4 +1,4 @@
-import type { LaserPointerOptions } from "@excalidraw/laser-pointer";
+import type { LaserPointerOptions } from "@zsviczian/laser-pointer";
 import type { Trail } from "./animated-trail";
 import { AnimatedTrail } from "./animated-trail";
 import type { AnimationFrameHandler } from "./animation-frame-handler";
@@ -7,6 +7,19 @@ import type { SocketId } from "./types";
 import { easeOut } from "./utils";
 import { getClientColor } from "./clients";
 import { DEFAULT_LASER_COLOR } from "./constants";
+
+//zsviczian
+// decay time in milliseconds
+const DECAY_TIME = 1000;
+const getDecayTime = () =>
+  (window as any).ExcalidrawAutomate?.LASERPOINTER?.DECAY_TIME ?? DECAY_TIME; //zsviczian
+// length of line in points before it starts decaying
+const DECAY_LENGTH = 50;
+const getDecayLength = () =>
+  (window as any).ExcalidrawAutomate?.LASERPOINTER?.DECAY_LENGTH ??
+  DECAY_LENGTH; //zsviczian
+const getColor = () =>
+  (window as any).ExcalidrawAutomate?.LASERPOINTER?.COLOR ?? "red"; //zsviczian
 
 export class LaserTrails implements Trail {
   public localTrail: AnimatedTrail;
@@ -22,7 +35,7 @@ export class LaserTrails implements Trail {
 
     this.localTrail = new AnimatedTrail(animationFrameHandler, app, {
       ...this.getTrailOptions(),
-      fill: () => DEFAULT_LASER_COLOR,
+      fill: () => getColor(), //zsviczian
     });
   }
 
@@ -31,8 +44,8 @@ export class LaserTrails implements Trail {
       simplify: 0,
       streamline: 0.4,
       sizeMapping: (c) => {
-        const DECAY_TIME = 1000;
-        const DECAY_LENGTH = 50;
+        const DECAY_TIME = getDecayTime(); //zsviczian
+        const DECAY_LENGTH = getDecayLength(); //zsviczian 
         const t = Math.max(
           0,
           1 - (performance.now() - c.pressure) / DECAY_TIME,

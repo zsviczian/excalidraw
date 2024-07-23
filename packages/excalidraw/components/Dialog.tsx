@@ -5,6 +5,7 @@ import {
   useExcalidrawContainer,
   useDevice,
   useExcalidrawSetAppState,
+  useExcalidrawAppState,
 } from "./App";
 import { KEYS } from "../keys";
 import "./Dialog.scss";
@@ -49,6 +50,7 @@ export const Dialog = (props: DialogProps) => {
   const [islandNode, setIslandNode] = useCallbackRefState<HTMLDivElement>();
   const [lastActiveElement] = useState(document.activeElement);
   const { id } = useExcalidrawContainer();
+  const { dynamicStyle } = useExcalidrawAppState(); //zsviczian
   const isFullscreen = useDevice().viewport.isMobile;
 
   useEffect(() => {
@@ -110,6 +112,7 @@ export const Dialog = (props: DialogProps) => {
       maxWidth={getDialogSize(props.size)}
       onCloseRequest={onClose}
       closeOnClickOutside={props.closeOnClickOutside}
+      style={dynamicStyle}
     >
       <Island ref={setIslandNode}>
         {props.title && (

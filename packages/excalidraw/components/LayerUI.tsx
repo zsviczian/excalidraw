@@ -241,6 +241,9 @@ const LayerUI = ({
       elements,
     );
 
+    if (appState.viewModeEnabled) {
+      return null;
+    } //zsviczian
     const shouldShowStats =
       appState.stats.open &&
       !appState.zenModeEnabled &&
@@ -275,7 +278,14 @@ const LayerUI = ({
                       >
                         <HintViewer
                           appState={appState}
-                          isMobile={device.editor.isMobile}
+                          isMobile={
+                            device.editor.isMobile ||
+                            (!(
+                              appState.viewModeEnabled ||
+                              appState.zenModeEnabled
+                            ) &&
+                              appState.trayModeEnabled)
+                          } //zsviczian
                           device={device}
                           app={app}
                         />
@@ -351,7 +361,8 @@ const LayerUI = ({
                 userToFollow={appState.userToFollow?.socketId || null}
               />
             )}
-            {renderTopRightUI?.(device.editor.isMobile, appState)}
+            {!appState.viewModeEnabled && //zsviczian
+              renderTopRightUI?.(device.editor.isMobile, appState)}
             {!appState.viewModeEnabled &&
               // hide button when sidebar docked
               (!isSidebarDocked ||
@@ -373,6 +384,10 @@ const LayerUI = ({
     );
   };
 
+  const isTrayModeOrMobile =
+    device.editor.isMobile ||
+    (!(appState.viewModeEnabled || appState.zenModeEnabled) &&
+      appState.trayModeEnabled); //zsviczian
   const renderSidebars = () => {
     return (
       <DefaultSidebar
@@ -415,7 +430,7 @@ const LayerUI = ({
         }}
         tab={DEFAULT_SIDEBAR.defaultTab}
       >
-        {t("toolBar.library")}
+        {/*t("toolBar.library") //zsviczian */}
       </DefaultSidebar.Trigger>
       <DefaultOverwriteConfirmDialog />
       {appState.openDialog?.name === "ttd" && <TTDDialog __fallback />}
@@ -427,7 +442,7 @@ const LayerUI = ({
           {appState.errorMessage}
         </ErrorDialog>
       )}
-      {eyeDropperState && !device.editor.isMobile && (
+      {eyeDropperState && ( //!device.editor.isMobile && //zsviczian
         <EyeDropper
           colorPickerType={eyeDropperState.colorPickerType}
           onCancel={() => {
@@ -516,7 +531,7 @@ const LayerUI = ({
           }
         />
       )}
-      {device.editor.isMobile && (
+      {isTrayModeOrMobile && ( //zsviczian Added isTrayMode condition
         <MobileMenu
           app={app}
           appState={appState}
@@ -536,7 +551,8 @@ const LayerUI = ({
           UIOptions={UIOptions}
         />
       )}
-      {!device.editor.isMobile && (
+
+      {!isTrayModeOrMobile && ( //zsviczian changed from !device.editor.isMobile
         <>
           <div
             className="layer-ui__wrapper"

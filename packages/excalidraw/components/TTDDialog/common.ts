@@ -1,6 +1,10 @@
-import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
-import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
-import { DEFAULT_EXPORT_PADDING, EDITOR_LS_KEYS } from "../../constants";
+import type { MermaidOptions } from "@zsviczian/mermaid-to-excalidraw";
+import type { MermaidToExcalidrawResult } from "@zsviczian/mermaid-to-excalidraw/dist/interfaces";
+import { 
+  DEFAULT_EXPORT_PADDING,
+  DEFAULT_FONT_SIZE,
+  EDITOR_LS_KEYS,
+} from "../../constants";
 import { convertToExcalidrawElements, exportToCanvas } from "../../index";
 import type { NonDeletedExcalidrawElement } from "../../element/types";
 import type { AppClassProperties, BinaryFiles } from "../../types";
@@ -34,7 +38,8 @@ export interface MermaidToExcalidrawLibProps {
   api: Promise<{
     parseMermaidToExcalidraw: (
       definition: string,
-      config?: MermaidConfig,
+      options: MermaidOptions, //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226
+      //config?: MermaidConfig, //zsviczian
     ) => Promise<MermaidToExcalidrawResult>;
   }>;
 }
@@ -74,19 +79,32 @@ export const convertMermaidToExcalidraw = async ({
 
     let ret;
     try {
-      ret = await api.parseMermaidToExcalidraw(mermaidDefinition);
+      ret = await api.parseMermaidToExcalidraw(mermaidDefinition, {
+        fontSize: DEFAULT_FONT_SIZE,
+      }); //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226
+      //ret = await api.parseMermaidToExcalidraw(mermaidDefinition); //zsviczian
     } catch (err: any) {
       ret = await api.parseMermaidToExcalidraw(
         mermaidDefinition.replace(/"/g, "'"),
+        {
+          fontSize: DEFAULT_FONT_SIZE, //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226 
+        },
       );
     }
     const { elements, files } = ret;
     setError(null);
 
     data.current = {
-      elements: convertToExcalidrawElements(elements, {
-        regenerateIds: true,
-      }),
+      elements: convertToExcalidrawElements(
+        //zsviczian add customData to new mermaid image element
+        elements.map((el) => {
+          if (el.type === "image") {
+            el.customData = { mermaidText: mermaidDefinition };
+          }
+          return el;
+        }),
+        { regenerateIds: true },
+      ),
       files,
     };
 

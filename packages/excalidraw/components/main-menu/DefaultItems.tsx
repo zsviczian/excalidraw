@@ -158,7 +158,7 @@ export const Help = () => {
       shortcut="?"
       aria-label={t("helpDialog.title")}
     >
-      {t("helpDialog.title")}
+      {"Help & Issues"}
     </DropdownMenuItem>
   );
 };

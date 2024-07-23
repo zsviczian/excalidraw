@@ -253,7 +253,7 @@ export const textWysiwyg = ({
         font,
         // must be defined *after* font ¯\_(ツ)_/¯
         lineHeight: updatedTextElement.lineHeight,
-        width: `${width}px`,
+        width: `${Math.ceil(width)}px`, //zsviczian Excalidraw 2.1.2, text wrapping issue when Obsidian zoom is not 100%
         height: `${height}px`,
         left: `${viewportX - padding}px`,
         top: `${viewportY}px`,
@@ -352,7 +352,7 @@ export const textWysiwyg = ({
           getBoundTextMaxWidth(container, boundTextElement),
         );
         const width = getTextWidth(wrappedText, font, true);
-        editable.style.width = `${width}px`;
+        editable.style.width = `${Math.ceil(width)}px`; //zsviczian Excalidraw 2.1.2, text wrapping issue when Obsidian zoom is not 100%
       }
     };
 
@@ -560,7 +560,7 @@ export const textWysiwyg = ({
         app.scene.getNonDeletedElementsMap(),
       );
     }
-
+    app.setState({ openPopup: null }); //zsviczian (container text color issue)
     onSubmit({
       viaKeyboard: submittedViaKeyboard,
       nextOriginalText: editable.value,
@@ -617,11 +617,16 @@ export const textWysiwyg = ({
     const isPropertiesTrigger =
       target instanceof HTMLElement &&
       target.classList.contains("properties-trigger");
-
+    const isShapeActionsPanel = //zsviczian
+      (event.target instanceof HTMLElement ||
+        event.target instanceof SVGElement) &&
+      (event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) ||
+        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MOBILE_MENU}`) ||
+        event.target.closest(`.${CLASSES.MOBILE_TOOLBAR}`));
     if (
       ((event.target instanceof HTMLElement ||
         event.target instanceof SVGElement) &&
-        event.target.closest(`.${CLASSES.SHAPE_ACTIONS_MENU}`) &&
+        isShapeActionsPanel && //zsviczian
         !isWritableElement(event.target)) ||
       isPropertiesTrigger
     ) {

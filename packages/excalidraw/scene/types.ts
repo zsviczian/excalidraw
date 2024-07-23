@@ -43,6 +43,7 @@ export type SVGRenderConfig = {
   renderEmbeddables: boolean;
   frameRendering: AppState["frameRendering"];
   canvasBackgroundColor: AppState["viewBackgroundColor"];
+  frameColor?: AppState["frameColor"]; //zsviczian
   embedsValidationStatus: EmbedsValidationStatus;
 };
 

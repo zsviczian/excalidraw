@@ -5,8 +5,11 @@ export const sanitizeHTMLAttribute = (html: string) => {
 };
 
 export const normalizeLink = (link: string) => {
-  link = link.trim();
   if (!link) {
+    return link;
+  }
+  link = link.trim();//zsviczian
+  if(link?.startsWith("data:text/html")) { //zsviczian
     return link;
   }
   return sanitizeUrl(sanitizeHTMLAttribute(link));

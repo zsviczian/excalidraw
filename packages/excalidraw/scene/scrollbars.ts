@@ -7,7 +7,7 @@ import type { ExcalidrawElement } from "../element/types";
 
 export const SCROLLBAR_MARGIN = 4;
 export const SCROLLBAR_WIDTH = 6;
-export const SCROLLBAR_COLOR = "rgba(0,0,0,0.3)";
+export const SCROLLBAR_COLOR = "rgba(128,128,128,0.3)"; //zsviczian
 
 export const getScrollBars = (
   elements: readonly ExcalidrawElement[],

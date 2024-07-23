@@ -11,6 +11,7 @@ import type {
   Arrowhead,
   ChartType,
   FontFamilyValues,
+  ExcalidrawTextElement,
   FileId,
   ExcalidrawImageElement,
   Theme,
@@ -40,6 +41,7 @@ import type { IMAGE_MIME_TYPES, MIME_TYPES } from "./constants";
 import type { ContextMenuItems } from "./components/ContextMenu";
 import type { SnapLine } from "./snapping";
 import type { Merge, MaybePromise, ValueOf } from "./utility-types";
+import { ColorPaletteCustom } from "./colors"; //zsviczian
 import type { StoreActionType } from "./store";
 
 export type Point = Readonly<RoughPoint>;
@@ -129,7 +131,8 @@ export type ToolType =
   | "frame"
   | "magicframe"
   | "embeddable"
-  | "laser";
+  | "laser"
+  | "mermaid";
 
 export type ElementOrToolType = ExcalidrawElementType | ToolType | "custom";
 
@@ -177,6 +180,9 @@ export type StaticCanvasAppState = Readonly<
     gridSize: AppState["gridSize"];
     frameRendering: AppState["frameRendering"];
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
+    linkOpacity: AppState["linkOpacity"]; //zsviczian
+    gridColor: AppState["gridColor"]; //zsviczian
+    frameColor: AppState["frameColor"]; //zsviczian
   }
 >;
 
@@ -329,6 +335,7 @@ export interface AppState {
   zenModeEnabled: boolean;
   theme: Theme;
   gridSize: number | null;
+  previousGridSize: number | null; //zsviczian
   viewModeEnabled: boolean;
 
   /** top-most selected groups (i.e. does not include nested groups) */
@@ -361,6 +368,28 @@ export interface AppState {
   /** imageElement waiting to be placed on canvas */
   pendingImageElementId: ExcalidrawImageElement["id"] | null;
   showHyperlinkPopup: false | "info" | "editor";
+  linkOpacity: number; //zsviczian
+  trayModeEnabled: boolean; //zsviczian
+  colorPalette?: {
+    canvasBackground: ColorPaletteCustom;
+    elementBackground: ColorPaletteCustom;
+    elementStroke: ColorPaletteCustom;
+    topPicks: {
+      canvasBackground: [string, string, string, string, string];
+      elementStroke: [string, string, string, string, string];
+      elementBackground: [string, string, string, string, string];
+    };
+  }; //zsviczian
+  allowWheelZoom?: boolean; //zsviczian
+  allowPinchZoom?: boolean; //zsviczian
+  pinnedScripts?: string[]; //zsviczian
+  customPens?: any[]; //zsviczian
+  currentStrokeOptions?: any; //zsviczian
+  resetCustomPen?: any; //zsviczian
+  gridColor: { Bold: string; Regular: string; MajorGridFrequency?: number }; //zsviczian
+  dynamicStyle: { [x: string]: string }; //zsviczian
+  frameColor: { stroke: string; fill: string; nameColor: string }; //zsviczian
+  invertBindingBehaviour: boolean; //zsviczian
   selectedLinearElement: LinearElementEditor | null;
   snapLines: readonly SnapLine[];
   originSnapOffset: {
@@ -465,6 +494,9 @@ export interface ExcalidrawProps {
     data: ClipboardData,
     event: ClipboardEvent | null,
   ) => Promise<boolean> | boolean;
+  onDrop?: (
+    event: React.DragEvent<HTMLDivElement>,
+  ) => Promise<boolean> | boolean; //zsviczian
   renderTopRightUI?: (
     isMobile: boolean,
     appState: UIAppState,
@@ -475,6 +507,7 @@ export interface ExcalidrawProps {
   gridModeEnabled?: boolean;
   objectsSnapModeEnabled?: boolean;
   libraryReturnUrl?: string;
+  initState?: AppState; //zsviczian
   theme?: Theme;
   // @TODO come with better API before v0.18.0
   name?: string;
@@ -487,13 +520,26 @@ export interface ExcalidrawProps {
   handleKeyboardGlobally?: boolean;
   onLibraryChange?: (libraryItems: LibraryItems) => void | Promise<any>;
   autoFocus?: boolean;
+  onBeforeTextEdit?: (textElement: ExcalidrawTextElement) => string; //zsviczian
+  onBeforeTextSubmit?: (
+    textElement: ExcalidrawTextElement,
+    nextText: string, //wrapped
+    nextOriginalText: string,
+    isDeleted: boolean,
+  ) => {updatedNextOriginalText: string, nextLink: string}; //zsviczian [updatedText: string, updatedOriginalText: string, link: string]; //zsviczian
   generateIdForFile?: (file: File) => string | Promise<string>;
+  onThemeChange?: (newTheme: string) => void; //zsviczian
+  onViewModeChange?: (isViewModeEnabled: boolean) => void; //zsviczian
   onLinkOpen?: (
     element: NonDeletedExcalidrawElement,
     event: CustomEvent<{
       nativeEvent: MouseEvent | React.PointerEvent<HTMLCanvasElement>;
     }>,
   ) => void;
+  onLinkHover?: (
+    element: NonDeletedExcalidrawElement,
+    event: React.PointerEvent<HTMLCanvasElement>,
+  ) => void; //zsviczian
   onPointerDown?: (
     activeTool: AppState["activeTool"],
     pointerDownState: PointerDownState,
@@ -515,8 +561,21 @@ export interface ExcalidrawProps {
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
   ) => JSX.Element | null;
+  renderWebview?: boolean; //zsviczian
+  renderEmbeddableMenu?: (
+    //zsivzian
+    appState: AppState,
+  ) => JSX.Element | null;
+  renderMermaid?: boolean; //zsviczian
+  onContextMenu?: (
+    //zsviczian
+    element: readonly NonDeletedExcalidrawElement[],
+    appState: AppState,
+    onClose: (callback?: () => void) => void,
+  ) => JSX.Element | null;
   aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
+  obsidianHostPlugin: WeakRef<any>; //zsviczian
 }
 
 export type SceneData = {
@@ -617,6 +676,7 @@ export type AppClassProperties = {
   scrollToContent: App["scrollToContent"];
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
+  setSelection: App["setSelection"]; //zsviczian
   togglePenMode: App["togglePenMode"];
   toggleLock: App["toggleLock"];
   setActiveTool: App["setActiveTool"];
@@ -698,6 +758,8 @@ export interface ExcalidrawImperativeAPI {
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
   };
+  zoomToFit: InstanceType<typeof App>["zoomToFit"]; //zsviczian
+  startLineEditor: InstanceType<typeof App>["startLineEditor"]; //zsviczian  
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
@@ -707,11 +769,20 @@ export interface ExcalidrawImperativeAPI {
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
   addFiles: (data: BinaryFileData[]) => void;
+  updateContainerSize: InstanceType<typeof App>["updateContainerSize"]; //zsviczian
   id: string;
+  setLocalFont: (showOnPanel: boolean) => void; //zsviczian
+  selectElements: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
+  sendBackward: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
+  bringForward: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
+  sendToBack: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
+  bringToFront: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
+  setMobileModeAllowed: (allow: boolean) => void; //zsviczian
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
   setCursor: InstanceType<typeof App>["setCursor"];
   resetCursor: InstanceType<typeof App>["resetCursor"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
+  getHTMLIFrameElement: InstanceType<typeof App>["getHTMLIFrameElement"]; //zsviczian
   /**
    * Disables rendering of frames (including element clipping), but currently
    * the frames are still interactive in edit mode. As such, this API should be

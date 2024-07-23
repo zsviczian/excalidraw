@@ -12,8 +12,8 @@ import { getShortcutFromShortcutName } from "../actions/shortcuts";
 const Header = () => (
   <div className="HelpDialog__header">
     <a
-      className="HelpDialog__btn"
-      href="https://docs.excalidraw.com"
+      className="HelpDialog__btn" //zsviczian
+      href="https://github.com/zsviczian/obsidian-excalidraw-plugin/#readme"
       target="_blank"
       rel="noopener noreferrer"
     >
@@ -22,16 +22,17 @@ const Header = () => (
     </a>
     <a
       className="HelpDialog__btn"
-      href="https://blog.excalidraw.com"
+      href="https://www.youtube.com/@VisualPKM" //zsviczian
       target="_blank"
       rel="noopener noreferrer"
     >
+      {"Visual PKM YouTube"}
       <div className="HelpDialog__link-icon">{ExternalLinkIcon}</div>
       {t("helpDialog.blog")}
     </a>
     <a
-      className="HelpDialog__btn"
-      href="https://github.com/excalidraw/excalidraw/issues"
+      className="HelpDialog__btn" //zsviczian
+      href="https://github.com/zsviczian/obsidian-excalidraw-plugin/issues"
       target="_blank"
       rel="noopener noreferrer"
     >

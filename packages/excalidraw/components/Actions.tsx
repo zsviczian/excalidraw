@@ -7,7 +7,7 @@ import type {
   NonDeletedSceneElementsMap,
 } from "../element/types";
 import { t } from "../i18n";
-import { useDevice } from "./App";
+import { useAppProps, useDevice } from "./App";
 import {
   canChangeRoundness,
   canHaveArrowheads,
@@ -30,7 +30,7 @@ import {
 } from "../element/typeChecks";
 import clsx from "clsx";
 import { actionToggleZenMode } from "../actions";
-import { Tooltip } from "./Tooltip";
+// import { Tooltip } from "./Tooltip"; //zsviczian
 import {
   shouldAllowVerticalAlign,
   suppportsHorizontalAlign,
@@ -255,6 +255,7 @@ export const ShapesSwitcher = ({
   app: AppClassProperties;
   UIOptions: AppProps["UIOptions"];
 }) => {
+  const { renderMermaid } = useAppProps(); //zsviczian
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
 
   const frameToolSelected = activeTool.type === "frame";
@@ -386,13 +387,15 @@ export const ShapesSwitcher = ({
             Generate
           </div>
           {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
-          <DropdownMenu.Item
-            onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
-            icon={mermaidLogoIcon}
-            data-testid="toolbar-embeddable"
-          >
-            {t("toolBar.mermaidToExcalidraw")}
-          </DropdownMenu.Item>
+          {renderMermaid && ( //zsviczian
+            <DropdownMenu.Item
+              onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
+              icon={mermaidLogoIcon}
+              data-testid="toolbar-embeddable"
+            >
+              {t("toolBar.mermaidToExcalidraw")}
+            </DropdownMenu.Item>
+          )}
           {app.props.aiEnabled !== false && (
             <>
               <DropdownMenu.Item
@@ -403,7 +406,7 @@ export const ShapesSwitcher = ({
                 {t("toolBar.magicframe")}
                 <DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>
               </DropdownMenu.Item>
-              <DropdownMenu.Item
+              {/*<DropdownMenu.Item //zsviczian
                 onSelect={() => {
                   trackEvent("ai", "open-settings", "d2c");
                   app.setOpenDialog({
@@ -416,7 +419,7 @@ export const ShapesSwitcher = ({
                 data-testid="toolbar-magicSettings"
               >
                 {t("toolBar.magicSettings")}
-              </DropdownMenu.Item>
+              </DropdownMenu.Item>*/}
             </>
           )}
         </DropdownMenu.Content>
@@ -428,11 +431,16 @@ export const ShapesSwitcher = ({
 export const ZoomActions = ({
   renderAction,
   zoom,
+  trayMode = false, //zsviczian
 }: {
   renderAction: ActionManager["renderAction"];
   zoom: Zoom;
+  trayMode?: boolean; //zsviczian note also changes to Stack.Col and Stack.Row
 }) => (
-  <Stack.Col gap={1} className="zoom-actions">
+  <Stack.Col
+    gap={1}
+    className={clsx("zoom-actions", { "tray-zoom": trayMode })}
+  >
     <Stack.Row align="center">
       {renderAction("zoomOut")}
       {renderAction("resetZoom")}
@@ -450,10 +458,10 @@ export const UndoRedoActions = ({
 }) => (
   <div className={`undo-redo-buttons ${className}`}>
     <div className="undo-button-container">
-      <Tooltip label={t("buttons.undo")}>{renderAction("undo")}</Tooltip>
+      {renderAction("undo") /* //zsviczian */}
     </div>
     <div className="redo-button-container">
-      <Tooltip label={t("buttons.redo")}> {renderAction("redo")}</Tooltip>
+      {renderAction("redo") /* //zsviczian */}
     </div>
   </div>
 );

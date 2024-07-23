@@ -39,13 +39,14 @@ const strokeGrid = (
   zoom: Zoom,
   width: number,
   height: number,
+  GridLineColor: { Bold: string; Regular: string; MajorGridFrequency?: number }, //zsviczian
 ) => {
-  const BOLD_LINE_FREQUENCY = 5;
+  const BOLD_LINE_FREQUENCY = GridLineColor?.MajorGridFrequency ?? 5; //zsviczian
 
-  enum GridLineColor {
+  /*enum GridLineColor {
     Bold = "#cccccc",
     Regular = "#e5e5e5",
-  }
+  }*/ //zsviczian
 
   const offsetX =
     -Math.round(zoom.value / gridSize) * gridSize + (scrollX % gridSize);
@@ -141,10 +142,12 @@ const renderLinkIcon = (
         window.devicePixelRatio * appState.zoom.value,
         window.devicePixelRatio * appState.zoom.value,
       );
-      linkCanvasCacheContext.fillStyle = "#fff";
-      linkCanvasCacheContext.fillRect(0, 0, width, height);
+      /*linkCanvasCacheContext.fillStyle = "#fff"; //zsviczian
+      linkCanvasCacheContext.fillRect(0, 0, width, height);*/ //zsviczian
+      //linkCanvasCacheContext.globalAlpha = appState.linkOpacity; //zsviczian
       linkCanvasCacheContext.drawImage(EXTERNAL_LINK_IMG, 0, 0, width, height);
       linkCanvasCacheContext.restore();
+      context.globalAlpha = appState.linkOpacity; //zsviczian
       context.drawImage(
         linkCanvasCache,
         x - centerX,
@@ -153,6 +156,7 @@ const renderLinkIcon = (
         height,
       );
     } else {
+      context.globalAlpha = appState.linkOpacity; //zsviczian
       context.drawImage(
         linkCanvasCache,
         x - centerX,
@@ -208,6 +212,7 @@ const _renderStaticScene = ({
       appState.zoom,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
+      appState.gridColor, //zsviczian
     );
   }
 

@@ -94,6 +94,7 @@ export const redrawTextBoundingBox = (
       const nextHeight = computeContainerDimensionForBoundText(
         metrics.height,
         container.type,
+        container.customData?.legacyTextWrap, //zsviczian
       );
       mutateElement(container, { height: nextHeight }, informMutation);
       updateOriginalContainerCache(container.id, nextHeight);
@@ -210,6 +211,7 @@ export const handleBindTextResize = (
       containerHeight = computeContainerDimensionForBoundText(
         nextHeight,
         container.type,
+        container.customData?.legacyTextWrap, //zsviczian
       );
 
       const diff = containerHeight - container.height;
@@ -446,7 +448,7 @@ export const wrapText = (
 
   const push = (str: string) => {
     if (str.trim()) {
-      lines.push(str);
+      lines.push(str.trim());
     }
   };
 
@@ -716,13 +718,15 @@ export const getContainerCoords = (container: NonDeletedExcalidrawElement) => {
   let offsetX = BOUND_TEXT_PADDING;
   let offsetY = BOUND_TEXT_PADDING;
 
-  if (container.type === "ellipse") {
+  const legacy = container.customData?.legacyTextWrap; //zsviczian
+
+  if (container.type === "ellipse" && !legacy) {
     // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6172
     offsetX += (container.width / 2) * (1 - Math.sqrt(2) / 2);
     offsetY += (container.height / 2) * (1 - Math.sqrt(2) / 2);
   }
   // The derivation of coordinates is explained in https://github.com/excalidraw/excalidraw/pull/6265
-  if (container.type === "diamond") {
+  if (container.type === "diamond" && !legacy) {
     offsetX += container.width / 4;
     offsetY += container.height / 4;
   }
@@ -803,17 +807,20 @@ export const isValidTextContainer = (element: {
 export const computeContainerDimensionForBoundText = (
   dimension: number,
   containerType: ExtractSetType<typeof VALID_CONTAINER_TYPES>,
+  legacy: boolean = false, //zsviczian
 ) => {
   dimension = Math.ceil(dimension);
   const padding = BOUND_TEXT_PADDING * 2;
 
-  if (containerType === "ellipse") {
+  if (containerType === "ellipse" && !legacy) {
+    //zsviczian
     return Math.round(((dimension + padding) / Math.sqrt(2)) * 2);
   }
   if (containerType === "arrow") {
     return dimension + padding * 8;
   }
-  if (containerType === "diamond") {
+  if (containerType === "diamond" && !legacy) {
+    //zsviczian
     return 2 * (dimension + padding);
   }
   return dimension + padding;
@@ -830,13 +837,16 @@ export const getBoundTextMaxWidth = (
       ARROW_LABEL_FONT_SIZE_TO_MIN_WIDTH_RATIO;
     return Math.max(ARROW_LABEL_WIDTH_FRACTION * width, minWidth);
   }
-  if (container.type === "ellipse") {
+
+  const legacy = container.customData?.legacyTextWrap; //zsviczian
+
+  if (container.type === "ellipse" && !legacy) {
     // The width of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.width / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse -https://github.com/excalidraw/excalidraw/pull/6172
     return Math.round((width / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
   }
-  if (container.type === "diamond") {
+  if (container.type === "diamond" && !legacy) {
     // The width of the largest rectangle inscribed inside a rhombus is
     // Math.round(width / 2) - https://github.com/excalidraw/excalidraw/pull/6265
     return Math.round(width / 2) - BOUND_TEXT_PADDING * 2;
@@ -856,13 +866,16 @@ export const getBoundTextMaxHeight = (
     }
     return height;
   }
-  if (container.type === "ellipse") {
+
+  const legacy = container.customData?.legacyTextWrap; //zsviczian
+
+  if (container.type === "ellipse" && !legacy) {
     // The height of the largest rectangle inscribed inside an ellipse is
     // Math.round((ellipse.height / 2) * Math.sqrt(2)) which is derived from
     // equation of an ellipse - https://github.com/excalidraw/excalidraw/pull/6172
     return Math.round((height / 2) * Math.sqrt(2)) - BOUND_TEXT_PADDING * 2;
   }
-  if (container.type === "diamond") {
+  if (container.type === "diamond" && !legacy) {
     // The height of the largest rectangle inscribed inside a rhombus is
     // Math.round(height / 2) - https://github.com/excalidraw/excalidraw/pull/6265
     return Math.round(height / 2) - BOUND_TEXT_PADDING * 2;

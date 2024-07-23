@@ -255,9 +255,9 @@ body.excalidraw-cursor-resize * {
     pointer-events: none;
 
     > .Island {
-      width: 100%;
+      /*width: 100%; //zsviczian*/
       max-width: 100%;
-      min-width: 100%;
+      /*min-width: 100%; //zsviczian*/
       box-sizing: border-box;
       max-height: 100%;
       display: flex;
@@ -288,7 +288,7 @@ body.excalidraw-cursor-resize * {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px;
+    padding: 6px; //zsviczian
 
     .dropdown-menu--mobile {
       bottom: 55px;
@@ -540,6 +540,16 @@ body.excalidraw-cursor-resize * {
     }
   }
 
+  /*zsviczian*/
+  textarea.excalidraw-wysiwyg {
+    border: none;
+    outline: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
   input.is-redacted {
     // we don't use type=password because browsers (chrome?) prompt
     // you to save it which is annoying
@@ -627,7 +637,7 @@ body.excalidraw-cursor-resize * {
     max-width: 98vw;
 
     .ToolIcon__keybinding {
-      display: none;
+      display: block; //zsviczian
     }
   }
   .UserList-Wrapper {
@@ -757,5 +767,10 @@ body.excalidraw-cursor-resize * {
     font-weight: 700;
     letter-spacing: 0.6px;
     font-family: "Assistant";
+    width: 33%;
+    height: 33%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }

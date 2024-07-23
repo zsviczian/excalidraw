@@ -24,7 +24,7 @@ import {
   getUpdatedTimestamp,
   isTestEnv,
 } from "../utils";
-import { randomInteger, randomId } from "../random";
+import { randomInteger, randomId, obsidianId } from "../random";
 import { bumpVersion, newElementWith } from "./mutateElement";
 import { getNewGroupIdsForDuplication } from "../groups";
 import type { AppState } from "../types";
@@ -100,7 +100,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
 ) => {
   // assign type to guard against excess properties
   const element: Merge<ExcalidrawGenericElement, { type: T["type"] }> = {
-    id: rest.id || randomId(),
+    id: rest.id || (type === "text" ? obsidianId() : randomId()), //zsviczian
     type,
     x,
     y,
@@ -126,6 +126,7 @@ const _newElementBase = <T extends ExcalidrawElement>(
     updated: getUpdatedTimestamp(),
     link,
     locked,
+    //...(rest.customData ? { customData: rest.customData } : {}), //zsviczian
     customData: rest.customData,
   };
   return element;
@@ -143,7 +144,10 @@ export const newEmbeddableElement = (
     type: "embeddable";
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawEmbeddableElement> => {
-  return _newElementBase<ExcalidrawEmbeddableElement>("embeddable", opts);
+  return {
+    ..._newElementBase<ExcalidrawEmbeddableElement>("embeddable", opts),
+    scale: [1, 1],
+  };
 };
 
 export const newIframeElement = (
@@ -153,6 +157,7 @@ export const newIframeElement = (
 ): NonDeleted<ExcalidrawIframeElement> => {
   return {
     ..._newElementBase<ExcalidrawIframeElement>("iframe", opts),
+    scale: [1, 1], //zsviczian
   };
 };
 
@@ -215,6 +220,7 @@ const getTextElementPositionOffsets = (
 export const newTextElement = (
   opts: {
     text: string;
+    rawText: string;
     originalText?: string;
     fontSize?: number;
     fontFamily?: FontFamilyValues;
@@ -230,6 +236,7 @@ export const newTextElement = (
   const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
   const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
   const text = normalizeText(opts.text);
+  const rawText = normalizeText(opts.rawText); //zsviczian
   const metrics = measureText(
     text,
     getFontString({ fontFamily, fontSize }),
@@ -245,6 +252,7 @@ export const newTextElement = (
   const textElementProps: ExcalidrawTextElement = {
     ..._newElementBase<ExcalidrawTextElement>("text", opts),
     text,
+    rawText, //zsviczian
     fontSize,
     fontFamily,
     textAlign,
@@ -252,6 +260,7 @@ export const newTextElement = (
     x: opts.x - offsets.x,
     y: opts.y - offsets.y,
     width: metrics.width,
+    //width: Math.max(opts.width??0,metrics.width), //zsviczian
     height: metrics.height,
     containerId: opts.containerId || null,
     originalText: opts.originalText ?? text,
@@ -545,7 +554,7 @@ export const duplicateElement = <TElement extends ExcalidrawElement>(
 ): Readonly<TElement> => {
   let copy = deepCopyElement(element);
 
-  copy.id = regenerateId(copy.id);
+  copy.id = copy.type === "text" ? obsidianId() : regenerateId(copy.id); //zsviczian
   copy.boundElements = null;
   copy.updated = getUpdatedTimestamp();
   copy.seed = randomInteger();

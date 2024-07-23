@@ -105,10 +105,16 @@ const addFrameLabelsAsTextElements = (
         fontSize: FRAME_STYLE.nameFontSize,
         lineHeight:
           FRAME_STYLE.nameLineHeight as ExcalidrawTextElement["lineHeight"],
-        strokeColor: opts.exportWithDarkMode
-          ? FRAME_STYLE.nameColorDarkTheme
-          : FRAME_STYLE.nameColorLightTheme,
+        strokeColor: 
+          element.customData?.frameColor?.nameColor ?? //zsviczian
+          (opts.exportWithDarkMode
+            ? FRAME_STYLE.nameColorDarkTheme
+            : FRAME_STYLE.nameColorLightTheme),
         text: getFrameLikeTitle(
+          element,
+          isFrameElement(element) ? frameIndex : magicFrameIndex,
+        ),
+        rawText: getFrameLikeTitle( //zsviczian
           element,
           isFrameElement(element) ? frameIndex : magicFrameIndex,
         ),
@@ -267,6 +273,7 @@ export const exportToSvg = async (
     exportWithDarkMode?: boolean;
     exportEmbedScene?: boolean;
     frameRendering?: AppState["frameRendering"];
+    frameColor?: AppState["frameColor"]; //zsviczian
   },
   files: BinaryFiles | null,
   opts?: {
@@ -451,6 +458,7 @@ export const exportToSvg = async (
       exportWithDarkMode,
       renderEmbeddables,
       frameRendering,
+      frameColor: appState.frameColor, //zsviczian
       canvasBackgroundColor: viewBackgroundColor,
       embedsValidationStatus: renderEmbeddables
         ? new Map(

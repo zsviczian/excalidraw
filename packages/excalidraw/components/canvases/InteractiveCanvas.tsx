@@ -164,9 +164,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       onPointerCancel={props.onPointerCancel}
       onTouchMove={props.onTouchMove}
       onPointerDown={props.onPointerDown}
-      onDoubleClick={
-        props.appState.viewModeEnabled ? undefined : props.onDoubleClick
-      }
+      onDoubleClick={props.onDoubleClick}
     >
       {t("labels.drawingCanvas")}
     </canvas>

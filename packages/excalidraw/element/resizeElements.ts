@@ -24,6 +24,7 @@ import {
   isBoundToContainer,
   isFrameLikeElement,
   isFreeDrawElement,
+  isIframeLikeElement,
   isImageElement,
   isLinearElement,
   isTextElement,
@@ -432,6 +433,9 @@ export const resizeSingleElement = (
   pointerX: number,
   pointerY: number,
 ) => {
+  if (element.customData?.isAnchored) {
+    return;
+  } //zsviczian
   const stateAtResizeStart = originalElements.get(element.id)!;
   // Gets bounds corners
   const [x1, y1, x2, y2] = getResizedElementAbsoluteCoords(
@@ -669,15 +673,31 @@ export const resizeSingleElement = (
   };
 
   if ("scale" in element && "scale" in stateAtResizeStart) {
-    mutateElement(element, {
-      scale: [
-        // defaulting because scaleX/Y can be 0/-0
-        (Math.sign(newBoundsX2 - stateAtResizeStart.x) ||
-          stateAtResizeStart.scale[0]) * stateAtResizeStart.scale[0],
-        (Math.sign(newBoundsY2 - stateAtResizeStart.y) ||
-          stateAtResizeStart.scale[1]) * stateAtResizeStart.scale[1],
-      ],
-    });
+    if (isIframeLikeElement(element)) { //zsviczian
+      if (shouldMaintainAspectRatio) {
+        const scale: [number, number] = [
+          Math.abs(
+            eleNewWidth /
+              (stateAtResizeStart.width / stateAtResizeStart.scale[0]),
+          ),
+          Math.abs(
+            eleNewHeight /
+              (stateAtResizeStart.height / stateAtResizeStart.scale[1]),
+          ),
+        ];
+        mutateElement(element, { scale });
+      }
+    } else {
+      mutateElement(element, {
+        scale: [
+          // defaulting because scaleX/Y can be 0/-0
+          (Math.sign(newBoundsX2 - stateAtResizeStart.x) ||
+            stateAtResizeStart.scale[0]) * stateAtResizeStart.scale[0],
+          (Math.sign(newBoundsY2 - stateAtResizeStart.y) ||
+            stateAtResizeStart.scale[1]) * stateAtResizeStart.scale[1],
+        ],
+      });
+    }
   }
 
   if (
@@ -887,8 +907,10 @@ export const resizeMultipleElements = (
       continue;
     }
 
-    const width = orig.width * scaleX;
-    const height = orig.height * scaleY;
+    const width = orig.customData?.isAnchored ? orig.width : orig.width * scaleX; //zsviczian
+    const height = orig.customData?.isAnchored
+      ? orig.height
+      : orig.height * scaleY; //zsviczian
     const angle = normalizeAngle(orig.angle * flipFactorX * flipFactorY);
 
     const isLinearOrFreeDraw = isLinearElement(orig) || isFreeDrawElement(orig);

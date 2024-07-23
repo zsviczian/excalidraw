@@ -39,12 +39,13 @@ import {
 import { createRedoAction, createUndoAction } from "../actions/actionHistory";
 import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
-import type { Action, ActionResult } from "../actions/types";
+import type { Action, ActionName, ActionResult } from "../actions/types";
 import { trackEvent } from "../analytics";
 import {
   getDefaultAppState,
   isEraserActive,
   isHandToolActive,
+  isLaserPointerActive,
 } from "../appState";
 import type { PastedMixedContent } from "../clipboard";
 import { copyTextToSystemClipboard, parseClipboard } from "../clipboard";
@@ -89,6 +90,7 @@ import {
   supportsResizeObserver,
   DEFAULT_COLLISION_THRESHOLD,
   DEFAULT_TEXT_ALIGN,
+  DEFAULT_FONT_SIZE,
 } from "../constants";
 import type { ExportedElements } from "../data";
 import { exportCanvas, loadFromBlob } from "../data";
@@ -209,6 +211,7 @@ import {
   getCornerRadius,
   getGridPoint,
   isPathALoop,
+  rotate,
 } from "../math";
 import {
   calculateScrollCenter,
@@ -363,7 +366,13 @@ import {
   actionRemoveAllElementsFromFrame,
   actionSelectAllElementsInFrame,
 } from "../actions/actionFrame";
-import { actionToggleHandTool, zoomToFit } from "../actions/actionCanvas";
+import {
+  actionToggleHandTool,
+  zoomToFit,
+  zoomToFitElements,
+  actionToggleLaserPointer,
+  actionToggleEraserTool,
+} from "../actions/actionCanvas";
 import { jotaiStore } from "../jotai";
 import { activeConfirmDialogAtom } from "./ActiveConfirmDialog";
 import { ImageSceneDataError } from "../errors";
@@ -394,6 +403,7 @@ import {
   setCursor,
   resetCursor,
   setCursorForShape,
+  clearEraserCanvasCache,
 } from "../cursor";
 import { Emitter } from "../emitter";
 import { ElementCanvasButtons } from "../element/ElementCanvasButtons";
@@ -405,12 +415,15 @@ import { ElementCanvasButton } from "./MagicButton";
 import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import FollowMode from "./FollowMode/FollowMode";
+import { getFontSize } from "../actions/actionProperties";
+
 import { Store, StoreAction } from "../store";
 import { AnimationFrameHandler } from "../animation-frame-handler";
 import { AnimatedTrail } from "../animated-trail";
 import { LaserTrails } from "../laser-trails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { getRenderOpacity } from "../renderer/renderElement";
+import { getExcalidrawContentEl, hideFreedrawPenmodeCursor, hostPlugin, initializeObsidianUtils } from "../obsidianUtils";
 import {
   hitElementBoundText,
   hitElementBoundingBoxOnly,
@@ -424,12 +437,15 @@ import {
   isPointHittingLinkIcon,
 } from "./hyperlink/helpers";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
+import { resizeSingleElement } from "../element/resizeElements"; //zsviczian
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
 import { getVisibleSceneBounds } from "../element/bounds";
 import { isMaybeMermaidDefinition } from "../mermaid";
+import { getTooltipDiv } from "./Tooltip";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
+export let showFourthFont: boolean = false; //zsviczian
 
 const deviceContextInitialValue = {
   viewport: {
@@ -567,6 +583,7 @@ class App extends React.Component<AppProps, AppState> {
     null;
   lastPointerMoveEvent: PointerEvent | null = null;
   lastViewportPosition = { x: 0, y: 0 };
+  allowMobileMode: boolean = true; //zsviczian
 
   animationFrameHandler = new AnimationFrameHandler();
 
@@ -635,6 +652,8 @@ class App extends React.Component<AppProps, AppState> {
       gridModeEnabled = false,
       objectsSnapModeEnabled = false,
       theme = defaultAppState.theme,
+      initState, //zsviczian
+      obsidianHostPlugin, //zsviczian
       name = `${t("labels.untitled")}-${getDateTime()}`,
     } = props;
     this.state = {
@@ -649,9 +668,11 @@ class App extends React.Component<AppProps, AppState> {
       name,
       width: window.innerWidth,
       height: window.innerHeight,
+      ...(initState ?? {}), //zsviczian
     };
 
     this.id = nanoid();
+    initializeObsidianUtils(obsidianHostPlugin.deref()); //zsviczian
     this.library = new Library(this);
     this.actionManager = new ActionManager(
       this.syncActionResult,
@@ -679,6 +700,8 @@ class App extends React.Component<AppProps, AppState> {
           clear: this.resetHistory,
         },
         scrollToContent: this.scrollToContent,
+        zoomToFit: this.zoomToFit, //zsviczian
+        startLineEditor: this.startLineEditor, //zsviczian
         getSceneElements: this.getSceneElements,
         getAppState: () => this.state,
         getFiles: () => this.files,
@@ -688,12 +711,21 @@ class App extends React.Component<AppProps, AppState> {
         },
         refresh: this.refresh,
         setToast: this.setToast,
+        updateContainerSize: this.updateContainerSize, //zsviczian
         id: this.id,
+        setLocalFont: this.setLocalFont, //zsviczian
+        selectElements: this.selectElements, //zsviczian
+        sendBackward: this.sendBackward, //zsviczian
+        bringForward: this.bringForward, //zsviczian
+        sendToBack: this.sendToBack, //zsviczian
+        bringToFront: this.bringToFront, //zsviczian
+        setMobileModeAllowed: this.setMobileModeAllowed, //zsviczian
         setActiveTool: this.setActiveTool,
         setCursor: this.setCursor,
         resetCursor: this.resetCursor,
         updateFrameRendering: this.updateFrameRendering,
         toggleSidebar: this.toggleSidebar,
+        getHTMLIFrameElement: (id: string) => this.getHTMLIFrameElement(id), //zsviczian
         onChange: (cb) => this.onChangeEmitter.on(cb),
         onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
         onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
@@ -797,8 +829,11 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   private getHTMLIFrameElement(
-    element: ExcalidrawIframeLikeElement,
+    element: ExcalidrawIframeLikeElement | string, //zsviczian
   ): HTMLIFrameElement | undefined {
+    if (typeof element === "string") { //zsviczian
+      return this.iFrameRefs.get(element)
+    } 
     return this.iFrameRefs.get(element.id);
   }
 
@@ -987,6 +1022,7 @@ class App extends React.Component<AppProps, AppState> {
           }
 
           let src: IframeData | null;
+          const embedLink = getEmbedLink(toValidURL(el.link || "")); //zsviczian
 
           if (isIframeElement(el)) {
             src = null;
@@ -1124,7 +1160,7 @@ class App extends React.Component<AppProps, AppState> {
               } as const;
             }
           } else {
-            src = getEmbedLink(toValidURL(el.link || ""));
+            src = embedLink; //zsviczian getEmbedLink(toValidURL(el.link || ""));
           }
 
           const isActive =
@@ -1133,6 +1169,15 @@ class App extends React.Component<AppProps, AppState> {
           const isHovered =
             this.state.activeEmbeddable?.element === el &&
             this.state.activeEmbeddable?.state === "hover";
+          const isWebview = //zsviczian
+            !isIframeElement(el) &&
+            this.props.renderWebview &&
+            embedLink?.type !== "document" &&
+            !embedLink?.link?.startsWith?.("https://player.vimeo.com");
+
+          // Modify the scale based on el.scale property
+          const [xScale, yScale] = el.scale ?? [1,1]; //zsviczian
+          const scaledTransform = `scale(${scale * xScale}, ${scale * yScale})`;
 
           return (
             <div
@@ -1144,7 +1189,7 @@ class App extends React.Component<AppProps, AppState> {
                 transform: isVisible
                   ? `translate(${x - this.state.offsetLeft}px, ${
                       y - this.state.offsetTop
-                    }px) scale(${scale})`
+                    }px) ${scaledTransform}`
                   : "none",
                 display: isVisible ? "block" : "none",
                 opacity: getRenderOpacity(
@@ -1153,9 +1198,8 @@ class App extends React.Component<AppProps, AppState> {
                   this.elementsPendingErasure,
                 ),
                 ["--embeddable-radius" as string]: `${getCornerRadius(
-                  Math.min(el.width, el.height),
-                  el,
-                )}px`,
+                  Math.min(el.width, el.height), el) / xScale //zsviczian
+                }px`,
               }}
             >
               <div
@@ -1177,8 +1221,8 @@ class App extends React.Component<AppProps, AppState> {
                 }}*/
                 className="excalidraw__embeddable-container__inner"
                 style={{
-                  width: isVisible ? `${el.width}px` : 0,
-                  height: isVisible ? `${el.height}px` : 0,
+                  width: isVisible ? `${el.width / xScale}px` : 0,
+                  height: isVisible ? `${el.height / yScale}px` : 0,
                   transform: isVisible ? `rotate(${el.angle}rad)` : "none",
                   pointerEvents: isActive
                     ? POINTER_EVENTS.enabled
@@ -1193,12 +1237,26 @@ class App extends React.Component<AppProps, AppState> {
                 <div
                   className="excalidraw__embeddable__outer"
                   style={{
-                    padding: `${el.strokeWidth}px`,
+                    padding: `${el.strokeWidth / (4*el.scale[0])}px`, //zsviczian MDEmbeddable round border cutoff issue
                   }}
                 >
                   {(isEmbeddableElement(el)
-                    ? this.props.renderEmbeddable?.(el, this.state)
+                    ? this.props.renderEmbeddable?.(el, this.state) //zsviczian
                     : null) ?? (
+                      isWebview ? ( //zsviczian
+                      <webview
+                        ref={(ref) =>
+                          this.cacheEmbeddableRef(
+                            el,
+                            ref as HTMLIFrameElement,
+                          )
+                        }
+                        className="excalidraw__embeddable"
+                        src={(embedLink?.type === "generic" || embedLink?.type === "video") ? embedLink.link : ""}
+                        title="Excalidraw Embedded Content"
+                        allowFullScreen={true}
+                      />
+                    ) : (
                     <iframe
                       ref={(ref) => this.cacheEmbeddableRef(el, ref)}
                       className="excalidraw__embeddable"
@@ -1220,7 +1278,7 @@ class App extends React.Component<AppProps, AppState> {
                         src?.sandbox?.allowSameOrigin ? "allow-same-origin" : ""
                       } allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads`}
                     />
-                  )}
+                  ))}
                 </div>
               </div>
             </div>
@@ -1366,14 +1424,14 @@ class App extends React.Component<AppProps, AppState> {
               display: "block",
               padding: `${FRAME_NAME_EDIT_PADDING}px`,
               borderRadius: 4,
-              boxShadow: "inset 0 0 0 1px var(--color-primary)",
+              boxShadow: "inset 0 0 0 2px var(--color-on-primary-container)", //zsviczian (change to container)
               fontFamily: "Assistant",
               fontSize: "14px",
               transform: `translate(-${FRAME_NAME_EDIT_PADDING}px, ${FRAME_NAME_EDIT_PADDING}px)`,
               color: "var(--color-gray-80)",
               overflow: "hidden",
               maxWidth: `${
-                document.body.clientWidth - x1 - FRAME_NAME_EDIT_PADDING
+                getExcalidrawContentEl().clientWidth - x1 - FRAME_NAME_EDIT_PADDING //zsviczian was document.body
               }px`,
             }}
             size={frameNameInEdit.length + 1 || 1}
@@ -1407,9 +1465,11 @@ class App extends React.Component<AppProps, AppState> {
             left: `${x1 - this.state.offsetLeft}px`,
             zIndex: 2,
             fontSize: FRAME_STYLE.nameFontSize,
-            color: isDarkTheme
-              ? FRAME_STYLE.nameColorDarkTheme
-              : FRAME_STYLE.nameColorLightTheme,
+            color:
+              this.state.frameColor?.nameColor ??
+              (isDarkTheme //zsviczian
+                ? FRAME_STYLE.nameColorDarkTheme
+                : FRAME_STYLE.nameColorLightTheme),
             lineHeight: FRAME_STYLE.nameLineHeight,
             width: "max-content",
             maxWidth: `${f.width}px`,
@@ -1483,12 +1543,19 @@ class App extends React.Component<AppProps, AppState> {
       <div
         className={clsx("excalidraw excalidraw-container", {
           "excalidraw--view-mode": this.state.viewModeEnabled,
-          "excalidraw--mobile": this.device.editor.isMobile,
+          "excalidraw--mobile":
+            this.device.editor.isMobile ||
+            (!(this.state.viewModeEnabled || this.state.zenModeEnabled) &&
+              this.state.trayModeEnabled), //zsviczian
         })}
         style={{
-          ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
-            ? POINTER_EVENTS.disabled
-            : POINTER_EVENTS.enabled,
+          ...{
+            //zsviczian
+            ["--ui-pointerEvents" as any]: shouldBlockPointerEvents
+              ? POINTER_EVENTS.disabled
+              : POINTER_EVENTS.enabled,
+          }, //zsviczian
+          ...this.state.dynamicStyle, //zsviczian
         }}
         ref={this.excalidrawContainerRef}
         onDrop={this.handleAppOnDrop}
@@ -1719,6 +1786,8 @@ class App extends React.Component<AppProps, AppState> {
                           />
                         )}
                         {this.renderFrameNames()}
+                        {this.state.activeEmbeddable?.state === "active" && //zsviczian
+                          this.props.renderEmbeddableMenu?.(this.state)}
                       </ExcalidrawActionManagerContext.Provider>
                       {this.renderEmbeddables()}
                     </ExcalidrawElementsContext.Provider>
@@ -1835,6 +1904,11 @@ class App extends React.Component<AppProps, AppState> {
     source: "button" | "upstream",
   ) {
     if (!this.OPENAI_KEY) {
+      this.setToast({ //zsviczian
+        message: "You must first configure your OpenAI API key in plugin settings",
+        duration: 5000,
+      });
+      return;
       this.setState({
         openDialog: {
           name: "settings",
@@ -1956,9 +2030,10 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private OPENAI_KEY: string | null = EditorLocalStorage.get(
-    EDITOR_LS_KEYS.OAI_API_KEY,
-  );
+  //zsviczian - ugly hack
+  private get OPENAI_KEY():string | null { return hostPlugin.settings.openAIAPIToken };
+  private set OPENAI_KEY(value:string | null) { return; };
+  
   private OPENAI_KEY_IS_PERSISTED: boolean =
     EditorLocalStorage.has(EDITOR_LS_KEYS.OAI_API_KEY) || false;
 
@@ -2009,14 +2084,10 @@ class App extends React.Component<AppProps, AppState> {
 
   public onMagicframeToolSelect = () => {
     if (!this.OPENAI_KEY) {
-      this.setState({
-        openDialog: {
-          name: "settings",
-          tab: "diagram-to-code",
-          source: "tool",
-        },
+      this.setToast({ //zsviczian
+        message: "You must first configure your OpenAI API key in plugin settings",
+        duration: 5000,
       });
-      trackEvent("ai", "tool-select (missing key)", "d2c");
       return;
     }
 
@@ -2351,8 +2422,10 @@ class App extends React.Component<AppProps, AppState> {
 
   private isMobileBreakpoint = (width: number, height: number) => {
     return (
-      width < MQ_MAX_WIDTH_PORTRAIT ||
-      (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE)
+      width !== 0 && //zsviczian changing tabs in Obsidian causes MobileMenu to be rendered
+      this.allowMobileMode && //zsviczian
+      (width < MQ_MAX_WIDTH_PORTRAIT ||
+        (height < MQ_MAX_HEIGHT_LANDSCAPE && width < MQ_MAX_WIDTH_LANDSCAPE))
     );
   };
 
@@ -2363,7 +2436,8 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     const { clientWidth: viewportWidth, clientHeight: viewportHeight } =
-      document.body;
+      getExcalidrawContentEl(); //zsviczian was document.body;
+      
 
     const prevViewportState = this.device.viewport;
 
@@ -2516,6 +2590,50 @@ class App extends React.Component<AppProps, AppState> {
     selectGroupsForSelectedElements.clearCache();
     touchTimeout = 0;
     document.documentElement.style.overscrollBehaviorX = "";
+    document.body.removeChild(getTooltipDiv());
+    //clearRenderCache(); //zsviczian
+    clearEraserCanvasCache(); //zsviczian
+    this.interactiveCanvas = null; //zsviczian
+    this.iFrameRefs.clear(); //zsviczian
+    //@ts-ignore
+    this.iFrameRefs = null; //zsviczian
+    this.embedsValidationStatus.clear(); //zsviczian
+    //@ts-ignore
+    this.embedsValidationStatus = null; //zsviczian
+    this.initializedEmbeds.clear(); //zsviczian
+    //@ts-ignore
+    this.initializedEmbeds = null; //zsviczian
+    this.elementsPendingErasure.clear(); //zsviczian 
+    //@ts-ignore
+    this.elementsPendingErasure = null; //zsviczian    
+    this.lastPointerDownEvent = null; //zsviczian
+    this.lastPointerUpEvent = null; //zsviczian
+    this.lastPointerMoveEvent = null; //zsviczian
+    //@ts-ignore
+    this.actionManager.app = null; //zsviczian
+    this.actionManager.actions = {} as Record<ActionName, Action>; //zsviczian
+    this.history.clear(); //zsviczian
+    this.store.clear(); //zsviczian
+    //@ts-ignore
+    this.store = null; //zsviczian
+    //@ts-ignore
+    this.library = null; //zsviczian
+    //@ts-ignore
+    this.canvas = null; //zsviczian
+    //@ts-ignore
+    this.rc = null; //zsviczian
+    //@ts-ignore
+    this.excalidrawContainerRef.current = undefined; //zsviczian
+    this.nearestScrollableContainer = undefined; //zsviczian
+    this.excalidrawContainerValue = { container: null, id:"unknown" }; //zsviczian
+    //@ts-ignore
+    // this.laserTrails.terminate(); //zsviczian
+    // this.eraserTrail.terminate(); //zsviczian
+    /*
+    Object.keys(this).forEach((key) => {
+      //@ts-ignore    
+      delete this[key];
+    });*/
   }
 
   private onResize = withBatchedUpdates(() => {
@@ -2572,16 +2690,18 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(document, EVENT.POINTER_UP, this.removePointer), // #3553
       addEventListener(document, EVENT.COPY, this.onCopy),
       addEventListener(document, EVENT.KEYUP, this.onKeyUp, { passive: true }),
+      addEventListener(window,"focus", ()=>this.triggerRender(true), { passive: true }), //zsviczian
       addEventListener(
         document,
         EVENT.POINTER_MOVE,
         this.updateCurrentCursorPosition,
       ),
       // rerender text elements on font load to fix #637 && #1553
-      addEventListener(document.fonts, "loadingdone", (event) => {
+      // zsviczian In Obsidian this is not needed as I manage font load separately
+      /*addEventListener(document.fonts, "loadingdone", (event) => {
         const loadedFontFaces = (event as FontFaceSetLoadEvent).fontfaces;
         this.fonts.onLoaded(loadedFontFaces);
-      }),
+      }),*/
       // Safari-only desktop pinch zoom
       addEventListener(
         document,
@@ -2836,6 +2956,10 @@ class App extends React.Component<AppProps, AppState> {
     scrollBars,
     elementsMap,
   }: RenderInteractiveSceneCallback) => {
+    if (!document.querySelector(".excalidraw")) {
+      return;
+    } //zsviczian - address issue when moving excalidraw to a new window/document
+
     if (scrollBars) {
       currentScrollBars = scrollBars;
     }
@@ -3054,11 +3178,14 @@ class App extends React.Component<AppProps, AppState> {
         });
       } else if (data.text) {
         if (data.text && isMaybeMermaidDefinition(data.text)) {
-          const api = await import("@excalidraw/mermaid-to-excalidraw");
+          const api = await import("@zsviczian/mermaid-to-excalidraw"); //zsviczian
 
           try {
             const { elements: skeletonElements, files } =
-              await api.parseMermaidToExcalidraw(data.text);
+              await api.parseMermaidToExcalidraw(data.text, { //zsviczian reverting https://github.com/excalidraw/excalidraw/pull/8226
+                fontSize: DEFAULT_FONT_SIZE,
+              });
+              //await api.parseMermaidToExcalidraw(data.text);
 
             const elements = convertToExcalidrawElements(skeletonElements, {
               regenerateIds: true,
@@ -3373,7 +3500,8 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       text,
-      fontSize: this.state.currentItemFontSize,
+      rawText: text,
+      fontSize: getFontSize(this.state.currentItemFontSize,this.state.zoom.value),//zsviczian
       fontFamily: this.state.currentItemFontFamily,
       textAlign: DEFAULT_TEXT_ALIGN,
       verticalAlign: DEFAULT_VERTICAL_ALIGN,
@@ -3419,6 +3547,7 @@ class App extends React.Component<AppProps, AppState> {
             x: startX,
             y: startY,
             text,
+            rawText: originalText, //zsviczian
             originalText,
             lineHeight,
             autoResize: !isTextUnwrapped,
@@ -3543,7 +3672,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   onHandToolToggle = () => {
-    this.actionManager.executeAction(actionToggleHandTool);
+    //zsviczian added timeout because button won't select otherwise
+    setTimeout(()=>this.actionManager.executeAction(actionToggleHandTool));
   };
 
   /**
@@ -3681,6 +3811,67 @@ class App extends React.Component<AppProps, AppState> {
     this.setState(state);
   };
 
+  //zsviczian
+  zoomToFit = (
+    target: readonly ExcalidrawElement[] = this.scene.getNonDeletedElements(),
+    maxZoom: number = 1, //null will zoom to max based on viewport
+    margin: number = 0.03, //percentage of viewport width&height
+  ) => {
+    if (!target) {
+      target = this.scene.getNonDeletedElements();
+    }
+    if (target.length === 0) {
+      maxZoom = 1;
+    }
+    this.setState(
+      zoomToFitElements(target, this.state, false, this, maxZoom, margin)
+        .appState,
+    );
+  };
+
+  //zsviczian
+  startLineEditor = (
+    el: ExcalidrawLinearElement,
+    selectedPointsIndices: number[] | null = null,
+  ) => {
+    if (!el || !isLinearElement(el)) {
+      return;
+    }
+    const editingLinearElement = new LinearElementEditor(el);
+    this.setState({
+      selectedLinearElement: editingLinearElement,
+      editingLinearElement: {
+        ...editingLinearElement,
+        selectedPointsIndices,
+      },
+    });
+  };
+
+  //zsviczian
+  updateContainerSize = withBatchedUpdates(
+    (containers: NonDeletedExcalidrawElement[]) => {
+      containers.forEach((el: ExcalidrawElement) => {
+        const [x, y] = rotate(
+          el.x + el.width,
+          el.y + el.height,
+          el.x + el.width / 2,
+          el.y + el.height / 2,
+          el.angle,
+        );
+        resizeSingleElement(
+          new Map().set(el.id, el),
+          false,
+          el,
+          this.scene.getElementsMapIncludingDeleted(),
+          "se",
+          true,
+          x,
+          y,
+        );
+      });
+    },
+  );
+
   setToast = (
     toast: {
       message: string;
@@ -3733,6 +3924,99 @@ class App extends React.Component<AppProps, AppState> {
     },
   );
 
+  //zsviczian https://github.com/zsviczian/excalibrain/issues/9
+  public setMobileModeAllowed: ExcalidrawImperativeAPI["setMobileModeAllowed"] =
+    (allow: boolean) => {
+      const { width: editorWidth, height: editorHeight } =
+        this.excalidrawContainerRef.current!.getBoundingClientRect();
+      this.allowMobileMode = allow;
+      const prevEditorState = this.device.editor;
+      let nextEditorState;
+      if (allow) {
+        nextEditorState = updateObject(prevEditorState, {
+          isMobile: this.isMobileBreakpoint(editorWidth, editorHeight),
+        });
+      } else {
+        nextEditorState = updateObject(prevEditorState, {
+          isMobile: false, //must test this
+        });
+      }
+      if (prevEditorState !== nextEditorState) {
+        this.device = { ...this.device, editor: nextEditorState };
+        this.forceUpdate();
+      }
+    };
+
+  //zsviczian
+  public setLocalFont: ExcalidrawImperativeAPI["setLocalFont"] = (
+    showOnPanel: boolean,
+  ) => {
+    showFourthFont = showOnPanel;
+  };
+
+  //zsviczian
+  public selectElements: ExcalidrawImperativeAPI["selectElements"] = (
+    elements: readonly ExcalidrawElement[],
+  ) => {
+    this.updateScene({
+      appState: {
+        ...this.state,
+        editingGroupId: null,
+        selectedElementIds: elements.reduce((map, element) => {
+          map[element.id] = true;
+          return map;
+        }, {} as any),
+      },
+      storeAction: StoreAction.NONE,
+      forceFlushSync: true,
+    });
+  };
+
+  public bringToFront: ExcalidrawImperativeAPI["bringToFront"] = (
+    elements: readonly ExcalidrawElement[],
+  ) => {
+    this.selectElements(elements);
+    this.updateScene(
+      actionBringToFront.perform(
+        this.scene.getNonDeletedElements(),
+        this.state,
+      ),
+    );
+  };
+
+  public bringForward: ExcalidrawImperativeAPI["bringForward"] = (
+    elements: readonly ExcalidrawElement[],
+  ) => {
+    this.selectElements(elements);
+    this.updateScene(
+      actionBringForward.perform(
+        this.scene.getNonDeletedElements(),
+        this.state,
+      ),
+    );
+  };
+
+  public sendToBack: ExcalidrawImperativeAPI["sendToBack"] = (
+    elements: readonly ExcalidrawElement[],
+  ) => {
+    this.selectElements(elements);
+    this.updateScene(
+      actionSendToBack.perform(this.scene.getNonDeletedElements(), this.state),
+    );
+  };
+
+  public sendBackward: ExcalidrawImperativeAPI["sendBackward"] = (
+    elements: readonly ExcalidrawElement[],
+  ) => {
+    this.selectElements(elements);
+    this.updateScene(
+      actionSendBackward.perform(
+        this.scene.getNonDeletedElements(),
+        this.state,
+      ),
+    );
+  };
+
   public updateScene = withBatchedUpdates(
     <K extends keyof AppState>(sceneData: {
       elements?: SceneData["elements"];
@@ -3740,6 +4024,7 @@ class App extends React.Component<AppProps, AppState> {
       collaborators?: SceneData["collaborators"];
       /** @default StoreAction.NONE */
       storeAction?: SceneData["storeAction"];
+      forceFlushSync?: boolean;
     }) => {
       const nextElements = syncInvalidIndices(sceneData.elements ?? []);
 
@@ -3773,8 +4058,18 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
 
-      if (sceneData.appState) {
-        this.setState(sceneData.appState);
+      //zsviczian forceFlushSync is set to true in ExcalidrawView.updateScene.
+      //without this e.g. text search did not select the elements
+      if(sceneData.forceFlushSync === true) {
+        flushSync(() => {
+          if (sceneData.appState) {
+            this.setState(sceneData.appState);
+          }
+        });
+      } else {
+        if (sceneData.appState) {
+          this.setState(sceneData.appState);
+        }
       }
 
       if (sceneData.elements) {
@@ -3843,8 +4138,11 @@ class App extends React.Component<AppProps, AppState> {
   // Input handling
   private onKeyDown = withBatchedUpdates(
     (event: React.KeyboardEvent | KeyboardEvent) => {
+      if (this.state.activeTool.type === "selection"  && this.state.resizingElement && (event.shiftKey || event.altKey)) {
+        event.stopPropagation(); //zsviczian shift fires repeatedly causing slowdown when resizing sticky notes
+        return;
+      }
       // normalize `event.key` when CapsLock is pressed #2372
-
       if (
         "Proxy" in window &&
         ((!event.shiftKey && /^[A-Z]$/.test(event.key)) ||
@@ -3951,7 +4249,22 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      if (event.key === KEYS.K && !event.altKey && !event[KEYS.CTRL_OR_CMD]) {
+        if (isLaserPointerActive(this.state)) {
+          this.setActiveTool({
+            type: "selection",
+          });
+        } else {
+          this.setActiveTool({ type: "laser" });
+        }
+        return;
+      }
+
       if (this.state.viewModeEnabled) {
+        //revert to hand in case a key is pressed (K is handled above)
+        if (event.key !== KEYS.K) {
+          this.setActiveTool({ type: "selection" });
+        }
         return;
       }
 
@@ -4051,6 +4364,10 @@ class App extends React.Component<AppProps, AppState> {
           } else if (isFrameLikeElement(selectedElement)) {
             this.setState({
               editingFrame: selectedElement.id,
+            });
+          } else if (isEmbeddableElement(selectedElement)) {//zsviczian
+            this.setState({
+              activeEmbeddable: { element: selectedElement, state: "active" }
             });
           }
         }
@@ -4259,33 +4576,40 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    this.setState((prevState) => {
-      const commonResets = {
-        snapLines: prevState.snapLines.length ? [] : prevState.snapLines,
-        originSnapOffset: null,
-        activeEmbeddable: null,
-      } as const;
+    setTimeout(() => {
+      this.setState((prevState) => {
+        const commonResets = {
+          snapLines: prevState.snapLines.length ? [] : prevState.snapLines,
+          originSnapOffset: null,
+          activeEmbeddable: null,
+        } as const;
 
-      if (nextActiveTool.type === "freedraw") {
-        this.store.shouldCaptureIncrement();
-      }
+        if (nextActiveTool.type === "freedraw") {
+          this.store.shouldCaptureIncrement();
+        }
 
-      if (nextActiveTool.type !== "selection") {
+        if (nextActiveTool.type !== "selection") {
+          return {
+            ...prevState,
+            activeTool: nextActiveTool,
+            selectedElementIds: makeNextSelectedElementIds(
+              nextActiveTool.type === "mermaid" //zsviczian
+                ? this.state.selectedElementIds
+                : {},
+              prevState,
+            ),
+            selectedGroupIds: makeNextSelectedElementIds({}, prevState),
+            editingGroupId: null,
+            multiElement: null,
+            ...commonResets,
+          };
+        }
         return {
           ...prevState,
           activeTool: nextActiveTool,
-          selectedElementIds: makeNextSelectedElementIds({}, prevState),
-          selectedGroupIds: makeNextSelectedElementIds({}, prevState),
-          editingGroupId: null,
-          multiElement: null,
           ...commonResets,
         };
-      }
-      return {
-        ...prevState,
-        activeTool: nextActiveTool,
-        ...commonResets,
-      };
+      });//zsviczian added timeout because button won't select otherwise
     });
   };
 
@@ -4394,13 +4718,20 @@ class App extends React.Component<AppProps, AppState> {
   ) {
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
 
-    const updateElement = (nextOriginalText: string, isDeleted: boolean) => {
+    const updateElement = (
+      nextOriginalText: string,
+      isDeleted: boolean,
+      rawText?: string, //zsviczian
+      link?: string, //zsviczian
+    ) => {
       this.scene.replaceAllElements([
         // Not sure why we include deleted elements as well hence using deleted elements map
         ...this.scene.getElementsIncludingDeleted().map((_element) => {
           if (_element.id === element.id && isTextElement(_element)) {
             return newElementWith(_element, {
               originalText: nextOriginalText,
+              rawText: rawText ?? nextOriginalText, //zsviczian
+              link, //zsviczian
               isDeleted: isDeleted ?? _element.isDeleted,
               // returns (wrapped) text and new dimensions
               ...refreshTextDimensions(
@@ -4415,6 +4746,34 @@ class App extends React.Component<AppProps, AppState> {
         }),
       ]);
     };
+
+    //zsviczian
+    if (isExistingElement && this.props.onBeforeTextEdit) {
+      const text = this.props.onBeforeTextEdit(element);
+      if (text && text !== element.originalText) {
+        this.scene.replaceAllElements([
+          ...this.scene.getElementsIncludingDeleted().map((_element) => {
+            if (_element.id === element.id && isTextElement(_element)) {
+              //changing the value of element so this gets edited by textWysiwyg
+              element = newElementWith(_element, {
+                originalText: text,
+                rawText: text, //zsviczian
+                isDeleted: false,
+                // returns (wrapped) text and new dimensions
+                ...refreshTextDimensions(
+                  _element,
+                  getContainerElement(_element, elementsMap),
+                  elementsMap,
+                  text,
+                ),
+              });
+              return element;
+            }
+            return _element;
+          }),
+        ]);
+      }
+    }
 
     textWysiwyg({
       id: element.id,
@@ -4440,7 +4799,32 @@ class App extends React.Component<AppProps, AppState> {
       }),
       onSubmit: withBatchedUpdates(({ viaKeyboard, nextOriginalText }) => {
         const isDeleted = !nextOriginalText.trim();
-        updateElement(nextOriginalText, isDeleted);
+        //zsviczian insert start
+        const rawText = nextOriginalText; //should this be originalText??
+        let link = undefined;
+        if (this.props.onBeforeTextSubmit) {
+          const _element = this.scene.getElementsIncludingDeleted().find((el) => 
+            (el.id === element.id && isTextElement(el))) as ExcalidrawTextElement;
+          if(_element) {
+            const dismensionsData = refreshTextDimensions(
+              _element,
+              getContainerElement(_element, elementsMap),
+              elementsMap,
+              nextOriginalText,
+            );
+            const {updatedNextOriginalText, nextLink} =
+              this.props.onBeforeTextSubmit(
+                element,
+                dismensionsData?.text??nextOriginalText, //should never be undefined
+                nextOriginalText,
+                isDeleted,
+              );
+            nextOriginalText = updatedNextOriginalText ?? nextOriginalText;
+            link = nextLink;
+          }
+        }
+        //zsviczian insert end
+        updateElement(nextOriginalText, isDeleted, rawText, link); //zsviczian (added rawText, link, text)
         // select the created text element only if submitting via keyboard
         // (when submitting via click it should act as signal to deselect)
         if (!isDeleted && viaKeyboard) {
@@ -4796,7 +5180,7 @@ class App extends React.Component<AppProps, AppState> {
 
     const lineHeight =
       existingTextElement?.lineHeight || getLineHeight(fontFamily);
-    const fontSize = this.state.currentItemFontSize;
+    const fontSize = getFontSize(this.state.currentItemFontSize,this.state.zoom.value); //zsviczian
 
     if (
       !existingTextElement &&
@@ -4833,6 +5217,11 @@ class App extends React.Component<AppProps, AppState> {
       y: sceneY,
     });
 
+    /*const shouldWrapText = !shouldBindToContainer && //zsviczian
+      this.lastPointerDownEvent?.pointerType === "pen";
+    const [x1, , x2] = getVisibleSceneBounds(this.state); //zsviczian
+    const maxTextWidth = Math.max(Math.min((x2 - x1) * 0.85, 800), 200); //zsviczian*/
+
     const element = existingTextElement
       ? existingTextElement
       : newTextElement({
@@ -4850,6 +5239,7 @@ class App extends React.Component<AppProps, AppState> {
           roughness: this.state.currentItemRoughness,
           opacity: this.state.currentItemOpacity,
           text: "",
+          rawText: "", //zsviczian
           fontSize,
           fontFamily,
           textAlign: parentCenterPosition
@@ -4863,6 +5253,12 @@ class App extends React.Component<AppProps, AppState> {
           lineHeight,
           angle: container?.angle ?? 0,
           frameId: topLayerFrame ? topLayerFrame.id : null,
+          /*...shouldWrapText //zsviczian
+            ? {
+              width: maxTextWidth,
+              autoResize: false,
+            }
+            : {},*/
         });
 
     if (!existingTextElement && shouldBindToContainer && container) {
@@ -4896,6 +5292,7 @@ class App extends React.Component<AppProps, AppState> {
     }
   };
 
+  private debounceDoubleClickTimestamp: number = 0; //zsviczian
   private handleCanvasDoubleClick = (
     event: React.MouseEvent<HTMLCanvasElement>,
   ) => {
@@ -4904,6 +5301,23 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.multiElement) {
       return;
     }
+
+    if ( //zsviczian - double click eraser
+      this.state.penMode &&
+      this.lastPointerDownEvent?.pointerType === "touch" &&
+      this.state.activeTool.type !== "selection"
+    ) {
+      const now = Date.now();
+      if (now - this.debounceDoubleClickTimestamp < 200) {
+        //handleCanvasDoubleClick click fires twice in case of touch.
+        //Once from the onTouchStart event handler, once from the double click event handler
+        return;
+      }
+      this.debounceDoubleClickTimestamp = now;  
+      this.updateScene(actionToggleEraserTool.perform([] as any, this.state));
+      return;
+    } // zsviczian - end
+
     // we should only be able to double click when mode is selection
     if (this.state.activeTool.type !== "selection") {
       return;
@@ -5144,7 +5558,9 @@ class App extends React.Component<AppProps, AppState> {
 
       const distance = getDistance(Array.from(gesture.pointers.values()));
       const scaleFactor =
-        this.state.activeTool.type === "freedraw" && this.state.penMode
+        !this.state.allowPinchZoom && //zsviczian
+        this.state.activeTool.type === "freedraw" &&
+        this.state.penMode
           ? 1
           : distance / gesture.initialDistance;
 
@@ -5195,9 +5611,13 @@ class App extends React.Component<AppProps, AppState> {
       event.clientY - this.state.offsetTop,
     );
     const isOverScrollBar = isPointerOverScrollBars.isOverEither;
+    const isPenFreedraw = this.state.activeTool.type === "freedraw" && event.pointerType === "pen"; //zsviczian
     if (!this.state.draggingElement && !this.state.multiElement) {
       if (isOverScrollBar) {
         resetCursor(this.interactiveCanvas);
+      } else if (isPenFreedraw && this.interactiveCanvas && hideFreedrawPenmodeCursor()) {
+        //zsviczian https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/1659
+        this.interactiveCanvas.style.cursor = "none";
       } else {
         setCursorForShape(this.interactiveCanvas, this.state);
       }
@@ -5480,6 +5900,9 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
         this.scene.getNonDeletedElementsMap(),
       );
+      if (this.props.onLinkHover) {
+        this.props.onLinkHover(this.hitLinkElement, event);
+      } //zsviczian
     } else {
       hideHyperlinkToolip();
       if (
@@ -5737,6 +6160,7 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
+    this.focusContainer(); //zsviczian
     this.maybeCleanupAfterMissingPointerUp(event.nativeEvent);
     this.maybeUnfollowRemoteUser();
 
@@ -5829,15 +6253,19 @@ class App extends React.Component<AppProps, AppState> {
     // we must exit before we set `cursorButton` state and `savePointer`
     // else it will send pointer state & laser pointer events in collab when
     // panning
-    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+    /*if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
       return;
-    }
+    }*/ //zsviczian this broke on pointer down in onPointerUpdate
 
     this.setState({
       lastPointerDownWith: event.pointerType,
       cursorButton: "down",
     });
     this.savePointer(event.clientX, event.clientY, "down");
+
+    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+      return;
+    } //zsviczian moved it here, because else pointer down in onPointerUpdate did not work
 
     if (
       event.button === POINTER_BUTTON.ERASER &&
@@ -5995,7 +6423,8 @@ class App extends React.Component<AppProps, AppState> {
       );
     } else if (
       this.state.activeTool.type !== "eraser" &&
-      this.state.activeTool.type !== "hand"
+      this.state.activeTool.type !== "hand" &&
+      this.state.activeTool.type !== "mermaid"
     ) {
       this.createGenericElementOnPointerDown(
         this.state.activeTool.type,
@@ -6162,7 +6591,7 @@ class App extends React.Component<AppProps, AppState> {
         (event.button === POINTER_BUTTON.WHEEL ||
           (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
           isHandToolActive(this.state) ||
-          this.state.viewModeEnabled)
+          (this.state.viewModeEnabled && !isLaserPointerActive(this.state)))
       ) ||
       isTextElement(this.state.editingElement)
     ) {
@@ -6750,6 +7179,10 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin.y,
       null,
     );
+    const strokeOptions = this.state.currentStrokeOptions; //zsviczian
+    const simulatePressure = strokeOptions?.constantPressure
+      ? false
+      : event.pressure === 0.5;
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
       x: gridX,
@@ -6768,8 +7201,11 @@ class App extends React.Component<AppProps, AppState> {
       roughness: this.state.currentItemRoughness,
       opacity: this.state.currentItemOpacity,
       roundness: null,
-      simulatePressure: event.pressure === 0.5,
+      simulatePressure, //zsviczian
       locked: false,
+      ...(strokeOptions //zsviczian
+        ? { customData: { strokeOptions } }
+        : {}),
       frameId: topLayerFrame ? topLayerFrame.id : null,
     });
 
@@ -6788,7 +7224,11 @@ class App extends React.Component<AppProps, AppState> {
 
     const pressures = element.simulatePressure
       ? element.pressures
-      : [...element.pressures, event.pressure];
+      : [
+          //zsviczian
+          ...element.pressures,
+          strokeOptions?.constantPressure ? 1 : event.pressure,
+        ];
 
     mutateElement(element, {
       points: [[0, 0]],
@@ -6799,7 +7239,16 @@ class App extends React.Component<AppProps, AppState> {
       pointerDownState.origin,
       this.scene.getNonDeletedElementsMap(),
     );
-    this.scene.insertElement(element);
+    if (strokeOptions?.highlighter) {
+      //zsviczian
+      this.scene.insertElement(element,0);
+/*      this.scene.replaceAllElements([
+        element,
+        ...this.scene.getElementsIncludingDeleted(),
+      ]);*/
+    } else {
+      this.scene.insertElement(element);
+    }
     this.setState({
       draggingElement: element,
       editingElement: element,
@@ -7168,6 +7617,14 @@ class App extends React.Component<AppProps, AppState> {
       opacity: this.state.currentItemOpacity,
       locked: false,
       ...FRAME_STYLE,
+      ...(this.state.frameColor
+        ? {
+            //zsviczian
+            customData: {
+              frameColor: this.state.frameColor,
+            },
+          }
+        : {}),
     } as const;
 
     const frame =
@@ -7260,6 +7717,11 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ) {
     return withBatchedUpdatesThrottled((event: PointerEvent) => {
+      //To avoid pointerMove canceling the selection of locked elements on mobile //zsviczian
+      if (Boolean(this.state.contextMenu)) {
+        return;
+      }
+
       // We need to initialize dragOffsetXY only after we've updated
       // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
       // event handler should hopefully ensure we're already working with
@@ -7640,9 +8102,14 @@ class App extends React.Component<AppProps, AppState> {
           lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
 
         if (!discardPoint) {
+          const strokeOptions = this.state.currentStrokeOptions; //zsviczian
           const pressures = draggingElement.simulatePressure
             ? draggingElement.pressures
-            : [...draggingElement.pressures, event.pressure];
+            : [
+                //zsviczian
+                ...draggingElement.pressures,
+                strokeOptions?.constantPressure ? 1 : event.pressure,
+              ];
 
           mutateElement(draggingElement, {
             points: [...points, [dx, dy]],
@@ -9146,6 +9613,32 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ suggestedBindings });
   };
 
+  //zsviczian - published on API
+  public setSelection(elements: readonly NonDeletedExcalidrawElement[]) {
+    const selectedElementIds: { [id: string]: true } = {};
+    const selectedGroupIds: { [id: string]: true } = {};
+
+    elements.forEach((ele) => {
+      if (ele.groupIds.length) {
+        selectedElementIds[ele.id] = true;
+        ele.groupIds.forEach((id) => {
+          selectedGroupIds[id] = true;
+        });
+      }
+      // exclude bound text elements as we don't mark them as selected when
+      // container is selected unless in group
+      else if (!isBoundToContainer(ele)) {
+        selectedElementIds[ele.id] = true;
+      }
+    });
+
+    this.setState({
+      previousSelectedElementIds: this.state.selectedElementIds,
+      selectedElementIds,
+      selectedGroupIds,
+    });
+  }
+
   private clearSelection(hitElement: ExcalidrawElement | null): void {
     this.setState((prevState) => ({
       selectedElementIds: makeNextSelectedElementIds({}, prevState),
@@ -9200,6 +9693,16 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   private handleAppOnDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    if (this.props.onDrop) {
+      try {
+        if ((await this.props.onDrop(event)) === false) {
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     // must be retrieved first, in the same frame
     const { file, fileHandle } = await getFileFromEvent(event);
     const { x: sceneX, y: sceneY } = viewportCoordsToSceneCoords(
@@ -9699,6 +10202,7 @@ class App extends React.Component<AppProps, AppState> {
           actionToggleZenMode,
           actionToggleViewMode,
           actionToggleStats,
+          actionToggleLaserPointer,
         ];
       }
 
@@ -9779,7 +10283,11 @@ class App extends React.Component<AppProps, AppState> {
 
       const { deltaX, deltaY } = event;
       // note that event.ctrlKey is necessary to handle pinch zooming
-      if (event.metaKey || event.ctrlKey) {
+      if (
+        //zsviczian
+        ((event.metaKey || event.ctrlKey) && !this.state.allowWheelZoom) ||
+        (!(event.metaKey || event.ctrlKey) && this.state.allowWheelZoom)
+      ) {
         const sign = Math.sign(deltaY);
         const MAX_STEP = ZOOM_STEP * 100;
         const absDelta = Math.abs(deltaY);
@@ -9922,6 +10430,14 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
+      //zsviczian
+      if (width === 0 || height === 0) {
+        if (cb) {
+          cb();
+        }
+        return;
+      }
+
       this.setState(
         {
           width,
@@ -9980,6 +10496,7 @@ declare global {
   }
 }
 
+/*  //zsviczian
 export const createTestHook = () => {
   if (import.meta.env.MODE === ENV.TEST || import.meta.env.DEV) {
     window.h = window.h || ({} as Window["h"]);
@@ -10000,5 +10517,5 @@ export const createTestHook = () => {
   }
 };
 
-createTestHook();
+createTestHook();*/
 export default App;

@@ -47,8 +47,11 @@ const MainMenu = Object.assign(
             >
               {HamburgerMenuIcon}
             </DropdownMenu.Trigger>
-            <DropdownMenu.Content
+            <DropdownMenu.Content //zsvicizan
               onClickOutside={onClickOutside}
+              className={
+                appState.trayModeEnabled ? "dropdown-menu--mobile" : undefined
+              }
               onSelect={composeEventHandlers(onSelect, () => {
                 setAppState({ openMenu: null });
               })}

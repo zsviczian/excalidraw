@@ -4,7 +4,7 @@ import { jotaiScope, jotaiStore } from "./jotai";
 import { atom, useAtomValue } from "jotai";
 import type { NestedKeyOf } from "./utility-types";
 
-const COMPLETION_THRESHOLD = 85;
+const COMPLETION_THRESHOLD = 66; //zsviczian - was 85 - was missing Dutch...
 
 export interface Language {
   code: string;

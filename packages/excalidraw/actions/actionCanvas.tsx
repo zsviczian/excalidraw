@@ -1,6 +1,7 @@
 import { ColorPicker } from "../components/ColorPicker/ColorPicker";
 import {
   handIcon,
+  laserPointerToolIcon,
   MoonIcon,
   SunIcon,
   TrashIcon,
@@ -24,17 +25,21 @@ import { CODES, KEYS } from "../keys";
 import { getNormalizedZoom } from "../scene";
 import { centerScrollOn } from "../scene/scroll";
 import { getStateForZoom } from "../scene/zoom";
-import type { AppState, NormalizedZoomValue } from "../types";
+import type { AppClassProperties, AppState, NormalizedZoomValue } from "../types";
 import { getShortcutKey, updateActiveTool } from "../utils";
 import { register } from "./register";
-import { Tooltip } from "../components/Tooltip";
 import { newElementWith } from "../element/mutateElement";
 import {
   getDefaultAppState,
   isEraserActive,
   isHandToolActive,
+  isLaserPointerActive,
 } from "../appState";
-import { DEFAULT_CANVAS_BACKGROUND_PICKS } from "../colors";
+import {
+  DEFAULT_CANVAS_BACKGROUND_PICKS,
+  DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE, //zsviczian
+} from "../colors";
+import { excludeElementsInFramesFromSelection } from "../scene/selection"; //zsviczian
 import type { SceneBounds } from "../element/bounds";
 import { setCursor } from "../cursor";
 import { StoreAction } from "../store";
@@ -62,8 +67,16 @@ export const actionChangeViewBackgroundColor = register({
     // FIXME move me to src/components/mainMenu/DefaultItems.tsx
     return (
       <ColorPicker
-        palette={null}
-        topPicks={DEFAULT_CANVAS_BACKGROUND_PICKS}
+        topPicks={
+          //zsviczian
+          appState.colorPalette?.topPicks?.canvasBackground ??
+          DEFAULT_CANVAS_BACKGROUND_PICKS
+        }
+        palette={
+          //zsviczian
+          appState.colorPalette?.canvasBackground ??
+          DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE
+        }
         label={t("labels.canvasBackground")}
         type="canvasBackground"
         color={appState.viewBackgroundColor}
@@ -110,6 +123,12 @@ export const actionClearCanvas = register({
           appState.activeTool.type === "image"
             ? { ...appState.activeTool, type: "selection" }
             : appState.activeTool,
+        colorPalette: appState.colorPalette, //zsviczian
+        trayModeEnabled: appState.trayModeEnabled, //zsviczian
+        allowPinchZoom: appState.allowPinchZoom, //zsviczian
+        allowWheelZoom: appState.allowWheelZoom, //zsviczian
+        pinnedScripts: appState.pinnedScripts, //zsviczian
+        customPens: appState.customPens, //zsviczian
       },
       storeAction: StoreAction.CAPTURE,
     };
@@ -222,19 +241,19 @@ export const actionResetZoom = register({
     };
   },
   PanelComponent: ({ updateData, appState }) => (
-    <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
-      <ToolButton
-        type="button"
-        className="reset-zoom-button zoom-button"
-        title={t("buttons.resetZoom")}
-        aria-label={t("buttons.resetZoom")}
-        onClick={() => {
-          updateData(null);
-        }}
-      >
-        {(appState.zoom.value * 100).toFixed(0)}%
-      </ToolButton>
-    </Tooltip>
+    // zsviczian <Tooltip label={t("buttons.resetZoom")} style={{ display: "none" }}>
+    <ToolButton
+      type="button"
+      className="reset-zoom-button zoom-button"
+      title={t("buttons.resetZoom")}
+      aria-label={t("buttons.resetZoom")}
+      onClick={() => {
+        updateData(null);
+      }}
+    >
+      {(appState.zoom.value * 100).toFixed(0)}%
+    </ToolButton>
+    //</Tooltip>
   ),
   keyTest: (event) =>
     (event.code === CODES.ZERO || event.code === CODES.NUM_ZERO) &&
@@ -244,6 +263,7 @@ export const actionResetZoom = register({
 const zoomValueToFitBoundsOnViewport = (
   bounds: SceneBounds,
   viewportDimensions: { width: number; height: number },
+  maxZoom: number = 1, //zsviczian
 ) => {
   const [x1, y1, x2, y2] = bounds;
   const commonBoundsWidth = x2 - x1;
@@ -255,7 +275,7 @@ const zoomValueToFitBoundsOnViewport = (
     Math.floor(smallestZoomValue / ZOOM_STEP) * ZOOM_STEP;
   const clampedZoomValueToFitElements = Math.min(
     Math.max(zoomAdjustedToSteps, MIN_ZOOM),
-    1,
+    maxZoom, //zsviczian
   );
   return clampedZoomValueToFitElements as NormalizedZoomValue;
 };
@@ -451,7 +471,14 @@ export const actionToggleTheme = register({
   icon: (appState) => (appState.theme === THEME.LIGHT ? MoonIcon : SunIcon),
   viewMode: true,
   trackEvent: { category: "canvas" },
-  perform: (_, appState, value) => {
+  perform: (_, appState, value, app) => {
+    //zsviczian
+    if (app.props.onThemeChange) {
+      //zsviczian
+      app.props.onThemeChange(
+        value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
+      );
+    }
     return {
       appState: {
         ...appState,
@@ -541,3 +568,95 @@ export const actionToggleHandTool = register({
   keyTest: (event) =>
     !event.altKey && !event[KEYS.CTRL_OR_CMD] && event.key === KEYS.H,
 });
+
+export const actionToggleLaserPointer = register({ //zsviczian - did I really add this? Delta compared to excalidraw.com
+  name: "toggleLaserPointerTool",
+  viewMode: true,
+  trackEvent: { category: "menu" },
+  perform(elements, appState, _, app) {
+    let activeTool: AppState["activeTool"];
+
+    if (isLaserPointerActive(appState)) {
+      activeTool = updateActiveTool(appState, {
+        ...(appState.activeTool.lastActiveTool || {
+          type: appState.viewModeEnabled ? "hand" : "selection",
+        }),
+        lastActiveToolBeforeEraser: null,
+      });
+      setCursor(
+        app.interactiveCanvas,
+        appState.viewModeEnabled ? CURSOR_TYPE.GRAB : CURSOR_TYPE.POINTER,
+      );
+    } else {
+      activeTool = updateActiveTool(appState, {
+        type: "laser",
+        lastActiveToolBeforeEraser: appState.activeTool,
+      });
+      setCursor(app.interactiveCanvas, CURSOR_TYPE.CROSSHAIR);
+    }
+
+    return {
+      appState: {
+        ...appState,
+        selectedElementIds: {},
+        selectedGroupIds: {},
+        activeEmbeddable: null,
+        activeTool,
+      },
+      storeAction: StoreAction.NONE,
+    };
+  },
+  checked: (appState) => appState.activeTool.type === "laser",
+  label: "labels.laser",
+  icon: laserPointerToolIcon,
+});
+
+//zsviczian
+export const zoomToFitElements = (
+  elements: readonly ExcalidrawElement[],
+  appState: Readonly<AppState>,
+  zoomToSelection: boolean,
+  app: AppClassProperties, //zsviczian
+  maxZoom: number = 1, //zsviczian
+  margin: number = 0, //zsviczian
+) => {
+  const nonDeletedElements = getNonDeletedElements(elements);
+  const selectedElements = app.scene.getSelectedElements(appState);
+
+  const commonBounds =
+    zoomToSelection && selectedElements.length > 0
+      ? getCommonBounds(excludeElementsInFramesFromSelection(selectedElements))
+      : getCommonBounds(
+          excludeElementsInFramesFromSelection(nonDeletedElements),
+        );
+
+  const newZoom = {
+    value: zoomValueToFitBoundsOnViewport(
+      commonBounds,
+      {
+        width: appState.width - appState.width * margin,
+        height: appState.height - appState.height * margin,
+      },
+      maxZoom,
+    ),
+  };
+
+  const [x1, y1, x2, y2] = commonBounds;
+  const centerX = (x1 + x2) / 2;
+  const centerY = (y1 + y2) / 2;
+  return {
+    appState: {
+      ...appState,
+      ...centerScrollOn({
+        scenePoint: { x: centerX, y: centerY },
+        viewportDimensions: {
+          width: appState.width,
+          height: appState.height,
+        },
+        zoom: newZoom,
+      }),
+      zoom: newZoom,
+    },
+    commitToHistory: false,
+  };
+};

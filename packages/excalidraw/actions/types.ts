@@ -134,6 +134,7 @@ export type ActionName =
   | "setEmbeddableAsActiveTool"
   | "createContainerFromText"
   | "wrapTextInContainer"
+  | "toggleLaserPointerTool" //zsviczian
   | "commandPalette"
   | "autoResize"
   | "elementStats";

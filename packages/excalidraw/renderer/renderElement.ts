@@ -17,6 +17,7 @@ import {
   isArrowElement,
   hasBoundTextElement,
   isMagicFrameElement,
+  isIframeLikeElement,
 } from "../element/typeChecks";
 import { getElementAbsoluteCoords } from "../element/bounds";
 import type { RoughCanvas } from "roughjs/bin/canvas";
@@ -55,10 +56,11 @@ import {
   getBoundTextMaxWidth,
 } from "../element/textElement";
 import { LinearElementEditor } from "../element/linearElementEditor";
-
+import easingsFunctions from "./easingFunctions"; //zsviczian
 import { getContainingFrame } from "../frame";
 import { ShapeCache } from "../scene/ShapeCache";
 import { getVerticalOffset } from "../fonts";
+import { getAreaLimit, getWidthHeightLimit } from "../obsidianUtils";
 
 // using a stronger invert (100% vs our regular 93%) and saturate
 // as a temp hack to make images in dark theme look closer to original
@@ -150,9 +152,9 @@ const cappedElementCanvasSize = (
   // on zoom.
   //
   // ~ safari mobile canvas area limit
-  const AREA_LIMIT = 16777216;
+  const AREA_LIMIT = getAreaLimit(); //zsviczian
   // ~ safari width/height limit based on developer.mozilla.org.
-  const WIDTH_HEIGHT_LIMIT = 32767;
+  const WIDTH_HEIGHT_LIMIT = getWidthHeightLimit(); //zsviczian
 
   const padding = getCanvasPadding(element);
 
@@ -309,7 +311,7 @@ const generateElementCanvas = (
         scale,
     );
   }
-
+  
   return {
     element,
     canvas,
@@ -404,7 +406,17 @@ const drawElementOnCanvas = (
         rc.draw(fillShape);
       }
 
-      context.fillStyle = element.strokeColor;
+      //zsviczian
+      if (element.customData?.strokeOptions?.hasOutline) {
+        context.lineWidth =
+          element.strokeWidth *
+          (element.customData.strokeOptions.outlineWidth ?? 1);
+        context.strokeStyle = element.strokeColor;
+        context.stroke(path);
+        context.fillStyle = element.backgroundColor;
+      } else {
+        context.fillStyle = element.strokeColor;
+      }
       context.fill(path);
 
       context.restore();
@@ -589,7 +601,8 @@ const drawElementFromCanvas = (
 
     if (
       "scale" in elementWithCanvas.element &&
-      !isPendingImageElement(element, renderConfig)
+      !isPendingImageElement(element, renderConfig) &&
+      !isIframeLikeElement(element) //zsviczian
     ) {
       context.scale(
         elementWithCanvas.element.scale[0],
@@ -683,10 +696,16 @@ export const renderElement = (
           element.x + appState.scrollX,
           element.y + appState.scrollY,
         );
-        context.fillStyle = "rgba(0, 0, 200, 0.04)";
+        context.fillStyle =
+          element.customData?.frameColor?.fill ??
+          appState?.frameColor?.fill ??
+          "rgba(0, 0, 200, 0.04)"; //zsviczian
 
         context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-        context.strokeStyle = FRAME_STYLE.strokeColor;
+        context.strokeStyle =
+          element.customData?.frameColor?.stroke ??
+          appState?.frameColor?.stroke ??
+          FRAME_STYLE.strokeColor; //zsviczian
 
         // TODO change later to only affect AI frames
         if (isMagicFrameElement(element)) {
@@ -943,15 +962,43 @@ export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
     : [[0, 0, 0.5]];
 
   // Consider changing the options for simulated pressure vs real pressure
-  const options: StrokeOptions = {
-    simulatePressure: element.simulatePressure,
-    size: element.strokeWidth * 4.25,
-    thinning: 0.6,
-    smoothing: 0.5,
-    streamline: 0.5,
-    easing: (t) => Math.sin((t * Math.PI) / 2), // https://easings.net/#easeOutSine
-    last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
-  };
+  const customOptions = element.customData?.strokeOptions?.options; //zsviczian
+  const options: StrokeOptions = customOptions //zsviczian
+    ? {
+        ...customOptions,
+        simulatePressure:
+          customOptions.simulatePressure ?? element.simulatePressure,
+        size: element.strokeWidth * 4.25, //override size with stroke width
+        last: !!element.lastCommittedPoint,
+        easing: easingsFunctions[customOptions.easing] ?? ((t) => t),
+        ...(customOptions.start?.easing
+          ? {
+              start: {
+                ...customOptions.start,
+                easing:
+                  easingsFunctions[customOptions.start.easing] ?? ((t) => t),
+              },
+            }
+          : { start: customOptions.start }),
+        ...(customOptions.end?.easing
+          ? {
+              end: {
+                ...customOptions.end,
+                easing:
+                  easingsFunctions[customOptions.end.easing] ?? ((t) => t),
+              },
+            }
+          : { end: customOptions.end }),
+      }
+    : {
+        simulatePressure: element.simulatePressure,
+        size: element.strokeWidth * 4.25,
+        thinning: 0.6,
+        smoothing: 0.5,
+        streamline: 0.5,
+        easing: easingsFunctions.easeOutSine, //zsviczian
+        last: !!element.lastCommittedPoint, // LastCommittedPoint is added on pointerup
+      };
 
   return getSvgPathFromStroke(getStroke(inputPoints as number[][], options));
 }

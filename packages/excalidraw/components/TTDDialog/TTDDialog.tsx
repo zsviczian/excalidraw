@@ -1,5 +1,5 @@
 import { Dialog } from "../Dialog";
-import { useApp, useExcalidrawSetAppState } from "../App";
+import { useApp, useAppProps, useExcalidrawSetAppState } from "../App";
 import MermaidToExcalidraw from "./MermaidToExcalidraw";
 import TTDDialogTabs from "./TTDDialogTabs";
 import type { ChangeEventHandler } from "react";
@@ -32,7 +32,7 @@ import { InlineIcon } from "../InlineIcon";
 import { TTDDialogSubmitShortcut } from "./TTDDialogSubmitShortcut";
 
 const MIN_PROMPT_LENGTH = 3;
-const MAX_PROMPT_LENGTH = 1000;
+const MAX_PROMPT_LENGTH = 40000; //zsviczian - was 1000
 
 const rateLimitsAtom = atom<{
   rateLimit: number;
@@ -88,6 +88,8 @@ export const TTDDialogBase = withInternalFallback(
     | { __fallback: true }
   )) => {
     const app = useApp();
+    const appState = useUIAppState();//zsviczian
+    const appProps = useAppProps();//zsviczian
     const setAppState = useExcalidrawSetAppState();
 
     const someRandomDivRef = useRef<HTMLDivElement>(null);
@@ -208,7 +210,7 @@ export const TTDDialogBase = withInternalFallback(
     const [mermaidToExcalidrawLib, setMermaidToExcalidrawLib] =
       useState<MermaidToExcalidrawLibProps>({
         loaded: false,
-        api: import("@excalidraw/mermaid-to-excalidraw"),
+        api: import("@zsviczian/mermaid-to-excalidraw"), //zsviczian
       });
 
     useEffect(() => {
@@ -265,12 +267,14 @@ export const TTDDialogBase = withInternalFallback(
               <TTDDialogTabTrigger tab="mermaid">Mermaid</TTDDialogTabTrigger>
             </TTDDialogTabTriggers>
           )}
-
-          <TTDDialogTab className="ttd-dialog-content" tab="mermaid">
-            <MermaidToExcalidraw
-              mermaidToExcalidrawLib={mermaidToExcalidrawLib}
-            />
-          </TTDDialogTab>
+          {appProps.renderMermaid && (
+            <TTDDialogTab className="ttd-dialog-content" tab="mermaid">
+              <MermaidToExcalidraw
+                mermaidToExcalidrawLib={mermaidToExcalidrawLib}
+                selectedElements={app.scene.getSelectedElements(appState)} //zsviczian
+              />
+            </TTDDialogTab>
+          )}
           {!("__fallback" in rest) && (
             <TTDDialogTab className="ttd-dialog-content" tab="text-to-diagram">
               <div className="ttd-dialog-desc">

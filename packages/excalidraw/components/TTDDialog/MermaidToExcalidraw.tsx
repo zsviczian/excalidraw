@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useDeferredValue } from "react";
 import type { BinaryFiles } from "../../types";
 import { useApp } from "../App";
-import type { NonDeletedExcalidrawElement } from "../../element/types";
+import type { ExcalidrawElement, NonDeletedExcalidrawElement } from "../../element/types";
 import { ArrowRightIcon } from "../icons";
 import "./MermaidToExcalidraw.scss";
 import { t } from "../../i18n";
@@ -16,6 +16,9 @@ import { TTDDialogPanels } from "./TTDDialogPanels";
 import { TTDDialogPanel } from "./TTDDialogPanel";
 import { TTDDialogInput } from "./TTDDialogInput";
 import { TTDDialogOutput } from "./TTDDialogOutput";
+import { MermaidOptions, parseMermaidToExcalidraw } from "@zsviczian/mermaid-to-excalidraw";
+import { DEFAULT_FONT_SIZE } from "../../constants";
+import { convertToExcalidrawElements } from "../../data/transform";
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
 import { EDITOR_LS_KEYS } from "../../constants";
 import { debounce, isDevEnv } from "../../utils";
@@ -28,8 +31,10 @@ const debouncedSaveMermaidDefinition = debounce(saveMermaidDataToStorage, 300);
 
 const MermaidToExcalidraw = ({
   mermaidToExcalidrawLib,
+  selectedElements, //zsviczian
 }: {
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
+  selectedElements: readonly NonDeletedExcalidrawElement[]; //zsviczian
 }) => {
   const [text, setText] = useState(
     () =>
@@ -37,6 +42,7 @@ const MermaidToExcalidraw = ({
       MERMAID_EXAMPLE,
   );
   const deferredText = useDeferredValue(text.trim());
+  const [loading, setLoading] = useState(true); //zsviczian
   const [error, setError] = useState<Error | null>(null);
 
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -48,12 +54,17 @@ const MermaidToExcalidraw = ({
   const app = useApp();
 
   useEffect(() => {
+    const selectedMermaidImage = selectedElements.filter(
+      (el) => el.type === "image" && el.customData?.mermaidText,
+    )[0]; //zsviczian
     convertMermaidToExcalidraw({
       canvasRef,
       data,
       mermaidToExcalidrawLib,
       setError,
-      mermaidDefinition: deferredText,
+      mermaidDefinition: selectedMermaidImage
+        ? selectedMermaidImage.customData?.mermaidText
+        : deferredText, //zsviczian
     }).catch((err) => {
       if (isDevEnv()) {
         console.error("Failed to parse mermaid definition", err);
@@ -61,7 +72,7 @@ const MermaidToExcalidraw = ({
     });
 
     debouncedSaveMermaidDefinition(deferredText);
-  }, [deferredText, mermaidToExcalidrawLib]);
+  }, [deferredText, mermaidToExcalidrawLib, selectedElements]); //zsviczian
 
   useEffect(
     () => () => {
@@ -130,3 +141,44 @@ const MermaidToExcalidraw = ({
   );
 };
 export default MermaidToExcalidraw;
+
+//zsviczian
+export const mermaidToExcalidraw = async (
+  mermaidDefinition: string,
+  opts: MermaidOptions = { fontSize: DEFAULT_FONT_SIZE },
+  forceSVG: boolean = false,
+): Promise<
+  | {
+      elements?: ExcalidrawElement[];
+      files?: any;
+      error?: string;
+    }
+  | undefined
+> => {
+  try {
+    const { elements, files } = await parseMermaidToExcalidraw(
+      mermaidDefinition,
+      opts,
+      forceSVG,
+    );
+
+    return {
+      elements: convertToExcalidrawElements(
+        elements.map((el) => {
+          if (el.type === "image") {
+            el.customData = { mermaidText: mermaidDefinition };
+          }
+          return el;
+        }),
+        {
+          regenerateIds: true,
+        },
+      ),
+      files,
+    };
+  } catch (e: any) {
+    return {
+      error: e.message,
+    }
+  }
+};
