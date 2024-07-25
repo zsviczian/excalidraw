@@ -258,12 +258,16 @@ export {
   intersectElementWithLine, //zsviczian
   determineFocusDistance, //zsviczian
   measureText, //zsviczian
-  getDefaultLineHeight, //zsviczian
+  getLineHeight, //zsviczian
   wrapText, //zsviczian
   getFontString, //zsviczian
   getBoundTextMaxWidth, //zsviczian
   mermaidToExcalidraw, //zsviczian
   destroyObsidianUtils, //zsviczian
+  registerLocalFont, //zsviczian
+  getFontFamilies, //zsviczian
+  getFontFamilyString, //zsviczian
+  registerFontsInCSS, //zsviczian
 } from "../utils/export";
 
 export {

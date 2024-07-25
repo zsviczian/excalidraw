@@ -771,7 +771,6 @@ export interface ExcalidrawImperativeAPI {
   addFiles: (data: BinaryFileData[]) => void;
   updateContainerSize: InstanceType<typeof App>["updateContainerSize"]; //zsviczian
   id: string;
-  setLocalFont: (showOnPanel: boolean) => void; //zsviczian
   selectElements: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   sendBackward: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   bringForward: (elements: readonly ExcalidrawElement[]) => void; //zsviczian

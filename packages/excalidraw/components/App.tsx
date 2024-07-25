@@ -445,7 +445,6 @@ import { getTooltipDiv } from "./Tooltip";
 
 const AppContext = React.createContext<AppClassProperties>(null!);
 const AppPropsContext = React.createContext<AppProps>(null!);
-export let showFourthFont: boolean = false; //zsviczian
 
 const deviceContextInitialValue = {
   viewport: {
@@ -713,7 +712,6 @@ class App extends React.Component<AppProps, AppState> {
         setToast: this.setToast,
         updateContainerSize: this.updateContainerSize, //zsviczian
         id: this.id,
-        setLocalFont: this.setLocalFont, //zsviczian
         selectElements: this.selectElements, //zsviczian
         sendBackward: this.sendBackward, //zsviczian
         bringForward: this.bringForward, //zsviczian
@@ -3946,13 +3944,6 @@ class App extends React.Component<AppProps, AppState> {
         this.forceUpdate();
       }
     };
-
-  //zsviczian
-  public setLocalFont: ExcalidrawImperativeAPI["setLocalFont"] = (
-    showOnPanel: boolean,
-  ) => {
-    showFourthFont = showOnPanel;
-  };
 
   //zsviczian
   public selectElements: ExcalidrawImperativeAPI["selectElements"] = (
