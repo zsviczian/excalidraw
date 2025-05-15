@@ -1313,15 +1313,15 @@ export class LinearElementEditor {
       element.points[element.points.length - 1];
 
     // break polygon if deleting start/end point
-    if (isLineElement(element) && element.polygon) {
-      if (
-        pointIndices.includes(0) ||
-        (pointIndices.includes(element.points.length - 1) &&
-          // don't disable polygon if cleaning up uncommitted point
-          !isUncommittedPoint)
-      ) {
-        app.scene.mutateElement(element, { polygon: false });
-      }
+    if (
+      isLineElement(element) &&
+      element.polygon &&
+      // don't disable polygon if cleaning up uncommitted point
+      !isUncommittedPoint &&
+      (pointIndices.includes(0) ||
+        pointIndices.includes(element.points.length - 1))
+    ) {
+      app.scene.mutateElement(element, { polygon: false });
     }
 
     const nextPoints = element.points.filter((_, idx) => {

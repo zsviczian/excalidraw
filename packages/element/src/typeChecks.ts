@@ -379,3 +379,9 @@ export const getLinearElementSubType = (
   }
   return "line";
 };
+
+export const isEligiblePolygon = (
+  element: ExcalidrawElement,
+): element is ExcalidrawLineElement => {
+  return isLineElement(element) && element.points.length > 2;
+};
