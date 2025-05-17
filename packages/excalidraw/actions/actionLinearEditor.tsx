@@ -198,7 +198,5 @@ export const actionTogglePolygon = register({
         style={{ marginLeft: "auto" }}
       />
     );
-  },
-  keyTest: (event) =>
-    event.shiftKey && event.key === KEYS.C,
+  }
 });
