@@ -6,7 +6,12 @@ import {
 } from "@excalidraw/element";
 import { LinearElementEditor } from "@excalidraw/element";
 
-import { isBindingElement, isLinearElement } from "@excalidraw/element";
+import {
+  isBindingElement,
+  isFreeDrawElement,
+  isLinearElement,
+  isLineElement,
+} from "@excalidraw/element";
 
 import { KEYS, arrayToMap, updateActiveTool } from "@excalidraw/common";
 import { isPathALoop } from "@excalidraw/element";
@@ -14,6 +19,8 @@ import { isPathALoop } from "@excalidraw/element";
 import { isInvisiblySmallElement } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
+
+import type { LocalPoint } from "@excalidraw/math";
 
 import { t } from "../i18n";
 import { resetCursor } from "../cursor";
@@ -82,14 +89,14 @@ export const actionFinalize = register({
 
     const multiPointElement = appState.multiElement
       ? appState.multiElement
-      : appState.newElement?.type === "freedraw"
+      : isFreeDrawElement(appState.newElement)
       ? appState.newElement
       : null;
 
     if (multiPointElement) {
       // pen and mouse have hover
       if (
-        multiPointElement.type !== "freedraw" &&
+        !isFreeDrawElement(multiPointElement) &&
         appState.lastPointerDownWith !== "touch"
       ) {
         const { points, lastCommittedPoint } = multiPointElement;
@@ -114,18 +121,30 @@ export const actionFinalize = register({
       // set the last point to first point.
       // This ensures that loop remains closed at different scales.
       const isLoop = isPathALoop(multiPointElement.points, appState.zoom.value);
-      if (multiPointElement.type === "line") {
-        //zsviczian multiPointElement.type === "freedraw"
+      if (
+        isLineElement(multiPointElement)
+        //https://github.com/zsviczian/excalidraw/commit/7e2cba833eb8ca57622f49041331973b7a5b3f82
+        //https://github.com/zsviczian/obsidian-excalidraw-plugin/releases/tag/2.0.15
+        //|| isFreeDrawElement(multiPointElement) //zsviczian
+      ) {
         if (isLoop) {
           const linePoints = multiPointElement.points;
           const firstPoint = linePoints[0];
-          scene.mutateElement(multiPointElement, {
-            points: linePoints.map((p, index) =>
-              index === linePoints.length - 1
-                ? pointFrom(firstPoint[0], firstPoint[1])
-                : p,
-            ),
-          });
+          const points: LocalPoint[] = linePoints.map((p, index) =>
+            index === linePoints.length - 1
+              ? pointFrom(firstPoint[0], firstPoint[1])
+              : p,
+          );
+          //if (isLineElement(multiPointElement)) { //zsviczian (because isFreeDrawElement is removed)
+            scene.mutateElement(multiPointElement, {
+              points,
+              polygon: true,
+            });
+          /*} else { //zsviczian
+            scene.mutateElement(multiPointElement, {
+              points,
+            });
+          }*/
         }
       }
 
