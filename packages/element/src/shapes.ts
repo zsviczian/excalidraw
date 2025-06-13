@@ -4,7 +4,6 @@ import {
   LINE_CONFIRM_THRESHOLD,
   ROUNDNESS,
   invariant,
-  elementCenterPoint,
   LINE_POLYGON_POINT_MERGE_DISTANCE,
 } from "@excalidraw/common";
 import {
@@ -34,7 +33,7 @@ import { LinearElementEditor } from "./linearElementEditor";
 import { getBoundTextElement } from "./textElement";
 import { ShapeCache } from "./ShapeCache";
 
-import { getElementAbsoluteCoords, type Bounds } from "./bounds";
+import { elementCenterPoint, getElementAbsoluteCoords, type Bounds } from "./bounds";
 
 import { canBecomePolygon } from "./typeChecks";
 

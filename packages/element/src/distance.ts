@@ -6,8 +6,6 @@ import {
 
 import { ellipse, ellipseDistanceFromPoint } from "@excalidraw/math/ellipse";
 
-import { elementCenterPoint } from "@excalidraw/common";
-
 import type { GlobalPoint, Radians } from "@excalidraw/math";
 
 import {
@@ -25,6 +23,7 @@ import type {
   ExcalidrawLinearElement,
   ExcalidrawRectanguloidElement,
 } from "./types";
+import { elementCenterPoint } from "./bounds";
 
 export const distanceToElement = (
   element: ExcalidrawElement,

@@ -1171,16 +1171,13 @@ export const getCenterForBounds = (bounds: Bounds): GlobalPoint =>
     bounds[1] + (bounds[3] - bounds[1]) / 2,
   );
 
-export const doBoundsIntersect = (
-  bounds1: Bounds | null,
-  bounds2: Bounds | null,
-): boolean => {
-  if (bounds1 == null || bounds2 == null) {
-    return false;
-  }
+export const elementCenterPoint = (
+  element: ExcalidrawElement,
+  elementsMap: ElementsMap,
+  xOffset: number = 0,
+  yOffset: number = 0,
+) => {
+  const [x, y] = getCenterForBounds(getElementBounds(element, elementsMap));
 
-  const [minX1, minY1, maxX1, maxY1] = bounds1;
-  const [minX2, minY2, maxX2, maxY2] = bounds2;
-
-  return minX1 < maxX2 && maxX1 > minX2 && minY1 < maxY2 && maxY1 > minY2;
+  return pointFrom<GlobalPoint>(x + xOffset, y + yOffset);
 };

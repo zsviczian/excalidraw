@@ -1,6 +1,6 @@
-import { elementCenterPoint, THEME, THEME_FILTER } from "@excalidraw/common";
+import { THEME, THEME_FILTER } from "@excalidraw/common";
 
-import { FIXED_BINDING_DISTANCE } from "@excalidraw/element";
+import { elementCenterPoint, FIXED_BINDING_DISTANCE } from "@excalidraw/element";
 import { getDiamondPoints } from "@excalidraw/element";
 import { getCornerRadius } from "@excalidraw/element";
 

@@ -1,9 +1,10 @@
-import { doBoundsIntersect, type Bounds } from "@excalidraw/element";
+import type { Bounds } from "@excalidraw/element";
 
 import { isPoint, pointDistance, pointFrom, pointFromVector } from "./point";
 import { vector, vectorNormal, vectorNormalize, vectorScale } from "./vector";
 
 import type { Curve, GlobalPoint, LineSegment, LocalPoint } from "./types";
+import { doBoundsIntersect } from "./utils";
 
 /**
  *
