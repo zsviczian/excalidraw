@@ -4319,6 +4319,7 @@ class App extends React.Component<AppProps, AppState> {
       const { elements, appState, collaborators, captureUpdate } = sceneData;
 
       if (captureUpdate) {
+        const nextElements = elements ? elements : undefined;
         const observedAppState = appState
           ? getObservedAppState({
               ...this.store.snapshot.appState,
@@ -4328,7 +4329,7 @@ class App extends React.Component<AppProps, AppState> {
 
         this.store.scheduleMicroAction({
           action: captureUpdate,
-          elements: elements ?? [],
+          elements: nextElements,
           appState: observedAppState,
         });
       }
