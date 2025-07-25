@@ -135,7 +135,10 @@ export const bindOrUnbindBindingElement = (
     scene.getNonDeletedElementsMap(),
     scene.getNonDeletedElements(),
     appState,
-    opts,
+    {
+      ...opts,
+      appState,
+    },
   );
   bindOrUnbindBindingElementEdge(arrow, start, "start", scene);
   bindOrUnbindBindingElementEdge(arrow, end, "end", scene);
@@ -225,6 +228,71 @@ const getOriginalBindingsIfStillCloseToBindingEnds = (
     return null;
   });
 
+export const getStartGlobalEndLocalPointsForBinding = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  start: BindingStrategy,
+  end: BindingStrategy,
+  startPoint: GlobalPoint,
+  endPoint: LocalPoint,
+  elementsMap: ElementsMap,
+): [GlobalPoint, LocalPoint] => {
+  let startGlobalPoint = startPoint;
+  let endLocalPoint = endPoint;
+  if (start.mode) {
+    const newStartLocalPoint = updateBoundPoint(
+      arrow,
+      "startBinding",
+      start.mode
+        ? {
+            ...calculateFixedPointForNonElbowArrowBinding(
+              arrow,
+              start.element,
+              "start",
+              elementsMap,
+              start.focusPoint,
+            ),
+            elementId: start.element.id,
+            mode: start.mode,
+          }
+        : null,
+      start.element,
+      elementsMap,
+    );
+    startGlobalPoint = newStartLocalPoint
+      ? LinearElementEditor.getPointGlobalCoordinates(
+          arrow,
+          newStartLocalPoint,
+          elementsMap,
+        )
+      : startGlobalPoint;
+  }
+
+  if (end.mode) {
+    const newEndLocalPoint = updateBoundPoint(
+      arrow,
+      "endBinding",
+      end.mode
+        ? {
+            ...calculateFixedPointForNonElbowArrowBinding(
+              arrow,
+              end.element,
+              "end",
+              elementsMap,
+              end.focusPoint,
+            ),
+            elementId: end.element.id,
+            mode: end.mode,
+          }
+        : null,
+      end.element,
+      elementsMap,
+    );
+    endLocalPoint = newEndLocalPoint ?? endLocalPoint;
+  }
+
+  return [startGlobalPoint, endLocalPoint];
+};
+
 const bindingStrategyForEndpointDragging = (
   point: GlobalPoint,
   oppositeBinding: FixedPointBinding | null,
@@ -233,7 +301,8 @@ const bindingStrategyForEndpointDragging = (
   zoom: AppState["zoom"],
   globalBindMode?: AppState["bindMode"],
   opts?: {
-    newArrow: boolean;
+    newArrow?: boolean;
+    appState?: AppState;
   },
 ): { current: BindingStrategy; other: BindingStrategy } => {
   let current: BindingStrategy = { mode: undefined };
@@ -256,7 +325,34 @@ const bindingStrategyForEndpointDragging = (
     return { current, other };
   }
 
-  // Dragged start point is outside of any bindable element
+  // Update the start point on new arrows
+  if (
+    opts?.newArrow &&
+    opts?.appState?.selectedLinearElement &&
+    oppositeBinding
+  ) {
+    const oppositeBindingElement = elementsMap.get(
+      oppositeBinding?.elementId,
+    ) as ExcalidrawBindableElement;
+
+    if (oppositeBinding.elementId !== hovered?.id) {
+      other = {
+        element: oppositeBindingElement,
+        mode: "orbit",
+        focusPoint: elementCenterPoint(oppositeBindingElement, elementsMap),
+      };
+    } else {
+      other = {
+        element: oppositeBindingElement,
+        mode: "inside",
+        focusPoint:
+          opts.appState.selectedLinearElement.pointerDownState
+            .arrowOriginalStartPoint,
+      };
+    }
+  }
+
+  // Dragged point is outside of any bindable element
   // so we break any existing binding
   if (!hovered) {
     return { current: { mode: null }, other };
@@ -342,14 +438,15 @@ const bindingStrategyForEndpointDragging = (
   return { current, other };
 };
 
-const getBindingStrategyForDraggingBindingElementEndpoints = (
+export const getBindingStrategyForDraggingBindingElementEndpoints = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   draggingPoints: PointsPositionUpdates,
   elementsMap: NonDeletedSceneElementsMap,
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   appState: AppState,
   opts?: {
-    newArrow: boolean;
+    newArrow?: boolean;
+    appState?: AppState;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
   const globalBindMode = appState.bindMode || "focus";

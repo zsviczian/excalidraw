@@ -16,7 +16,6 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
-  pointsEqual,
   lineSegment,
 } from "@excalidraw/math";
 
@@ -240,7 +239,8 @@ import {
   calculateFixedPointForNonElbowArrowBinding,
   normalizeFixedPoint,
   bindOrUnbindBindingElement,
-  updateBoundPoint,
+  getBindingStrategyForDraggingBindingElementEndpoints,
+  getStartGlobalEndLocalPointsForBinding,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -6155,143 +6155,66 @@ class App extends React.Component<AppProps, AppState> {
             ));
         }
 
-        if (
-          isBindingElement(multiElement) &&
-          this.state.bindMode === "orbit" &&
-          isBindingEnabled(this.state)
-        ) {
-          const elementsMap = this.scene.getNonDeletedElementsMap();
-          const hoveredElement = getHoveredElementForBinding(
-            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-            this.scene.getNonDeletedElements(),
-            this.scene.getNonDeletedElementsMap(),
-            this.state.zoom,
-          );
-          const otherPoint =
-            LinearElementEditor.getPointAtIndexGlobalCoordinates(
-              multiElement,
-              0,
-              this.scene.getNonDeletedElementsMap(),
-            );
-          const otherHoveredElement = getHoveredElementForBinding(
-            otherPoint,
-            this.scene.getNonDeletedElements(),
-            this.scene.getNonDeletedElementsMap(),
-            this.state.zoom,
-          );
-
-          if (hoveredElement?.id !== otherHoveredElement?.id) {
-            const avoidancePoint =
-              multiElement &&
-              hoveredElement &&
-              getOutlineAvoidingPoint(
-                multiElement,
-                hoveredElement,
-                pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-                multiElement.points.length - 1,
-                elementsMap,
-                shouldRotateWithDiscreteAngle(event)
-                  ? lineSegment<GlobalPoint>(
-                      otherPoint,
-                      pointFrom<GlobalPoint>(
-                        multiElement.x + lastCommittedX + dxFromLastCommitted,
-                        multiElement.y + lastCommittedY + dyFromLastCommitted,
-                      ),
-                    )
-                  : undefined,
-              );
-            const x = avoidancePoint
-              ? avoidancePoint[0]
-              : hoveredElement
-              ? scenePointerX
-              : gridX;
-            const y = avoidancePoint
-              ? avoidancePoint[1]
-              : hoveredElement
-              ? scenePointerY
-              : gridY;
-            dxFromLastCommitted = x - rx - lastCommittedX;
-            dyFromLastCommitted = y - ry - lastCommittedY;
-          }
-        }
-
         if (isPathALoop(points, this.state.zoom.value)) {
           setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
+        }
+
+        // Update arrow points
+        const elementsMap = this.scene.getNonDeletedElementsMap();
+        let startGlobalPoint =
+          this.state.selectedLinearElement?.pointerDownState
+            ?.arrowOriginalStartPoint ??
+          LinearElementEditor.getPointAtIndexGlobalCoordinates(
+            multiElement,
+            0,
+            elementsMap,
+          );
+        let endLocalPoint = pointFrom<LocalPoint>(
+          lastCommittedX + dxFromLastCommitted,
+          lastCommittedY + dyFromLastCommitted,
+        );
+
+        if (isBindingElement(multiElement)) {
+          const point = pointFrom<LocalPoint>(
+            scenePointerX - rx,
+            scenePointerY - ry,
+          );
+          const { start, end } =
+            getBindingStrategyForDraggingBindingElementEndpoints(
+              multiElement,
+              new Map([
+                [multiElement.points.length - 1, { point, isDragging: true }],
+              ]),
+              elementsMap,
+              this.scene.getNonDeletedElements(),
+              this.state,
+              { newArrow: !!this.state.newElement, appState: this.state },
+            );
+
+          [startGlobalPoint, endLocalPoint] =
+            getStartGlobalEndLocalPointsForBinding(
+              multiElement,
+              start,
+              end,
+              startGlobalPoint,
+              endLocalPoint,
+              elementsMap,
+            );
         }
 
         // update last uncommitted point
         this.scene.mutateElement(
           multiElement,
           {
-            points: [
-              ...points.slice(0, -1),
-              pointFrom<LocalPoint>(
-                lastCommittedX + dxFromLastCommitted,
-                lastCommittedY + dyFromLastCommitted,
-              ),
-            ],
+            x: startGlobalPoint[0],
+            y: startGlobalPoint[1],
+            points: [...points.slice(0, -1), endLocalPoint],
           },
           {
             isDragging: true,
             informMutation: false,
           },
         );
-
-        // If start is bound then snap the fixed binding point if needed
-        if (
-          isArrowElement(multiElement) &&
-          multiElement.startBinding &&
-          multiElement.startBinding.mode === "orbit"
-        ) {
-          const elementsMap = this.scene.getNonDeletedElementsMap();
-          const hoveredElement = getHoveredElementForBinding(
-            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
-            this.scene.getNonDeletedElements(),
-            this.scene.getNonDeletedElementsMap(),
-            this.state.zoom,
-          );
-          if (
-            !hoveredElement ||
-            hoveredElement.id !== multiElement.startBinding.elementId
-          ) {
-            const startPoint =
-              LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                multiElement,
-                0,
-                elementsMap,
-              );
-            const startElement = this.scene.getElement(
-              multiElement.startBinding.elementId,
-            ) as ExcalidrawBindableElement;
-            const localPoint = updateBoundPoint(
-              multiElement,
-              "startBinding",
-              multiElement.startBinding,
-              startElement,
-              elementsMap,
-            );
-            const avoidancePoint = localPoint
-              ? LinearElementEditor.getPointGlobalCoordinates(
-                  multiElement,
-                  localPoint,
-                  elementsMap,
-                )
-              : null;
-            if (avoidancePoint && !pointsEqual(startPoint, avoidancePoint)) {
-              const point = LinearElementEditor.pointFromAbsoluteCoords(
-                multiElement,
-                avoidancePoint,
-                elementsMap,
-              );
-
-              LinearElementEditor.movePoints(
-                multiElement,
-                this.scene,
-                new Map([[0, { point }]]),
-              );
-            }
-          }
-        }
 
         // in this path, we're mutating multiElement to reflect
         // how it will be after adding pointer position as the next point
