@@ -16,7 +16,6 @@ import {
   vectorSubtract,
   vectorDot,
   vectorNormalize,
-  lineSegment,
 } from "@excalidraw/math";
 
 import {
@@ -235,9 +234,7 @@ import {
   hitElementBoundingBox,
   isLineElement,
   isSimpleArrow,
-  getOutlineAvoidingPoint,
   calculateFixedPointForNonElbowArrowBinding,
-  normalizeFixedPoint,
   bindOrUnbindBindingElement,
   getBindingStrategyForDraggingBindingElementEndpoints,
   getStartGlobalEndLocalPointsForBinding,
@@ -6174,7 +6171,7 @@ class App extends React.Component<AppProps, AppState> {
           lastCommittedY + dyFromLastCommitted,
         );
 
-        if (isBindingElement(multiElement)) {
+        if (isBindingElement(multiElement) && !isElbowArrow(multiElement)) {
           const point = pointFrom<LocalPoint>(
             scenePointerX - rx,
             scenePointerY - ry,
@@ -8984,134 +8981,70 @@ class App extends React.Component<AppProps, AppState> {
         } else if (isLinearElement(newElement)) {
           pointerDownState.drag.hasOccurred = true;
           const points = newElement.points;
-          let [firstPointX, firstPointY] =
-            LinearElementEditor.getPointGlobalCoordinates(
+
+          // Update arrow points
+          let startBinding = newElement.startBinding;
+          let startGlobalPoint =
+            this.state.selectedLinearElement?.pointerDownState
+              ?.arrowOriginalStartPoint ??
+            LinearElementEditor.getPointAtIndexGlobalCoordinates(
               newElement,
-              newElement.points[0],
+              0,
               elementsMap,
             );
+          let endLocalPoint = pointFrom<LocalPoint>(
+            gridX - newElement.x,
+            gridY - newElement.y,
+          );
 
-          let startBinding = newElement.startBinding;
-          let dx = gridX - newElement.x;
-          let dy = gridY - newElement.y;
-
-          if (shouldRotateWithDiscreteAngle(event) && points.length === 2) {
-            ({ width: dx, height: dy } = getLockedLinearCursorAlignSize(
-              newElement.x,
-              newElement.y,
-              pointerCoords.x,
-              pointerCoords.y,
-            ));
-          }
-
-          if (
-            !isElbowArrow(newElement) &&
-            this.state.selectedLinearElement &&
-            isBindingElement(newElement, false)
-          ) {
-            // Handles the case where we need to "jump out" the simple arrow
-            // start point as we drag-create it.
-            const hoveredElement = getHoveredElementForBinding(
-              pointFrom<GlobalPoint>(gridX, gridY),
-              this.scene.getNonDeletedElements(),
-              this.scene.getNonDeletedElementsMap(),
-              this.state.zoom,
+          if (isBindingElement(newElement) && !isElbowArrow(newElement)) {
+            const point = pointFrom<LocalPoint>(
+              pointerCoords.x - newElement.x,
+              pointerCoords.y - newElement.y,
             );
-            const otherBoundElement = startBinding
-              ? elementsMap.get(startBinding.elementId) ?? null
-              : null;
-            const arrowEndpointsAboutToBindToSameElement =
-              startBinding && startBinding.elementId === hoveredElement?.id;
+            const { start, end } =
+              getBindingStrategyForDraggingBindingElementEndpoints(
+                newElement,
+                new Map([
+                  [newElement.points.length - 1, { point, isDragging: true }],
+                ]),
+                elementsMap,
+                this.scene.getNonDeletedElements(),
+                this.state,
+                { newArrow: !!this.state.newElement, appState: this.state },
+              );
 
-            if (!arrowEndpointsAboutToBindToSameElement) {
-              const [targetPointX, targetPointY] =
-                this.state.bindMode === "orbit" && isBindingEnabled(this.state)
-                  ? getOutlineAvoidingPoint(
-                      newElement,
-                      hoveredElement,
-                      hoveredElement
-                        ? pointFrom(pointerCoords.x, pointerCoords.y)
-                        : pointFrom(gridX, gridY),
-                      newElement.points.length - 1,
-                      elementsMap,
-                      shouldRotateWithDiscreteAngle(event) &&
-                        points.length === 2
-                        ? lineSegment(
-                            LinearElementEditor.getPointGlobalCoordinates(
-                              newElement,
-                              points[0],
-                              elementsMap,
-                            ),
-                            pointFrom<GlobalPoint>(
-                              newElement.x + dx,
-                              newElement.y + dy,
-                            ),
-                          )
-                        : undefined,
-                    )
-                  : pointFrom(gridX, gridY);
-
-              // We might need to "jump" and snap the first point of our arrow
-              if (otherBoundElement && isBindableElement(otherBoundElement)) {
-                const [newX, newY] = getOutlineAvoidingPoint(
+            if (start.mode) {
+              startBinding = {
+                elementId: start.element.id,
+                mode: start.mode,
+                ...calculateFixedPointForNonElbowArrowBinding(
                   newElement,
-                  otherBoundElement,
-                  pointFrom(
-                    otherBoundElement.x + otherBoundElement.width / 2,
-                    otherBoundElement.y + otherBoundElement.height / 2,
-                  ),
-                  0,
+                  start.element,
+                  "start",
                   elementsMap,
-                );
-
-                if (
-                  Math.abs(firstPointX - newX) > 1 ||
-                  Math.abs(firstPointY - newY) > 1
-                ) {
-                  startBinding = {
-                    elementId: otherBoundElement.id,
-                    fixedPoint: normalizeFixedPoint([0.5, 0.5]),
-                    mode: "orbit",
-                  };
-                  firstPointX = newX;
-                  firstPointY = newY;
-                }
-              }
-              dx = targetPointX - firstPointX;
-              dy = targetPointY - firstPointY;
-            } else {
-              // Use the original start point of the arrow if previously it
-              // was "jumping" on the outline of the element.
-              firstPointX =
-                this.state.selectedLinearElement?.pointerDownState
-                  .arrowOriginalStartPoint?.[0] ?? firstPointX;
-              firstPointY =
-                this.state.selectedLinearElement?.pointerDownState
-                  .arrowOriginalStartPoint?.[1] ?? firstPointY;
-              if (otherBoundElement && isBindableElement(otherBoundElement)) {
-                startBinding = {
-                  elementId: otherBoundElement.id,
-                  ...calculateFixedPointForNonElbowArrowBinding(
-                    newElement,
-                    otherBoundElement,
-                    "start",
-                    elementsMap,
-                    this.state.selectedLinearElement?.pointerDownState
-                      .arrowOriginalStartPoint,
-                  ),
-                  mode: "inside",
-                };
-              }
+                ),
+              };
             }
+
+            [startGlobalPoint, endLocalPoint] =
+              getStartGlobalEndLocalPointsForBinding(
+                newElement,
+                start,
+                end,
+                startGlobalPoint,
+                endLocalPoint,
+                elementsMap,
+              );
           }
 
           if (points.length === 1) {
             this.scene.mutateElement(
               newElement,
               {
-                x: firstPointX,
-                y: firstPointY,
-                points: [...points, pointFrom<LocalPoint>(dx, dy)],
+                x: startGlobalPoint[0],
+                y: startGlobalPoint[1],
+                points: [...points, endLocalPoint],
                 startBinding,
               },
               { informMutation: false, isDragging: false },
@@ -9123,9 +9056,9 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.mutateElement(
               newElement,
               {
-                x: firstPointX,
-                y: firstPointY,
-                points: [...points.slice(0, -1), pointFrom<LocalPoint>(dx, dy)],
+                x: startGlobalPoint[0],
+                y: startGlobalPoint[1],
+                points: [...points.slice(0, -1), endLocalPoint],
                 startBinding,
               },
               { isDragging: true, informMutation: false },
