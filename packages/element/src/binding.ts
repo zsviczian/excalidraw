@@ -313,6 +313,7 @@ const bindingStrategyForEndpointDragging = (
     elements,
     elementsMap,
     zoom,
+    true,
   );
 
   // If the global bind mode is in free binding mode, just bind

@@ -103,6 +103,7 @@ export type HitTestArgs = {
   threshold: number;
   elementsMap: ElementsMap;
   frameNameBound?: FrameNameBounds | null;
+  overrideShouldTestInside?: boolean;
 };
 
 export const hitElementItself = ({
@@ -111,6 +112,7 @@ export const hitElementItself = ({
   threshold,
   elementsMap,
   frameNameBound = null,
+  overrideShouldTestInside = false,
 }: HitTestArgs) => {
   // Hit test against a frame's name
   const hitFrameName = frameNameBound
@@ -143,7 +145,9 @@ export const hitElementItself = ({
   }
 
   // Do the precise (and relatively costly) hit test
-  const hitElement = shouldTestInside(element)
+  const hitElement = (
+    overrideShouldTestInside ? true : shouldTestInside(element)
+  )
     ? // Since `inShape` tests STRICTLY againt the insides of a shape
       // we would need `onShape` as well to include the "borders"
       isPointInElement(point, element, elementsMap) ||
@@ -314,6 +318,7 @@ export const getHoveredElementForBindingAndIfItsPrecise = (
   elements: readonly Ordered<NonDeletedExcalidrawElement>[],
   elementsMap: NonDeletedSceneElementsMap,
   zoom: AppState["zoom"],
+  shouldTestInside: boolean = true,
 ): {
   hovered: NonDeleted<ExcalidrawBindableElement> | null;
   hit: boolean;
@@ -332,6 +337,7 @@ export const getHoveredElementForBindingAndIfItsPrecise = (
       elementsMap,
       point,
       threshold: 0,
+      overrideShouldTestInside: shouldTestInside,
     });
 
   return { hovered: hoveredElement, hit };
