@@ -8077,7 +8077,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       this.scene.mutateElement(element, {
-        points: [...element.points, pointFrom<LocalPoint>(0, 0)],
+        points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(0, 0)],
       });
       this.scene.insertElement(element);
       if (isBindingElement(element)) {

@@ -474,23 +474,30 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
       appState.zoom,
     );
 
-    return {
-      start: hovered
-        ? hit
-          ? { element: hovered, mode: "inside" }
-          : opts?.newArrow
-          ? {
-              element: hovered,
-              mode: "orbit",
-              focusPoint: pointFrom<GlobalPoint>(
-                hovered.x + hovered.width / 2,
-                hovered.y + hovered.height / 2,
-              ),
-            }
-          : { element: hovered, mode: "inside" }
-        : { mode: undefined },
-      end: { mode: undefined },
-    };
+    return isElbowArrow(arrow)
+      ? {
+          start: hovered
+            ? { element: hovered, mode: "orbit" }
+            : { mode: undefined },
+          end: { mode: undefined },
+        }
+      : {
+          start: hovered
+            ? hit
+              ? { element: hovered, mode: "inside" }
+              : opts?.newArrow
+              ? {
+                  element: hovered,
+                  mode: "orbit",
+                  focusPoint: pointFrom<GlobalPoint>(
+                    hovered.x + hovered.width / 2,
+                    hovered.y + hovered.height / 2,
+                  ),
+                }
+              : { element: hovered, mode: "inside" }
+            : { mode: undefined },
+          end: { mode: undefined },
+        };
   }
 
   // If none of the ends are dragged, we don't change anything
