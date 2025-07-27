@@ -1166,7 +1166,20 @@ export const avoidRectangularCorner = (
   return p;
 };
 
-export const snapToMid = (
+export const snapToCenter = (
+  element: ExcalidrawBindableElement,
+  elementsMap: ElementsMap,
+  p: GlobalPoint,
+  tolerance: number = 0.05,
+) => {
+  const center = elementCenterPoint(element, elementsMap);
+  if (pointDistance(p, center) < tolerance) {
+    return pointFrom<GlobalPoint>(center[0], center[1]);
+  }
+  return p;
+};
+
+const snapToMid = (
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
   p: GlobalPoint,

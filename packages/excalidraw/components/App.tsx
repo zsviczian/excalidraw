@@ -238,6 +238,7 @@ import {
   bindOrUnbindBindingElement,
   getBindingStrategyForDraggingBindingElementEndpoints,
   getStartGlobalEndLocalPointsForBinding,
+  snapToCenter,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -8531,16 +8532,25 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
 
+        const [x, y] = hoveredElement
+          ? snapToCenter(
+              hoveredElement,
+              elementsMap,
+              pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
+              10,
+            )
+          : [pointerCoords.x, pointerCoords.y];
+
         const newState = LinearElementEditor.handlePointDragging(
           event,
           this,
-          pointerCoords.x,
-          pointerCoords.y,
+          x,
+          y,
           linearElementEditor,
         );
         if (newState) {
-          pointerDownState.lastCoords.x = pointerCoords.x;
-          pointerDownState.lastCoords.y = pointerCoords.y;
+          pointerDownState.lastCoords.x = x;
+          pointerDownState.lastCoords.y = y;
           pointerDownState.drag.hasOccurred = true;
 
           this.setState(newState);
