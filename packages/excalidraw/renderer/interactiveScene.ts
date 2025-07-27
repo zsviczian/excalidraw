@@ -899,7 +899,11 @@ const _renderInteractiveScene = ({
   }
 
   // Paint selected elements
-  if (!appState.multiElement && !appState.selectedLinearElement?.isEditing) {
+  if (
+    !appState.multiElement &&
+    !appState.newElement &&
+    !appState.selectedLinearElement?.isEditing
+  ) {
     const showBoundingBox = shouldShowBoundingBox(selectedElements, appState);
 
     const isSingleLinearElementSelected =

@@ -217,6 +217,7 @@ export type InteractiveCanvasAppState = Readonly<
     selectedGroupIds: AppState["selectedGroupIds"];
     selectedLinearElement: AppState["selectedLinearElement"];
     multiElement: AppState["multiElement"];
+    newElement: AppState["newElement"];
     isBindingEnabled: AppState["isBindingEnabled"];
     suggestedBindings: AppState["suggestedBindings"];
     isRotating: AppState["isRotating"];
