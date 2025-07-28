@@ -92,7 +92,7 @@ export type BindingStrategy =
   | {
       mode: BindMode;
       element: NonDeleted<ExcalidrawBindableElement>;
-      focusPoint?: GlobalPoint;
+      focusPoint: GlobalPoint;
     }
   // Break the binding
   | {
@@ -320,7 +320,11 @@ const bindingStrategyForEndpointDragging = (
   // where the pointer is and keep the other end intact
   if (globalBindMode === "inside") {
     current = hovered
-      ? { element: hovered, mode: hit ? "inside" : "outside" }
+      ? {
+          element: hovered,
+          focusPoint: point,
+          mode: hit ? "inside" : "outside",
+        }
       : { mode: undefined };
 
     return { current, other };
@@ -348,7 +352,7 @@ const bindingStrategyForEndpointDragging = (
         mode: "inside",
         focusPoint:
           opts.appState.selectedLinearElement.pointerDownState
-            .arrowOriginalStartPoint,
+            .arrowOriginalStartPoint ?? point,
       };
     }
   }
@@ -377,7 +381,7 @@ const bindingStrategyForEndpointDragging = (
                 hovered.x + hovered.width / 2,
                 hovered.y + hovered.height / 2,
               )
-            : undefined,
+            : point,
         };
 
         return { current, other };
@@ -385,7 +389,7 @@ const bindingStrategyForEndpointDragging = (
     }
 
     // No opposite binding or the opposite binding is on a different element
-    current = { element: hovered, mode: "orbit" };
+    current = { element: hovered, mode: "orbit", focusPoint: point };
   }
   // The dragged point is inside the hovered bindable element
   else {
@@ -395,7 +399,7 @@ const bindingStrategyForEndpointDragging = (
       if (oppositeBinding.elementId === hovered.id) {
         // The opposite binding is on the binding gap of the same element
         if (oppositeBinding.mode !== "inside") {
-          current = { element: hovered, mode: "orbit" };
+          current = { element: hovered, mode: "orbit", focusPoint: point };
           other = { mode: null };
 
           return { current, other };
@@ -419,7 +423,7 @@ const bindingStrategyForEndpointDragging = (
                 hovered.x + hovered.width / 2,
                 hovered.y + hovered.height / 2,
               )
-            : undefined,
+            : point,
         };
 
         return { current, other };
@@ -430,6 +434,7 @@ const bindingStrategyForEndpointDragging = (
       current = {
         element: hovered,
         mode: "orbit",
+        focusPoint: point,
       };
     }
   }
