@@ -5876,6 +5876,8 @@ class App extends React.Component<AppProps, AppState> {
           scrollY: zoomState.scrollY + 2 * (deltaY / nextZoom),
           shouldCacheIgnoreZoom: true,
         });
+
+        return null;
       });
       this.resetShouldCacheIgnoreZoomDebounced();
     } else {
@@ -8139,7 +8141,7 @@ class App extends React.Component<AppProps, AppState> {
           ...prevState,
           newElement: element,
           startBoundElement: boundElement,
-          suggestedBindings: [],
+          suggestedBindings: boundElement ? [boundElement] : [],
           selectedElementIds: nextSelectedElementIds,
           selectedLinearElement: linearElementEditor,
         };
