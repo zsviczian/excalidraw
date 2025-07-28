@@ -332,7 +332,7 @@ const bindingStrategyForEndpointDragging = (
       ? {
           element: hovered,
           focusPoint: point,
-          mode: hit ? "inside" : "outside",
+          mode: "inside",
         }
       : { mode: undefined };
 
