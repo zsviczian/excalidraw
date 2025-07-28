@@ -723,8 +723,7 @@ export const unbindBindingElement = (
 
   const oppositeBinding =
     arrow[startOrEnd === "start" ? "endBinding" : "startBinding"];
-
-  if (oppositeBinding?.elementId !== binding.elementId) {
+  if (!oppositeBinding || oppositeBinding.elementId !== binding.elementId) {
     // Only remove the record on the bound element if the other
     // end is not bound to the same element
     const boundElement = scene
