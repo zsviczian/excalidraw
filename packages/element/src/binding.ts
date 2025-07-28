@@ -393,6 +393,7 @@ const bindingStrategyForEndpointDragging = (
   }
   // The dragged point is inside the hovered bindable element
   else {
+    console.log(oppositeBinding);
     // The opposite binding is on the same element
     // eslint-disable-next-line no-lonely-if
     if (oppositeBinding) {
@@ -434,7 +435,12 @@ const bindingStrategyForEndpointDragging = (
       current = {
         element: hovered,
         mode: "orbit",
-        focusPoint: point,
+        focusPoint: opts?.newArrow
+          ? pointFrom<GlobalPoint>(
+              hovered.x + hovered.width / 2,
+              hovered.y + hovered.height / 2,
+            )
+          : point,
       };
     }
   }
