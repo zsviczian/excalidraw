@@ -96,63 +96,69 @@ export const bezierEquation = <Point extends GlobalPoint | LocalPoint>(
       t ** 3 * c[3][1],
   );
 
+const initial_guesses: [number, number][] = [
+  [0.5, 0],
+  [0.2, 0],
+  [0.8, 0],
+];
+
+const line = <Point extends GlobalPoint | LocalPoint>(
+  s: number,
+  l: LineSegment<Point>,
+) =>
+  pointFrom<Point>(
+    l[0][0] + s * (l[1][0] - l[0][0]),
+    l[0][1] + s * (l[1][1] - l[0][1]),
+  );
+
+const calculate = <Point extends GlobalPoint | LocalPoint>(
+  [t0, s0]: [number, number],
+  l: LineSegment<Point>,
+  c: Curve<Point>,
+) => {
+  const solution = solve(
+    (t: number, s: number) => {
+      const bezier_point = bezierEquation(c, t);
+      const line_point = line(s, l);
+
+      return [bezier_point[0] - line_point[0], bezier_point[1] - line_point[1]];
+    },
+    t0,
+    s0,
+    1e-2,
+    2,
+  );
+
+  if (!solution) {
+    return null;
+  }
+
+  const [t, s] = solution;
+
+  if (t < 0 || t > 1 || s < 0 || s > 1) {
+    return null;
+  }
+
+  return bezierEquation(c, t);
+};
+
 /**
  * Computes the intersection between a cubic spline and a line segment.
  */
 export function curveIntersectLineSegment<
   Point extends GlobalPoint | LocalPoint,
 >(c: Curve<Point>, l: LineSegment<Point>): Point[] {
-  const line = (s: number) =>
-    pointFrom<Point>(
-      l[0][0] + s * (l[1][0] - l[0][0]),
-      l[0][1] + s * (l[1][1] - l[0][1]),
-    );
-
-  const initial_guesses: [number, number][] = [
-    [0.5, 0],
-    [0.2, 0],
-    [0.8, 0],
-  ];
-
-  const calculate = ([t0, s0]: [number, number]) => {
-    const solution = solve(
-      (t: number, s: number) => {
-        const bezier_point = bezierEquation(c, t);
-        const line_point = line(s);
-
-        return [
-          bezier_point[0] - line_point[0],
-          bezier_point[1] - line_point[1],
-        ];
-      },
-      t0,
-      s0,
-    );
-
-    if (!solution) {
-      return null;
-    }
-
-    const [t, s] = solution;
-
-    if (t < 0 || t > 1 || s < 0 || s > 1) {
-      return null;
-    }
-
-    return bezierEquation(c, t);
-  };
-
-  let solution = calculate(initial_guesses[0]);
+  let solution = calculate(initial_guesses[0], l, c);
   if (solution) {
     return [solution];
   }
 
-  solution = calculate(initial_guesses[1]);
+  solution = calculate(initial_guesses[1], l, c);
   if (solution) {
     return [solution];
   }
 
-  solution = calculate(initial_guesses[2]);
+  solution = calculate(initial_guesses[2], l, c);
   if (solution) {
     return [solution];
   }
