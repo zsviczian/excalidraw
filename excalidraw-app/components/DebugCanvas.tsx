@@ -96,6 +96,11 @@ const _renderBinding = (
   height: number,
   color: string,
 ) => {
+  if (!binding.fixedPoint) {
+    console.warn("Binding must have a fixedPoint");
+    return;
+  }
+
   const bindable = elementsMap.get(
     binding.elementId,
   ) as ExcalidrawBindableElement;
@@ -134,6 +139,11 @@ const _renderBindableBinding = (
   const bindable = elementsMap.get(
     binding.elementId,
   ) as ExcalidrawBindableElement;
+  if (!binding.fixedPoint) {
+    console.warn("Binding must have a fixedPoint");
+    return;
+  }
+
   const [x, y] = getGlobalFixedPointForBindableElement(
     binding.fixedPoint,
     bindable,
