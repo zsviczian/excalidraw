@@ -140,8 +140,9 @@ const repairBinding = <T extends ExcalidrawLinearElement>(
   }
 
   return {
-    ...binding,
-    focus,
+    elementId: binding.elementId,
+    mode: binding.mode || "orbit",
+    fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.51, 0.51]),
   } as FixedPointBinding | null;
 };
 
