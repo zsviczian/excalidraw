@@ -2491,6 +2491,47 @@ class App extends React.Component<AppProps, AppState> {
             return this.setState(...args);
           },
         },
+        watchState: {
+          configurable: true,
+          value: (
+            callback:
+              | ((
+                  prevState: Parameters<typeof setState>,
+                  nextState: Parameters<typeof setState> | null,
+                ) => void)
+              | undefined,
+          ) => {
+            if (callback) {
+              (window as any).__originalSetState = this.setState;
+              this.setState = new Proxy(this.setState, {
+                apply: (target, thisArg, [state, cb]) => {
+                  const prevState = thisArg.state;
+                  let newState: Parameters<typeof setState> | null = null;
+
+                  // Log state change for debugging
+                  if (typeof state === "function") {
+                    newState = state(prevState, this.props);
+                  } else if (state) {
+                    newState = state;
+                  }
+
+                  try {
+                    callback(prevState, newState);
+                  } catch (error) {
+                    console.warn("Error in watchState callback:", error);
+                  }
+
+                  if (newState) {
+                    target.bind(thisArg)(newState as any, cb);
+                  }
+                },
+              });
+            } else if ((window as any).__originalSetState) {
+              this.setState = (window as any).__originalSetState;
+              delete (window as any).__originalSetState;
+            }
+          },
+        },
         app: {
           configurable: true,
           value: this,
@@ -11515,6 +11556,8 @@ class App extends React.Component<AppProps, AppState> {
     };
   }
 
+  watchState = () => {};
+
   private async updateLanguage() {
     const currentLang =
       languages.find((lang) => lang.code === this.props.langCode) ||
@@ -11534,6 +11577,7 @@ declare global {
       elements: readonly ExcalidrawElement[];
       state: AppState;
       setState: React.Component<any, AppState>["setState"];
+      watchState: (prev: any, next: any) => void | undefined;
       app: InstanceType<typeof App>;
       history: History;
       store: Store;
