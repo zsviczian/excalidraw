@@ -102,6 +102,7 @@ import {
   Emitter,
   MINIMUM_ARROW_SIZE,
   BIND_MODE_TIMEOUT,
+  invariant,
 } from "@excalidraw/common";
 
 import {
@@ -266,6 +267,8 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawBindableElement,
+  FixedPoint,
+  BindMode,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -8077,11 +8080,21 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
+      const binding = boundElement
+        ? {
+            elementId: boundElement.id,
+            mode: "inside" as BindMode,
+            fixedPoint: [0.5, 0.5] as FixedPoint,
+          }
+        : null;
       this.scene.mutateElement(element, {
         points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(0, 0)],
+        startBinding: binding,
+        endBinding: binding,
       });
       this.scene.insertElement(element);
       if (isBindingElement(element)) {
+        // Do the initial binding so the binding strategy has the initial state
         bindOrUnbindBindingElement(
           element,
           new Map([
@@ -8108,7 +8121,6 @@ class App extends React.Component<AppProps, AppState> {
           );
           linearElementEditor = {
             ...linearElement,
-            startBindingElement: boundElement,
             pointerDownState: {
               ...linearElement.pointerDownState,
               arrowOriginalStartPoint: pointFrom<GlobalPoint>(
@@ -9048,18 +9060,12 @@ class App extends React.Component<AppProps, AppState> {
               );
           }
 
-          if (points.length === 1) {
-            this.scene.mutateElement(
-              newElement,
-              {
-                x: startGlobalPoint[0],
-                y: startGlobalPoint[1],
-                points: [...points, endLocalPoint],
-                startBinding,
-              },
-              { informMutation: false, isDragging: false },
-            );
-          } else if (
+          invariant(
+            points.length > 1,
+            "Do not create linear elements with less than 2 points",
+          );
+
+          if (
             points.length === 2 ||
             (points.length > 1 && isElbowArrow(newElement))
           ) {

@@ -403,7 +403,7 @@ const bindingStrategyForEndpointDragging = (
         // The opposite binding is inside the same element
         // eslint-disable-next-line no-else-return
         else {
-          current = { element: hovered, mode: "inside" };
+          current = { element: hovered, mode: "inside", focusPoint: point };
 
           return { current, other };
         }
@@ -459,47 +459,10 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
   let start: BindingStrategy = { mode: undefined };
   let end: BindingStrategy = { mode: undefined };
 
-  // Special case for single point new arrows
-  if (arrow.points.length === 1) {
-    invariant(startDragged, "Single point arrow must have start dragged");
-    const localPoint = draggingPoints.get(0)?.point as LocalPoint;
-    const globalPoint = LinearElementEditor.getPointGlobalCoordinates(
-      arrow,
-      localPoint,
-      elementsMap,
-    );
-    const { hovered, hit } = getHoveredElementForBindingAndIfItsPrecise(
-      globalPoint,
-      elements,
-      elementsMap,
-      appState.zoom,
-    );
-
-    return isElbowArrow(arrow)
-      ? {
-          start: hovered
-            ? { element: hovered, mode: "orbit" }
-            : { mode: undefined },
-          end: { mode: undefined },
-        }
-      : {
-          start: hovered
-            ? hit
-              ? { element: hovered, mode: "inside" }
-              : opts?.newArrow
-              ? {
-                  element: hovered,
-                  mode: "orbit",
-                  focusPoint: pointFrom<GlobalPoint>(
-                    hovered.x + hovered.width / 2,
-                    hovered.y + hovered.height / 2,
-                  ),
-                }
-              : { element: hovered, mode: "inside" }
-            : { mode: undefined },
-          end: { mode: undefined },
-        };
-  }
+  invariant(
+    arrow.points.length > 1,
+    "Do not attempt to bind linear elements with a single point",
+  );
 
   // If none of the ends are dragged, we don't change anything
   if (!startDragged && !endDragged) {
