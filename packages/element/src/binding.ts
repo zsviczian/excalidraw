@@ -1,4 +1,10 @@
-import { KEYS, arrayToMap, invariant, tupleToCoors } from "@excalidraw/common";
+import {
+  KEYS,
+  arrayToMap,
+  invariant,
+  isAlwaysInsideBinding,
+  tupleToCoors,
+} from "@excalidraw/common";
 
 import {
   lineSegment,
@@ -318,7 +324,10 @@ const bindingStrategyForEndpointDragging = (
 
   // If the global bind mode is in free binding mode, just bind
   // where the pointer is and keep the other end intact
-  if (globalBindMode === "inside") {
+  if (
+    globalBindMode === "inside" ||
+    (hovered && isAlwaysInsideBinding(hovered))
+  ) {
     current = hovered
       ? {
           element: hovered,
@@ -393,7 +402,6 @@ const bindingStrategyForEndpointDragging = (
   }
   // The dragged point is inside the hovered bindable element
   else {
-    console.log(oppositeBinding);
     // The opposite binding is on the same element
     // eslint-disable-next-line no-lonely-if
     if (oppositeBinding) {
