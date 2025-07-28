@@ -2,6 +2,7 @@ import {
   TEXT_AUTOWRAP_THRESHOLD,
   getGridPoint,
   getFontString,
+  DRAGGING_THRESHOLD,
 } from "@excalidraw/common";
 
 import type {
@@ -141,7 +142,8 @@ export const dragSelectedElements = (
     } else if (
       // NOTE: Add a little initial drag to the arrow dragging to avoid
       // accidentally unbinding the arrow when the user just wants to select it.
-      Math.max(Math.abs(adjustedOffset.x), Math.abs(adjustedOffset.y)) > 1
+      Math.max(Math.abs(adjustedOffset.x), Math.abs(adjustedOffset.y)) >
+      DRAGGING_THRESHOLD
     ) {
       updateElementCoords(pointerDownState, element, scene, adjustedOffset);
 
