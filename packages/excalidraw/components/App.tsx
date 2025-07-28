@@ -9421,6 +9421,10 @@ class App extends React.Component<AppProps, AppState> {
             this.state,
             this.scene,
           );
+          this.actionManager.executeAction(actionFinalize, "ui", {
+            event: childEvent,
+            sceneCoords,
+          });
           if (editingLinearElement !== this.state.selectedLinearElement) {
             this.setState({
               selectedLinearElement: editingLinearElement,
