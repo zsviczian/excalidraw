@@ -32,6 +32,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawLinearElement,
   NonDeleted,
+  PointsPositionUpdates,
 } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
@@ -55,14 +56,10 @@ export const actionFinalize = register<FormData>({
   perform: (elements, appState, data, app) => {
     let newElements = elements;
     const { interactiveCanvas, focusContainer, scene } = app;
-    const { event, sceneCoords } =
-      (data as {
-        event?: PointerEvent;
-        sceneCoords?: { x: number; y: number };
-      }) ?? {};
     const elementsMap = scene.getNonDeletedElementsMap();
 
-    if (event && appState.selectedLinearElement) {
+    if (data && appState.selectedLinearElement) {
+      const { event, sceneCoords } = data;
       const element = LinearElementEditor.getElement<ExcalidrawArrowElement>(
         appState.selectedLinearElement.elementId,
         elementsMap,
@@ -71,6 +68,11 @@ export const actionFinalize = register<FormData>({
       invariant(
         element,
         "Arrow element should exist if selectedLinearElement is set",
+      );
+
+      invariant(
+        sceneCoords,
+        "sceneCoords should be defined if actionFinalize is called with event",
       );
 
       const linearElementEditor = LinearElementEditor.handlePointerUp(
@@ -85,23 +87,15 @@ export const actionFinalize = register<FormData>({
       const selectedPointsIndices = newArrow
         ? [element.points.length - 1] // New arrow creation
         : appState.selectedLinearElement.selectedPointsIndices;
-      const draggedPoints =
+
+      const draggedPoints: PointsPositionUpdates =
         selectedPointsIndices.reduce((map, index) => {
           map.set(index, {
-            point: newArrow
-              ? LinearElementEditor.pointFromAbsoluteCoords(
-                  element,
-                  sceneCoords
-                    ? pointFrom<GlobalPoint>(sceneCoords.x, sceneCoords.y)
-                    : LinearElementEditor.getPointAtIndexGlobalCoordinates(
-                        element,
-                        -1,
-                        arrayToMap(newElements),
-                      ),
-                  elementsMap,
-                )
-              : element.points[index],
-            draggedPoints: !newArrow,
+            point: LinearElementEditor.pointFromAbsoluteCoords(
+              element,
+              pointFrom<GlobalPoint>(sceneCoords.x, sceneCoords.y),
+              elementsMap,
+            ),
           });
 
           return map;
