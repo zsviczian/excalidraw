@@ -471,7 +471,8 @@ export const actionToggleTheme = register<AppState["theme"]>({
       : "buttons.darkMode";
   },
   keywords: ["toggle", "dark", "light", "mode", "theme"],
-  icon: (appState) => (appState.theme === THEME.LIGHT ? MoonIcon : SunIcon),
+  icon: (appState, elements) =>
+    appState.theme === THEME.LIGHT ? MoonIcon : SunIcon,
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_, appState, value) => {
