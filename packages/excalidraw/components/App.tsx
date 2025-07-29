@@ -8009,7 +8009,11 @@ class App extends React.Component<AppProps, AppState> {
           ) < LINE_CONFIRM_THRESHOLD)
       ) {
         this.actionManager.executeAction(actionFinalize, "ui", {
-          event,
+          event: event.nativeEvent,
+          sceneCoords: {
+            x: pointerDownState.origin.x,
+            y: pointerDownState.origin.y,
+          },
         });
         return;
       }

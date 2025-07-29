@@ -51,7 +51,7 @@ import { register } from "./register";
 
 import type { AppState, Offsets } from "../types";
 
-export const actionChangeViewBackgroundColor = register({
+export const actionChangeViewBackgroundColor = register<Partial<AppState>>({
   name: "changeViewBackgroundColor",
   label: "labels.canvasBackground",
   trackEvent: false,
@@ -64,7 +64,7 @@ export const actionChangeViewBackgroundColor = register({
   perform: (_, appState, value) => {
     return {
       appState: { ...appState, ...value },
-      captureUpdate: !!value.viewBackgroundColor
+      captureUpdate: !!value?.viewBackgroundColor
         ? CaptureUpdateAction.IMMEDIATELY
         : CaptureUpdateAction.EVENTUALLY,
     };
@@ -463,7 +463,7 @@ export const actionZoomToFit = register({
     !event[KEYS.CTRL_OR_CMD],
 });
 
-export const actionToggleTheme = register({
+export const actionToggleTheme = register<AppState["theme"]>({
   name: "toggleTheme",
   label: (_, appState) => {
     return appState.theme === THEME.DARK

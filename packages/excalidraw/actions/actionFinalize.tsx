@@ -43,7 +43,12 @@ import { register } from "./register";
 
 import type { AppState } from "../types";
 
-export const actionFinalize = register({
+type FormData = {
+  event: PointerEvent;
+  sceneCoords: { x: number; y: number };
+};
+
+export const actionFinalize = register<FormData>({
   name: "finalize",
   label: "",
   trackEvent: false,
