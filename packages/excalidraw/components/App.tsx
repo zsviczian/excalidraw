@@ -8584,63 +8584,93 @@ class App extends React.Component<AppProps, AppState> {
           return;
         }
 
-        const hoveredElement = getHoveredElementForBinding(
-          pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
-          this.scene.getNonDeletedElements(),
+        const element = LinearElementEditor.getElement(
+          linearElementEditor.elementId,
           elementsMap,
-          this.state.zoom,
         );
+        let [x, y] = [pointerCoords.x, pointerCoords.y];
 
-        // Timed bind mode handler for arrow elements
-        if (this.state.bindMode === "orbit") {
-          if (this.bindModeHandler && !hoveredElement) {
-            clearTimeout(this.bindModeHandler);
-            this.bindModeHandler = null;
-          } else if (!this.bindModeHandler && hoveredElement) {
-            this.bindModeHandler = setTimeout(() => {
-              if (hoveredElement) {
-                flushSync(() => {
-                  this.setState({
-                    bindMode: "inside",
+        if (isBindingElement(element)) {
+          const hoveredElement = getHoveredElementForBinding(
+            pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
+            this.scene.getNonDeletedElements(),
+            elementsMap,
+            this.state.zoom,
+          );
+
+          // Timed bind mode handler for arrow elements
+          if (this.state.bindMode === "orbit") {
+            if (this.bindModeHandler && !hoveredElement) {
+              clearTimeout(this.bindModeHandler);
+              this.bindModeHandler = null;
+            } else if (!this.bindModeHandler && hoveredElement) {
+              this.bindModeHandler = setTimeout(() => {
+                if (hoveredElement) {
+                  flushSync(() => {
+                    this.setState({
+                      bindMode: "inside",
+                    });
                   });
-                });
-                const newState = LinearElementEditor.handlePointDragging(
-                  event,
-                  this,
-                  this.lastPointerMoveCoords?.x ?? pointerDownState.origin.x,
-                  this.lastPointerMoveCoords?.y ?? pointerDownState.origin.y,
-                  linearElementEditor,
-                );
-                if (newState) {
-                  pointerDownState.lastCoords.x =
-                    this.lastPointerMoveCoords?.x ?? pointerDownState.origin.x;
-                  pointerDownState.lastCoords.y =
-                    this.lastPointerMoveCoords?.y ?? pointerDownState.origin.y;
-                  pointerDownState.drag.hasOccurred = true;
 
-                  this.setState(newState);
+                  const [lastX, lastY] =
+                    hoveredElement && element.startBinding?.mode !== "inside"
+                      ? snapToCenter(
+                          hoveredElement,
+                          elementsMap,
+                          pointFrom<GlobalPoint>(
+                            this.lastPointerMoveCoords?.x ??
+                              pointerDownState.origin.x,
+                            this.lastPointerMoveCoords?.y ??
+                              pointerDownState.origin.y,
+                          ),
+                        )
+                      : [
+                          this.lastPointerMoveCoords?.x ??
+                            pointerDownState.origin.x,
+                          this.lastPointerMoveCoords?.y ??
+                            pointerDownState.origin.y,
+                        ];
+
+                  const newState = LinearElementEditor.handlePointDragging(
+                    event,
+                    this,
+                    lastX,
+                    lastY,
+                    linearElementEditor,
+                  );
+                  if (newState) {
+                    pointerDownState.lastCoords.x =
+                      this.lastPointerMoveCoords?.x ??
+                      pointerDownState.origin.x;
+                    pointerDownState.lastCoords.y =
+                      this.lastPointerMoveCoords?.y ??
+                      pointerDownState.origin.y;
+                    pointerDownState.drag.hasOccurred = true;
+
+                    this.setState(newState);
+                  }
+                } else {
+                  this.bindModeHandler = null;
                 }
-              } else {
-                this.bindModeHandler = null;
-              }
-            }, BIND_MODE_TIMEOUT);
-          }
-        } else if (!hoveredElement) {
-          flushSync(() => {
-            this.setState({
-              bindMode: "orbit",
+              }, BIND_MODE_TIMEOUT);
+            }
+          } else if (!hoveredElement) {
+            flushSync(() => {
+              this.setState({
+                bindMode: "orbit",
+              });
             });
-          });
-        }
+          }
 
-        const [x, y] = hoveredElement
-          ? snapToCenter(
-              hoveredElement,
-              elementsMap,
-              pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
-              10,
-            )
-          : [pointerCoords.x, pointerCoords.y];
+          [x, y] =
+            hoveredElement && element.startBinding?.mode !== "inside"
+              ? snapToCenter(
+                  hoveredElement,
+                  elementsMap,
+                  pointFrom<GlobalPoint>(pointerCoords.x, pointerCoords.y),
+                )
+              : [pointerCoords.x, pointerCoords.y];
+        }
 
         const newState = LinearElementEditor.handlePointDragging(
           event,

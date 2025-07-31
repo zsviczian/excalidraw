@@ -422,6 +422,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
       };
       let current: BindingStrategy;
 
+      // We are hovering another element with the end point
       if (hovered) {
         const isInsideBinding =
           globalBindMode === "inside" || isAlwaysInsideBinding(hovered);
@@ -447,9 +448,18 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
 
     // No start binding
     if (!arrow.startBinding) {
-      end = hovered
-        ? { element: hovered, mode: "orbit", focusPoint: point }
-        : { mode: null };
+      if (hovered) {
+        const isInsideBinding =
+          globalBindMode === "inside" || isAlwaysInsideBinding(hovered);
+
+        end = {
+          mode: isInsideBinding ? "inside" : "orbit",
+          element: hovered,
+          focusPoint: point,
+        };
+      } else {
+        end = { mode: null };
+      }
 
       return { start, end };
     }
@@ -498,33 +508,6 @@ const bindingStrategyForSimpleArrowEndpointDragging = (
       : { mode: undefined };
 
     return { current, other };
-  }
-
-  // Update the start point on new arrows
-  if (
-    opts?.newArrow &&
-    opts?.appState?.selectedLinearElement &&
-    oppositeBinding
-  ) {
-    const oppositeBindingElement = elementsMap.get(
-      oppositeBinding?.elementId,
-    ) as ExcalidrawBindableElement;
-
-    if (oppositeBinding.elementId !== hovered?.id) {
-      other = {
-        element: oppositeBindingElement,
-        mode: "orbit",
-        focusPoint: elementCenterPoint(oppositeBindingElement, elementsMap),
-      };
-    } else {
-      other = {
-        element: oppositeBindingElement,
-        mode: "inside",
-        focusPoint:
-          opts.appState.selectedLinearElement.pointerDownState
-            .arrowOriginalStartPoint ?? point,
-      };
-    }
   }
 
   // Dragged point is outside of any bindable element
@@ -1378,10 +1361,10 @@ export const snapToCenter = (
   element: ExcalidrawBindableElement,
   elementsMap: ElementsMap,
   p: GlobalPoint,
-  tolerance: number = 0.05,
 ) => {
+  const extent = Math.min(element.width, element.height);
   const center = elementCenterPoint(element, elementsMap);
-  if (pointDistance(p, center) < tolerance) {
+  if (pointDistance(p, center) < extent * 0.05) {
     return pointFrom<GlobalPoint>(center[0], center[1]);
   }
   return p;
