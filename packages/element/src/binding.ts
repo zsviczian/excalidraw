@@ -1114,40 +1114,33 @@ export const bindPointToSnapToElementOutline = (
   customIntersector?: LineSegment<GlobalPoint>,
 ): GlobalPoint => {
   const aabb = aabbForElement(bindableElement, elementsMap);
-  const localP =
-    linearElement.points[
-      startOrEnd === "start" ? 0 : linearElement.points.length - 1
-    ];
-  const globalP = pointFrom<GlobalPoint>(
-    linearElement.x + localP[0],
-    linearElement.y + localP[1],
+  const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    linearElement,
+    startOrEnd === "start" ? 0 : -1,
+    elementsMap,
   );
 
   if (linearElement.points.length < 2) {
     // New arrow creation, so no snapping
-    return globalP;
+    return point;
   }
 
   const edgePoint = isRectanguloidElement(bindableElement)
-    ? avoidRectangularCorner(bindableElement, elementsMap, globalP)
-    : globalP;
+    ? avoidRectangularCorner(bindableElement, elementsMap, point)
+    : point;
   const elbowed = isElbowArrow(linearElement);
   const center = getCenterForBounds(aabb);
-  const adjacentPointIdx =
-    startOrEnd === "start" ? 1 : linearElement.points.length - 2;
-  const adjacentPoint = pointRotateRads(
-    pointFrom<GlobalPoint>(
-      linearElement.x + linearElement.points[adjacentPointIdx][0],
-      linearElement.y + linearElement.points[adjacentPointIdx][1],
-    ),
-    center,
-    linearElement.angle ?? 0,
+  const adjacentPointIdx = startOrEnd === "start" ? 1 : -2;
+  const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+    linearElement,
+    adjacentPointIdx,
+    elementsMap,
   );
 
   let intersection: GlobalPoint | null = null;
   if (elbowed) {
     const isHorizontal = headingIsHorizontal(
-      headingForPointFromElement(bindableElement, aabb, globalP),
+      headingForPointFromElement(bindableElement, aabb, point),
     );
     const snapPoint = snapToMid(bindableElement, elementsMap, edgePoint);
     const otherPoint = pointFrom<GlobalPoint>(
@@ -1217,22 +1210,26 @@ export const getOutlineAvoidingPoint = (
   customIntersector?: LineSegment<GlobalPoint>,
 ): GlobalPoint => {
   if (hoveredElement) {
-    const nextPoint = LinearElementEditor.pointFromAbsoluteCoords(
-      element,
-      coords,
-      elementsMap,
-    );
-
     return bindPointToSnapToElementOutline(
       {
         ...element,
-        ...LinearElementEditor.getNormalizeElementPointsAndCoords({
-          ...element,
-          points:
-            pointIndex === 0
-              ? [nextPoint, ...element.points.slice(1)]
-              : [...element.points.slice(0, -1), nextPoint],
-        }),
+        x: pointIndex === 0 ? coords[0] : element.x,
+        y: pointIndex === 0 ? coords[1] : element.y,
+        points:
+          pointIndex === 0
+            ? element.points.map((p) =>
+                pointFrom<LocalPoint>(
+                  p[0] - (coords[0] - element.x),
+                  p[1] - (coords[1] - element.y),
+                ),
+              )
+            : [
+                ...element.points.slice(0, -1),
+                pointFrom<LocalPoint>(
+                  coords[0] - element.x,
+                  coords[1] - element.y,
+                ),
+              ],
       },
       hoveredElement,
       pointIndex === 0 ? "start" : "end",
