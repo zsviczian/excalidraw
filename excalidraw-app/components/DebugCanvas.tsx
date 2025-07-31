@@ -27,7 +27,7 @@ import { isCurve } from "@excalidraw/math/curve";
 import React from "react";
 
 import type { Curve } from "@excalidraw/math";
-import type { DebugElement } from "@excalidraw/utils/visualdebug";
+import type { DebugElement } from "@excalidraw/common";
 import type {
   ElementsMap,
   ExcalidrawArrowElement,
