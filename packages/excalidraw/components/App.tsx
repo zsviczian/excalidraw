@@ -6018,9 +6018,6 @@ class App extends React.Component<AppProps, AppState> {
             scenePointerY,
             this,
           );
-      const linearElement = editingLinearElement
-        ? this.scene.getElement(editingLinearElement.elementId)
-        : null;
 
       if (
         editingLinearElement &&
@@ -6035,78 +6032,82 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
       }
-      const arrowWithoutUncommittedPoint =
-        editingLinearElement?.lastUncommittedPoint != null &&
-        linearElement &&
-        isBindingElementType(linearElement.type);
 
-      if (arrowWithoutUncommittedPoint || this.state.newElement) {
-        // Timed bind mode handler for arrow elements
-        if (isArrowElement(this.state.newElement)) {
-          const hoveredElement = getHoveredElementForBinding(
-            pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
-            this.scene.getNonDeletedElements(),
-            this.scene.getNonDeletedElementsMap(),
-            this.state.zoom,
-          );
+      // const linearElement = editingLinearElement
+      //   ? this.scene.getElement(editingLinearElement.elementId)
+      //   : null;
+      // const arrowWithoutUncommittedPoint =
+      //   editingLinearElement?.lastUncommittedPoint != null &&
+      //   linearElement &&
+      //   isBindingElementType(linearElement.type);
 
-          if (this.state.bindMode === "orbit") {
-            if (this.bindModeHandler && !hoveredElement) {
-              clearTimeout(this.bindModeHandler);
-              this.bindModeHandler = null;
-            } else if (!this.bindModeHandler && hoveredElement) {
-              this.bindModeHandler = setTimeout(() => {
-                if (hoveredElement) {
-                  flushSync(() => {
-                    this.setState({
-                      bindMode: "inside",
-                    });
-                  });
+      // if (arrowWithoutUncommittedPoint || this.state.newElement) {
+      //   // Timed bind mode handler for arrow elements
+      //   if (isArrowElement(this.state.newElement)) {
+      //     const hoveredElement = getHoveredElementForBinding(
+      //       pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
+      //       this.scene.getNonDeletedElements(),
+      //       this.scene.getNonDeletedElementsMap(),
+      //       this.state.zoom,
+      //     );
 
-                  if (isArrowElement(this.state.newElement)) {
-                    const lastSceneCoords = viewportCoordsToSceneCoords(
-                      {
-                        clientX: this.lastPointerMoveEvent?.clientX ?? 0,
-                        clientY: this.lastPointerMoveEvent?.clientY ?? 0,
-                      },
-                      this.state,
-                    );
-                    this.scene.mutateElement(
-                      this.state.newElement,
-                      {
-                        points: [
-                          ...this.state.newElement.points.slice(0, -1),
-                          LinearElementEditor.pointFromAbsoluteCoords(
-                            this.state.newElement,
-                            pointFrom<GlobalPoint>(
-                              lastSceneCoords.x,
-                              lastSceneCoords.y,
-                            ),
-                            this.scene.getNonDeletedElementsMap(),
-                          ),
-                        ],
-                      },
-                      { informMutation: false, isDragging: false },
-                    );
-                  }
-                } else {
-                  this.bindModeHandler = null;
-                }
-              }, BIND_MODE_TIMEOUT);
-            }
-          } else if (!hoveredElement) {
-            flushSync(() => {
-              this.setState({
-                bindMode: "orbit",
-              });
-            });
-          }
-        }
+      //     if (this.state.bindMode === "orbit") {
+      //       if (this.bindModeHandler && !hoveredElement) {
+      //         clearTimeout(this.bindModeHandler);
+      //         this.bindModeHandler = null;
+      //       } else if (!this.bindModeHandler && hoveredElement) {
+      //         this.bindModeHandler = setTimeout(() => {
+      //           if (hoveredElement) {
+      //             flushSync(() => {
+      //               this.setState({
+      //                 bindMode: "inside",
+      //               });
+      //             });
 
-        this.maybeSuggestBindingAtCursor(scenePointer);
-      } else {
-        this.setState({ suggestedBindings: [] });
-      }
+      //             if (isArrowElement(this.state.newElement)) {
+      //               const lastSceneCoords = viewportCoordsToSceneCoords(
+      //                 {
+      //                   clientX: this.lastPointerMoveEvent?.clientX ?? 0,
+      //                   clientY: this.lastPointerMoveEvent?.clientY ?? 0,
+      //                 },
+      //                 this.state,
+      //               );
+      //               this.scene.mutateElement(
+      //                 this.state.newElement,
+      //                 {
+      //                   points: [
+      //                     ...this.state.newElement.points.slice(0, -1),
+      //                     LinearElementEditor.pointFromAbsoluteCoords(
+      //                       this.state.newElement,
+      //                       pointFrom<GlobalPoint>(
+      //                         lastSceneCoords.x,
+      //                         lastSceneCoords.y,
+      //                       ),
+      //                       this.scene.getNonDeletedElementsMap(),
+      //                     ),
+      //                   ],
+      //                 },
+      //                 { informMutation: false, isDragging: false },
+      //               );
+      //             }
+      //           } else {
+      //             this.bindModeHandler = null;
+      //           }
+      //         }, BIND_MODE_TIMEOUT);
+      //       }
+      //     } else if (!hoveredElement) {
+      //       flushSync(() => {
+      //         this.setState({
+      //           bindMode: "orbit",
+      //         });
+      //       });
+      //     }
+      //   }
+
+      //   this.maybeSuggestBindingAtCursor(scenePointer);
+      // } else {
+      //   this.setState({ suggestedBindings: [] });
+      // }
     }
 
     if (isBindingElementType(this.state.activeTool.type)) {
@@ -6217,8 +6218,42 @@ class App extends React.Component<AppProps, AppState> {
           lastCommittedX + dxFromLastCommitted,
           lastCommittedY + dyFromLastCommitted,
         );
+        let startBinding = multiElement.startBinding;
 
         if (isBindingElement(multiElement) && !isElbowArrow(multiElement)) {
+          const hoveredElement = getHoveredElementForBinding(
+            pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
+            this.scene.getNonDeletedElements(),
+            elementsMap,
+            this.state.zoom,
+          );
+
+          // Timed bind mode handler for arrow elements
+          if (this.state.bindMode === "orbit") {
+            if (this.bindModeHandler && !hoveredElement) {
+              clearTimeout(this.bindModeHandler);
+              this.bindModeHandler = null;
+            } else if (!this.bindModeHandler && hoveredElement) {
+              this.bindModeHandler = setTimeout(() => {
+                if (hoveredElement) {
+                  flushSync(() => {
+                    this.setState({
+                      bindMode: "inside",
+                    });
+                  });
+                } else {
+                  this.bindModeHandler = null;
+                }
+              }, BIND_MODE_TIMEOUT);
+            }
+          } else if (!hoveredElement) {
+            flushSync(() => {
+              this.setState({
+                bindMode: "orbit",
+              });
+            });
+          }
+
           const point = pointFrom<LocalPoint>(
             scenePointerX - rx,
             scenePointerY - ry,
@@ -6234,6 +6269,19 @@ class App extends React.Component<AppProps, AppState> {
               this.state,
               { newArrow: !!this.state.newElement },
             );
+
+          if (start.mode) {
+            startBinding = {
+              elementId: start.element.id,
+              mode: start.mode,
+              ...calculateFixedPointForNonElbowArrowBinding(
+                multiElement,
+                start.element,
+                "start",
+                elementsMap,
+              ),
+            };
+          }
 
           [startGlobalPoint, endLocalPoint] =
             getStartGlobalEndLocalPointsForSimpleArrowBinding(
@@ -6253,6 +6301,7 @@ class App extends React.Component<AppProps, AppState> {
             x: startGlobalPoint[0],
             y: startGlobalPoint[1],
             points: [...points.slice(0, -1), endLocalPoint],
+            startBinding,
           },
           {
             isDragging: true,

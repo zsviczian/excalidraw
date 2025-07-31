@@ -143,7 +143,8 @@ export const dragSelectedElements = (
       // NOTE: Add a little initial drag to the arrow dragging to avoid
       // accidentally unbinding the arrow when the user just wants to select it.
       Math.max(Math.abs(adjustedOffset.x), Math.abs(adjustedOffset.y)) >
-      DRAGGING_THRESHOLD
+        DRAGGING_THRESHOLD ||
+      (!element.startBinding && !element.endBinding)
     ) {
       updateElementCoords(pointerDownState, element, scene, adjustedOffset);
 
