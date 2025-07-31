@@ -233,7 +233,7 @@ const getOriginalBindingsIfStillCloseToBindingEnds = (
     return null;
   });
 
-export const getStartGlobalEndLocalPointsForBinding = (
+export const getStartGlobalEndLocalPointsForSimpleArrowBinding = (
   arrow: NonDeleted<ExcalidrawArrowElement>,
   start: BindingStrategy,
   end: BindingStrategy,
@@ -295,7 +295,13 @@ export const getStartGlobalEndLocalPointsForBinding = (
     endLocalPoint = newEndLocalPoint ?? endLocalPoint;
   }
 
-  return [startGlobalPoint, endLocalPoint];
+  return [
+    startGlobalPoint,
+    pointFrom<LocalPoint>(
+      endLocalPoint[0] - (startGlobalPoint[0] - arrow.x),
+      endLocalPoint[1] - (startGlobalPoint[1] - arrow.y),
+    ),
+  ];
 };
 
 const bindingStrategyForNewSimpleArrowEndpointDragging = (
@@ -1114,10 +1120,13 @@ export const bindPointToSnapToElementOutline = (
   customIntersector?: LineSegment<GlobalPoint>,
 ): GlobalPoint => {
   const aabb = aabbForElement(bindableElement, elementsMap);
-  const point = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    linearElement,
-    startOrEnd === "start" ? 0 : -1,
-    elementsMap,
+  const localPoint =
+    linearElement.points[
+      startOrEnd === "start" ? 0 : linearElement.points.length - 1
+    ];
+  const point = pointFrom<GlobalPoint>(
+    linearElement.x + localPoint[0],
+    linearElement.y + localPoint[1],
   );
 
   if (linearElement.points.length < 2) {
@@ -1130,11 +1139,15 @@ export const bindPointToSnapToElementOutline = (
     : point;
   const elbowed = isElbowArrow(linearElement);
   const center = getCenterForBounds(aabb);
-  const adjacentPointIdx = startOrEnd === "start" ? 1 : -2;
-  const adjacentPoint = LinearElementEditor.getPointAtIndexGlobalCoordinates(
-    linearElement,
-    adjacentPointIdx,
-    elementsMap,
+  const adjacentPointIdx =
+    startOrEnd === "start" ? 1 : linearElement.points.length - 2;
+  const adjacentPoint = pointRotateRads(
+    pointFrom<GlobalPoint>(
+      linearElement.x + linearElement.points[adjacentPointIdx][0],
+      linearElement.y + linearElement.points[adjacentPointIdx][1],
+    ),
+    center,
+    linearElement.angle ?? 0,
   );
 
   let intersection: GlobalPoint | null = null;
@@ -1166,28 +1179,31 @@ export const bindPointToSnapToElementOutline = (
       FIXED_BINDING_DISTANCE,
     ).sort(pointDistanceSq)[0];
   } else {
+    const halfVector = vectorScale(
+      vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
+      pointDistance(edgePoint, adjacentPoint) +
+        Math.max(bindableElement.width, bindableElement.height) +
+        FIXED_BINDING_DISTANCE * 2,
+    );
     const intersector =
       customIntersector ??
       lineSegment(
-        adjacentPoint,
-        pointFromVector(
-          vectorScale(
-            vectorNormalize(vectorFromPoint(edgePoint, adjacentPoint)),
-            pointDistance(edgePoint, adjacentPoint) +
-              Math.max(bindableElement.width, bindableElement.height) * 2,
-          ),
-          adjacentPoint,
-        ),
+        pointFromVector(halfVector, adjacentPoint),
+        pointFromVector(vectorScale(halfVector, -1), adjacentPoint),
       );
-    intersection = intersectElementWithLineSegment(
-      bindableElement,
-      elementsMap,
-      intersector,
-      FIXED_BINDING_DISTANCE,
-    ).sort(
-      (g, h) =>
-        pointDistanceSq(g, adjacentPoint) - pointDistanceSq(h, adjacentPoint),
-    )[0];
+    intersection =
+      pointDistance(edgePoint, adjacentPoint) < 1
+        ? edgePoint
+        : intersectElementWithLineSegment(
+            bindableElement,
+            elementsMap,
+            intersector,
+            FIXED_BINDING_DISTANCE,
+          ).sort(
+            (g, h) =>
+              pointDistanceSq(g, adjacentPoint) -
+              pointDistanceSq(h, adjacentPoint),
+          )[0];
   }
 
   if (
@@ -1217,12 +1233,17 @@ export const getOutlineAvoidingPoint = (
         y: pointIndex === 0 ? coords[1] : element.y,
         points:
           pointIndex === 0
-            ? element.points.map((p) =>
-                pointFrom<LocalPoint>(
-                  p[0] - (coords[0] - element.x),
-                  p[1] - (coords[1] - element.y),
-                ),
-              )
+            ? [
+                pointFrom<LocalPoint>(0, 0),
+                ...element.points
+                  .slice(1)
+                  .map((p) =>
+                    pointFrom<LocalPoint>(
+                      p[0] - (coords[0] - element.x),
+                      p[1] - (coords[1] - element.y),
+                    ),
+                  ),
+              ]
             : [
                 ...element.points.slice(0, -1),
                 pointFrom<LocalPoint>(

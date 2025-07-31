@@ -238,7 +238,7 @@ import {
   calculateFixedPointForNonElbowArrowBinding,
   bindOrUnbindBindingElement,
   getBindingStrategyForDraggingBindingElementEndpoints,
-  getStartGlobalEndLocalPointsForBinding,
+  getStartGlobalEndLocalPointsForSimpleArrowBinding,
   snapToCenter,
 } from "@excalidraw/element";
 
@@ -6236,7 +6236,7 @@ class App extends React.Component<AppProps, AppState> {
             );
 
           [startGlobalPoint, endLocalPoint] =
-            getStartGlobalEndLocalPointsForBinding(
+            getStartGlobalEndLocalPointsForSimpleArrowBinding(
               multiElement,
               start,
               end,
@@ -9059,6 +9059,7 @@ class App extends React.Component<AppProps, AppState> {
             gridY - newElement.y,
           );
 
+          // Simple arrows need both their start and end points adjusted
           if (isBindingElement(newElement) && !isElbowArrow(newElement)) {
             const point = pointFrom<LocalPoint>(
               pointerCoords.x - newElement.x,
@@ -9090,7 +9091,7 @@ class App extends React.Component<AppProps, AppState> {
             }
 
             [startGlobalPoint, endLocalPoint] =
-              getStartGlobalEndLocalPointsForBinding(
+              getStartGlobalEndLocalPointsForSimpleArrowBinding(
                 newElement,
                 start,
                 end,
@@ -9105,16 +9106,13 @@ class App extends React.Component<AppProps, AppState> {
             "Do not create linear elements with less than 2 points",
           );
 
-          if (
-            points.length === 2 ||
-            (points.length > 1 && isElbowArrow(newElement))
-          ) {
+          if (isElbowArrow(newElement) || points.length === 2) {
             this.scene.mutateElement(
               newElement,
               {
                 x: startGlobalPoint[0],
                 y: startGlobalPoint[1],
-                points: [...points.slice(0, -1), endLocalPoint],
+                points: [pointFrom<LocalPoint>(0, 0), endLocalPoint],
                 startBinding,
               },
               { isDragging: true, informMutation: false },
