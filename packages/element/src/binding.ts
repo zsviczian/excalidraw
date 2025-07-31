@@ -143,7 +143,6 @@ export const bindOrUnbindBindingElement = (
     appState,
     {
       ...opts,
-      appState,
     },
   );
   bindOrUnbindBindingElementEdge(arrow, start, "start", scene);
@@ -299,7 +298,149 @@ export const getStartGlobalEndLocalPointsForBinding = (
   return [startGlobalPoint, endLocalPoint];
 };
 
-const bindingStrategyForEndpointDragging = (
+const bindingStrategyForNewSimpleArrowEndpointDragging = (
+  arrow: NonDeleted<ExcalidrawArrowElement>,
+  draggingPoints: PointsPositionUpdates,
+  elementsMap: NonDeletedSceneElementsMap,
+  elements: readonly Ordered<NonDeletedExcalidrawElement>[],
+  startDragged: boolean,
+  endDragged: boolean,
+  startIdx: number,
+  endIdx: number,
+  appState: AppState,
+  globalBindMode?: AppState["bindMode"],
+): {
+  start: BindingStrategy;
+  end: BindingStrategy;
+} => {
+  let start: BindingStrategy = { mode: undefined };
+  let end: BindingStrategy = { mode: undefined };
+
+  const point = LinearElementEditor.getPointGlobalCoordinates(
+    arrow,
+    draggingPoints.get(startDragged ? startIdx : endIdx)!.point,
+    elementsMap,
+  );
+  const { hovered, hit } = getHoveredElementForBindingAndIfItsPrecise(
+    point,
+    elements,
+    elementsMap,
+    appState.zoom,
+    true,
+  );
+
+  // With new arrows this handles the binding at arrow creation
+  if (startDragged) {
+    if (hovered) {
+      if (hit) {
+        start = {
+          element: hovered,
+          mode: "inside",
+          focusPoint: point,
+        };
+      } else {
+        start = {
+          element: hovered,
+          mode: "orbit",
+          focusPoint: point,
+        };
+      }
+    } else {
+      start = { mode: null };
+    }
+
+    return { start, end };
+  }
+
+  // With new arrows it represents the continuous dragging of the end point
+  if (endDragged) {
+    // Inside -> inside binding
+    if (hovered && hit && arrow.startBinding?.elementId === hovered.id) {
+      const arrowOriginalStartPoint =
+        appState?.selectedLinearElement?.pointerDownState
+          .arrowOriginalStartPoint;
+      invariant(
+        arrowOriginalStartPoint,
+        "appState.selectedLinearElement.pointerDownState.arrowOriginalStartPoint must be defined for new arrow creation",
+      );
+
+      return {
+        start: {
+          mode: "inside",
+          element: hovered,
+          focusPoint: arrowOriginalStartPoint,
+        },
+        end: { mode: "inside", element: hovered, focusPoint: point },
+      };
+    }
+
+    // Inside -> orbit binding
+    if (hovered && !hit && arrow.startBinding?.elementId === hovered.id) {
+      return {
+        start: {
+          mode: "orbit",
+          element: hovered,
+          focusPoint: pointFrom<GlobalPoint>(
+            hovered.x + hovered.width / 2,
+            hovered.y + hovered.height / 2,
+          ),
+        },
+        end: { mode: null },
+      };
+    }
+
+    // Inside -> outside binding
+    if (arrow.startBinding && arrow.startBinding.elementId !== hovered?.id) {
+      const otherElement = elementsMap.get(arrow.startBinding.elementId);
+      invariant(otherElement, "Other element must be in the elements map");
+
+      // We need to "jump" the start point out with the detached
+      // focus point of the center of the bound element
+      const other: BindingStrategy = {
+        mode: "orbit",
+        element: otherElement as ExcalidrawBindableElement,
+        focusPoint: pointFrom<GlobalPoint>(
+          otherElement.x + otherElement.width / 2,
+          otherElement.y + otherElement.height / 2,
+        ),
+      };
+      let current: BindingStrategy;
+
+      if (hovered) {
+        current = {
+          mode:
+            globalBindMode === "inside" || isAlwaysInsideBinding(hovered)
+              ? "inside"
+              : "orbit",
+          element: hovered,
+          focusPoint: point,
+        };
+      } else {
+        current = { mode: null };
+      }
+
+      return {
+        start: other,
+        end: current,
+      };
+    }
+
+    // No start binding
+    if (!arrow.startBinding) {
+      end = hovered
+        ? { element: hovered, mode: "orbit", focusPoint: point }
+        : { mode: null };
+
+      return { start, end };
+    }
+  }
+
+  invariant(false, "New arrow creation should not reach here");
+
+  return { start, end };
+};
+
+const bindingStrategyForSimpleArrowEndpointDragging = (
   point: GlobalPoint,
   oppositeBinding: FixedPointBinding | null,
   elementsMap: NonDeletedSceneElementsMap,
@@ -466,7 +607,6 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
   appState: AppState,
   opts?: {
     newArrow?: boolean;
-    appState?: AppState;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
   const globalBindMode = appState.bindMode || "focus";
@@ -503,6 +643,51 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
     return { start, end };
   }
 
+  // Handle simpler elbow arrow binding, which always binds as orbiting the
+  // element, even if the mouse cursor is over the element itself
+  if (isElbowArrow(arrow)) {
+    const p = LinearElementEditor.getPointAtIndexGlobalCoordinates(
+      arrow,
+      startDragged ? startIdx : endIdx,
+      elementsMap,
+    );
+    const hoveredElement = getHoveredElementForBinding(
+      p,
+      elements,
+      elementsMap,
+      appState.zoom,
+    );
+    const current: BindingStrategy = hoveredElement
+      ? {
+          element: hoveredElement,
+          mode: "orbit",
+          focusPoint: p,
+        }
+      : { mode: null };
+    const other: BindingStrategy = { mode: undefined };
+
+    return {
+      start: startDragged ? current : other,
+      end: startDragged ? other : current,
+    };
+  }
+
+  // Handle new arrow creation separately, as it is special
+  if (opts?.newArrow) {
+    return bindingStrategyForNewSimpleArrowEndpointDragging(
+      arrow,
+      draggingPoints,
+      elementsMap,
+      elements,
+      startDragged,
+      endDragged,
+      startIdx,
+      endIdx,
+      appState,
+      globalBindMode,
+    );
+  }
+
   // Only the start point is dragged
   if (startDragged) {
     const localPoint = draggingPoints.get(startIdx)?.point;
@@ -512,7 +697,8 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
       localPoint,
       elementsMap,
     );
-    const { current, other } = bindingStrategyForEndpointDragging(
+
+    const { current, other } = bindingStrategyForSimpleArrowEndpointDragging(
       globalPoint,
       arrow.endBinding,
       elementsMap,
@@ -534,7 +720,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
       localPoint,
       elementsMap,
     );
-    const { current, other } = bindingStrategyForEndpointDragging(
+    const { current, other } = bindingStrategyForSimpleArrowEndpointDragging(
       globalPoint,
       arrow.startBinding,
       elementsMap,
@@ -1031,16 +1217,22 @@ export const getOutlineAvoidingPoint = (
   customIntersector?: LineSegment<GlobalPoint>,
 ): GlobalPoint => {
   if (hoveredElement) {
-    const newPoints = Array.from(element.points);
-    newPoints[pointIndex] = pointFrom<LocalPoint>(
-      coords[0] - element.x,
-      coords[1] - element.y,
+    const nextPoint = LinearElementEditor.pointFromAbsoluteCoords(
+      element,
+      coords,
+      elementsMap,
     );
 
     return bindPointToSnapToElementOutline(
       {
         ...element,
-        points: newPoints,
+        ...LinearElementEditor.getNormalizeElementPointsAndCoords({
+          ...element,
+          points:
+            pointIndex === 0
+              ? [nextPoint, ...element.points.slice(1)]
+              : [...element.points.slice(0, -1), nextPoint],
+        }),
       },
       hoveredElement,
       pointIndex === 0 ? "start" : "end",
@@ -1289,17 +1481,11 @@ export const updateBoundPoint = (
     bindableElement,
     elementsMap,
   );
-  const element =
-    arrow.points.length === 1
-      ? {
-          ...arrow,
-          points: [arrow.points[0], arrow.points[0]],
-        }
-      : arrow;
+
   const maybeOutlineGlobal =
     binding.mode === "orbit"
       ? getOutlineAvoidingPoint(
-          element,
+          arrow,
           bindableElement,
           global,
           startOrEnd === "startBinding" ? 0 : arrow.points.length - 1,

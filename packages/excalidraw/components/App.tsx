@@ -267,8 +267,6 @@ import type {
   ExcalidrawArrowElement,
   ExcalidrawElbowArrowElement,
   ExcalidrawBindableElement,
-  FixedPoint,
-  BindMode,
 } from "@excalidraw/element/types";
 
 import type { Mutable, ValueOf } from "@excalidraw/common/utility-types";
@@ -6234,7 +6232,7 @@ class App extends React.Component<AppProps, AppState> {
               elementsMap,
               this.scene.getNonDeletedElements(),
               this.state,
-              { newArrow: !!this.state.newElement, appState: this.state },
+              { newArrow: !!this.state.newElement },
             );
 
           [startGlobalPoint, endLocalPoint] =
@@ -8129,19 +8127,12 @@ class App extends React.Component<AppProps, AppState> {
         });
       }
 
-      const binding = boundElement
-        ? {
-            elementId: boundElement.id,
-            mode: "inside" as BindMode,
-            fixedPoint: [0.5, 0.5] as FixedPoint,
-          }
-        : null;
       this.scene.mutateElement(element, {
         points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(0, 0)],
-        startBinding: binding,
-        endBinding: binding,
       });
+
       this.scene.insertElement(element);
+
       if (isBindingElement(element)) {
         // Do the initial binding so the binding strategy has the initial state
         bindOrUnbindBindingElement(
@@ -9082,7 +9073,7 @@ class App extends React.Component<AppProps, AppState> {
                 elementsMap,
                 this.scene.getNonDeletedElements(),
                 this.state,
-                { newArrow: !!this.state.newElement, appState: this.state },
+                { newArrow: !!this.state.newElement },
               );
 
             if (start.mode) {
