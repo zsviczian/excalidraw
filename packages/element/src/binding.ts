@@ -322,6 +322,9 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
   let start: BindingStrategy = { mode: undefined };
   let end: BindingStrategy = { mode: undefined };
 
+  const arrowOriginalStartPoint =
+    appState?.selectedLinearElement?.pointerDownState.arrowOriginalStartPoint;
+
   const point = LinearElementEditor.getPointGlobalCoordinates(
     arrow,
     draggingPoints.get(startDragged ? startIdx : endIdx)!.point,
@@ -362,9 +365,6 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
   if (endDragged) {
     // Inside -> inside binding
     if (hovered && hit && arrow.startBinding?.elementId === hovered.id) {
-      const arrowOriginalStartPoint =
-        appState?.selectedLinearElement?.pointerDownState
-          .arrowOriginalStartPoint;
       invariant(
         arrowOriginalStartPoint,
         "appState.selectedLinearElement.pointerDownState.arrowOriginalStartPoint must be defined for new arrow creation",
@@ -382,14 +382,22 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
 
     // Inside -> orbit binding
     if (hovered && !hit && arrow.startBinding?.elementId === hovered.id) {
+      invariant(
+        arrowOriginalStartPoint,
+        "appState.selectedLinearElement.pointerDownState.arrowOriginalStartPoint must be defined for new arrow creation",
+      );
+
+      const center = pointFrom<GlobalPoint>(
+        hovered.x + hovered.width / 2,
+        hovered.y + hovered.height / 2,
+      );
+
       return {
         start: {
-          mode: "orbit",
+          mode: globalBindMode === "inside" ? "inside" : "orbit",
           element: hovered,
-          focusPoint: pointFrom<GlobalPoint>(
-            hovered.x + hovered.width / 2,
-            hovered.y + hovered.height / 2,
-          ),
+          focusPoint:
+            globalBindMode === "inside" ? arrowOriginalStartPoint : center,
         },
         end: { mode: null },
       };
@@ -397,29 +405,41 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
 
     // Inside -> outside binding
     if (arrow.startBinding && arrow.startBinding.elementId !== hovered?.id) {
+      invariant(
+        arrowOriginalStartPoint,
+        "appState.selectedLinearElement.pointerDownState.arrowOriginalStartPoint must be defined for new arrow creation",
+      );
+
       const otherElement = elementsMap.get(arrow.startBinding.elementId);
       invariant(otherElement, "Other element must be in the elements map");
+
+      const center = pointFrom<GlobalPoint>(
+        otherElement.x + otherElement.width / 2,
+        otherElement.y + otherElement.height / 2,
+      );
+      const otherIsInsideBinding = arrow.startBinding?.mode === "inside";
 
       // We need to "jump" the start point out with the detached
       // focus point of the center of the bound element
       const other: BindingStrategy = {
-        mode: "orbit",
+        mode: otherIsInsideBinding ? "inside" : "orbit",
         element: otherElement as ExcalidrawBindableElement,
-        focusPoint: pointFrom<GlobalPoint>(
-          otherElement.x + otherElement.width / 2,
-          otherElement.y + otherElement.height / 2,
-        ),
+        focusPoint: otherIsInsideBinding ? arrowOriginalStartPoint : center,
       };
       let current: BindingStrategy;
 
       if (hovered) {
+        const isInsideBinding =
+          globalBindMode === "inside" || isAlwaysInsideBinding(hovered);
         current = {
-          mode:
-            globalBindMode === "inside" || isAlwaysInsideBinding(hovered)
-              ? "inside"
-              : "orbit",
+          mode: isInsideBinding ? "inside" : "orbit",
           element: hovered,
-          focusPoint: point,
+          focusPoint: isInsideBinding
+            ? point
+            : pointFrom<GlobalPoint>(
+                hovered.x + hovered.width / 2,
+                hovered.y + hovered.height / 2,
+              ),
         };
       } else {
         current = { mode: null };
