@@ -126,7 +126,7 @@ const calculate = <Point extends GlobalPoint | LocalPoint>(
     t0,
     s0,
     1e-2,
-    2,
+    1,
   );
 
   if (!solution) {
