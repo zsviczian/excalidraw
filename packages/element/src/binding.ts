@@ -613,7 +613,7 @@ export const getBindingStrategyForDraggingBindingElementEndpoints = (
     newArrow?: boolean;
   },
 ): { start: BindingStrategy; end: BindingStrategy } => {
-  const globalBindMode = appState.bindMode || "focus";
+  const globalBindMode = appState.bindMode || "orbit";
   const startIdx = 0;
   const endIdx = arrow.points.length - 1;
   const startDragged = draggingPoints.has(startIdx);

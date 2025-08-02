@@ -6032,82 +6032,6 @@ class App extends React.Component<AppProps, AppState> {
           });
         });
       }
-
-      // const linearElement = editingLinearElement
-      //   ? this.scene.getElement(editingLinearElement.elementId)
-      //   : null;
-      // const arrowWithoutUncommittedPoint =
-      //   editingLinearElement?.lastUncommittedPoint != null &&
-      //   linearElement &&
-      //   isBindingElementType(linearElement.type);
-
-      // if (arrowWithoutUncommittedPoint || this.state.newElement) {
-      //   // Timed bind mode handler for arrow elements
-      //   if (isArrowElement(this.state.newElement)) {
-      //     const hoveredElement = getHoveredElementForBinding(
-      //       pointFrom<GlobalPoint>(scenePointer.x, scenePointer.y),
-      //       this.scene.getNonDeletedElements(),
-      //       this.scene.getNonDeletedElementsMap(),
-      //       this.state.zoom,
-      //     );
-
-      //     if (this.state.bindMode === "orbit") {
-      //       if (this.bindModeHandler && !hoveredElement) {
-      //         clearTimeout(this.bindModeHandler);
-      //         this.bindModeHandler = null;
-      //       } else if (!this.bindModeHandler && hoveredElement) {
-      //         this.bindModeHandler = setTimeout(() => {
-      //           if (hoveredElement) {
-      //             flushSync(() => {
-      //               this.setState({
-      //                 bindMode: "inside",
-      //               });
-      //             });
-
-      //             if (isArrowElement(this.state.newElement)) {
-      //               const lastSceneCoords = viewportCoordsToSceneCoords(
-      //                 {
-      //                   clientX: this.lastPointerMoveEvent?.clientX ?? 0,
-      //                   clientY: this.lastPointerMoveEvent?.clientY ?? 0,
-      //                 },
-      //                 this.state,
-      //               );
-      //               this.scene.mutateElement(
-      //                 this.state.newElement,
-      //                 {
-      //                   points: [
-      //                     ...this.state.newElement.points.slice(0, -1),
-      //                     LinearElementEditor.pointFromAbsoluteCoords(
-      //                       this.state.newElement,
-      //                       pointFrom<GlobalPoint>(
-      //                         lastSceneCoords.x,
-      //                         lastSceneCoords.y,
-      //                       ),
-      //                       this.scene.getNonDeletedElementsMap(),
-      //                     ),
-      //                   ],
-      //                 },
-      //                 { informMutation: false, isDragging: false },
-      //               );
-      //             }
-      //           } else {
-      //             this.bindModeHandler = null;
-      //           }
-      //         }, BIND_MODE_TIMEOUT);
-      //       }
-      //     } else if (!hoveredElement) {
-      //       flushSync(() => {
-      //         this.setState({
-      //           bindMode: "orbit",
-      //         });
-      //       });
-      //     }
-      //   }
-
-      //   this.maybeSuggestBindingAtCursor(scenePointer);
-      // } else {
-      //   this.setState({ suggestedBindings: [] });
-      // }
     }
 
     if (isBindingElementType(this.state.activeTool.type)) {
@@ -7083,6 +7007,14 @@ class App extends React.Component<AppProps, AppState> {
    * pointerup handlers manually
    */
   private maybeCleanupAfterMissingPointerUp = (event: PointerEvent | null) => {
+    if (this.bindModeHandler) {
+      clearTimeout(this.bindModeHandler);
+    }
+    this.bindModeHandler = null;
+    this.setState({
+      bindMode: "orbit",
+    });
+
     lastPointerUp?.();
     this.missingPointerEventCleanupEmitter.trigger(event).clear();
   };
@@ -8224,8 +8156,14 @@ class App extends React.Component<AppProps, AppState> {
           );
         }
 
+        if (this.bindModeHandler) {
+          clearTimeout(this.bindModeHandler);
+        }
+        this.bindModeHandler = null;
+
         return {
           ...prevState,
+          bindMode: "orbit",
           newElement: element,
           startBoundElement: boundElement,
           suggestedBindings: boundElement ? [boundElement] : [],
