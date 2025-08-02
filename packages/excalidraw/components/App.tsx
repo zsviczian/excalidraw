@@ -6180,6 +6180,10 @@ class App extends React.Component<AppProps, AppState> {
               }, BIND_MODE_TIMEOUT);
             }
           } else if (!hoveredElement) {
+            if (this.bindModeHandler) {
+              clearTimeout(this.bindModeHandler);
+              this.bindModeHandler = null;
+            }
             flushSync(() => {
               this.setState({
                 bindMode: "orbit",
