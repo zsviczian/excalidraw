@@ -859,10 +859,7 @@ export const resizeSingleElement = (
       shouldMaintainAspectRatio,
     );
 
-    updateBoundElements(latestElement, scene, {
-      // TODO: confirm with MARK if this actually makes sense
-      newSize: { width: nextWidth, height: nextHeight },
-    });
+    updateBoundElements(latestElement, scene);
   }
 };
 
@@ -1416,13 +1413,12 @@ export const resizeMultipleElements = (
       element,
       update: { boundTextFontSize, ...update },
     } of elementsAndUpdates) {
-      const { width, height, angle } = update;
+      const { angle } = update;
 
       scene.mutateElement(element, update);
 
       updateBoundElements(element, scene, {
         simultaneouslyUpdated: elementsToUpdate,
-        newSize: { width, height },
       });
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
