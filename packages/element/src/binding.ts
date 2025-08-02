@@ -425,8 +425,7 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
 
       // We are hovering another element with the end point
       if (hovered) {
-        const isInsideBinding =
-          globalBindMode === "inside" || isAlwaysInsideBinding(hovered);
+        const isInsideBinding = globalBindMode === "inside";
         current = {
           mode: isInsideBinding ? "inside" : "orbit",
           element: hovered,
