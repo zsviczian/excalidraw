@@ -667,3 +667,5 @@ export enum UserIdleState {
  * the start and end points)
  */
 export const LINE_POLYGON_POINT_MERGE_DISTANCE = 20;
+
+export const BIND_MODE_TIMEOUT = 800; // ms

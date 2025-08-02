@@ -269,7 +269,6 @@ export {
 
 export { getCommonBoundingBox } from "@excalidraw/element/bounds"; //zsviczian
 export { getMaximumGroups } from "@excalidraw/element/groups"; //zsviczian
-export { determineFocusDistance } from "@excalidraw/element/binding"; //zsviczian
 export { measureText } from "@excalidraw/element/textMeasurements"; //zsviczian
 export { wrapText } from "@excalidraw/element/textWrapping"; //zsviczian
 export { getLineHeight } from "@excalidraw/common"; //zsviczian

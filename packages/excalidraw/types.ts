@@ -224,6 +224,7 @@ export type InteractiveCanvasAppState = Readonly<
     selectedGroupIds: AppState["selectedGroupIds"];
     selectedLinearElement: AppState["selectedLinearElement"];
     multiElement: AppState["multiElement"];
+    newElement: AppState["newElement"];
     isBindingEnabled: AppState["isBindingEnabled"];
     suggestedBindings: AppState["suggestedBindings"];
     isRotating: AppState["isRotating"];
@@ -474,6 +475,7 @@ export interface AppState {
   // as elements are unlocked, we remove the groupId from the elements
   // and also remove groupId from this map
   lockedMultiSelections: { [groupId: string]: true };
+  bindMode: "orbit" | "inside" | "skip";
 }
 
 export type SearchMatch = {
