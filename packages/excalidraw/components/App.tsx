@@ -4717,9 +4717,8 @@ class App extends React.Component<AppProps, AppState> {
               this.setState({
                 bindMode: "inside",
               });
-            } else {
-              this.bindModeHandler = null;
             }
+            this.bindModeHandler = null;
           }, BIND_MODE_TIMEOUT);
         }
       }
@@ -6163,11 +6162,21 @@ class App extends React.Component<AppProps, AppState> {
                   flushSync(() => {
                     this.setState({
                       bindMode: "inside",
+                      selectedLinearElement: this.state.selectedLinearElement
+                        ? {
+                            ...this.state.selectedLinearElement,
+                            pointerDownState: {
+                              ...this.state.selectedLinearElement
+                                .pointerDownState,
+                              arrowStartIsInside: true,
+                            },
+                          }
+                        : null,
                     });
                   });
-                } else {
-                  this.bindModeHandler = null;
                 }
+
+                this.bindModeHandler = null;
               }, BIND_MODE_TIMEOUT);
             }
           } else if (!hoveredElement) {
@@ -6893,8 +6902,9 @@ class App extends React.Component<AppProps, AppState> {
     if (this.state.bindMode === "inside" || this.state.bindMode === "skip") {
       if (this.bindModeHandler) {
         clearTimeout(this.bindModeHandler);
+        this.bindModeHandler = null;
       }
-      this.bindModeHandler = null;
+
       // We need this iteration to complete binding and change
       // back to orbit mode after that
       setTimeout(() =>
@@ -7009,8 +7019,9 @@ class App extends React.Component<AppProps, AppState> {
   private maybeCleanupAfterMissingPointerUp = (event: PointerEvent | null) => {
     if (this.bindModeHandler) {
       clearTimeout(this.bindModeHandler);
+      this.bindModeHandler = null;
     }
-    this.bindModeHandler = null;
+
     this.setState({
       bindMode: "orbit",
     });
@@ -8095,19 +8106,6 @@ class App extends React.Component<AppProps, AppState> {
         this.state.zoom,
       );
 
-      if (isSimpleArrow(element)) {
-        this.setState((prevState) => {
-          const nextSelectedElementIds = makeNextSelectedElementIds(
-            { [element.id]: true },
-            prevState,
-          );
-
-          return {
-            selectedElementIds: nextSelectedElementIds,
-          };
-        });
-      }
-
       this.scene.mutateElement(element, {
         points: [pointFrom<LocalPoint>(0, 0), pointFrom<LocalPoint>(0, 0)],
       });
@@ -8132,6 +8130,29 @@ class App extends React.Component<AppProps, AppState> {
           { newArrow: true },
         );
       }
+
+      if (isSimpleArrow(element)) {
+        if (this.bindModeHandler) {
+          clearTimeout(this.bindModeHandler);
+          this.bindModeHandler = null;
+        }
+
+        this.bindModeHandler = setTimeout(() => {
+          this.setState({
+            bindMode: "inside",
+            selectedLinearElement: this.state.selectedLinearElement
+              ? {
+                  ...this.state.selectedLinearElement,
+                  pointerDownState: {
+                    ...this.state.selectedLinearElement?.pointerDownState,
+                    arrowStartIsInside: !!boundElement,
+                  },
+                }
+              : null,
+          });
+        }, BIND_MODE_TIMEOUT);
+      }
+
       this.setState((prevState) => {
         let linearElementEditor = null;
         let nextSelectedElementIds = prevState.selectedElementIds;
@@ -8155,11 +8176,6 @@ class App extends React.Component<AppProps, AppState> {
             prevState,
           );
         }
-
-        if (this.bindModeHandler) {
-          clearTimeout(this.bindModeHandler);
-        }
-        this.bindModeHandler = null;
 
         return {
           ...prevState,
@@ -8547,6 +8563,16 @@ class App extends React.Component<AppProps, AppState> {
                   flushSync(() => {
                     this.setState({
                       bindMode: "inside",
+                      selectedLinearElement: this.state.selectedLinearElement
+                        ? {
+                            ...this.state.selectedLinearElement,
+                            pointerDownState: {
+                              ...this.state.selectedLinearElement
+                                .pointerDownState,
+                              arrowStartIsInside: true,
+                            },
+                          }
+                        : null,
                     });
                   });
 
@@ -8587,9 +8613,9 @@ class App extends React.Component<AppProps, AppState> {
 
                     this.setState(newState);
                   }
-                } else {
-                  this.bindModeHandler = null;
                 }
+
+                this.bindModeHandler = null;
               }, BIND_MODE_TIMEOUT);
             }
           } else if (!hoveredElement) {
