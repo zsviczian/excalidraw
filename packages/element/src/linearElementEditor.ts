@@ -143,6 +143,7 @@ export class LinearElementEditor {
       added: boolean;
     };
     arrowOriginalStartPoint?: GlobalPoint;
+    arrowStartIsInside: boolean;
   }>;
 
   /** whether you're dragging a point */
@@ -186,6 +187,7 @@ export class LinearElementEditor {
         index: null,
         added: false,
       },
+      arrowStartIsInside: false,
     };
     this.hoverPointIndex = -1;
     this.segmentMidPointHoveredCoords = null;
@@ -582,6 +584,7 @@ export class LinearElementEditor {
       pointerDownState: {
         ...editingLinearElement.pointerDownState,
         arrowOriginalStartPoint: undefined,
+        arrowStartIsInside: false,
       },
     };
   }
@@ -889,6 +892,9 @@ export class LinearElementEditor {
             index: segmentMidpointIndex,
             added: false,
           },
+          arrowStartIsInside:
+            !!app.state.newElement &&
+            (app.state.bindMode === "inside" || app.state.bindMode === "skip"),
         },
         selectedPointsIndices: [element.points.length - 1],
         lastUncommittedPoint: null,
@@ -948,6 +954,9 @@ export class LinearElementEditor {
           index: segmentMidpointIndex,
           added: false,
         },
+        arrowStartIsInside:
+          !!app.state.newElement &&
+          (app.state.bindMode === "inside" || app.state.bindMode === "skip"),
       },
       selectedPointsIndices: nextSelectedPointsIndices,
       pointerOffset: targetPoint

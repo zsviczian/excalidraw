@@ -409,7 +409,8 @@ const bindingStrategyForNewSimpleArrowEndpointDragging = (
         otherElement.x + otherElement.width / 2,
         otherElement.y + otherElement.height / 2,
       );
-      const otherIsInsideBinding = arrow.startBinding?.mode === "inside";
+      const otherIsInsideBinding =
+        !!appState.selectedLinearElement?.pointerDownState.arrowStartIsInside;
 
       // We need to "jump" the start point out with the detached
       // focus point of the center of the bound element
