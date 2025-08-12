@@ -2,7 +2,6 @@ import {
   KEYS,
   arrayToMap,
   invariant,
-  isAlwaysInsideBinding,
   tupleToCoors,
 } from "@excalidraw/common";
 
@@ -55,6 +54,7 @@ import {
   isBindableElement,
   isBoundToContainer,
   isElbowArrow,
+  isImageElement,
   isRectanguloidElement,
   isTextElement,
 } from "./typeChecks";
@@ -115,6 +115,9 @@ export type BindingStrategy =
 
 export const FIXED_BINDING_DISTANCE = 5;
 export const BINDING_HIGHLIGHT_THICKNESS = 10;
+
+const isAlwaysInsideBinding = (element: ExcalidrawBindableElement) =>
+  isImageElement(element);
 
 export const shouldEnableBindingForPointerEvent = (
   event: React.PointerEvent<HTMLElement>,

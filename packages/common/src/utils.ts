@@ -567,9 +567,6 @@ export const isTransparent = (color: string) => {
   );
 };
 
-export const isAlwaysInsideBinding = (element: ExcalidrawBindableElement) =>
-  isImageElement(element);
-
 export type ResolvablePromise<T> = Promise<T> & {
   resolve: [T] extends [undefined]
     ? (value?: MaybePromise<Awaited<T>>) => void
