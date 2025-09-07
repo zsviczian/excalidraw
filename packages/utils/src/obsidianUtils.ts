@@ -1,15 +1,15 @@
 import { type GlobalPoint } from "@excalidraw/math/types";
-import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
-import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
+import type { MermaidToExcalidrawLibProps } from "../../excalidraw/components/TTDDialog/common";
+import { loadMermaidLib } from "../../excalidraw/components/TTDDialog/MermaidToExcalidrawLib";
 import { FONT_FAMILY, getVerticalOffset, ZOOM_STEP, MAX_ZOOM, MIN_ZOOM, viewportCoordsToSceneCoords } from "@excalidraw/common";
 import type { ElementsMap, ExcalidrawElement, ExcalidrawTextElement, NonDeletedExcalidrawElement } from "@excalidraw/element/types";
-import { Fonts } from "./fonts";
+import { Fonts } from "../../excalidraw/fonts";
 import type { FontMetadata } from "@excalidraw/common";
 import { FONT_METADATA } from "@excalidraw/common";
-import type { AppState } from "./types";
+import type { AppState } from "../../excalidraw/types";
 import { intersectElementWithLineSegment } from "@excalidraw/element/collision";
 import { lineSegment } from "@excalidraw/math";
-import { getElementAbsoluteCoords, getLineHeightInPx } from "@excalidraw/element";
+import { getLineHeightInPx } from "@excalidraw/element";
 
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
 export let hostPlugin: any = null;

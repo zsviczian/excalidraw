@@ -1,7 +1,7 @@
 import { DEFAULT_EXPORT_PADDING, EDITOR_LS_KEYS } from "@excalidraw/common";
 
-import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
-import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
+import type { MermaidConfig } from "@zsviczian/mermaid-to-excalidraw";
+import type { MermaidToExcalidrawResult } from "@zsviczian/mermaid-to-excalidraw/dist/interfaces";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 

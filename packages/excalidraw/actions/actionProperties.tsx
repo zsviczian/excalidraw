@@ -1,4 +1,5 @@
 import { pointFrom } from "@excalidraw/math";
+
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
@@ -21,12 +22,13 @@ import {
   getLineHeight,
   isTransparent,
   reduceToCommonValue,
+  invariant,
 } from "@excalidraw/common";
 
 import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
 
 import {
-  bindLinearElement,
+  bindBindingElement,
   calculateFixedPointForElbowArrowBinding,
   updateBoundElements,
 } from "@excalidraw/element";
@@ -140,7 +142,7 @@ import {
   isSomeElementSelected,
 } from "../scene";
 
-import { t2 } from "../obsidianUtils";
+import { t2 } from "../../utils/src/obsidianUtils";
 
 import { register } from "./register";
 
@@ -297,7 +299,9 @@ const changeFontSize = (
 
 // -----------------------------------------------------------------------------
 
-export const actionChangeStrokeColor = register({
+export const actionChangeStrokeColor = register<
+  Pick<AppState, "currentItemStrokeColor">
+>({
   name: "changeStrokeColor",
   label: "labels.stroke",
   trackEvent: false,
@@ -309,7 +313,7 @@ export const actionChangeStrokeColor = register({
       .filter((el) => el.boundElements)
       .map((el) => el.id);
     return {
-      ...(value.currentItemStrokeColor && {
+      ...(value?.currentItemStrokeColor && {
         elements: changeProperty(
           elements,
           appState,
@@ -336,7 +340,7 @@ export const actionChangeStrokeColor = register({
         ...appState,
         ...value,
       },
-      captureUpdate: !!value.currentItemStrokeColor
+      captureUpdate: !!value?.currentItemStrokeColor
         ? CaptureUpdateAction.IMMEDIATELY
         : CaptureUpdateAction.EVENTUALLY,
     };
@@ -374,12 +378,14 @@ export const actionChangeStrokeColor = register({
   ),
 });
 
-export const actionChangeBackgroundColor = register({
+export const actionChangeBackgroundColor = register<
+  Pick<AppState, "currentItemBackgroundColor" | "viewBackgroundColor">
+>({
   name: "changeBackgroundColor",
   label: "labels.changeBackground",
   trackEvent: false,
   perform: (elements, appState, value, app) => {
-    if (!value.currentItemBackgroundColor) {
+    if (!value?.currentItemBackgroundColor) {
       return {
         appState: {
           ...appState,
@@ -459,7 +465,7 @@ export const actionChangeBackgroundColor = register({
   ),
 });
 
-export const actionChangeFillStyle = register({
+export const actionChangeFillStyle = register<ExcalidrawElement["fillStyle"]>({
   name: "changeFillStyle",
   label: "labels.fill",
   trackEvent: false,
@@ -539,7 +545,9 @@ export const actionChangeFillStyle = register({
   },
 });
 
-export const actionChangeStrokeWidth = register({
+export const actionChangeStrokeWidth = register<
+  ExcalidrawElement["strokeWidth"]
+>({
   name: "changeStrokeWidth",
   label: "labels.strokeWidth",
   trackEvent: false,
@@ -601,7 +609,7 @@ export const actionChangeStrokeWidth = register({
   ),
 });
 
-export const actionChangeSloppiness = register({
+export const actionChangeSloppiness = register<ExcalidrawElement["roughness"]>({
   name: "changeSloppiness",
   label: "labels.sloppiness",
   trackEvent: false,
@@ -655,7 +663,9 @@ export const actionChangeSloppiness = register({
   ),
 });
 
-export const actionChangeStrokeStyle = register({
+export const actionChangeStrokeStyle = register<
+  ExcalidrawElement["strokeStyle"]
+>({
   name: "changeStrokeStyle",
   label: "labels.strokeStyle",
   trackEvent: false,
@@ -708,7 +718,7 @@ export const actionChangeStrokeStyle = register({
   ),
 });
 
-export const actionChangeOpacity = register({
+export const actionChangeOpacity = register<ExcalidrawElement["opacity"]>({
   name: "changeOpacity",
   label: "labels.opacity",
   trackEvent: false,
@@ -875,118 +885,129 @@ export const getFontSize = (size: number, zoom: number): number => {
   return nextValue ?? size;
 };
 
-export const actionChangeFontSize = register({
-  name: "changeFontSize",
-  label: "labels.fontSize",
-  trackEvent: false,
-  perform: (elements, appState, value, app) => {
-    return changeFontSize(elements, appState, app, () => value, value);
-  },
-  PanelComponent: ({ elements, appState, updateData, app }) => {
-    //zsviczian
-    let selectedElements = getSelectedElements(elements, appState).filter(
-      (el) => isTextElement(el),
-    ) as ExcalidrawTextElement[];
-    if (selectedElements.length === 0) {
-      selectedElements = (
-        appState.editingTextElement ? [appState.editingTextElement] : []
+export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
+  {
+    name: "changeFontSize",
+    label: "labels.fontSize",
+    trackEvent: false,
+    perform: (elements, appState, value, app) => {
+      return changeFontSize(
+        elements,
+        appState,
+        app,
+        () => {
+          invariant(value, "actionChangeFontSize: Expected a font size value");
+          return value;
+        },
+        value,
+      );
+    },
+    PanelComponent: ({ elements, appState, updateData, app }) => {
+      //zsviczian
+      let selectedElements = getSelectedElements(elements, appState).filter(
+        (el) => isTextElement(el),
       ) as ExcalidrawTextElement[];
-    }
-    const size = selectedElements[0]?.fontSize;
-    let idx: number | null = null;
-    if (size && selectedElements.every((el) => el.fontSize === size)) {
-      idx = findIndex(normalValues, size);
-      if (idx === null) {
-        idx = findIndex(fibonacciValues, size);
+      if (selectedElements.length === 0) {
+        selectedElements = (
+          appState.editingTextElement ? [appState.editingTextElement] : []
+        ) as ExcalidrawTextElement[];
       }
-    }
-    const isSmall = idx === 0;
-    const isMedium = idx === 1;
-    const isLarge = idx === 2;
-    const isVeryLarge = idx === 3;
-    return (
-    //zsviczian
-      <fieldset>
-        <legend>{t("labels.fontSize")}</legend>
-        <div className="buttonList">
-          <RadioSelection
-            type="button" //zsviczian
-            //group="font-size" //zsviczian
-            options={[
-              {
-                value: 16,
-                text: `${t("labels.small")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
-                icon: FontSizeSmallIcon,
-                testId: "fontSize-small",
-                active: isSmall ? true : undefined, //zsviczian
-              },
-              {
-                value: 20,
-                text: `${t("labels.medium")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
-                icon: FontSizeMediumIcon,
-                testId: "fontSize-medium",
-                active: isMedium ? true : undefined, //zsviczian
-              },
-              {
-                value: 28,
-                text: `${t("labels.large")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
-                icon: FontSizeLargeIcon,
-                testId: "fontSize-large",
-                active: isLarge ? true : undefined, //zsviczian
-              },
-              {
-                value: 36,
-                text: `${t(
-                  "labels.veryLarge",
-                )}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
-                icon: FontSizeExtraLargeIcon,
-                testId: "fontSize-veryLarge",
-                active: isVeryLarge ? true : undefined, //zsviczian
-              },
-            ]}
-            value={getFormValue(
-              elements,
-              app,
-              (element) => {
-                if (isTextElement(element)) {
-                  return element.fontSize;
-                }
-                const boundTextElement = getBoundTextElement(
-                  element,
-                  app.scene.getNonDeletedElementsMap(),
-                );
-                if (boundTextElement) {
-                  return boundTextElement.fontSize;
-                }
-                return null;
-              },
-              (element) =>
-                isTextElement(element) ||
-                getBoundTextElement(
-                  element,
-                  app.scene.getNonDeletedElementsMap(),
-                ) !== null,
-              (hasSelection) =>
-                hasSelection
-                  ? null
-                  : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
-            )}
-            //zsviczian onClick
-            onClick={(
-              value: number,
-              event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-            ) => {
-              scaleFontSize = event.shiftKey;
-              useFibonacci = event.altKey;
-              updateData(getFontSize(value, appState.zoom.value));
-            }}
-            //onChange={(value) => updateData(value)} //zsviczian
-          />
-        </div>
-      </fieldset>
-    );
-  },
-});
+      const size = selectedElements[0]?.fontSize;
+      let idx: number | null = null;
+      if (size && selectedElements.every((el) => el.fontSize === size)) {
+        idx = findIndex(normalValues, size);
+        if (idx === null) {
+          idx = findIndex(fibonacciValues, size);
+        }
+      }
+      const isSmall = idx === 0;
+      const isMedium = idx === 1;
+      const isLarge = idx === 2;
+      const isVeryLarge = idx === 3;
+      return (
+      //zsviczian
+        <fieldset>
+          <legend>{t("labels.fontSize")}</legend>
+          <div className="buttonList">
+            <RadioSelection
+              type="button" //zsviczian
+              //group="font-size" //zsviczian
+              options={[
+                {
+                  value: 16,
+                  text: `${t("labels.small")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
+                  icon: FontSizeSmallIcon,
+                  testId: "fontSize-small",
+                  active: isSmall ? true : undefined, //zsviczian
+                },
+                {
+                  value: 20,
+                  text: `${t("labels.medium")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
+                  icon: FontSizeMediumIcon,
+                  testId: "fontSize-medium",
+                  active: isMedium ? true : undefined, //zsviczian
+                },
+                {
+                  value: 28,
+                  text: `${t("labels.large")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
+                  icon: FontSizeLargeIcon,
+                  testId: "fontSize-large",
+                  active: isLarge ? true : undefined, //zsviczian
+                },
+                {
+                  value: 36,
+                  text: `${t(
+                    "labels.veryLarge",
+                  )}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
+                  icon: FontSizeExtraLargeIcon,
+                  testId: "fontSize-veryLarge",
+                  active: isVeryLarge ? true : undefined, //zsviczian
+                },
+              ]}
+              value={getFormValue(
+                elements,
+                app,
+                (element) => {
+                  if (isTextElement(element)) {
+                    return element.fontSize;
+                  }
+                  const boundTextElement = getBoundTextElement(
+                    element,
+                    app.scene.getNonDeletedElementsMap(),
+                  );
+                  if (boundTextElement) {
+                    return boundTextElement.fontSize;
+                  }
+                  return null;
+                },
+                (element) =>
+                  isTextElement(element) ||
+                  getBoundTextElement(
+                    element,
+                    app.scene.getNonDeletedElementsMap(),
+                  ) !== null,
+                (hasSelection) =>
+                  hasSelection
+                    ? null
+                    : appState.currentItemFontSize || DEFAULT_FONT_SIZE,
+              )}
+              //zsviczian onClick
+              onClick={(
+                value: number,
+                event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+              ) => {
+                scaleFontSize = event.shiftKey;
+                useFibonacci = event.altKey;
+                updateData(getFontSize(value, appState.zoom.value));
+              }}
+              //onChange={(value) => updateData(value)} //zsviczian
+            />
+          </div>
+        </fieldset>
+      );
+    },
+  }
+);
 
 export const actionDecreaseFontSize = register({
   name: "decreaseFontSize",
@@ -1046,7 +1067,10 @@ type ChangeFontFamilyData = Partial<
   resetContainers?: true;
 };
 
-export const actionChangeFontFamily = register({
+export const actionChangeFontFamily = register<{
+  currentItemFontFamily: any;
+  currentHoveredFontFamily: any;
+}>({
   name: "changeFontFamily",
   label: "labels.fontFamily",
   trackEvent: false,
@@ -1082,6 +1106,8 @@ export const actionChangeFontFamily = register({
         captureUpdate: CaptureUpdateAction.NEVER,
       };
     }
+
+    invariant(value, "actionChangeFontFamily: value must be defined");
 
     const { currentItemFontFamily, currentHoveredFontFamily } = value;
 
@@ -1416,7 +1442,7 @@ export const actionChangeFontFamily = register({
   },
 });
 
-export const actionChangeTextAlign = register({
+export const actionChangeTextAlign = register<TextAlign>({
   name: "changeTextAlign",
   label: "Change text alignment",
   trackEvent: false,
@@ -1508,7 +1534,7 @@ export const actionChangeTextAlign = register({
   },
 });
 
-export const actionChangeVerticalAlign = register({
+export const actionChangeVerticalAlign = register<VerticalAlign>({
   name: "changeVerticalAlign",
   label: "Change vertical alignment",
   trackEvent: { category: "element" },
@@ -1600,7 +1626,7 @@ export const actionChangeVerticalAlign = register({
   },
 });
 
-export const actionChangeRoundness = register({
+export const actionChangeRoundness = register<"sharp" | "round">({
   name: "changeRoundness",
   label: "Change edge roundness",
   trackEvent: false,
@@ -1757,15 +1783,16 @@ const getArrowheadOptions = (flip: boolean) => {
   ] as const;
 };
 
-export const actionChangeArrowhead = register({
+export const actionChangeArrowhead = register<{
+  position: "start" | "end";
+  type: Arrowhead;
+}>({
   name: "changeArrowhead",
   label: "Change arrowheads",
   trackEvent: false,
-  perform: (
-    elements,
-    appState,
-    value: { position: "start" | "end"; type: Arrowhead },
-  ) => {
+  perform: (elements, appState, value) => {
+    invariant(value, "actionChangeArrowhead: value must be defined");
+
     return {
       elements: changeProperty(elements, appState, (el) => {
         if (isLinearElement(el)) {
@@ -1841,7 +1868,7 @@ export const actionChangeArrowhead = register({
   },
 });
 
-export const actionChangeArrowType = register({
+export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
   name: "changeArrowType",
   label: "Change arrow types",
   trackEvent: false,
@@ -1942,7 +1969,13 @@ export const actionChangeArrowType = register({
             newElement.startBinding.elementId,
           ) as ExcalidrawBindableElement;
           if (startElement) {
-            bindLinearElement(newElement, startElement, "start", app.scene);
+            bindBindingElement(
+              newElement,
+              startElement,
+              appState.bindMode === "inside" ? "inside" : "orbit",
+              "start",
+              app.scene,
+            );
           }
         }
         if (newElement.endBinding) {
@@ -1950,7 +1983,13 @@ export const actionChangeArrowType = register({
             newElement.endBinding.elementId,
           ) as ExcalidrawBindableElement;
           if (endElement) {
-            bindLinearElement(newElement, endElement, "end", app.scene);
+            bindBindingElement(
+              newElement,
+              endElement,
+              appState.bindMode === "inside" ? "inside" : "orbit",
+              "end",
+              app.scene,
+            );
           }
         }
       }

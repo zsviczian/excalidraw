@@ -598,7 +598,7 @@ const LayerUI = ({
 
 const stripIrrelevantAppStateProps = (appState: AppState): UIAppState => {
   const {
-    suggestedBindings,
+    suggestedBinding,
     startBoundElement,
     cursorButton,
     scrollX,

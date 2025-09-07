@@ -2,7 +2,7 @@ import type { MermaidConfig } from "@zsviczian/mermaid-to-excalidraw";
 import { convertToExcalidrawElements } from "../../data/transform";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { MermaidToExcalidrawLibProps } from "./common";
-import { getSharedMermaidInstance } from "../../obsidianUtils";
+import { getSharedMermaidInstance } from "../../../utils/src/obsidianUtils";
 
 let mermaidToExcalidrawLib: MermaidToExcalidrawLibProps | null = null;
 let queue: Promise<any> = Promise.resolve();
