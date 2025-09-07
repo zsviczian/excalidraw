@@ -72,7 +72,7 @@ import {
 import type { AppClassProperties, AppProps, UIAppState, Zoom } from "../types";
 import type { ActionManager } from "../actions/manager";
 
-import { runAction, t2 } from "../obsidianUtils"; //zsviczian
+import { runAction, t2 } from "../../utils/src/obsidianUtils"; //zsviczian
 
 export const canChangeStrokeColor = (
   appState: UIAppState,
