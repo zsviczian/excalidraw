@@ -102,6 +102,7 @@ const getRelevantAppStateProps = (appState: AppState): StaticCanvasAppState => {
     linkOpacity: appState.linkOpacity, //zsviczian
     gridColor: appState.gridColor, //zsviczian
     gridDirection: appState.gridDirection, //zsviczian
+    gridType: appState.gridType, //zsviczian
     frameColor: appState.frameColor, //zsviczian
     suggestedBinding: appState.suggestedBinding,
   };

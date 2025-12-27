@@ -13,6 +13,7 @@ import {
   isTestEnv,
 } from "@excalidraw/common";
 
+import { GridType } from "./types";
 import type { AppState, NormalizedZoomValue } from "./types";
 
 const defaultExportScale = 1; //zsviczian - iPad scaling issue on export
@@ -126,6 +127,7 @@ export const getDefaultAppState = (): Omit<
     resetCustomPen: null, //zsviczian
     gridColor: { Bold: "#cccccc", Regular: "#e5e5e5" }, //zsviczian
     gridDirection: { horizontal: true, vertical: true }, //zsviczian
+    gridType: GridType.DEFAULT, //zsviczian - grid rendering style
     highlightSearchResult: false, //zsviczian
     dynamicStyle: {}, //zsviczian
     frameColor: {
@@ -275,6 +277,7 @@ const APP_STATE_STORAGE_CONF = (<
   resetCustomPen: { browser: false, export: false, server: false }, //zsviczian
   gridColor: { browser: false, export: false, server: false }, //zsviczian
   gridDirection: { browser: false, export: false, server: false }, //zsviczian
+  gridType: { browser: false, export: false, server: false }, //zsviczian
   highlightSearchResult: { browser: false, export: false, server: false }, //zsviczian
   dynamicStyle: { browser: false, export: false, server: false }, //zsviczian
   frameColor: { browser: false, export: false, server: false }, //zsviczian
