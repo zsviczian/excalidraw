@@ -3030,6 +3030,13 @@
   dependencies:
     socket.io-client "*"
 
+"@types/sockjs@^0.3.36":
+  version "0.3.36"
+  resolved "https://registry.yarnpkg.com/@types/sockjs/-/sockjs-0.3.36.tgz#ce322cf07bcc119d4cbf7f88954f3a3bd0f67535"
+  integrity sha512-MK9V6NzAS1+Ud7JV9lJLFqW85VbC9dq3LmwZCuBe4wBDgKC0Kj/jd8Xl+nSviU+Qc3+m7umHHyHg//2KSa0a0Q==
+  dependencies:
+    "@types/node" "*"
+
 "@types/tinycolor2@1.4.6":
   version "1.4.6"
   resolved "https://registry.yarnpkg.com/@types/tinycolor2/-/tinycolor2-1.4.6.tgz#670cbc0caf4e58dd61d1e3a6f26386e473087f06"
