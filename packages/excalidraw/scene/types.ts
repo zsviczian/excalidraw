@@ -37,6 +37,7 @@ export type StaticCanvasRenderConfig = {
   elementsPendingErasure: ElementsPendingErasure;
   pendingFlowchartNodes: PendingExcalidrawElements | null;
   isHighlighterPenDrawing?: boolean; //zsiviczian
+  theme: AppState["theme"];
 };
 
 export type SVGRenderConfig = {
@@ -56,6 +57,7 @@ export type SVGRenderConfig = {
    * @default true
    */
   reuseImages: boolean;
+  theme: AppState["theme"];
 };
 
 export type InteractiveCanvasRenderConfig = {
@@ -150,7 +152,14 @@ export type ScrollBars = {
   } | null;
 };
 
-export type ElementShape = Drawable | Drawable[] | null;
+export type SVGPathString = string & { __brand: "SVGPathString" };
+
+export type ElementShape =
+  | Drawable
+  | Drawable[]
+  | Path2D
+  | (Drawable | SVGPathString)[]
+  | null;
 
 export type ElementShapes = {
   rectangle: Drawable;
@@ -158,7 +167,7 @@ export type ElementShapes = {
   diamond: Drawable;
   iframe: Drawable;
   embeddable: Drawable;
-  freedraw: Drawable | null;
+  freedraw: (Drawable | SVGPathString)[];
   arrow: Drawable[];
   line: Drawable[];
   text: null;

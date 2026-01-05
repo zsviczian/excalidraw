@@ -47,7 +47,6 @@ import {
   TAP_TWICE_TIMEOUT,
   TEXT_TO_CENTER_SNAP_THRESHOLD,
   THEME,
-  THEME_FILTER,
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
   YOUTUBE_STATES,
@@ -88,6 +87,7 @@ import {
   getDateTime,
   isShallowEqual,
   arrayToMap,
+  applyDarkModeFilter,
   type EXPORT_IMAGE_TYPES,
   randomInteger,
   CLASSES,
@@ -251,6 +251,8 @@ import {
   doBoundsIntersect,
   isPointInElement,
   maxBindingDistance_simple,
+  convertToExcalidrawElements,
+  type ExcalidrawElementSkeleton,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -348,7 +350,7 @@ import {
 
 import { exportCanvas, loadFromBlob } from "../data";
 import Library, { distributeLibraryItemsOnSquareGrid } from "../data/library";
-import { restore, restoreElements } from "../data/restore";
+import { restoreAppState, restoreElements } from "../data/restore";
 import { getCenter, getDistance } from "../gesture";
 import { History } from "../history";
 import { defaultLang, getLanguage, languages, setLanguage, t } from "../i18n";
@@ -399,7 +401,6 @@ import {
   SnapCache,
   isGridModeEnabled,
 } from "../snapping";
-import { convertToExcalidrawElements } from "../data/transform";
 import { Renderer } from "../scene/Renderer";
 import {
   setEraserCursor,
@@ -462,7 +463,7 @@ import type { ClipboardData, PastedMixedContent } from "../clipboard";
 import type { ExportedElements } from "../data";
 import type { ContextMenuItems } from "./ContextMenu";
 import type { FileSystemHandle } from "../data/filesystem";
-import type { ExcalidrawElementSkeleton } from "../data/transform";
+
 import type {
   AppClassProperties,
   AppProps,
@@ -1837,8 +1838,9 @@ class App extends React.Component<AppProps, AppState> {
               }
             }}
             style={{
-              background: this.state.viewBackgroundColor,
-              filter: isDarkTheme ? THEME_FILTER : "none",
+              background: isDarkTheme
+                ? applyDarkModeFilter(this.state.viewBackgroundColor)
+                : this.state.viewBackgroundColor,
               zIndex: 2,
               border: "none",
               display: "block",
@@ -1848,7 +1850,9 @@ class App extends React.Component<AppProps, AppState> {
               fontFamily: "Assistant",
               fontSize: `${FRAME_STYLE.nameFontSize}px`,
               transform: `translate(-${FRAME_NAME_EDIT_PADDING}px, ${FRAME_NAME_EDIT_PADDING}px)`,
-              color: "var(--color-gray-80)",
+              color: isDarkTheme
+                ? FRAME_STYLE.nameColorDarkTheme
+                : FRAME_STYLE.nameColorLightTheme,
               overflow: "hidden",
               maxWidth: `${
                 getExcalidrawContentEl().clientWidth -
@@ -2194,6 +2198,7 @@ class App extends React.Component<AppProps, AppState> {
                                 elementsPendingErasure:
                                   this.elementsPendingErasure,
                                 pendingFlowchartNodes: null,
+                                theme: this.state.theme,
                                 isHighlighterPenDrawing: isHighlighter, //zsviczian
                               }}
                             />
@@ -2220,32 +2225,33 @@ class App extends React.Component<AppProps, AppState> {
                             elementsPendingErasure: this.elementsPendingErasure,
                             pendingFlowchartNodes:
                               this.flowChartCreator.pendingNodes,
+                            theme: this.state.theme,
                             isHighlighterPenDrawing: isHighlighter, //zsviczian
                           }}
                         />
-                        {this.state.newElement &&
-                          !isHighlighter && ( //zsviczian
-                            <NewElementCanvas
-                              appState={this.state}
-                              scale={window.devicePixelRatio}
-                              rc={this.rc}
-                              elementsMap={elementsMap}
-                              allElementsMap={allElementsMap}
-                              renderConfig={{
-                                imageCache: this.imageCache,
-                                isExporting: false,
-                                renderGrid: false,
-                                canvasBackgroundColor:
-                                  this.state.viewBackgroundColor,
-                                embedsValidationStatus:
-                                  this.embedsValidationStatus,
-                                elementsPendingErasure:
-                                  this.elementsPendingErasure,
-                                pendingFlowchartNodes: null,
-                                isHighlighterPenDrawing: isHighlighter, //zsviczian
-                              }}
-                            />
-                          )}
+                        {this.state.newElement && (
+                          <NewElementCanvas
+                            appState={this.state}
+                            scale={window.devicePixelRatio}
+                            rc={this.rc}
+                            elementsMap={elementsMap}
+                            allElementsMap={allElementsMap}
+                            renderConfig={{
+                              imageCache: this.imageCache,
+                              isExporting: false,
+                              renderGrid: false,
+                              canvasBackgroundColor:
+                                this.state.viewBackgroundColor,
+                              embedsValidationStatus:
+                                this.embedsValidationStatus,
+                              elementsPendingErasure:
+                                this.elementsPendingErasure,
+                              pendingFlowchartNodes: null,
+                              theme: this.state.theme,
+                              isHighlighterPenDrawing: isHighlighter, //zsviczian
+                            }}
+                          />
+                        )}
                         <InteractiveCanvas
                           app={this}
                           containerRef={this.excalidrawContainerRef}
@@ -2811,46 +2817,47 @@ class App extends React.Component<AppProps, AppState> {
         },
       };
     }
-    const scene = restore(initialData, null, null, {
+    const restoredElements = restoreElements(initialData?.elements, null, {
       repairBindings: true,
       deleteInvisibleElements: true,
     });
-    const activeTool = scene.appState.activeTool;
+    let restoredAppState = restoreAppState(initialData?.appState, null);
+    const activeTool = restoredAppState.activeTool;
 
-    if (!scene.appState.preferredSelectionTool.initialized) {
-      scene.appState.preferredSelectionTool = {
+    if (!restoredAppState.preferredSelectionTool.initialized) {
+      restoredAppState.preferredSelectionTool = {
         type:
           this.editorInterface.formFactor === "phone" ? "lasso" : "selection",
         initialized: true,
       };
     }
 
-    scene.appState = {
-      ...scene.appState,
-      theme: this.props.theme || scene.appState.theme,
+    restoredAppState = {
+      ...restoredAppState,
+      theme: this.props.theme || restoredAppState.theme,
       // we're falling back to current (pre-init) state when deciding
       // whether to open the library, to handle a case where we
       // update the state outside of initialData (e.g. when loading the app
       // with a library install link, which should auto-open the library)
-      openSidebar: scene.appState?.openSidebar || this.state.openSidebar,
+      openSidebar: restoredAppState?.openSidebar || this.state.openSidebar,
       activeTool:
         activeTool.type === "image" ||
         activeTool.type === "lasso" ||
         activeTool.type === "selection"
           ? {
               ...activeTool,
-              type: scene.appState.preferredSelectionTool.type,
+              type: restoredAppState.preferredSelectionTool.type,
             }
-          : scene.appState.activeTool,
+          : restoredAppState.activeTool,
       isLoading: false,
       toast: this.state.toast,
     };
 
     if (initialData?.scrollToContent) {
-      scene.appState = {
-        ...scene.appState,
-        ...calculateScrollCenter(scene.elements, {
-          ...scene.appState,
+      restoredAppState = {
+        ...restoredAppState,
+        ...calculateScrollCenter(restoredElements, {
+          ...restoredAppState,
           width: this.state.width,
           height: this.state.height,
           offsetTop: this.state.offsetTop,
@@ -2862,7 +2869,9 @@ class App extends React.Component<AppProps, AppState> {
     this.resetStore();
     this.resetHistory();
     this.syncActionResult({
-      ...scene,
+      elements: restoredElements,
+      appState: restoredAppState,
+      files: initialData?.files,
       captureUpdate: CaptureUpdateAction.NEVER,
     });
 
@@ -3387,6 +3396,7 @@ class App extends React.Component<AppProps, AppState> {
     ) {
       setEraserCursor(this.interactiveCanvas, this.state.theme);
     }
+
     // Hide hyperlink popup if shown when element type is not selection
     if (
       prevState.activeTool.type === "selection" &&

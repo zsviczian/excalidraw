@@ -1,4 +1,9 @@
-import { FRAME_STYLE, throttleRAF } from "@excalidraw/common";
+import {
+  applyDarkModeFilter,
+  FRAME_STYLE,
+  THEME,
+  throttleRAF,
+} from "@excalidraw/common";
 import { isElementLink } from "@excalidraw/element";
 import { createPlaceholderEmbeddableLabel } from "@excalidraw/element";
 import { getBoundTextElement } from "@excalidraw/element";
@@ -37,9 +42,15 @@ import type {
 } from "../scene/types";
 import type { StaticCanvasAppState, Zoom } from "../types";
 
-/*const gridLineColor = {
-  Bold: "#dddddd",
-  Regular: "#e5e5e5",
+/*const GridLineColor = {
+  [THEME.LIGHT]: {
+    bold: "#dddddd",
+    regular: "#e5e5e5",
+  },
+  [THEME.DARK]: {
+    bold: applyDarkModeFilter("#dddddd"),
+    regular: applyDarkModeFilter("#e5e5e5"),
+  },
 } as const;*/ //zsviczian
 
 const strokeGrid = (
@@ -51,11 +62,20 @@ const strokeGrid = (
   scrollX: number,
   scrollY: number,
   zoom: Zoom,
+  theme: StaticCanvasRenderConfig["theme"],
   width: number,
   height: number,
   gridLineColor: { Bold: string; Regular: string }, //zsviczian
   gridDirection: { horizontal: boolean; vertical: boolean } = { horizontal: true, vertical: true }, //zsviczian
 ) => {
+  const bold = //zsviczian
+    theme === THEME.DARK
+      ? applyDarkModeFilter(gridLineColor.Bold)
+      : gridLineColor.Bold;
+  const regular = //zsviczian
+    theme === THEME.DARK
+      ? applyDarkModeFilter(gridLineColor.Regular)
+      : gridLineColor.Regular;
   const offsetX = (scrollX % gridSize) - gridSize;
   const offsetY = (scrollY % gridSize) - gridSize;
 
@@ -89,7 +109,7 @@ const strokeGrid = (
 
       context.beginPath();
       context.setLineDash(isBold ? [] : lineDash);
-      context.strokeStyle = isBold ? gridLineColor.Bold : gridLineColor.Regular;
+      context.strokeStyle = isBold ? bold : regular; //zsviczian
       context.moveTo(x, offsetY - gridSize);
       context.lineTo(x, Math.ceil(offsetY + height + gridSize * 2));
       context.stroke();
@@ -110,7 +130,7 @@ const strokeGrid = (
 
       context.beginPath();
       context.setLineDash(isBold ? [] : lineDash);
-      context.strokeStyle = isBold ? gridLineColor.Bold : gridLineColor.Regular;
+      context.strokeStyle = isBold ? bold : regular; //zsviczian
       context.moveTo(offsetX - gridSize, y);
       context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
       context.stroke();
@@ -270,6 +290,7 @@ const _renderStaticScene = ({
       appState.scrollX,
       appState.scrollY,
       appState.zoom,
+      renderConfig.theme,
       normalizedWidth / appState.zoom.value,
       normalizedHeight / appState.zoom.value,
       appState.gridColor, //zsviczian
