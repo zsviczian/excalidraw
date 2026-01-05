@@ -22,6 +22,7 @@ import {
   isTransparent,
   reduceToCommonValue,
   invariant,
+  FONT_SIZES,
 } from "@excalidraw/common";
 
 import { canBecomePolygon, getNonDeletedElements } from "@excalidraw/element";
@@ -958,28 +959,28 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
               //group="font-size" //zsviczian
               options={[
                 {
-                  value: 16,
+                  value: FONT_SIZES.sm,
                   text: `${t("labels.small")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
                   icon: FontSizeSmallIcon,
                   testId: "fontSize-small",
                   active: isSmall ? true : undefined, //zsviczian
                 },
                 {
-                  value: 20,
+                  value: FONT_SIZES.md,
                   text: `${t("labels.medium")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
                   icon: FontSizeMediumIcon,
                   testId: "fontSize-medium",
                   active: isMedium ? true : undefined, //zsviczian
                 },
                 {
-                  value: 28,
+                  value: FONT_SIZES.lg,
                   text: `${t("labels.large")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
                   icon: FontSizeLargeIcon,
                   testId: "fontSize-large",
                   active: isLarge ? true : undefined, //zsviczian
                 },
                 {
-                  value: 36,
+                  value: FONT_SIZES.xl,
                   text: `${t(
                     "labels.veryLarge",
                   )}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian

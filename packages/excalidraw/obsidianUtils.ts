@@ -453,4 +453,4 @@ export const attachInlineLinkSuggester = (
 
 export const syncElementLinkWithText = (): boolean => {
   return getHostPlugin().settings.syncElementLinkWithText ?? true;
-}
+};

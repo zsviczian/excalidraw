@@ -1,5 +1,4 @@
 import rough from "roughjs/bin/rough";
-import { getStroke } from "perfect-freehand";
 
 import {
   type GlobalPoint,
@@ -24,6 +23,7 @@ import {
   invariant,
   getAreaLimit,
   getWidthHeightLimit,
+  applyDarkModeFilter,
 } from "@excalidraw/common";
 
 import type {
@@ -80,17 +80,9 @@ import type {
   ElementsMap,
 } from "./types";
 
-import type { StrokeOptions } from "perfect-freehand";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import { isIframeLikeElement } from "@excalidraw/element/typeChecks";
-import easingsFunctions from "./easingFunctions";
-
-// using a stronger invert (100% vs our regular 93%) and saturate
-// as a temp hack to make images in dark theme look closer to original
-// color scheme (it's still not quite there and the colors look slightly
-// desatured, alas...)
-export const IMAGE_INVERT_FILTER =
-  "invert(100%) hue-rotate(180deg) saturate(1.25)";
+import { getFreeDrawSvgPath } from "./freedrawPath";
 
 const isPendingImageElement = (
   element: ExcalidrawElement,
@@ -98,19 +90,6 @@ const isPendingImageElement = (
 ) =>
   isInitializedImageElement(element) &&
   !renderConfig.imageCache.has(element.fileId);
-
-const shouldResetImageFilter = (
-  element: ExcalidrawElement,
-  renderConfig: StaticCanvasRenderConfig,
-  appState: StaticCanvasAppState | InteractiveCanvasAppState,
-) => {
-  return (
-    appState.theme === THEME.DARK &&
-    isInitializedImageElement(element) &&
-    !isPendingImageElement(element, renderConfig) &&
-    renderConfig.imageCache.get(element.fileId)?.mimeType !== MIME_TYPES.svg
-  );
-};
 
 const getCanvasPadding = (element: ExcalidrawElement) => {
   switch (element.type) {
@@ -276,11 +255,6 @@ const generateElementCanvas = (
 
   const rc = rough.canvas(canvas);
 
-  // in dark theme, revert the image color filter
-  if (shouldResetImageFilter(element, renderConfig, appState)) {
-    context.filter = IMAGE_INVERT_FILTER;
-  }
-
   drawElementOnCanvas(element, rc, context, renderConfig);
 
   context.restore();
@@ -425,7 +399,8 @@ const drawElementOnCanvas = (
     case "ellipse": {
       context.lineJoin = "round";
       context.lineCap = "round";
-      rc.draw(ShapeCache.get(element)!);
+
+      rc.draw(ShapeCache.generateElementShape(element, renderConfig));
       break;
     }
     case "arrow":
@@ -433,35 +408,59 @@ const drawElementOnCanvas = (
       context.lineJoin = "round";
       context.lineCap = "round";
 
-      ShapeCache.get(element)!.forEach((shape) => {
-        rc.draw(shape);
-      });
+      ShapeCache.generateElementShape(element, renderConfig).forEach(
+        (shape) => {
+          rc.draw(shape);
+        },
+      );
       break;
     }
     case "freedraw": {
       // Draw directly to canvas
       context.save();
-      context.fillStyle = element.strokeColor;
 
-      const path = getFreeDrawPath2D(element) as Path2D;
-      const fillShape = ShapeCache.get(element);
+      const shapes = ShapeCache.generateElementShape(element, renderConfig);
 
-      if (fillShape) {
-        rc.draw(fillShape);
+      for (const shape of shapes) {
+        if (typeof shape === "string") {
+          const { path, fillStyle } = (() => { //zsviczian
+            const path = new Path2D(getFreeDrawSvgPath(element));
+            const hasOutline = element.customData?.strokeOptions?.hasOutline;
+            const outlineWidth =
+              element.customData?.strokeOptions?.outlineWidth ?? 1;
+            const fillColor = hasOutline
+              ? element.backgroundColor
+              : element.strokeColor;
+            const fillStyle =
+              renderConfig.theme === THEME.DARK
+                ? applyDarkModeFilter(fillColor)
+                : fillColor;
+
+            if (hasOutline) {
+              context.lineWidth = element.strokeWidth * outlineWidth;
+              context.strokeStyle =
+                renderConfig.theme === THEME.DARK
+                  ? applyDarkModeFilter(element.strokeColor)
+                  : element.strokeColor;
+              context.stroke(path);
+            }
+
+            return { path, fillStyle };
+          })();
+
+          context.fillStyle = fillStyle; //zsviczian
+          context.fill(path); //zsviczian
+          /*
+          context.fillStyle =
+            renderConfig.theme === THEME.DARK
+              ? applyDarkModeFilter(element.strokeColor)
+              : element.strokeColor;
+          context.fill(new Path2D(shape));
+          */ //zsviczian
+        } else {
+          rc.draw(shape);
+        }
       }
-
-      //zsviczian
-      if (element.customData?.strokeOptions?.hasOutline) {
-        context.lineWidth =
-          element.strokeWidth *
-          (element.customData.strokeOptions.outlineWidth ?? 1);
-        context.strokeStyle = element.strokeColor;
-        context.stroke(path);
-        context.fillStyle = element.backgroundColor;
-      } else {
-        context.fillStyle = element.strokeColor;
-      }
-      context.fill(path);
 
       context.restore();
       break;
@@ -520,7 +519,10 @@ const drawElementOnCanvas = (
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
         context.font = getFontString(element);
-        context.fillStyle = element.strokeColor;
+        context.fillStyle =
+          renderConfig.theme === THEME.DARK
+            ? applyDarkModeFilter(element.strokeColor)
+            : element.strokeColor;
         context.textAlign = element.textAlign as CanvasTextAlign;
 
         // Canvas does not support multiline text by default
@@ -781,14 +783,22 @@ export const renderElement = (
 
         context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
         context.strokeStyle =
-          element.customData?.frameColor?.stroke ??
-          appState?.frameColor?.stroke ??
-          FRAME_STYLE.strokeColor; //zsviczian
+          appState.theme === THEME.DARK
+            ? applyDarkModeFilter(
+                element.customData?.frameColor?.stroke ??
+                  appState?.frameColor?.stroke ??
+                  FRAME_STYLE.strokeColor, //zsviczian
+              )
+            : element.customData?.frameColor?.stroke ??
+              appState?.frameColor?.stroke ??
+              FRAME_STYLE.strokeColor; //zsviczian
 
         // TODO change later to only affect AI frames
         if (isMagicFrameElement(element)) {
           context.strokeStyle =
-            appState.theme === THEME.LIGHT ? "#7affd7" : "#1d8264";
+            appState.theme === THEME.LIGHT
+              ? "#7affd7"
+              : applyDarkModeFilter("#1d8264");
         }
 
         //zsviczian
@@ -818,11 +828,6 @@ export const renderElement = (
       break;
     }
     case "freedraw": {
-      // TODO investigate if we can do this in situ. Right now we need to call
-      // beforehand because math helpers (such as getElementAbsoluteCoords)
-      // rely on existing shapes
-      ShapeCache.generateElementShape(element, null);
-
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;
@@ -866,10 +871,6 @@ export const renderElement = (
     case "text":
     case "iframe":
     case "embeddable": {
-      // TODO investigate if we can do this in situ. Right now we need to call
-      // beforehand because math helpers (such as getElementAbsoluteCoords)
-      // rely on existing shapes
-      ShapeCache.generateElementShape(element, renderConfig);
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
         const cx = (x1 + x2) / 2 + appState.scrollX;
@@ -892,9 +893,6 @@ export const renderElement = (
         context.save();
         context.translate(cx, cy);
 
-        if (shouldResetImageFilter(element, renderConfig, appState)) {
-          context.filter = "none";
-        }
         const boundTextElement = getBoundTextElement(element, elementsMap);
 
         if (isArrowElement(element) && boundTextElement) {
@@ -1057,23 +1055,6 @@ export const renderElement = (
   context.globalAlpha = 1;
 };
 
-export const pathsCache = new WeakMap<ExcalidrawFreeDrawElement, Path2D>([]);
-
-export function generateFreeDrawShape(element: ExcalidrawFreeDrawElement) {
-  const svgPathData = getFreeDrawSvgPath(element);
-  const path = new Path2D(svgPathData);
-  pathsCache.set(element, path);
-  return path;
-}
-
-export function getFreeDrawPath2D(element: ExcalidrawFreeDrawElement) {
-  return pathsCache.get(element);
-}
-
-export function getFreeDrawSvgPath(element: ExcalidrawFreeDrawElement) {
-  return getSvgPathFromStroke(getFreedrawOutlinePoints(element));
-}
-
 export function getFreedrawOutlineAsSegments(
   element: ExcalidrawFreeDrawElement,
   points: [number, number][],
@@ -1128,86 +1109,4 @@ export function getFreedrawOutlineAsSegments(
       ),
     ],
   );
-}
-
-export function getFreedrawOutlinePoints(element: ExcalidrawFreeDrawElement) {
-  // If input points are empty (should they ever be?) return a dot
-  const inputPoints = element.simulatePressure
-    ? element.points
-    : element.points.length
-    ? element.points.map(([x, y], i) => [x, y, element.pressures[i]])
-    : [[0, 0, 0.5]];
-
-  // Consider changing the options for simulated pressure vs real pressure
-  const customOptions = element.customData?.strokeOptions?.options; //zsviczian
-  const options: StrokeOptions = customOptions //zsviczian
-    ? {
-        ...customOptions,
-        simulatePressure:
-          customOptions.simulatePressure ?? element.simulatePressure,
-        size: element.strokeWidth * 4.25, //override size with stroke width
-        last: true,
-        easing: easingsFunctions[customOptions.easing] ?? ((t) => t),
-        ...(customOptions.start?.easing
-          ? {
-              start: {
-                ...customOptions.start,
-                easing:
-                  easingsFunctions[customOptions.start.easing] ?? ((t) => t),
-              },
-            }
-          : { start: customOptions.start }),
-        ...(customOptions.end?.easing
-          ? {
-              end: {
-                ...customOptions.end,
-                easing:
-                  easingsFunctions[customOptions.end.easing] ?? ((t) => t),
-              },
-            }
-          : { end: customOptions.end }),
-      }
-    : {
-        simulatePressure: element.simulatePressure,
-        size: element.strokeWidth * 4.25,
-        thinning: 0.6,
-        smoothing: 0.5,
-        streamline: 0.5,
-        easing: easingsFunctions.easeOutSine, //zsviczian
-        last: true,
-      };
-
-  return getStroke(inputPoints as number[][], options) as [number, number][];
-}
-
-function med(A: number[], B: number[]) {
-  return [(A[0] + B[0]) / 2, (A[1] + B[1]) / 2];
-}
-
-// Trim SVG path data so number are each two decimal points. This
-// improves SVG exports, and prevents rendering errors on points
-// with long decimals.
-const TO_FIXED_PRECISION = /(\s?[A-Z]?,?-?[0-9]*\.[0-9]{0,2})(([0-9]|e|-)*)/g;
-
-function getSvgPathFromStroke(points: number[][]): string {
-  if (!points.length) {
-    return "";
-  }
-
-  const max = points.length - 1;
-
-  return points
-    .reduce(
-      (acc, point, i, arr) => {
-        if (i === max) {
-          acc.push(point, med(point, arr[0]), "L", arr[0], "Z");
-        } else {
-          acc.push(point, med(point, arr[i + 1]));
-        }
-        return acc;
-      },
-      ["M", points[0], "Q"],
-    )
-    .join(" ")
-    .replace(TO_FIXED_PRECISION, "$1");
 }
