@@ -255,6 +255,7 @@ const getRelevantAppStateProps = (
   viewBackgroundColor: appState.viewBackgroundColor, //zsviczian
   gridColor: appState.gridColor, //zsviczian
   gridDirection: appState.gridDirection, //zsviczian
+  gridType: appState.gridType, //zsviczian
   highlightSearchResult: appState.highlightSearchResult, //zsviczian
   isCropping: appState.isCropping,
   croppingElementId: appState.croppingElementId,
