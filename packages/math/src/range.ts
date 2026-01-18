@@ -1,6 +1,17 @@
-import { toBrandedType } from "@excalidraw/common";
-
+import type { CombineBrands, UnbrandForValue } from "@excalidraw/common/utils";
 import type { InclusiveRange } from "./types";
+
+//zsviczian circular dependency fix
+function toBrandedType<BrandedType>(
+  value: UnbrandForValue<BrandedType>,
+): BrandedType;
+function toBrandedType<BrandedType, CurrentType>(
+  value: CurrentType,
+): CombineBrands<BrandedType, CurrentType>;
+function toBrandedType(value: unknown) {
+  return value;
+}
+//zsviczian circular dependency fix - end
 
 /**
  * Create an inclusive range from the two numbers provided.

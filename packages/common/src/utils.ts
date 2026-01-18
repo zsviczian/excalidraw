@@ -1168,7 +1168,7 @@ type RemoveAllBrands<T> = HasBrand<T> extends true
 
 // For accepting values - uses loose matching for branded types
 // Preserves readonly modifier: mutable array requires mutable input
-type UnbrandForValue<T> = T extends Map<infer E, infer F>
+export type UnbrandForValue<T> = T extends Map<infer E, infer F> //zsviczian
   ? Map<UnbrandForValue<E>, UnbrandForValue<F>>
   : T extends Set<infer E>
   ? Set<UnbrandForValue<E>>
