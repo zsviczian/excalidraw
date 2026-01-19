@@ -2229,7 +2229,7 @@ class App extends React.Component<AppProps, AppState> {
                             isHighlighterPenDrawing: isHighlighter, //zsviczian
                           }}
                         />
-                        {this.state.newElement && (
+                        {this.state.newElement && !isHighlighter && ( //zsviczian
                           <NewElementCanvas
                             appState={this.state}
                             scale={window.devicePixelRatio}

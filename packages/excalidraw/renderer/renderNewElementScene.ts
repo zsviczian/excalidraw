@@ -36,6 +36,7 @@ const _renderNewElementScene = ({
       scale,
       normalizedWidth,
       normalizedHeight,
+      theme: appState.theme, //zsviczian
       viewBackgroundColor: isHighlighterPenDrawing
         ? appState.viewBackgroundColor
         : "transparent", //zsviczian
