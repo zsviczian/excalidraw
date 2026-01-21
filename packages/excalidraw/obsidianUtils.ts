@@ -41,13 +41,24 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
+import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
+
+import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
+
 import { Fonts } from "./fonts";
 import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
 
 import type { AppClassProperties, AppState } from "./types";
 
-import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/common";
-
+interface MermaidToExcalidrawLibProps {
+  loaded: boolean;
+  api: Promise<{
+    parseMermaidToExcalidraw: (
+      definition: string,
+      config?: MermaidConfig,
+    ) => Promise<MermaidToExcalidrawResult>;
+  }>;
+}
 
 export function allowDoubleTapEraser() {
   return getHostPlugin().settings.penModeDoubleTapEraser;
@@ -165,23 +176,23 @@ export function getFontFamilies(): string[] {
   return Array.from(fontFamilies);
 }
 
-export const getDefaultColorPalette = (): [
+export const getDefaultColorPalette = (): readonly (readonly [
   string,
   string,
   string,
   string,
   string,
-][] => {
+])[] => {
   const isColorTuple = (
     value: unknown,
-  ): value is [string, string, string, string, string] =>
+  ): value is readonly [string, string, string, string, string] =>
     Array.isArray(value) &&
     value.length === 5 &&
     value.every((entry) => typeof entry === "string");
 
   return Object.values(DEFAULT_ELEMENT_STROKE_COLOR_PALETTE).filter(
     isColorTuple,
-  );
+  ) as readonly (readonly [string, string, string, string, string])[];
 };
 
 export async function registerFontsInCSS() {

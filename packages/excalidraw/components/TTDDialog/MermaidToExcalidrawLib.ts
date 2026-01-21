@@ -1,4 +1,4 @@
-import type { MermaidConfig } from "@zsviczian/mermaid-to-excalidraw";
+import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import { getSharedMermaidInstance } from "../../obsidianUtils";
 import { convertToExcalidrawElements } from "@excalidraw/excalidraw";

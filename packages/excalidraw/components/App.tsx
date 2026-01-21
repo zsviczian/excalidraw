@@ -3703,7 +3703,7 @@ class App extends React.Component<AppProps, AppState> {
 
     // ------------------- Successful Mermaid -------------------
     if (!isPlainPaste && isMaybeMermaidDefinition(data.text)) {
-      const api = await import("@zsviczian/mermaid-to-excalidraw");
+      const api = await import("@excalidraw/mermaid-to-excalidraw");
       try {
         const { elements: skeletonElements, files } =
           await api.parseMermaidToExcalidraw(data.text);
