@@ -52,7 +52,7 @@ import type {
 
 import type { Action } from "./actions/types";
 import type { Spreadsheet } from "./charts";
-import type { ClipboardData } from "./clipboard";
+import type { ClipboardData, ParsedDataTransferFile } from "./clipboard";
 import type App from "./components/App";
 import type Library from "./data/library";
 import type { FileSystemHandle } from "./data/filesystem";
@@ -598,6 +598,7 @@ export interface ExcalidrawProps {
   onPaste?: (
     data: ClipboardData,
     event: ClipboardEvent | null,
+    files: ParsedDataTransferFile[], //zsviczian
   ) => Promise<boolean> | boolean;
   onDrop?: (
     event: React.DragEvent<HTMLDivElement>,

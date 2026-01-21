@@ -3813,7 +3813,7 @@ class App extends React.Component<AppProps, AppState> {
 
       if (this.props.onPaste) {
         try {
-          if ((await this.props.onPaste(data, event)) === false) {
+          if ((await this.props.onPaste(data, event, filesList)) === false) { //zsviczian
             return;
           }
         } catch (error: any) {
