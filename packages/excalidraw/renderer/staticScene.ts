@@ -222,10 +222,10 @@ const renderLinkIcon = (
       /*linkCanvasCacheContext.fillStyle = appState.viewBackgroundColor || "#fff";
       linkCanvasCacheContext.fillRect(0, 0, width, height);*/ //zsviczian
 
+      linkCanvasCacheContext.globalAlpha = appState.linkOpacity; //zsviczian
       if (canvasKey === "elementLink") {
         linkCanvasCacheContext.drawImage(ELEMENT_LINK_IMG, 0, 0, width, height);
       } else {
-        linkCanvasCacheContext.globalAlpha = appState.linkOpacity; //zsviczian
         linkCanvasCacheContext.drawImage(
           EXTERNAL_LINK_IMG,
           0,
