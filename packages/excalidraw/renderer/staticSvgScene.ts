@@ -569,7 +569,9 @@ const renderElementToSvg = (
 
         if (
           renderConfig.theme === THEME.DARK &&
-          fileData.mimeType === MIME_TYPES.svg
+          (fileData.mimeType === MIME_TYPES.svg ||
+            !!element.customData?.pdfPageViewProps ||
+            !!element.customData?.invertInDarkmode) //zsviczian
         ) {
           g.setAttribute("filter", DARK_THEME_FILTER);
         }
