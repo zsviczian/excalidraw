@@ -57,6 +57,7 @@ import { Fonts } from "../fonts";
 
 import { renderStaticScene } from "../renderer/staticScene";
 import { renderSceneToSvg } from "../renderer/staticSvgScene";
+import { getDefaultInvertInDarkMode } from "../obsidianUtils"; // zsviczian
 
 import type { RenderableElementsMap } from "./types";
 
@@ -174,6 +175,20 @@ const prepareElementsForRender = ({
   return nextElements;
 };
 
+const applyDefaultInvertInDarkMode = (
+  files: BinaryFiles | null | undefined,
+): BinaryFiles => {
+  const target = files ?? ({} as BinaryFiles); // zsviczian
+
+  Object.values(target).forEach((file) => {
+    if (file.invertInDarkMode === undefined) {
+      file.invertInDarkMode = getDefaultInvertInDarkMode(file.mimeType); // zsviczian
+    }
+  });
+
+  return target;
+}; // zsviczian
+
 export const exportToCanvas = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: AppState,
@@ -204,6 +219,8 @@ export const exportToCanvas = async (
 ) => {
   // load font faces before continuing, by default leverages browsers' [FontFace API](https://developer.mozilla.org/en-US/docs/Web/API/FontFace)
   await loadFonts();
+
+  const normalizedFiles = applyDefaultInvertInDarkMode(files); // zsviczian
 
   const frameRendering = getFrameRenderingConfig(
     exportingFrame ?? null,
@@ -244,7 +261,7 @@ export const exportToCanvas = async (
     fileIds: getInitializedImageElements(elementsForRender).map(
       (element) => element.fileId,
     ),
-    files,
+    files: normalizedFiles,
   });
 
   renderStaticScene({
@@ -319,6 +336,8 @@ export const exportToSvg = async (
     appState.frameRendering ?? null,
   );
 
+  const normalizedFiles = applyDefaultInvertInDarkMode(files); // zsviczian
+
   let {
     exportPadding = DEFAULT_EXPORT_PADDING,
     exportWithDarkMode = false,
@@ -389,7 +408,12 @@ export const exportToSvg = async (
         // elements which don't contain the temp frame labels.
         // But it also requires that the exportToSvg is being supplied with
         // only the elements that we're exporting, and no extra.
-        payload: serializeAsJSON(filteredElements, appState, files || {}, "local"), //zsviczian
+        payload: serializeAsJSON(
+          filteredElements,
+          appState,
+          normalizedFiles,
+          "local",
+        ), // zsviczian
       });
     } catch (error: any) {
       console.error(error);
@@ -489,7 +513,7 @@ export const exportToSvg = async (
     toBrandedType<RenderableElementsMap>(arrayToMap(elementsForRender)),
     rsvg,
     svgRoot,
-    files || {},
+    normalizedFiles,
     {
       offsetX,
       offsetY,

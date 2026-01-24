@@ -492,7 +492,7 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionName, ActionResult } from "../actions/types";
-import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, isTouchInPenMode, isPanWithRightMouseEnabled, shouldDisableZoom, isContextMenuDisabled, refreshAllArrows, syncElementLinkWithText } from "../obsidianUtils";
+import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getDefaultInvertInDarkMode, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, isTouchInPenMode, isPanWithRightMouseEnabled, shouldDisableZoom, isContextMenuDisabled, refreshAllArrows, syncElementLinkWithText } from "../obsidianUtils"; // zsviczian
 import { initializeObsidianUtils } from "@excalidraw/common";
 import { getTooltipDiv } from "./Tooltip";
 import { getFontSize } from "../actions/actionProperties";
@@ -4707,6 +4707,12 @@ class App extends React.Component<AppProps, AppState> {
       if (!force && nextFiles[fileData.id]) {
         //zsviczian
         continue;
+      }
+
+      if (fileData.invertInDarkMode === undefined) {
+        fileData.invertInDarkMode = getDefaultInvertInDarkMode(
+          fileData.mimeType,
+        ); // zsviczian
       }
 
       addedFiles[fileData.id] = fileData;

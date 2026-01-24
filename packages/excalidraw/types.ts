@@ -117,6 +117,7 @@ export type BinaryFileData = {
     | typeof MIME_TYPES.binary;
   id: FileId;
   dataURL: DataURL;
+  invertInDarkMode?: boolean; // zsviczian
   /**
    * Epoch timestamp in milliseconds
    */
@@ -795,6 +796,7 @@ export type AppClassProperties = {
     {
       image: HTMLImageElement | Promise<HTMLImageElement>;
       mimeType: ValueOf<typeof IMAGE_MIME_TYPES>;
+      invertInDarkMode?: boolean; // zsviczian
     }
   >;
   files: BinaryFiles;

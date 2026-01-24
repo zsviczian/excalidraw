@@ -8,6 +8,7 @@ import {
   //  TOUCH_CTX_MENU_TIMEOUT,
   //  DRAGGING_THRESHOLD,
   deriveStylesPanelMode,
+  MIME_TYPES, // zsviczian
 } from "@excalidraw/common";
 
 import { FONT_METADATA } from "@excalidraw/common";
@@ -48,7 +49,7 @@ import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidra
 import { Fonts } from "./fonts";
 import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
 
-import type { AppClassProperties, AppState } from "./types";
+import type { AppClassProperties, AppState, BinaryFileData } from "./types"; // zsviczian
 
 interface MermaidToExcalidrawLibProps {
   loaded: boolean;
@@ -194,6 +195,10 @@ export const getDefaultColorPalette = (): readonly (readonly [
     isColorTuple,
   ) as readonly (readonly [string, string, string, string, string])[];
 };
+
+export const getDefaultInvertInDarkMode = (
+  mimeType: BinaryFileData["mimeType"],
+): boolean => mimeType === MIME_TYPES.svg; // zsviczian
 
 export async function registerFontsInCSS() {
   const styleId = "ExcalidrawFonts";
