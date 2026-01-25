@@ -156,6 +156,17 @@ export type ExcalidrawImageElement = _ExcalidrawElementBase &
     scale: [number, number];
     /** whether an element is cropped */
     crop: ImageCrop | null;
+    customData?: {
+      pdfPageViewProps?: {
+        left: number;
+        bottom: number;
+        right: number;
+        top: number;
+        rotate?: number;
+      };
+      doNotInvertSVGInDarkMode?: boolean;
+      invertBitmapInDarkmode?: boolean;
+    }; //zsviczian
   }>;
 
 export type InitializedExcalidrawImageElement = MarkNonNullable<

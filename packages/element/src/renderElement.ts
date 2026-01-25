@@ -478,9 +478,9 @@ const drawElementOnCanvas = (
 
       const shouldInvertImage =
         renderConfig.theme === THEME.DARK &&
-        (cacheEntry?.mimeType === MIME_TYPES.svg ||
-          !!element.customData?.pdfPageViewProps ||
-          !!element.customData?.invertInDarkmode); //zsviczian
+        ((cacheEntry?.mimeType === MIME_TYPES.svg && !element.customData?.doNotInvertSVGInDarkMode) ||
+          (!!element.customData?.pdfPageViewProps && (element.customData?.invertBitmapInDarkmode ?? true)) ||
+          !!element.customData?.invertBitmapInDarkmode); //zsviczian
 
       if (shouldInvertImage) {
         context.filter = DARK_THEME_FILTER;
