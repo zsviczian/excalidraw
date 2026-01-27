@@ -14,6 +14,7 @@ import {
 
 import {
   originalContainerCache,
+  updateBoundElements,
   updateOriginalContainerCache,
 } from "@excalidraw/element";
 
@@ -209,6 +210,7 @@ export const textWysiwyg = ({
           );
 
           app.scene.mutateElement(container, { height: targetContainerHeight });
+          updateBoundElements(container, app.scene);
           return;
         } else if (
           // autoshrink container height until original container height
@@ -222,6 +224,7 @@ export const textWysiwyg = ({
             container.type,
           );
           app.scene.mutateElement(container, { height: targetContainerHeight });
+          updateBoundElements(container, app.scene);
         } else {
           const { x, y } = computeBoundTextPosition(
             container,
