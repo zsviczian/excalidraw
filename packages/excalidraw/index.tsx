@@ -372,3 +372,5 @@ export { getDataURL } from "./data/blob";
 export { isElementLink } from "@excalidraw/element";
 
 export { setCustomTextMetricsProvider } from "@excalidraw/element";
+
+export { GridType } from "./types"; //zsviczian - grid type enum for dot/isometric grids

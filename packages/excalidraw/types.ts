@@ -67,6 +67,18 @@ import type { JSX } from "react";
 
 export type SocketId = string & { _brand: "SocketId" };
 
+/**
+ * Grid type enum for different grid rendering styles.
+ * DEFAULT: Traditional line-based grid
+ * DOT: Dot pattern grid (modern, minimal)
+ * ISOMETRIC_DOT: Isometric dot pattern (60° angle offset)
+ */
+export enum GridType {
+  DEFAULT = "default",
+  DOT = "dot",
+  ISOMETRIC_DOT = "isometric_dot",
+}
+
 export type Collaborator = Readonly<{
   pointer?: CollaboratorPointer;
   button?: "up" | "down";
@@ -208,6 +220,7 @@ export type StaticCanvasAppState = Readonly<
     linkOpacity: AppState["linkOpacity"]; //zsviczian
     gridColor: AppState["gridColor"]; //zsviczian
     gridDirection: AppState["gridDirection"]; //zsviczian
+    gridType: AppState["gridType"]; //zsviczian
     frameColor: AppState["frameColor"]; //zsviczian
     currentHoveredFontFamily: AppState["currentHoveredFontFamily"];
     hoveredElementIds: AppState["hoveredElementIds"];
@@ -239,6 +252,7 @@ export type InteractiveCanvasAppState = Readonly<
     viewBackgroundColor: AppState["viewBackgroundColor"]; //zsviczian
     gridColor: AppState["gridColor"]; //zsviczian
     gridDirection: AppState["gridDirection"]; //zsviczian
+    gridType: AppState["gridType"]; //zsviczian
     highlightSearchResult: AppState["highlightSearchResult"]; //zsviczian
     // Cropping
     isCropping: AppState["isCropping"];
@@ -463,6 +477,7 @@ export interface AppState {
   resetCustomPen?: any; //zsviczian
   gridColor: { Bold: string; Regular: string }; //zsviczian
   gridDirection: { horizontal: boolean; vertical: boolean }; //zsviczian
+  gridType: GridType; //zsviczian - grid rendering style (default, dot, isometric_dot)
   highlightSearchResult: boolean; //zsviczian
   dynamicStyle: { [x: string]: string }; //zsviczian
   frameColor: { stroke: string; fill: string; nameColor: string }; //zsviczian

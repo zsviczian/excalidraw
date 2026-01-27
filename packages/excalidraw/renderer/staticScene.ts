@@ -34,12 +34,13 @@ import {
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
 
-import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
+import { bootstrapCanvas, fillCircle, getNormalizedCanvasDimensions } from "./helpers";
 
 import type {
   StaticCanvasRenderConfig,
   StaticSceneRenderConfig,
 } from "../scene/types";
+import { GridType } from "../types";
 import type { StaticCanvasAppState, Zoom } from "../types";
 
 /*const GridLineColor = {
@@ -137,6 +138,178 @@ const strokeGrid = (
     }
   }
   context.restore();
+};
+
+/**
+ * Renders a dot grid pattern. Each grid intersection is marked with a small dot.
+ * Modern, minimal alternative to line grids.
+ */
+const strokeDotGrid = (
+  context: CanvasRenderingContext2D,
+  gridSize: number,
+  gridStep: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
+  width: number,
+  height: number,
+  gridLineColor: { Bold: string; Regular: string },
+) => {
+  const offsetX = (scrollX % gridSize) - gridSize;
+  const offsetY = (scrollY % gridSize) - gridSize;
+
+  const actualGridSize = gridSize * zoom.value;
+
+  context.save();
+
+  for (let x = offsetX; x < offsetX + width + gridSize * 2; x += gridSize) {
+    for (let y = offsetY; y < offsetY + height + gridSize * 2; y += gridSize) {
+      const isBoldX =
+        gridStep > 1 && Math.round(x - scrollX) % (gridStep * gridSize) === 0;
+      const isBoldY =
+        gridStep > 1 && Math.round(y - scrollY) % (gridStep * gridSize) === 0;
+      const isBold = isBoldX && isBoldY;
+
+      // Skip non-bold dots when zoomed out for performance
+      if (!isBold && actualGridSize < 10) {
+        continue;
+      }
+
+      const dotRadius = isBold
+        ? Math.max(2 / zoom.value, 1.5)
+        : Math.max(1 / zoom.value, 0.75);
+
+      context.fillStyle = isBold ? gridLineColor.Bold : gridLineColor.Regular;
+      fillCircle(context, x, y, dotRadius, false, true);
+    }
+  }
+
+  context.restore();
+};
+
+/**
+ * Renders an isometric dot grid pattern. Every other row is offset by half
+ * the grid size, creating a 60° angle pattern useful for isometric drawings.
+ */
+const strokeIsometricDotGrid = (
+  context: CanvasRenderingContext2D,
+  gridSize: number,
+  gridStep: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
+  width: number,
+  height: number,
+  gridLineColor: { Bold: string; Regular: string },
+) => {
+  const offsetX = (scrollX % gridSize) - gridSize;
+  const offsetY = (scrollY % gridSize) - gridSize;
+
+  const actualGridSize = gridSize * zoom.value;
+  // Vertical spacing for isometric grid (creates 60° angle)
+  const verticalSpacing = gridSize * Math.sin(Math.PI / 3);
+
+  context.save();
+
+  let rowIndex = 0;
+  for (
+    let y = offsetY;
+    y < offsetY + height + gridSize * 2;
+    y += verticalSpacing
+  ) {
+    const isOddRow = rowIndex % 2 === 1;
+    const rowOffsetX = isOddRow ? gridSize / 2 : 0;
+
+    for (
+      let x = offsetX + rowOffsetX;
+      x < offsetX + width + gridSize * 2;
+      x += gridSize
+    ) {
+      const isBoldX =
+        gridStep > 1 &&
+        Math.round(x - scrollX - rowOffsetX) % (gridStep * gridSize) === 0;
+      const isBoldY =
+        gridStep > 1 &&
+        Math.round((y - scrollY) / verticalSpacing) % gridStep === 0;
+      const isBold = isBoldX && isBoldY && !isOddRow;
+
+      // Skip non-bold dots when zoomed out for performance
+      if (!isBold && actualGridSize < 10) {
+        continue;
+      }
+
+      const dotRadius = isBold
+        ? Math.max(2 / zoom.value, 1.5)
+        : Math.max(1 / zoom.value, 0.75);
+
+      context.fillStyle = isBold ? gridLineColor.Bold : gridLineColor.Regular;
+      fillCircle(context, x, y, dotRadius, false, true);
+    }
+    rowIndex++;
+  }
+
+  context.restore();
+};
+
+/**
+ * Dispatches to the appropriate grid rendering function based on gridType.
+ */
+const renderGridByType = (
+  context: CanvasRenderingContext2D,
+  gridSize: number,
+  gridStep: number,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
+  width: number,
+  height: number,
+  gridLineColor: { Bold: string; Regular: string },
+  gridDirection: { horizontal: boolean; vertical: boolean },
+  gridType: GridType,
+) => {
+  switch (gridType) {
+    case GridType.DOT:
+      strokeDotGrid(
+        context,
+        gridSize,
+        gridStep,
+        scrollX,
+        scrollY,
+        zoom,
+        width,
+        height,
+        gridLineColor,
+      );
+      break;
+    case GridType.ISOMETRIC_DOT:
+      strokeIsometricDotGrid(
+        context,
+        gridSize,
+        gridStep,
+        scrollX,
+        scrollY,
+        zoom,
+        width,
+        height,
+        gridLineColor,
+      );
+      break;
+    case GridType.DEFAULT:
+    default:
+      strokeGrid(
+        context,
+        gridSize,
+        gridStep,
+        scrollX,
+        scrollY,
+        zoom,
+        width,
+        height,
+        gridLineColor,
+        gridDirection,
+      );
+      break;
+  }
 };
 
 export const frameClip = (
@@ -284,7 +457,7 @@ const _renderStaticScene = ({
 
   // Grid
   if (renderGrid) {
-    strokeGrid(
+    renderGridByType(
       context,
       appState.gridSize,
       appState.gridStep,
@@ -296,6 +469,7 @@ const _renderStaticScene = ({
       normalizedHeight / appState.zoom.value,
       appState.gridColor, //zsviczian
       appState.gridDirection, //zsviczian
+      appState.gridType ?? GridType.DEFAULT, //zsviczian - grid type dispatch
     );
   }
 
