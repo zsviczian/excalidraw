@@ -244,6 +244,7 @@ const getRelevantAppStateProps = (
   multiElement: appState.multiElement,
   newElement: appState.newElement,
   isBindingEnabled: appState.isBindingEnabled,
+  invertBindingBehaviour: appState.invertBindingBehaviour, //zsviczian
   suggestedBinding: appState.suggestedBinding,
   isRotating: appState.isRotating,
   elementsToHighlight: appState.elementsToHighlight,

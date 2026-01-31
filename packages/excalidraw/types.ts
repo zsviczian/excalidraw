@@ -229,6 +229,7 @@ export type InteractiveCanvasAppState = Readonly<
     multiElement: AppState["multiElement"];
     newElement: AppState["newElement"];
     isBindingEnabled: AppState["isBindingEnabled"];
+    invertBindingBehaviour: AppState["invertBindingBehaviour"]; //zsviczian
     suggestedBinding: AppState["suggestedBinding"];
     isRotating: AppState["isRotating"];
     elementsToHighlight: AppState["elementsToHighlight"];

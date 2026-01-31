@@ -40,6 +40,7 @@ export const isFocusPointVisible = (
   elementsMap: ElementsMap,
   appState: {
     isBindingEnabled: AppState["isBindingEnabled"];
+    invertBindingBehaviour: AppState["invertBindingBehaviour"]; //zsviczian
     zoom: AppState["zoom"];
   },
   ignoreOverlap = false,
