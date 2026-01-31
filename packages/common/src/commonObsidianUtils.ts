@@ -52,8 +52,9 @@ export const getDesktopUIMode = () => {
   if (!obsidianPlugin) {
     return "tray";
   }
-  const desktopUIMode = obsidianPlugin.settings.desktopUIMode;
-  return ["tray", "full", "compact"].includes(desktopUIMode)
+
+  const desktopUIMode = obsidianPlugin.getPreferredUIMode();
+  return ["tray", "full", "compact", "phone"].includes(desktopUIMode)
     ? desktopUIMode
     : "tray";
 };
