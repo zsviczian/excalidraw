@@ -253,6 +253,11 @@ import {
   maxBindingDistance_simple,
   convertToExcalidrawElements,
   type ExcalidrawElementSkeleton,
+  handleFocusPointDrag,
+  handleFocusPointHover,
+  handleFocusPointPointerDown,
+  handleFocusPointPointerUp,
+  maybeHandleArrowPointlikeDrag,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -5272,8 +5277,12 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // Handle Alt key for bind mode
-      if (event.key === KEYS.ALT && getFeatureFlag("COMPLEX_BINDINGS")) {
-        this.handleSkipBindMode();
+      if (event.key === KEYS.ALT) {
+        if (getFeatureFlag("COMPLEX_BINDINGS")) {
+          this.handleSkipBindMode();
+        } else {
+          maybeHandleArrowPointlikeDrag({ app: this, event });
+        }
       }
 
       if (this.actionManager.handleKeyDown(event)) {
@@ -5304,7 +5313,11 @@ class App extends React.Component<AppProps, AppState> {
           this.resetDelayedBindMode();
         }
 
-        this.setState({ isBindingEnabled: false });
+        flushSync(() => {
+          this.setState({ isBindingEnabled: false });
+        });
+
+        maybeHandleArrowPointlikeDrag({ app: this, event });
       }
 
       if (isArrowKey(event.key)) {
@@ -5582,6 +5595,11 @@ class App extends React.Component<AppProps, AppState> {
       }
       isHoldingSpace = false;
     }
+
+    if (event.key === KEYS.ALT) {
+      maybeHandleArrowPointlikeDrag({ app: this, event });
+    }
+
     if (
       (event.key === KEYS.ALT && this.state.bindMode === "skip") ||
       (!event[KEYS.CTRL_OR_CMD] && !isBindingEnabled(this.state))
@@ -5592,7 +5610,7 @@ class App extends React.Component<AppProps, AppState> {
       });
 
       // Restart the timer if we're creating/editing a linear element and hovering over an element
-      if (this.lastPointerMoveEvent) {
+      if (this.lastPointerMoveEvent && getFeatureFlag("COMPLEX_BINDINGS")) {
         const scenePointer = viewportCoordsToSceneCoords(
           {
             clientX: this.lastPointerMoveEvent.clientX,
@@ -5613,14 +5631,18 @@ class App extends React.Component<AppProps, AppState> {
             this.scene.getNonDeletedElementsMap(),
           );
 
-          if (isBindingElement(element) && getFeatureFlag("COMPLEX_BINDINGS")) {
+          if (isBindingElement(element)) {
             this.handleDelayedBindModeChange(element, hoveredElement);
           }
         }
       }
     }
     if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
-      this.setState({ isBindingEnabled: true });
+      flushSync(() => {
+        this.setState({ isBindingEnabled: true });
+      });
+
+      maybeHandleArrowPointlikeDrag({ app: this, event });
     }
     if (isArrowKey(event.key)) {
       bindOrUnbindBindingElements(
@@ -7084,7 +7106,7 @@ class App extends React.Component<AppProps, AppState> {
           pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
           this.scene.getNonDeletedElements(),
           this.scene.getNonDeletedElementsMap(),
-          (el) => maxBindingDistance_simple(this.state.zoom),
+          maxBindingDistance_simple(this.state.zoom),
         );
         if (hoveredElement) {
           this.setState({
@@ -7115,7 +7137,7 @@ class App extends React.Component<AppProps, AppState> {
             pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
             this.scene.getNonDeletedElements(),
             this.scene.getNonDeletedElementsMap(),
-            (el) => maxBindingDistance_simple(this.state.zoom),
+            maxBindingDistance_simple(this.state.zoom),
           );
         if (hoveredElement) {
           this.actionManager.executeAction(actionFinalize, "ui", {
@@ -7269,7 +7291,7 @@ class App extends React.Component<AppProps, AppState> {
         pointFrom<GlobalPoint>(scenePointerX, scenePointerY),
         this.scene.getNonDeletedElements(),
         this.scene.getNonDeletedElementsMap(),
-        (el) => maxBindingDistance_simple(this.state.zoom),
+        maxBindingDistance_simple(this.state.zoom),
       );
       if (
         hit &&
@@ -7630,6 +7652,37 @@ class App extends React.Component<AppProps, AppState> {
             segmentMidPointHoveredCoords,
           },
         });
+      }
+
+      // Check for focus point hover
+      let hoveredFocusPointBinding: "start" | "end" | null = null;
+      const arrow = element as any;
+      if (arrow.startBinding || arrow.endBinding) {
+        hoveredFocusPointBinding = handleFocusPointHover(
+          element as ExcalidrawArrowElement,
+          scenePointerX,
+          scenePointerY,
+          this.scene,
+          this.state,
+        );
+      }
+
+      if (
+        this.state.selectedLinearElement.hoveredFocusPointBinding !==
+        hoveredFocusPointBinding
+      ) {
+        this.setState({
+          selectedLinearElement: {
+            ...this.state.selectedLinearElement,
+            isDragging: false,
+            hoveredFocusPointBinding,
+          },
+        });
+      }
+
+      // Set cursor to pointer when hovering over a focus point
+      if (hoveredFocusPointBinding) {
+        setCursor(this.interactiveCanvas, CURSOR_TYPE.POINTER);
       }
     } else {
       setCursor(this.interactiveCanvas, CURSOR_TYPE.AUTO);
@@ -8645,6 +8698,37 @@ class App extends React.Component<AppProps, AppState> {
           }
           if (ret.didAddPoint) {
             return true;
+          }
+
+          // Also check at current pointer position if focus point is being hovered
+          // (in case we're clicking directly without a prior move event)
+          const elementsMap = this.scene.getNonDeletedElementsMap();
+          const arrow = LinearElementEditor.getElement(
+            linearElementEditor.elementId,
+            elementsMap,
+          ) as any;
+
+          if (arrow && isBindingElement(arrow)) {
+            const { hitFocusPoint, pointerOffset } =
+              handleFocusPointPointerDown(
+                arrow,
+                pointerDownState,
+                elementsMap,
+                this.state,
+              );
+
+            // If focus point is hit, update state and prevent element selection
+            if (hitFocusPoint) {
+              this.setState({
+                selectedLinearElement: {
+                  ...linearElementEditor,
+                  hoveredFocusPointBinding: hitFocusPoint,
+                  draggedFocusPointBinding: hitFocusPoint,
+                  pointerOffset,
+                },
+              });
+              return false;
+            }
           }
         }
 
@@ -9829,6 +9913,31 @@ class App extends React.Component<AppProps, AppState> {
       if (this.state.selectedLinearElement) {
         const linearElementEditor = this.state.selectedLinearElement;
 
+        // Handle focus point dragging if needed
+        if (linearElementEditor.draggedFocusPointBinding) {
+          handleFocusPointDrag(
+            linearElementEditor,
+            elementsMap,
+            pointerCoords,
+            this.scene,
+            this.state,
+            this.getEffectiveGridSize(),
+            event.altKey,
+          );
+          this.setState({
+            selectedLinearElement: {
+              ...linearElementEditor,
+              isDragging: false,
+              selectedPointsIndices: [],
+              initialState: {
+                ...linearElementEditor.initialState,
+                lastClickedPoint: -1,
+              },
+            },
+          });
+          return;
+        }
+
         if (
           LinearElementEditor.shouldAddMidpoint(
             this.state.selectedLinearElement,
@@ -10702,12 +10811,14 @@ class App extends React.Component<AppProps, AppState> {
       // and sets binding element
       if (
         this.state.selectedLinearElement?.isEditing &&
-        !this.state.newElement
+        !this.state.newElement &&
+        this.state.selectedLinearElement.draggedFocusPointBinding === null
       ) {
         if (
           !pointerDownState.boxSelection.hasOccurred &&
           pointerDownState.hit?.element?.id !==
-            this.state.selectedLinearElement.elementId
+            this.state.selectedLinearElement.elementId &&
+          this.state.selectedLinearElement.draggedFocusPointBinding === null
         ) {
           this.actionManager.executeAction(actionFinalize);
         } else {
@@ -10743,7 +10854,18 @@ class App extends React.Component<AppProps, AppState> {
           }
         }
 
-        if (
+        if (this.state.selectedLinearElement.draggedFocusPointBinding) {
+          handleFocusPointPointerUp(
+            this.state.selectedLinearElement,
+            this.scene,
+          );
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              draggedFocusPointBinding: null,
+            },
+          });
+        } else if (
           pointerDownState.hit?.element?.id !==
           this.state.selectedLinearElement.elementId
         ) {
@@ -10753,6 +10875,12 @@ class App extends React.Component<AppProps, AppState> {
             this.setState({ selectedLinearElement: null });
           }
         } else if (this.state.selectedLinearElement.isDragging) {
+          this.setState({
+            selectedLinearElement: {
+              ...this.state.selectedLinearElement,
+              isDragging: false,
+            },
+          });
           this.actionManager.executeAction(actionFinalize, "ui", {
             event: childEvent,
             sceneCoords,
