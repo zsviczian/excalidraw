@@ -25,6 +25,8 @@ import {
   getAreaLimit,
   getWidthHeightLimit,
   applyDarkModeFilter,
+  applyDarkThemeFilterToImageData,
+  isIOS,
 } from "@excalidraw/common";
 
 import type {
@@ -482,7 +484,7 @@ const drawElementOnCanvas = (
           (!!element.customData?.pdfPageViewProps && (element.customData?.invertBitmapInDarkmode ?? true)) ||
           !!element.customData?.invertBitmapInDarkmode); //zsviczian
 
-      if (shouldInvertImage) {
+      if (shouldInvertImage && !isIOS) { //zsviczian
         context.filter = DARK_THEME_FILTER;
       }
       if (img != null && !(img instanceof Promise)) {
@@ -507,17 +509,50 @@ const drawElementOnCanvas = (
               height: img.naturalHeight,
             };
 
-        context.drawImage(
-          img,
-          x,
-          y,
-          width,
-          height,
-          0 /* hardcoded for the selection box*/,
-          0,
-          element.width,
-          element.height,
-        );
+        if (shouldInvertImage && isIOS) { //zsviczian
+          const tempCanvas = document.createElement("canvas");
+          tempCanvas.width = element.width;
+          tempCanvas.height = element.height;
+          const tempContext = tempCanvas.getContext("2d");
+
+          if (tempContext) {
+            tempContext.drawImage(
+              img,
+              x,
+              y,
+              width,
+              height,
+              0,
+              0,
+              element.width,
+              element.height,
+            );
+
+            const imageData = tempContext.getImageData(
+              0,
+              0,
+              element.width,
+              element.height,
+            );
+
+            applyDarkThemeFilterToImageData(imageData);
+
+            tempContext.putImageData(imageData, 0, 0);
+            context.drawImage(tempCanvas, 0, 0);
+          }
+        } else {
+          context.drawImage(
+            img,
+            x,
+            y,
+            width,
+            height,
+            0 /* hardcoded for the selection box*/,
+            0,
+            element.width,
+            element.height,
+          );
+        }
       } else {
         drawImagePlaceholder(element, context);
       }

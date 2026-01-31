@@ -13,3 +13,4 @@ export * from "./utils";
 export * from "./emitter";
 export * from "./editorInterface";
 export * from "./commonObsidianUtils";
+export * from "./imageUtils";
