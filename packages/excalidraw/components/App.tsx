@@ -2757,26 +2757,12 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   // zsviczian
-  private undo = async () =>
-    this.syncActionResult(
-      await this.actionManager.actions.undo.perform(
-        this.scene.getElementsIncludingDeleted(),
-        this.state,
-        null,
-        this,
-      ),
-    );
+  private undo = () =>
+    this.actionManager.executeAction(this.actionManager.actions.undo, "api");
 
   // zsviczian
-  private redo = async () =>
-    this.syncActionResult(
-      await this.actionManager.actions.redo.perform(
-        this.scene.getElementsIncludingDeleted(),
-        this.state,
-        null,
-        this,
-      ),
-    );
+  private redo = () =>
+    this.actionManager.executeAction(this.actionManager.actions.redo, "api");
 
   private resetStore = () => {
     this.store.clear();
