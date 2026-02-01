@@ -765,6 +765,8 @@ class App extends React.Component<AppProps, AppState> {
           this.getSceneElementsMapIncludingDeleted,
         history: {
           clear: this.resetHistory,
+          undo: this.undo, //zsviczian
+          redo: this.redo, //zsviczian
         },
         scrollToContent: this.scrollToContent,
         setForceRenderAllEmbeddables: this.setForceRenderAllEmbeddables, //zsviczian
@@ -2750,6 +2752,28 @@ class App extends React.Component<AppProps, AppState> {
   private resetHistory = () => {
     this.history.clear();
   };
+
+  // zsviczian
+  private undo = async () =>
+    this.syncActionResult(
+      await this.actionManager.actions.undo.perform(
+        this.scene.getElementsIncludingDeleted(),
+        this.state,
+        null,
+        this,
+      ),
+    );
+
+  // zsviczian
+  private redo = async () =>
+    this.syncActionResult(
+      await this.actionManager.actions.redo.perform(
+        this.scene.getElementsIncludingDeleted(),
+        this.state,
+        null,
+        this,
+      ),
+    );
 
   private resetStore = () => {
     this.store.clear();

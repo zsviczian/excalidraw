@@ -625,6 +625,43 @@ const repairFrameMembership = (
   }
 };
 
+// Removes groupIds that only occur on a single non-deleted element.
+// zsviczian
+const pruneOrphanGroupIds = <T extends ExcalidrawElement>(
+  elements: readonly T[],
+): T[] => {
+  const counts = new Map<string, number>();
+
+  for (const element of elements) {
+    if (element.isDeleted) {
+      continue;
+    }
+    for (const groupId of element.groupIds ?? []) {
+      counts.set(groupId, (counts.get(groupId) ?? 0) + 1);
+    }
+  }
+
+  if (!counts.size) {
+    return elements as T[];
+  }
+
+  return elements.map((element) => {
+    if (!element.groupIds?.length) {
+      return element;
+    }
+
+    const filteredGroupIds = element.groupIds.filter(
+      (groupId) => (counts.get(groupId) ?? 0) > 1,
+    );
+
+    if (filteredGroupIds.length === element.groupIds.length) {
+      return element;
+    }
+
+    return { ...element, groupIds: filteredGroupIds } as T;
+  });
+};
+
 export const restoreElements = <T extends ExcalidrawElement>(
   targetElements: readonly T[] | undefined | null,
   /** used for additional context (e.g. repairing arrow bindings) */
@@ -643,7 +680,7 @@ export const restoreElements = <T extends ExcalidrawElement>(
   const existingElementsMap = existingElements
     ? arrayToMap(existingElements)
     : null;
-  const restoredElements = syncInvalidIndices(
+  let restoredElements = syncInvalidIndices( //zsviczian let not const
     (targetElements || []).reduce((elements, element) => {
       // filtering out selection, which is legacy, no longer kept in elements,
       // and causing issues if retained
@@ -689,6 +726,8 @@ export const restoreElements = <T extends ExcalidrawElement>(
       return elements;
     }, [] as ExcalidrawElement[]),
   );
+
+  restoredElements = pruneOrphanGroupIds(restoredElements); //zsviczian
 
   if (!opts?.repairBindings) {
     return restoredElements as CombineBrandsIfNeeded<

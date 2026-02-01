@@ -921,6 +921,8 @@ export interface ExcalidrawImperativeAPI {
   >["getSceneElementsMapIncludingDeleted"];
   history: {
     clear: InstanceType<typeof App>["resetHistory"];
+    undo: InstanceType<typeof App>["undo"]; //zsviczian
+    redo: InstanceType<typeof App>["redo"]; //zsviczian
   };
   setForceRenderAllEmbeddables: InstanceType<typeof App>["setForceRenderAllEmbeddables"]; //zsviczian
   zoomToFit: InstanceType<typeof App>["zoomToFit"]; //zsviczian
