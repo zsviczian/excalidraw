@@ -6825,7 +6825,7 @@ class App extends React.Component<AppProps, AppState> {
         hitElementIndex = index;
       }
       if (
-        element.link &&
+        (element.link || element.hasTextLink) && //zsviczian
         index >= hitElementIndex &&
         isPointHittingLink(
           element,
@@ -6883,8 +6883,8 @@ class App extends React.Component<AppProps, AppState> {
     if (lastPointerDownHittingLinkIcon && lastPointerUpHittingLinkIcon) {
       hideHyperlinkToolip();
       let url = this.hitLinkElement.link;
-      if (url) {
-        url = normalizeLink(url);
+      if (url || this.hitLinkElement.hasTextLink) { //zsviczian
+        url = normalizeLink(url ?? ""); //zsviczian
         let customEvent;
         if (this.props.onLinkOpen) {
           customEvent = wrapEvent(EVENT.EXCALIDRAW_LINK, event.nativeEvent);

@@ -86,7 +86,8 @@ export const isPointHittingLink = (
   [x, y]: GlobalPoint,
   isMobile: boolean,
 ) => {
-  if (!element.link || appState.selectedElementIds[element.id]) {
+  //zsviczian, added hasTextLink
+  if (!(element.link || element.hasTextLink) || appState.selectedElementIds[element.id]) {
     return false;
   }
   if (

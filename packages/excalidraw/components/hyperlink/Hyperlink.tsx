@@ -10,7 +10,7 @@ import {
 
 import { EVENT, HYPERLINK_TOOLTIP_DELAY, KEYS } from "@excalidraw/common";
 
-import { getElementAbsoluteCoords } from "@excalidraw/element";
+import { getElementAbsoluteCoords, isTextElement } from "@excalidraw/element";
 
 import { hitElementBoundingBox } from "@excalidraw/element";
 
@@ -456,12 +456,21 @@ export const showHyperlinkTooltip = (
   );
 };
 
+//zsviczian
+const preview = (element: NonDeletedExcalidrawElement): string => {
+  if (!isTextElement(element)) {
+    return "";
+  }
+  const value = element.text;
+  return value.length > 80 ? `${value.slice(0, 80)}...` : value;
+};
+
 const renderTooltip = (
   element: NonDeletedExcalidrawElement,
   appState: AppState,
   elementsMap: ElementsMap,
 ) => {
-  if (!element.link) {
+  if (!(element.link || element.hasTextLink)) {//zsviczian
     return;
   }
 
@@ -469,9 +478,10 @@ const renderTooltip = (
 
   tooltipDiv.classList.add("excalidraw-tooltip--visible");
   tooltipDiv.style.maxWidth = "20rem";
-  tooltipDiv.textContent = isElementLink(element.link)
-    ? t("labels.link.goToElement")
-    : element.link;
+  tooltipDiv.textContent =
+    element.link && isElementLink(element.link) //zsviczian
+      ? t("labels.link.goToElement")
+      : element.link ?? preview(element); //zsviczian
 
   const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
 
