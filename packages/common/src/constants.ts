@@ -109,6 +109,7 @@ export const CLASSES = {
   CONVERT_ELEMENT_TYPE_POPUP: "ConvertElementTypePopup",
   SHAPE_ACTIONS_THEME_SCOPE: "shape-actions-theme-scope",
   FRAME_NAME: "frame-name",
+  DROPDOWN_MENU_EVENT_WRAPPER: "dropdown-menu-event-wrapper",
 };
 
 export const FONT_SIZES = {

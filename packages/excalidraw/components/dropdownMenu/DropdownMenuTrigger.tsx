@@ -1,5 +1,7 @@
 import clsx from "clsx";
 
+import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
+
 import { useEditorInterface } from "../App";
 
 const MenuTrigger = ({
@@ -28,7 +30,7 @@ const MenuTrigger = ({
     },
   ).trim();
   return (
-    <button
+    <DropdownMenuPrimitive.Trigger
       className={classNames}
       onClick={onToggle}
       type="button"
@@ -37,7 +39,7 @@ const MenuTrigger = ({
       {...rest}
     >
       {children}
-    </button>
+    </DropdownMenuPrimitive.Trigger>
   );
 };
 
