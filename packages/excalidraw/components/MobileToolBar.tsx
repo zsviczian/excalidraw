@@ -197,7 +197,7 @@ export const MobileToolBar = ({
       : extraToolsIcon
     : extraToolsIcon;
 
-  /*zsviczian - shoImageToolMenu start*/
+  /*zsviczian - showImageToolMenu start*/
   const renderImageToolMenuItems = () => (
     <>
       <DropdownMenu.Item
@@ -237,7 +237,7 @@ export const MobileToolBar = ({
     }
 
     return (
-      <DropdownMenu open={isImageMenuOpen} placement="top">
+      <DropdownMenu open={isImageMenuOpen}>
         <DropdownMenu.Trigger
           className={clsx("App-toolbar__extra-tools-trigger")}
           onToggle={() => {

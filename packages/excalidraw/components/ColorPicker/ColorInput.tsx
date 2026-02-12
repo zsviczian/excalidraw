@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { useCallback, useEffect, useRef, useState } from "react";
+import tinycolor from "tinycolor2";
 
 import { KEYS, normalizeInputColor } from "@excalidraw/common";
 
@@ -62,33 +63,24 @@ export const ColorInput = ({
 
   //zsviczian
   let opacity: string = "";
-  const hexColor = (color: string): string => {
-    if (Object.keys(COLOR_NAMES).includes(color)) {
-      return COLOR_NAMES[color];
+  const hexColor = (value: string): string => {
+    const normalizedValue = value.toLowerCase();
+    const resolvedColor = COLOR_NAMES[normalizedValue] ?? normalizedValue;
+    const tc = tinycolor(resolvedColor);
+
+    if (!tc.isValid()) {
+      opacity = "";
+      return "#000000";
     }
-    const style = new Option().style;
-    style.color = color;
-    if (!!style.color) {
-      const digits = style.color.match(
-        /^[^\d]*(\d*)[^\d]*(\d*)[^\d]*(\d*)[^\d]*([\d.]*)?/,
-      );
-      if (!digits) {
-        return "#000000";
-      }
-      opacity = digits[4]
-        ? (Math.round(parseFloat(digits[4]) * 255) << 0)
+
+    const alpha = tc.getAlpha();
+    opacity = alpha < 1
+        ? Math.round(alpha * 255)
             .toString(16)
             .padStart(2, "0")
         : "";
-      return `#${(parseInt(digits[1]) << 0).toString(16).padStart(2, "0")}${(
-        parseInt(digits[2]) << 0
-      )
-        .toString(16)
-        .padStart(2, "0")}${(parseInt(digits[3]) << 0)
-        .toString(16)
-        .padStart(2, "0")}`;
-    }
-    return "#000000";
+
+    return tc.toHexString();
   };
   const [eyeDropperState, setEyeDropperState] = useAtom(activeEyeDropperAtom);
 
