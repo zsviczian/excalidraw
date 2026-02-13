@@ -486,8 +486,14 @@ const renderElementToSvg = (
         isInitializedImageElement(element) && files[element.fileId];
       if (fileData) {
         const { reuseImages = true } = renderConfig;
+        let suffix = fileData.mimeType === "image/svg+xml" &&
+          element.customData?.doNotInvertSVGInDarkMode
+            ? "-no-invert-svg"
+            : element.customData?.invertBitmapInDarkmode
+            ? "-invert-bitmap"
+            : ""; //zsviczian
 
-        let symbolId = `image-${fileData.id}`;
+        let symbolId = `image-${fileData.id}${suffix}`; //zsviczian
 
         let uncroppedWidth = element.width;
         let uncroppedHeight = element.height;
@@ -496,12 +502,12 @@ const renderElementToSvg = (
             getUncroppedWidthAndHeight(element));
 
           symbolId = `image-crop-${fileData.id}-${hashString(
-            `${uncroppedWidth}x${uncroppedHeight}`,
+            `${uncroppedWidth}x${uncroppedHeight}${suffix}`, //zsviczian
           )}`;
         }
 
         if (!reuseImages) {
-          symbolId = `image-${element.id}`;
+          symbolId = `image-${element.id}${suffix}`; //zsviczian
         }
 
         let symbol = svgRoot.querySelector(`#${symbolId}`);
