@@ -26,7 +26,7 @@ const MenuTrigger = ({
     {
       "dropdown-menu-button--tray":
         editorInterface.formFactor !== "phone" &&
-        editorInterface.preferTrayMode, //zsviczian
+        editorInterface.desktopUIMode === "tray", //zsviczian
     },
   ).trim();
   return (

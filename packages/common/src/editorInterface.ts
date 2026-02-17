@@ -1,10 +1,10 @@
-import { getDesktopUIMode, getObsidianDeviceInfo } from "./commonObsidianUtils";
+import { getDesktopUIMode, getObsidianDeviceInfo, getPreferredUIMode } from "./commonObsidianUtils";
 
 export type StylesPanelMode = "compact" | "full" | "mobile" | "tray"; //zsviczian
 
 export type EditorInterface = Readonly<{
   formFactor: "phone" | "tablet" | "desktop";
-  desktopUIMode: "compact" | "full" | "tray";
+  desktopUIMode: "compact" | "full" | "tray" | "mobile"; //zsviczian
   userAgent: Readonly<{
     isMobileDevice: boolean;
     platform: "ios" | "android" | "other" | "unknown";
@@ -12,7 +12,6 @@ export type EditorInterface = Readonly<{
   isTouchScreen: boolean;
   canFitSidebar: boolean;
   isLandscape: boolean;
-  preferTrayMode: boolean; //zsviczian
 }>;
 
 // storage key
@@ -155,8 +154,15 @@ export const getFormFactor = (
   editorHeight: number,
   allowMobile: boolean, //zsviczian
 ): EditorInterface["formFactor"] => {
+  if (getObsidianDeviceInfo()?.isDesktop) {//zsviczian
+    return "desktop";
+  }
   if (isMobileBreakpoint(editorWidth, editorHeight, allowMobile)) { //zsviczian
-    return "phone";
+    return getPreferredUIMode("phone") === "mobile" ? "phone" : "tablet"; //zsviczian";
+  }
+
+  if (getObsidianDeviceInfo()?.isTablet) {//zsviczian
+    return "tablet";
   }
 
   if (isTabletBreakpoint(editorWidth, editorHeight)) {
@@ -169,12 +175,13 @@ export const getFormFactor = (
 export const deriveStylesPanelMode = (
   editorInterface: EditorInterface,
 ): StylesPanelMode => {
+  return getPreferredUIMode(editorInterface.formFactor); //zsviczian
   if (editorInterface.formFactor === "phone") {
     return "mobile";
   }
 
   if (editorInterface.formFactor === "tablet") {
-    return editorInterface.preferTrayMode ? "tray" : "compact"; //zsviczian
+    return "compact";
   }
 
   return editorInterface.desktopUIMode;
@@ -230,7 +237,7 @@ const persistDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
 };
 
 export const setDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
-  if (mode !== "compact" && mode !== "full" && mode !== "tray") { //zsviczian
+  if (mode !== "compact" && mode !== "full") {
     return;
   }
 

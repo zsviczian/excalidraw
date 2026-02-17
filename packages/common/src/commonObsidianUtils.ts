@@ -1,3 +1,5 @@
+import type { EditorInterface, StylesPanelMode } from "./editorInterface";
+
 //zsviczian, my dirty little secrets. These are hacks I am not proud of...
 export type ObsidianDeviceType = {
   isDesktop: boolean;
@@ -54,9 +56,23 @@ export const getDesktopUIMode = () => {
   }
 
   const desktopUIMode = obsidianPlugin.getPreferredUIMode();
-  return ["tray", "full", "compact", "phone"].includes(desktopUIMode)
+  return ["tray", "full", "compact", "mobile"].includes(desktopUIMode)
     ? desktopUIMode
     : "tray";
+};
+
+export const getPreferredUIMode = (
+  formFactor: EditorInterface["formFactor"],
+): StylesPanelMode => {
+  if (formFactor === "phone") {
+    return getHostPlugin().settings.phoneUIMode;
+  }
+
+  if (formFactor === "tablet") {
+    return getHostPlugin().settings.tabletUIMode;
+  }
+
+  return getHostPlugin().settings.desktopUIMode;
 };
 
 export function getAreaLimit() {

@@ -27,7 +27,7 @@ export const useCreatePortalContainer = (opts?: {
       );
       div.classList.toggle(
         "excalidraw--tray",
-        editorInterface.formFactor !== "phone" && editorInterface.preferTrayMode,
+        editorInterface.formFactor !== "phone" && editorInterface.desktopUIMode === "tray", //zsviczian
       ); //zsviczian
       div.classList.toggle("theme--dark", theme === THEME.DARK);
       if (opts?.style) {
@@ -39,7 +39,7 @@ export const useCreatePortalContainer = (opts?: {
         div.setAttribute("style", styleString);
       }
     }
-  }, [div, theme, editorInterface.formFactor, editorInterface.preferTrayMode, opts?.className]); //zsviczian
+  }, [div, theme, editorInterface.formFactor, editorInterface.desktopUIMode, opts?.className]); //zsviczian
 
   useLayoutEffect(() => {
     const container = opts?.parentSelector

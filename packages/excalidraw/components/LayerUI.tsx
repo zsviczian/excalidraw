@@ -7,6 +7,7 @@ import {
   TOOL_TYPE,
   arrayToMap,
   capitalizeString,
+  getPreferredUIMode,
   isShallowEqual,
 } from "@excalidraw/common";
 
@@ -433,7 +434,7 @@ const LayerUI = ({
             )}
             {!appState.viewModeEnabled && //zsviczian
               renderTopRightUI?.(
-              editorInterface.formFactor === "phone",
+              isMobileMode, //zsviczian editorInterface.formFactor === "phone",
               appState,
             )}
             {!appState.viewModeEnabled &&
@@ -458,12 +459,15 @@ const LayerUI = ({
     );
   };
 
+  const preferredPhoneUIMode =
+    editorInterface.formFactor === "phone" ? getPreferredUIMode("phone") : null; //zsviczian
   const isTrayMode =
     !(appState.viewModeEnabled || appState.zenModeEnabled) &&
-    editorInterface.formFactor !== "phone" &&
-    editorInterface.preferTrayMode; //zsviczian
-  const isTrayModeOrMobile =
-    isTrayMode || editorInterface.formFactor === "phone"; //zsviczian
+    ((!preferredPhoneUIMode && editorInterface.desktopUIMode === "tray") ||
+      preferredPhoneUIMode === "tray"); //zsviczian
+  const isMobileMode =
+    editorInterface.formFactor === "phone" && preferredPhoneUIMode === "mobile"; //zsviczian
+  const isTrayModeOrMobile = isTrayMode || isMobileMode; //zsviczian
 
   const renderSidebars = () => {
     return (
@@ -474,7 +478,7 @@ const LayerUI = ({
             "sidebar",
             `toggleDock (${docked ? "dock" : "undock"})`,
             `(${
-              editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+              isMobileMode ? "mobile" : "desktop" //zsviczian was editorInterface.formFactor === "phone"
             })`,
           );
         }}
@@ -504,7 +508,7 @@ const LayerUI = ({
               "sidebar",
               `${DEFAULT_SIDEBAR.name} (open)`,
               `button (${
-                editorInterface.formFactor === "phone" ? "mobile" : "desktop"
+                isMobileMode ? "mobile" : "desktop" //zsviczian was editorInterface.formFactor === "phone"
               })`,
             );
           }
@@ -600,28 +604,27 @@ const LayerUI = ({
           }
         />
       )}
-      {editorInterface.formFactor !== "phone" &&
-        isTrayMode && ( //zsviczian Added isTrayMode condition
-          <TrayMenu
-            app={app}
-            appState={appState}
-            elements={elements}
-            actionManager={actionManager}
-            renderJSONExportDialog={renderJSONExportDialog}
-            renderImageExportDialog={renderImageExportDialog}
-            setAppState={setAppState}
-            onLockToggle={onLockToggle}
-            onHandToolToggle={onHandToolToggle}
-            onPenModeToggle={onPenModeToggle}
-            renderTopRightUI={renderTopRightUI}
-            renderCustomStats={renderCustomStats}
-            renderSidebars={renderSidebars}
-            editorInterface={editorInterface}
-            renderWelcomeScreen={renderWelcomeScreen}
-            UIOptions={UIOptions}
-          />
-        )}
-      {editorInterface.formFactor === "phone" && (
+      {isTrayMode && ( //zsviczian Added isTrayMode condition
+        <TrayMenu
+          app={app}
+          appState={appState}
+          elements={elements}
+          actionManager={actionManager}
+          renderJSONExportDialog={renderJSONExportDialog}
+          renderImageExportDialog={renderImageExportDialog}
+          setAppState={setAppState}
+          onLockToggle={onLockToggle}
+          onHandToolToggle={onHandToolToggle}
+          onPenModeToggle={onPenModeToggle}
+          renderTopRightUI={renderTopRightUI}
+          renderCustomStats={renderCustomStats}
+          renderSidebars={renderSidebars}
+          editorInterface={editorInterface}
+          renderWelcomeScreen={renderWelcomeScreen}
+          UIOptions={UIOptions}
+        />
+      )}
+      {isMobileMode && ( //zsviczian was editorInterface.formFactor === "phone"
         <MobileMenu
           app={app}
           appState={appState}

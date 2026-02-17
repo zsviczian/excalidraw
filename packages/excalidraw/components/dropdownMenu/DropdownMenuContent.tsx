@@ -83,7 +83,7 @@ const MenuContent = ({
   const classNames = clsx(`dropdown-menu ${className}`, {
     "dropdown-menu--mobile": editorInterface.formFactor === "phone",
     "dropdown-menu--tray":
-      editorInterface.formFactor !== "phone" && editorInterface.preferTrayMode &&
+      editorInterface.formFactor !== "phone" && editorInterface.desktopUIMode === "tray" &&
       appState.openMenu === "canvas", //zsviczian
   }).trim();
 

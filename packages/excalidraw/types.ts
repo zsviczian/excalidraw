@@ -933,7 +933,6 @@ export interface ExcalidrawImperativeAPI {
   zoomToFit: InstanceType<typeof App>["zoomToFit"]; //zsviczian
   refreshEditorInterface: InstanceType<typeof App>["refreshEditorInterface"]; //zsviczian
   isTouchScreen: InstanceType<typeof App>["isTouchScreen"]; //zsviczian
-  setTrayModeEnabled: InstanceType<typeof App>["setTrayModeEnabled"]; //zsviczian
   setDesktopUIMode: InstanceType<typeof App>["setDesktopUIMode"]; //zsviczian
   setMobileModeAllowed: InstanceType<typeof App>["setMobileModeAllowed"]; //zsviczian
   isTrayModeEnabled: InstanceType<typeof App>["isTrayModeEnabled"]; //zsviczian

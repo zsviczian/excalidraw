@@ -513,7 +513,6 @@ const editorInterfaceContextInitialValue: EditorInterface = {
     typeof navigator !== "undefined" ? navigator.userAgent : "",
   ),
   isTouchScreen: false,
-  preferTrayMode: false, //zsviczian
   canFitSidebar: false,
   isLandscape: true,
 };
@@ -776,7 +775,6 @@ class App extends React.Component<AppProps, AppState> {
         setForceRenderAllEmbeddables: this.setForceRenderAllEmbeddables, //zsviczian
         zoomToFit: this.zoomToFit, //zsviczian
         refreshEditorInterface: this.refreshEditorInterface, //zsviczian
-        setTrayModeEnabled: this.setTrayModeEnabled, //zsviczian
         setDesktopUIMode: this.setDesktopUIMode, //zsviczian
         setMobileModeAllowed: this.setMobileModeAllowed, //zsviczian
         isTouchScreen: this.isTouchScreen, //zsviczian
@@ -1998,7 +1996,7 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--tray":
             !(this.state.viewModeEnabled || this.state.zenModeEnabled) &&
             this.editorInterface.formFactor !== "phone" &&
-            this.editorInterface.preferTrayMode, //zsviczian
+            this.editorInterface.desktopUIMode === "tray", //zsviczian
         })}
         style={{
           //zsviczian
@@ -2918,7 +2916,7 @@ class App extends React.Component<AppProps, AppState> {
     );
   };
 
-  public refreshEditorInterface = (preferTrayMode?: boolean) => { //zsviczian
+  public refreshEditorInterface = () => {
     const container = this.excalidrawContainerRef.current;
     if (!container) {
       return;
@@ -2937,13 +2935,11 @@ class App extends React.Component<AppProps, AppState> {
         ? this.props.UIOptions.dockedSidebarBreakpoint
         : MQ_RIGHT_SIDEBAR_MIN_WIDTH;
     const nextEditorInterface = updateObject(this.editorInterface, {
-      desktopUIMode: preferTrayMode ? "tray" : //zsviczian
-        storedDesktopUIMode ?? this.editorInterface.desktopUIMode,
+      desktopUIMode: storedDesktopUIMode ?? this.editorInterface.desktopUIMode,
       formFactor: this.getFormFactor(editorWidth, editorHeight),
       userAgent: userAgentDescriptor,
       canFitSidebar: editorWidth > sidebarBreakpoint,
       isLandscape: editorWidth > editorHeight,
-      preferTrayMode: preferTrayMode ?? this.editorInterface.preferTrayMode, //zsviczian
     });
 
     this.editorInterface = nextEditorInterface;
@@ -2974,11 +2970,12 @@ class App extends React.Component<AppProps, AppState> {
 
   /** TO BE USED LATER */
   private setDesktopUIMode = (mode: EditorInterface["desktopUIMode"]) => {
-    const nextMode = setDesktopUIMode(mode);
+    const nextMode = mode; //setDesktopUIMode(mode); //zsviczian
     this.editorInterface = updateObject(this.editorInterface, {
       desktopUIMode: nextMode,
     });
     this.reconcileStylesPanelMode(this.editorInterface);
+    this.triggerRender(); //zsviczian
   };
 
   //zsviczian
@@ -2987,30 +2984,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   //zsviczian
-  private setTrayModeEnabled = (enabled: boolean) => {
-    const container = this.excalidrawContainerRef.current;
-    if (!container) {
-      return;
-    }
-    if (this.editorInterface.formFactor === "phone") {
-      enabled = false;
-    }
-
-    if (
-      this.editorInterface.preferTrayMode === enabled &&
-      this.editorInterface.desktopUIMode === "tray"
-    ) {
-      return;
-    }
-
-    this.refreshEditorInterface(enabled);
-    this.triggerRender();
-    setDesktopUIMode(this.editorInterface.desktopUIMode);
-  };
-
-  //zsviczian
   public isTrayModeEnabled = () => {
-    return this.editorInterface.preferTrayMode;
+    return this.editorInterface.desktopUIMode === "tray";
   };
 
   private clearImageShapeCache(filesMap?: BinaryFiles) {
@@ -4628,7 +4603,7 @@ class App extends React.Component<AppProps, AppState> {
     this.allowMobileMode = allow;
     this.refreshEditorInterface();
     this.triggerRender();
-    setDesktopUIMode(this.editorInterface.desktopUIMode);
+    this.setDesktopUIMode(this.editorInterface.desktopUIMode);
   };
 
   //zsviczian
