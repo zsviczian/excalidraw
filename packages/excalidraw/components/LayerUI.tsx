@@ -465,8 +465,7 @@ const LayerUI = ({
     !(appState.viewModeEnabled || appState.zenModeEnabled) &&
     ((!preferredPhoneUIMode && editorInterface.desktopUIMode === "tray") ||
       preferredPhoneUIMode === "tray"); //zsviczian
-  const isMobileMode =
-    editorInterface.formFactor === "phone" && preferredPhoneUIMode === "mobile"; //zsviczian
+  const isMobileMode = preferredPhoneUIMode === "mobile"; //zsviczian
   const isTrayModeOrMobile = isTrayMode || isMobileMode; //zsviczian
 
   const renderSidebars = () => {

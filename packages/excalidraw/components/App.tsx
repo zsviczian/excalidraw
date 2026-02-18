@@ -1995,7 +1995,7 @@ class App extends React.Component<AppProps, AppState> {
           "excalidraw--mobile": this.editorInterface.formFactor === "phone",
           "excalidraw--tray":
             !(this.state.viewModeEnabled || this.state.zenModeEnabled) &&
-            this.editorInterface.formFactor !== "phone" &&
+            //this.editorInterface.formFactor !== "phone" &&
             this.editorInterface.desktopUIMode === "tray", //zsviczian
         })}
         style={{
@@ -2975,7 +2975,8 @@ class App extends React.Component<AppProps, AppState> {
       desktopUIMode: nextMode,
     });
     this.reconcileStylesPanelMode(this.editorInterface);
-    this.triggerRender(); //zsviczian
+    this.refreshEditorInterface(); //zsviczian (set formfactor for mobile if needed (phone or tablet))
+    this.triggerRender(true); //zsviczian
   };
 
   //zsviczian
