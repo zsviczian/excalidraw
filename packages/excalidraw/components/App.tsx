@@ -10446,9 +10446,7 @@ class App extends React.Component<AppProps, AppState> {
                   isBindableElement(element) &&
                   element.boundElements?.some((other) => other.type === "arrow")
                 ) {
-                  updateBoundElements(element, this.scene, {
-                    indirectArrowUpdate: true,
-                  });
+                  updateBoundElements(element, this.scene);
                 }
               });
 

@@ -1312,13 +1312,21 @@ export const EdgeRoundIcon = createIcon(
   tablerIconProps,
 );
 
-export const ArrowheadNoneIcon = createIcon(
-  <g stroke="var(--icon-fill-color)" opacity={0.3} strokeWidth={2}>
-    <path d="M12 12l9 0" />
-    <path d="M3 9l6 6" />
-    <path d="M3 15l6 -6" />
-  </g>,
-  tablerIconProps,
+export const ArrowheadNoneIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        transform={flip ? "translate(24, 0) scale(-1, 1)" : ""}
+        stroke="currentColor"
+        opacity={0.3}
+        strokeWidth={2}
+      >
+        <path d="M12 12l-9 0" />
+        <path d="M21 9l-6 6" />
+        <path d="M21 15l-6 -6" />
+      </g>,
+      tablerIconProps,
+    ),
 );
 
 export const ArrowheadArrowIcon = React.memo(
