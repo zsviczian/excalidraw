@@ -1775,7 +1775,7 @@ const getArrowheadOptions = (flip: boolean) => {
       value: null,
       text: t("labels.arrowhead_none"),
       keyBinding: "q",
-      icon: ArrowheadNoneIcon,
+      icon: <ArrowheadNoneIcon flip={flip} />,
     },
     {
       value: "arrow",
@@ -1903,7 +1903,8 @@ export const actionChangeArrowhead = register<{
                   ? element.startArrowhead
                   : appState.currentItemStartArrowhead,
               true,
-              appState.currentItemStartArrowhead,
+              (hasSelection) =>
+                hasSelection ? null : appState.currentItemStartArrowhead,
             )}
             onChange={(value) => updateData({ position: "start", type: value })}
             numberOfOptionsToAlwaysShow={4}
@@ -1920,7 +1921,8 @@ export const actionChangeArrowhead = register<{
                   ? element.endArrowhead
                   : appState.currentItemEndArrowhead,
               true,
-              appState.currentItemEndArrowhead,
+              (hasSelection) =>
+                hasSelection ? null : appState.currentItemEndArrowhead,
             )}
             onChange={(value) => updateData({ position: "end", type: value })}
             numberOfOptionsToAlwaysShow={4}
