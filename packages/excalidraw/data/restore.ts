@@ -156,7 +156,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
         | ExcalidrawElbowArrowElement["startBinding"]
         | ExcalidrawElbowArrowElement["endBinding"] = {
         ...binding,
-        fixedPoint: normalizeFixedPoint(binding.fixedPoint ?? [0, 0]),
+        fixedPoint: normalizeFixedPoint(binding.fixedPoint),
         mode: binding.mode || "orbit",
       };
 
@@ -177,7 +177,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
         return {
           elementId: binding.elementId,
           mode: binding.mode,
-          fixedPoint: normalizeFixedPoint(binding.fixedPoint || [0.5, 0.5]),
+          fixedPoint: normalizeFixedPoint(binding.fixedPoint),
         } as FixedPointBinding | null;
       }
       return null;
@@ -186,15 +186,14 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
     // binding schema v1 (legacy) -> attempt to migrate to v2
     // ---------------------------------------------------------------------------
 
-    const targetBoundElement =
-      (targetElementsMap.get(binding.elementId) as ExcalidrawBindableElement) ||
-      undefined;
+    const targetBoundElement = targetElementsMap.get(binding.elementId) as
+      | ExcalidrawBindableElement
+      | undefined;
     const boundElement =
       targetBoundElement ||
-      (existingElementsMap?.get(
-        binding.elementId,
-      ) as ExcalidrawBindableElement) ||
-      undefined;
+      (existingElementsMap?.get(binding.elementId) as
+        | ExcalidrawBindableElement
+        | undefined);
     const elementsMap = targetBoundElement
       ? targetElementsMap
       : existingElementsMap;
@@ -209,11 +208,28 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
       const mode = isPointInElement(p, boundElement, elementsMap)
         ? "inside"
         : "orbit";
+      const safeElement = {
+        ...element,
+        startBinding: element.startBinding?.elementId
+          ? {
+              ...element.startBinding,
+              mode,
+              fixedPoint: normalizeFixedPoint(element.startBinding.fixedPoint),
+            }
+          : null,
+        endBinding: element.endBinding?.elementId
+          ? {
+              ...element.endBinding,
+              mode,
+              fixedPoint: normalizeFixedPoint(element.endBinding.fixedPoint),
+            }
+          : null,
+      };
       const focusPoint =
         mode === "inside"
           ? p
           : projectFixedPointOntoDiagonal(
-              element,
+              safeElement,
               p,
               boundElement,
               startOrEnd,
@@ -221,7 +237,7 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
               { value: 1 as NormalizedZoomValue },
             ) || p;
       const { fixedPoint } = calculateFixedPointForNonElbowArrowBinding(
-        element,
+        safeElement,
         boundElement,
         startOrEnd,
         elementsMap,
