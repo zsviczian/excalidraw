@@ -257,6 +257,7 @@ export type InteractiveCanvasAppState = Readonly<
     frameColor: AppState["frameColor"]; //zsviczian
     shouldCacheIgnoreZoom: AppState["shouldCacheIgnoreZoom"];
     exportScale: AppState["exportScale"];
+    currentItemArrowType: AppState["currentItemArrowType"];
   }
 >;
 
