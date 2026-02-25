@@ -5383,14 +5383,14 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       // view mode hardcoded from upstream -> disable tool switching for now
-      const shouldPreventToolSwitching = false; //this.props.viewModeEnabled === true; //zsviczian
+      const shouldPreventToolSwitching = this.props.viewModeEnabled === true;
 
       if (
         !shouldPreventToolSwitching &&
         this.state.viewModeEnabled &&
         event.key === KEYS.ESCAPE
       ) {
-        this.setActiveTool({ type: "hand" });
+        this.setActiveTool({ type: "selection" }); //zsviczian
         return;
       }
 
@@ -5451,7 +5451,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (this.state.viewModeEnabled) {
-        //revert to hand in case a key is pressed (K is handled above)
+        // revert to selection in case a key is pressed (K is handled above)
         if (event.key !== KEYS.K) {
           this.setActiveTool({ type: "selection" });
         }

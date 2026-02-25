@@ -642,7 +642,7 @@ export const actionToggleLaserPointer = register({
     if (isLaserPointerActive(appState)) {
       activeTool = updateActiveTool(appState, {
         ...(appState.activeTool.lastActiveTool || {
-          type: appState.viewModeEnabled ? "hand" : "selection",
+          type: "selection",
         }),
         lastActiveToolBeforeEraser: null,
       });
