@@ -430,6 +430,8 @@ import { EraserTrail } from "../eraser";
 
 import { getShortcutKey } from "../shortcut";
 
+import { tryParseSpreadsheet } from "../charts";
+
 import ConvertElementTypePopup, {
   getConversionTypeFromElements,
   convertElementTypePopupAtom,
@@ -3743,14 +3745,19 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     // ------------------- Spreadsheet -------------------
-    if (data.spreadsheet && !isPlainPaste) {
-      this.setState({
-        pasteDialog: {
-          data: data.spreadsheet,
-          shown: true,
-        },
-      });
-      return;
+
+    if (!isPlainPaste && data.text) {
+      const result = tryParseSpreadsheet(data.text);
+      if (result.ok) {
+        this.setState({
+          openDialog: {
+            name: "charts",
+            data: result.data,
+            rawText: data.text,
+          },
+        });
+        return;
+      }
     }
 
     // ------------------- Images or SVG code -------------------

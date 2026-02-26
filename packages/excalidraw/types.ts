@@ -21,7 +21,6 @@ import type {
   GroupId,
   ExcalidrawBindableElement,
   Arrowhead,
-  ChartType,
   FontFamilyValues,
   ExcalidrawTextElement,
   FileId,
@@ -399,7 +398,8 @@ export interface AppState {
     | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
     | { name: "commandPalette" }
     | { name: "settings" }
-    | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] };
+    | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] }
+    | { name: "charts"; data: Spreadsheet; rawText: string };
   /**
    * Reflects user preference for whether the default sidebar should be docked.
    *
@@ -441,16 +441,6 @@ export interface AppState {
     /** bitmap. Use `STATS_PANELS` bit values */
     panels: number;
   };
-  currentChartType: ChartType;
-  pasteDialog:
-    | {
-        shown: false;
-        data: null;
-      }
-    | {
-        shown: true;
-        data: Spreadsheet;
-      };
   showHyperlinkPopup: false | "info" | "editor";
   linkOpacity: number; //zsviczian
   colorPalette?: {
