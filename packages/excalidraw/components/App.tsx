@@ -5390,7 +5390,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state.viewModeEnabled &&
         event.key === KEYS.ESCAPE
       ) {
-        this.setActiveTool({ type: "selection" }); //zsviczian
+        this.setActiveTool({ type: "selection" });
         return;
       }
 
