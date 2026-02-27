@@ -266,7 +266,7 @@ const getTextElementPositionOffsets = (
 export const newTextElement = (
   opts: {
     text: string;
-    rawText: string;
+    rawText?: string;
     originalText?: string;
     fontSize?: number;
     fontFamily?: FontFamilyValues;
@@ -281,7 +281,7 @@ export const newTextElement = (
   const fontSize = opts.fontSize || DEFAULT_FONT_SIZE;
   const lineHeight = opts.lineHeight || getLineHeight(fontFamily);
   const text = normalizeText(opts.text);
-  const rawText = normalizeText(opts.rawText); //zsviczian
+  const rawText = normalizeText(opts.rawText ?? opts.originalText ?? opts.text); //zsviczian
   const metrics = measureText(
     text,
     getFontString({ fontFamily, fontSize }),

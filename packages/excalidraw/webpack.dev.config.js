@@ -8,6 +8,19 @@ const BundleAnalyzerPlugin =
 const MiniCssExtractPlugin = require("mini-css-extract-plugin"); //zsviczian
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
+const TRANSPILE_NODE_MODULES = new RegExp(
+  "node_modules[\\\\/](?:" +
+    [
+      "browser-fs-access",
+      "canvas-roundrect-polyfill",
+      "@excalidraw[\\\\/]laser-pointer",
+      "@excalidraw[\\\\/]mermaid-to-excalidraw",
+      "@mermaid-js[\\\\/]parser",
+      "mermaid",
+    ].join("|") +
+    ")[\\\\/]",
+);
+
 module.exports = {
   mode: "development",
   entry: {
@@ -65,8 +78,9 @@ module.exports = {
       },
       {
         test: /\.(ts|tsx|js|jsx|mjs)$/,
-        exclude:
-          /node_modules[\\/](?!(browser-fs-access|canvas-roundrect-polyfil|@zsviczian[\\/]laser-pointer))/,
+        exclude: (modulePath) =>
+          /node_modules[\\/]/.test(modulePath) &&
+          !TRANSPILE_NODE_MODULES.test(modulePath),
         use: [
           {
             loader: "import-meta-loader",
@@ -75,7 +89,15 @@ module.exports = {
             loader: "babel-loader", // Add this babel-loader
             options: {
               presets: [
-                "@babel/preset-env",
+                [
+                  "@babel/preset-env",
+                  {
+                    targets: {
+                      ios: "16",
+                    },
+                    bugfixes: true,
+                  },
+                ],
                 ["@babel/preset-react", { 
                   runtime: "classic", // Use classic JSX transform
                   pragma: "React.createElement",
