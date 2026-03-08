@@ -120,7 +120,6 @@ import {
   fixBindingsAfterDeletion,
   getHoveredElementForBinding,
   isBindingEnabled,
-  shouldEnableBindingForPointerEvent,
   updateBoundElements,
   LinearElementEditor,
   newElementWith,
@@ -322,6 +321,8 @@ import {
   actionToggleElementLock,
   actionToggleLinearEditor,
   actionToggleObjectsSnapMode,
+  actionToggleArrowBinding,
+  actionToggleMidpointSnapping,
   actionToggleCropEditor,
 } from "../actions";
 import { actionWrapTextInContainer } from "../actions/actionBoundText";
@@ -603,6 +604,7 @@ const gesture: Gesture = {
 class App extends React.Component<AppProps, AppState> {
   canvas: AppClassProperties["canvas"];
   interactiveCanvas: AppClassProperties["interactiveCanvas"] = null;
+  public sessionExportThemeOverride: AppState["theme"] | undefined;
   rc: RoughCanvas;
   unmounted: boolean = false;
   actionManager: ActionManager;
@@ -721,6 +723,7 @@ class App extends React.Component<AppProps, AppState> {
     this.state = {
       ...defaultAppState,
       theme,
+      exportWithDarkMode: theme === THEME.DARK,
       isLoading: true,
       ...this.getCanvasOffsets(),
       viewModeEnabled,
@@ -2845,7 +2848,9 @@ class App extends React.Component<AppProps, AppState> {
 
   private onBlur = withBatchedUpdates(() => {
     isHoldingSpace = false;
-    this.setState({ isBindingEnabled: true });
+    this.setState({
+      isBindingEnabled: this.state.bindingPreference === "enabled",
+    });
   });
 
   private onUnload = () => {
@@ -3423,6 +3428,13 @@ class App extends React.Component<AppProps, AppState> {
     this.updateEmbeddables();
     const elements = this.scene.getElementsIncludingDeleted();
     const elementsMap = this.scene.getElementsMapIncludingDeleted();
+
+    const shouldExportWithDarkMode =
+      (this.sessionExportThemeOverride ?? this.state.theme) === THEME.DARK;
+
+    if (this.state.exportWithDarkMode !== shouldExportWithDarkMode) {
+      this.setState({ exportWithDarkMode: shouldExportWithDarkMode });
+    }
 
     if (!this.state.showWelcomeScreen && !elements.length) {
       this.setState({ showWelcomeScreen: true });
@@ -5465,13 +5477,15 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      if (event[KEYS.CTRL_OR_CMD] && this.state.isBindingEnabled) {
+      if (event[KEYS.CTRL_OR_CMD] && !event.repeat) {
         if (getFeatureFlag("COMPLEX_BINDINGS")) {
           this.resetDelayedBindMode();
         }
 
         flushSync(() => {
-          this.setState({ isBindingEnabled: false });
+          this.setState({
+            isBindingEnabled: this.state.bindingPreference !== "enabled",
+          });
         });
 
         maybeHandleArrowPointlikeDrag({ app: this, event });
@@ -5750,10 +5764,13 @@ class App extends React.Component<AppProps, AppState> {
         }
       }
     }
-    if (!event[KEYS.CTRL_OR_CMD] && !this.state.isBindingEnabled) {
-      flushSync(() => {
-        this.setState({ isBindingEnabled: true });
-      });
+    if (!event[KEYS.CTRL_OR_CMD]) {
+      const preferenceEnabled = this.state.bindingPreference === "enabled";
+      if (this.state.isBindingEnabled !== preferenceEnabled) {
+        flushSync(() => {
+          this.setState({ isBindingEnabled: preferenceEnabled });
+        });
+      }
 
       maybeHandleArrowPointlikeDrag({ app: this, event });
     }
@@ -7847,6 +7864,14 @@ class App extends React.Component<AppProps, AppState> {
       this.focusContainer();
     } //zsviczian - end
 
+    // If Ctrl is not held, ensure isBindingEnabled reflects the user preference.
+    if (!event.ctrlKey) {
+      const preferenceEnabled = this.state.bindingPreference === "enabled";
+      if (this.state.isBindingEnabled !== preferenceEnabled) {
+        this.setState({ isBindingEnabled: preferenceEnabled });
+      }
+    }
+
     const scenePointer = viewportCoordsToSceneCoords(event, this.state);
     const { x: scenePointerX, y: scenePointerY } = scenePointer;
     this.lastPointerMoveCoords = {
@@ -8071,7 +8096,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     this.clearSelectionIfNotUsingSelection();
-    this.updateBindingEnabledOnPointerMove(event);
 
     if (this.handleSelectionOnPointerDown(event, pointerDownState)) {
       return;
@@ -8294,6 +8318,13 @@ class App extends React.Component<AppProps, AppState> {
 
     this.removePointer(event);
     this.lastPointerUpEvent = event;
+
+    if (!event.ctrlKey) {
+      const preferenceEnabled = this.state.bindingPreference === "enabled";
+      if (this.state.isBindingEnabled !== preferenceEnabled) {
+        this.setState({ isBindingEnabled: preferenceEnabled });
+      }
+    }
 
     const scenePointer = viewportCoordsToSceneCoords(
       { clientX: event.clientX, clientY: event.clientY },
@@ -9431,7 +9462,9 @@ class App extends React.Component<AppProps, AppState> {
   ): void => {
     if (event.ctrlKey) {
       flushSync(() => {
-        this.setState({ isBindingEnabled: false });
+        this.setState({
+          isBindingEnabled: this.state.bindingPreference !== "enabled",
+        });
       });
     }
 
@@ -12151,15 +12184,6 @@ class App extends React.Component<AppProps, AppState> {
     this.addNewImagesToImageCache();
   }, IMAGE_RENDER_TIMEOUT);
 
-  private updateBindingEnabledOnPointerMove = (
-    event: React.PointerEvent<HTMLElement>,
-  ) => {
-    const shouldEnableBinding = shouldEnableBindingForPointerEvent(event);
-    if (this.state.isBindingEnabled !== shouldEnableBinding) {
-      this.setState({ isBindingEnabled: shouldEnableBinding });
-    }
-  };
-
   //zsviczian - published on API
   public setSelection(elements: readonly NonDeletedExcalidrawElement[]) {
     const selectedElementIds: { [id: string]: true } = {};
@@ -12964,6 +12988,8 @@ class App extends React.Component<AppProps, AppState> {
         CONTEXT_MENU_SEPARATOR,
         actionToggleGridMode,
         actionToggleObjectsSnapMode,
+        actionToggleArrowBinding,
+        actionToggleMidpointSnapping,
         actionToggleZenMode,
         actionToggleViewMode,
         actionToggleStats,

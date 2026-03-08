@@ -565,6 +565,14 @@ export const MobileToolBar = ({
                 {t("toolBar.embeddable")}
               </DropdownMenu.Item>
               <DropdownMenu.Item
+                onSelect={() => app.onMagicframeToolSelect()}
+                icon={MagicIcon}
+                data-testid="toolbar-magicframe"
+                badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
+              >
+                {t("toolBar.magicframe")}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item
                 onSelect={() => app.setActiveTool({ type: "laser" })}
                 icon={laserPointerToolIcon}
                 data-testid="toolbar-laser"

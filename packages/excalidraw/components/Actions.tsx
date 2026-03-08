@@ -238,7 +238,7 @@ export const SelectedShapeActions = ({
       {(appState.activeTool.type === "text" ||
         targetElements.some(isTextElement)) && (
         <>
-          {renderAction("changeFontFamily")}
+          <fieldset>{renderAction("changeFontFamily")}</fieldset>
           {renderAction("changeFontSize")}
           {(appState.activeTool.type === "text" ||
             suppportsHorizontalAlign(targetElements, elementsMap)) &&

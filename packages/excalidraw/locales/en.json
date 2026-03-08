@@ -182,7 +182,9 @@
     "shapeSwitch": "Switch shape",
     "toggleFrameRole": "Toggle frame role",
     "preferences": "Preferences",
-    "preferences_toolLock": "Tool lock"
+    "preferences_toolLock": "Tool lock",
+    "arrowBinding": "Arrow binding",
+    "midpointSnapping": "Snap to midpoints"
   },
   "elementLink": {
     "title": "Link to object",
@@ -627,7 +629,8 @@
     "syntax": "Mermaid Syntax",
     "preview": "Preview",
     "label": "Mermaid",
-    "inputPlaceholder": "Write Mermaid diagram defintion here..."
+    "inputPlaceholder": "Write Mermaid diagram defintion here...",
+    "autoFixAvailable": "Auto-fix is available"
   },
   "ttd": {
     "error": "Error!"

@@ -2050,6 +2050,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                   startElement,
                   "start",
                   elementsMap,
+                  appState.isBindingEnabled,
                 ),
               }
             : null;
@@ -2063,6 +2064,7 @@ export const actionChangeArrowType = register<keyof typeof ARROW_TYPE>({
                   endElement,
                   "end",
                   elementsMap,
+                  appState.isBindingEnabled,
                 ),
               }
             : null;
