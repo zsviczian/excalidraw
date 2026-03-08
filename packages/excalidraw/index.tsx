@@ -321,6 +321,7 @@ export {
   getFormFactor,
   safelyParseJSON, //zsviczian
   destroyObsidianUtils, //zsviczian
+  throttleRAF,
 } from "@excalidraw/common";
 
 export {
