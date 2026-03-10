@@ -4,17 +4,11 @@ import {
   supported as nativeFileSystemSupported,
 } from "browser-fs-access";
 
-import { EVENT, MIME_TYPES, debounce } from "@excalidraw/common";
-
-import { AbortError } from "../errors";
+import { MIME_TYPES } from "@excalidraw/common";
 
 import { normalizeFile } from "./blob";
 
-import type { FileSystemHandle } from "browser-fs-access";
-
 type FILE_EXTENSION = Exclude<keyof typeof MIME_TYPES, "binary">;
-
-const INPUT_CHANGE_INTERVAL_MS = 5000;
 
 export const fileOpen = async <M extends boolean | undefined = false>(opts: {
   extensions?: FILE_EXTENSION[];
@@ -43,68 +37,6 @@ export const fileOpen = async <M extends boolean | undefined = false>(opts: {
     extensions,
     mimeTypes,
     multiple: opts.multiple ?? false,
-    legacySetup: (resolve, reject, input) => {
-      let isResolved = false;
-      let checkInterval: number | null = null;
-
-      // Increased delay for iOS to ensure file selection is complete
-      const CHECK_INTERVAL = 100; // 100ms
-      const MAX_CHECKS = 50; // 5 seconds total
-      let checkCount = 0;
-
-      const scheduleRejection = debounce(reject, INPUT_CHANGE_INTERVAL_MS);
-
-      const checkForFile = () => {
-        if (isResolved) {
-          return;
-        }
-
-        if (input.files?.length) {
-          isResolved = true;
-          const ret = opts.multiple ? [...input.files] : input.files[0];
-          resolve(ret as RetType);
-          return true;
-        }
-
-        checkCount++;
-        if (checkCount >= MAX_CHECKS) {
-          scheduleRejection();
-          return true;
-        }
-        return false;
-      };
-
-      const focusHandler = () => {
-        // Start checking for files only after focus event
-        checkInterval = window.setInterval(() => {
-          if (checkForFile()) {
-            clearInterval(checkInterval!);
-          }
-        }, CHECK_INTERVAL);
-
-        document.addEventListener(EVENT.KEYUP, scheduleRejection);
-        document.addEventListener(EVENT.POINTER_UP, scheduleRejection);
-      };
-
-      requestAnimationFrame(() => {
-        window.addEventListener(EVENT.FOCUS, focusHandler);
-      });
-
-      return (rejectPromise) => {
-        if (checkInterval) {
-          clearInterval(checkInterval);
-        }
-        scheduleRejection.cancel();
-        window.removeEventListener(EVENT.FOCUS, focusHandler);
-        document.removeEventListener(EVENT.KEYUP, scheduleRejection);
-        document.removeEventListener(EVENT.POINTER_UP, scheduleRejection);
-
-        if (rejectPromise && !isResolved) {
-          console.warn("Opening the file was canceled (legacy-fs).");
-          rejectPromise(new AbortError());
-        }
-      };
-    },
   });
 
   if (Array.isArray(files)) {
@@ -124,8 +56,8 @@ export const fileSave = (
     extension: FILE_EXTENSION;
     mimeTypes?: string[];
     description: string;
-    /** existing FileSystemHandle */
-    fileHandle?: FileSystemHandle | null;
+    /** existing FileSystemFileHandle */
+    fileHandle?: FileSystemFileHandle | null;
   },
 ) => {
   return _fileSave(
@@ -137,8 +69,8 @@ export const fileSave = (
       mimeTypes: opts.mimeTypes,
     },
     opts.fileHandle,
+    false,
   );
 };
 
 export { nativeFileSystemSupported };
-export type { FileSystemHandle };

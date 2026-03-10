@@ -11,6 +11,8 @@ export * from "./random";
 export * from "./url";
 export * from "./utils";
 export * from "./emitter";
+export * from "./appEventBus";
 export * from "./editorInterface";
 export * from "./commonObsidianUtils";
+export * from "./versionedSnapshotStore";
 export { Debug } from "../debug";

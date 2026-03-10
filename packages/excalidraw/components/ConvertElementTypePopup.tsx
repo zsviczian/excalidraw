@@ -1,7 +1,9 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  bumpVersion,
   getLinearElementSubType,
+  mutateElement,
   updateElbowArrowPoints,
 } from "@excalidraw/element";
 
@@ -37,6 +39,8 @@ import {
   isProdEnv,
   mapFind,
   reduceToCommonValue,
+  ROUNDNESS,
+  sceneCoordsToViewportCoords,
   updateActiveTool,
 } from "@excalidraw/common";
 
@@ -71,10 +75,6 @@ import type {
 
 import type { Scene } from "@excalidraw/element";
 
-import {
-  ROUNDNESS,
-  sceneCoordsToViewportCoords,
-} from "@excalidraw/common";
 import { trackEvent } from "../analytics";
 import { atom } from "../editor-jotai";
 
@@ -93,7 +93,6 @@ import {
 import type App from "./App";
 
 import type { AppClassProperties } from "../types";
-import { bumpVersion, mutateElement } from "@excalidraw/element/mutateElement";
 
 const GAP_HORIZONTAL = 8;
 const GAP_VERTICAL = 10;
