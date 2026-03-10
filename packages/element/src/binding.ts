@@ -138,11 +138,8 @@ export const maxBindingDistance_simple = (zoom?: AppState["zoom"]): number => {
 
 export const isBindingEnabled = (appState: {
   isBindingEnabled: AppState["isBindingEnabled"];
-  invertBindingBehaviour: AppState["invertBindingBehaviour"]; //zsviczian
 }): boolean => {
-  return appState.invertBindingBehaviour //zsviczian
-    ? !appState.isBindingEnabled
-    : appState.isBindingEnabled;
+  return appState.isBindingEnabled;
 };
 
 export const bindOrUnbindBindingElement = (

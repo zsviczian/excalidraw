@@ -133,7 +133,6 @@ export const getDefaultAppState = (): Omit<
       fill: "rgba(0, 0, 200, 0.04)",
       nameColor: "#999999",
     }, //zsviczian
-    invertBindingBehaviour: false, //zsviczian
     selectedLinearElement: null,
     snapLines: [],
     originSnapOffset: {
@@ -278,7 +277,6 @@ const APP_STATE_STORAGE_CONF = (<
   highlightSearchResult: { browser: false, export: false, server: false }, //zsviczian
   dynamicStyle: { browser: false, export: false, server: false }, //zsviczian
   frameColor: { browser: false, export: false, server: false }, //zsviczian
-  invertBindingBehaviour: { browser: false, export: false, server: false }, //zsviczian
   selectedLinearElement: { browser: true, export: false, server: false },
   snapLines: { browser: false, export: false, server: false },
   originSnapOffset: { browser: false, export: false, server: false },

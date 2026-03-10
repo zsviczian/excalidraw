@@ -230,7 +230,6 @@ export type InteractiveCanvasAppState = Readonly<
     multiElement: AppState["multiElement"];
     newElement: AppState["newElement"];
     isBindingEnabled: AppState["isBindingEnabled"];
-    invertBindingBehaviour: AppState["invertBindingBehaviour"]; //zsviczian
     isMidpointSnappingEnabled: AppState["isMidpointSnappingEnabled"];
     suggestedBinding: AppState["suggestedBinding"];
     isRotating: AppState["isRotating"];
@@ -474,7 +473,6 @@ export interface AppState {
   highlightSearchResult: boolean; //zsviczian
   dynamicStyle: { [x: string]: string }; //zsviczian
   frameColor: { stroke: string; fill: string; nameColor: string }; //zsviczian
-  invertBindingBehaviour: boolean; //zsviczian
   selectedLinearElement: LinearElementEditor | null;
   snapLines: readonly SnapLine[];
   originSnapOffset: {
