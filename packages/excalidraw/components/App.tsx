@@ -526,6 +526,7 @@ EditorInterfaceContext.displayName = "EditorInterfaceContext";
 const editorLifecycleEventBehavior = {
   "editor:mount": { cardinality: "once", replay: "last" },
   "editor:initialize": { cardinality: "once", replay: "last" },
+  "editor:unmount": { cardinality: "once", replay: "last" },
 } as const;
 
 export const ExcalidrawContainerContext = React.createContext<{
@@ -565,7 +566,7 @@ export const ExcalidrawAPIContext =
 ExcalidrawAPIContext.displayName = "ExcalidrawAPIContext";
 
 export const ExcalidrawAPISetContext = React.createContext<
-  ((api: ExcalidrawImperativeAPI) => void) | null
+  ((api: ExcalidrawImperativeAPI | null) => void) | null
 >(null);
 ExcalidrawAPISetContext.displayName = "ExcalidrawAPISetContext";
 
@@ -742,6 +743,69 @@ class App extends React.Component<AppProps, AppState> {
 
   api: ExcalidrawImperativeAPI;
 
+  private createExcalidrawAPI(): ExcalidrawImperativeAPI {
+    const api: ExcalidrawImperativeAPI = {
+      isDestroyed: false,
+      updateScene: this.updateScene,
+      applyDeltas: this.applyDeltas,
+      mutateElement: this.mutateElement,
+      updateLibrary: this.library.updateLibrary,
+      addFiles: this.addFiles,
+      resetScene: this.resetScene,
+      getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
+      getSceneElementsMapIncludingDeleted:
+        this.getSceneElementsMapIncludingDeleted,
+      history: {
+        clear: this.resetHistory,
+        undo: this.undo, //zsviczian
+        redo: this.redo, //zsviczian
+      },
+      scrollToContent: this.scrollToContent,
+      getSceneElements: this.getSceneElements,
+      getAppState: () => this.state,
+      getFiles: () => this.files,
+      getName: this.getName,
+      registerAction: (action: Action) => {
+        this.actionManager.registerAction(action);
+      },
+      refresh: this.refresh,
+      setToast: this.setToast,
+      id: this.id,
+      setActiveTool: this.setActiveTool,
+      setCursor: this.setCursor,
+      resetCursor: this.resetCursor,
+      getEditorInterface: () => this.editorInterface,
+      updateFrameRendering: this.updateFrameRendering,
+      toggleSidebar: this.toggleSidebar,
+      onChange: (cb) => this.onChangeEmitter.on(cb),
+      onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
+      onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
+      onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
+      onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
+      onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
+      onStateChange: this.onStateChange,
+      onEvent: this.onEvent,
+      setForceRenderAllEmbeddables: this.setForceRenderAllEmbeddables, //zsviczian
+      zoomToFit: this.zoomToFit, //zsviczian
+      refreshEditorInterface: this.refreshEditorInterface, //zsviczian
+      setDesktopUIMode: this.setDesktopUIMode, //zsviczian
+      setMobileModeAllowed: this.setMobileModeAllowed, //zsviczian
+      isTouchScreen: this.isTouchScreen, //zsviczian
+      isTrayModeEnabled: this.isTrayModeEnabled, //zsviczian
+      getColorAtScenePoint: this.getColorAtScenePoint, //zsviczian
+      startLineEditor: this.startLineEditor, //zsviczian
+      refreshAllArrows: this.refreshAllArrows, //zsviczian
+      updateContainerSize: this.updateContainerSize, //zsviczian
+      selectElements: this.selectElements, //zsviczian
+      sendBackward: this.sendBackward, //zsviczian
+      bringForward: this.bringForward, //zsviczian
+      sendToBack: this.sendToBack, //zsviczian
+      bringToFront: this.bringToFront, //zsviczian
+      getHTMLIFrameElement: (id: string) => this.getHTMLIFrameElement(id), //zsviczian
+    };
+    return api;
+  }
+
   constructor(props: AppProps) {
     super(props);
     const defaultAppState = getDefaultAppState();
@@ -805,66 +869,11 @@ class App extends React.Component<AppProps, AppState> {
     this.actionManager.registerAction(createUndoAction(this.history));
     this.actionManager.registerAction(createRedoAction(this.history));
 
-    this.api = {
-      updateScene: this.updateScene,
-      applyDeltas: this.applyDeltas,
-      mutateElement: this.mutateElement,
-      updateLibrary: this.library.updateLibrary,
-      addFiles: this.addFiles,
-      resetScene: this.resetScene,
-      getSceneElementsIncludingDeleted: this.getSceneElementsIncludingDeleted,
-      getSceneElementsMapIncludingDeleted:
-        this.getSceneElementsMapIncludingDeleted,
-      history: {
-        clear: this.resetHistory,
-        undo: this.undo, //zsviczian
-        redo: this.redo, //zsviczian
-      },
-      scrollToContent: this.scrollToContent,
-      getSceneElements: this.getSceneElements,
-      getAppState: () => this.state,
-      getFiles: () => this.files,
-      getName: this.getName,
-      registerAction: (action: Action) => {
-        this.actionManager.registerAction(action);
-      },
-      refresh: this.refresh,
-      setToast: this.setToast,
-      id: this.id,
-      setActiveTool: this.setActiveTool,
-      setCursor: this.setCursor,
-      resetCursor: this.resetCursor,
-      getEditorInterface: () => this.editorInterface,
-      updateFrameRendering: this.updateFrameRendering,
-      toggleSidebar: this.toggleSidebar,
-      onChange: (cb) => this.onChangeEmitter.on(cb),
-      onIncrement: (cb) => this.store.onStoreIncrementEmitter.on(cb),
-      onPointerDown: (cb) => this.onPointerDownEmitter.on(cb),
-      onPointerUp: (cb) => this.onPointerUpEmitter.on(cb),
-      onScrollChange: (cb) => this.onScrollChangeEmitter.on(cb),
-      onUserFollow: (cb) => this.onUserFollowEmitter.on(cb),
-      onStateChange: this.onStateChange,
-      onEvent: this.onEvent,
-      setForceRenderAllEmbeddables: this.setForceRenderAllEmbeddables, //zsviczian
-      zoomToFit: this.zoomToFit, //zsviczian
-      refreshEditorInterface: this.refreshEditorInterface, //zsviczian
-      setDesktopUIMode: this.setDesktopUIMode, //zsviczian
-      setMobileModeAllowed: this.setMobileModeAllowed, //zsviczian
-      isTouchScreen: this.isTouchScreen, //zsviczian
-      isTrayModeEnabled: this.isTrayModeEnabled, //zsviczian
-      getColorAtScenePoint: this.getColorAtScenePoint, //zsviczian
-      startLineEditor: this.startLineEditor, //zsviczian
-      refreshAllArrows: this.refreshAllArrows, //zsviczian
-      updateContainerSize: this.updateContainerSize, //zsviczian
-      selectElements: this.selectElements, //zsviczian
-      sendBackward: this.sendBackward, //zsviczian
-      bringForward: this.bringForward, //zsviczian
-      sendToBack: this.sendToBack, //zsviczian
-      bringToFront: this.bringToFront, //zsviczian
-      getHTMLIFrameElement: (id: string) => this.getHTMLIFrameElement(id), //zsviczian
-    } as const;
-
-    props.onExcalidrawAPI?.(this.api);
+    // in case internal editor APIs call this early, otherwise we need
+    // to construct this in componentDidMount because componentWillUnmount
+    // will invalidate it (so in StrictMode, doing this in constructor alone
+    // would be a problem)
+    this.api = this.createExcalidrawAPI();
   }
 
   updateEditorAtom = <Value, Args extends unknown[], Result>(
@@ -3140,6 +3149,8 @@ class App extends React.Component<AppProps, AppState> {
 
   public async componentDidMount() {
     this.unmounted = false;
+    this.api = this.createExcalidrawAPI();
+
     this.excalidrawContainerValue.container =
       this.excalidrawContainerRef.current;
 
@@ -3228,10 +3239,35 @@ class App extends React.Component<AppProps, AppState> {
 
     this.editorLifecycleEvents.emit("editor:mount", mountPayload);
     this.props.onMount?.(mountPayload);
+    this.props.onExcalidrawAPI?.(this.api);
   }
 
   public componentWillUnmount() {
+    // we're recreating the api object reference so that the
+    // <ExcalidrawAPIContext.Provider/> picks up on it
+    this.api = { ...this.api, isDestroyed: true };
+
+    for (const key of Object.keys(this.api) as (keyof typeof this.api)[]) {
+      if (
+        (key.startsWith("get") ||
+          key === "onStateChange" ||
+          key === "onEvent") &&
+        typeof this.api[key] === "function"
+      ) {
+        (this.api as any)[key] = () => {
+          throw new Error(
+            "ExcalidrawAPI is no longer usable after the editor has been unmounted and will return invalid/empty data. You should check for `ExcalidrawAPI.isDestroyed` before calling get* methods on subscribing to state/event changes.",
+          );
+        };
+      }
+    }
+
+    this.editorLifecycleEvents.emit("editor:unmount");
+    this.props.onUnmount?.();
+    this.props.onExcalidrawAPI?.(null);
+
     (window as any).launchQueue?.setConsumer(() => {});
+
     this.renderer.destroy();
     this.scene.destroy();
     this.scene = new Scene();
