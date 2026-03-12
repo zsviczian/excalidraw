@@ -69,6 +69,11 @@ const modifiedTablerIconProps: Opts = {
   strokeLinejoin: "round",
 } as const;
 
+const arrowheadPreviewIconProps: Opts = {
+  width: 40,
+  height: 20,
+} as const;
+
 // -----------------------------------------------------------------------------
 
 // tabler-icons: present
@@ -204,7 +209,7 @@ export const LockedIcon = createIcon(
 );
 
 export const LockedIconFilled = createIcon(
-  <g fill="currentColor">
+  <g fill="var(--icon-fill-color)">
     <path d="M12 2a5 5 0 0 1 5 5v3a3 3 0 0 1 3 3v6a3 3 0 0 1 -3 3h-10a3 3 0 0 1 -3 -3v-6a3 3 0 0 1 3 -3v-3a5 5 0 0 1 5 -5m0 12a2 2 0 0 0 -1.995 1.85l-.005 .15a2 2 0 1 0 2 -2m0 -10a3 3 0 0 0 -3 3v3h6v-3a3 3 0 0 0 -3 -3" />
   </g>,
   {
@@ -315,7 +320,7 @@ export const SelectionIcon = createIcon(
 
 export const LassoIcon = createIcon(
   <g
-    stroke="currentColor"
+    stroke="var(--icon-fill-color)" //zsviczian
     strokeLinecap="round"
     strokeLinejoin="round"
     strokeWidth={1.5}
@@ -411,7 +416,7 @@ export const TextIcon = createIcon(
 );
 
 export const TextSizeIcon = createIcon(
-  <g stroke="currentColor" strokeWidth="1.5">
+  <g stroke="var(--icon-fill-color)" strokeWidth="1.5">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M3 7v-2h13v2" />
     <path d="M10 5v14" />
@@ -1316,16 +1321,17 @@ export const ArrowheadNoneIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
-        transform={flip ? "translate(24, 0) scale(-1, 1)" : ""}
-        stroke="currentColor"
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+        stroke="var(--icon-fill-color)" //zsviczian
         opacity={0.3}
         strokeWidth={2}
+        fill="none"
+        strokeLinecap="round"
       >
-        <path d="M12 12l-9 0" />
-        <path d="M21 9l-6 6" />
-        <path d="M21 15l-6 -6" />
+        <path d="M7,11 H19" />
+        <path d="M25,6 L33,16 M33,6 L25,16" />
       </g>,
-      tablerIconProps,
+      arrowheadPreviewIconProps,
     ),
 );
 
@@ -1337,57 +1343,12 @@ export const ArrowheadArrowIcon = React.memo(
         stroke="var(--icon-fill-color)"
         strokeWidth={2}
         fill="none"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       >
-        <path d="M34 10H6M34 10L27 5M34 10L27 15" />
-        <path d="M27.5 5L34.5 10L27.5 15" />
+        <path d="M7,11 H33 M23,5 L33,11 L23,17" />
       </g>,
-      { width: 40, height: 20 },
-    ),
-);
-
-export const ArrowheadCircleIcon = React.memo(
-  ({ flip = false }: { flip?: boolean }) =>
-    createIcon(
-      <g
-        stroke="var(--icon-fill-color)"
-        fill="var(--icon-fill-color)"
-        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
-      >
-        <path d="M32 10L6 10" strokeWidth={2} />
-        <circle r="4" transform="matrix(-1 0 0 1 30 10)" />
-      </g>,
-      { width: 40, height: 20 },
-    ),
-);
-
-export const ArrowheadCircleOutlineIcon = React.memo(
-  ({ flip = false }: { flip?: boolean }) =>
-    createIcon(
-      <g
-        stroke="currentColor"
-        fill="none"
-        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
-        strokeWidth={2}
-      >
-        <path d="M26 10L6 10" />
-        <circle r="4" transform="matrix(-1 0 0 1 30 10)" />
-      </g>,
-      { width: 40, height: 20 },
-    ),
-);
-
-export const ArrowheadBarIcon = React.memo(
-  ({ flip = false }: { flip?: boolean }) =>
-    createIcon(
-      <g transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}>
-        <path
-          d="M34 10H5.99996M34 10L34 5M34 10L34 15"
-          stroke="var(--icon-fill-color)"
-          strokeWidth={2}
-          fill="none"
-        />
-      </g>,
-      { width: 40, height: 20 },
+      arrowheadPreviewIconProps,
     ),
 );
 
@@ -1398,11 +1359,12 @@ export const ArrowheadTriangleIcon = React.memo(
         stroke="var(--icon-fill-color)"
         fill="var(--icon-fill-color)"
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+        strokeLinejoin="round"
       >
-        <path d="M32 10L6 10" strokeWidth={2} />
-        <path d="M27.5 5.5L34.5 10L27.5 14.5L27.5 5.5" />
+        <path d="M7,11 H23" strokeWidth={2} strokeLinecap="round" />
+        <path d="M23,5 L35,11 L23,17 Z" />
       </g>,
-      { width: 40, height: 20 },
+      arrowheadPreviewIconProps,
     ),
 );
 
@@ -1410,17 +1372,48 @@ export const ArrowheadTriangleOutlineIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)"//zsviczian
         fill="none"
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
         strokeWidth={2}
         strokeLinejoin="round"
+        strokeLinecap="round"
       >
-        <path d="M6,9.5H27" />
-        <path d="M27,5L34,10L27,14Z" fill="none" />
+        <path d="M7,11 H23" />
+        <path d="M23,5 L35,11 L23,17 Z" />
       </g>,
+      arrowheadPreviewIconProps,
+    ),
+);
 
-      { width: 40, height: 20 },
+export const ArrowheadCircleIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke="var(--icon-fill-color)" //zsviczian
+        fill="var(--icon-fill-color)" //zsviczian
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+      >
+        <path d="M7,11 H25" strokeWidth={2} strokeLinecap="round" />
+        <circle cx="29" cy="11" r="4" />
+      </g>,
+      arrowheadPreviewIconProps,
+    ),
+);
+
+export const ArrowheadCircleOutlineIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke="var(--icon-fill-color)" //zsviczian
+        fill="none"
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+        strokeWidth={2}
+      >
+        <path d="M7,11 H25" strokeLinecap="round" />
+        <circle cx="29" cy="11" r="4" />
+      </g>,
+      arrowheadPreviewIconProps,
     ),
 );
 
@@ -1428,16 +1421,15 @@ export const ArrowheadDiamondIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
-        stroke="currentColor"
-        fill="currentColor"
+        stroke="var(--icon-fill-color)" //zsviczian
+        fill="var(--icon-fill-color)" //zsviczian
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
         strokeLinejoin="round"
-        strokeWidth={2}
       >
-        <path d="M6,9.5H20" />
-        <path d="M27,5L34,10L27,14L20,9.5Z" />
+        <path d="M7,11 H21" strokeWidth={2} strokeLinecap="round" />
+        <path d="M21,11 L28,5 L35,11 L28,17 Z" />
       </g>,
-      { width: 40, height: 20 },
+      arrowheadPreviewIconProps,
     ),
 );
 
@@ -1445,64 +1437,131 @@ export const ArrowheadDiamondOutlineIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)" //zsviczian
         fill="none"
         transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
         strokeLinejoin="round"
         strokeWidth={2}
+        strokeLinecap="round"
       >
-        <path d="M6,9.5H20" />
-        <path d="M27,5L34,10L27,14L20,9.5Z" />
+        <path d="M7,11 H21" />
+        <path d="M21,11 L28,5 L35,11 L28,17 Z" />
       </g>,
-      { width: 40, height: 20 },
+      arrowheadPreviewIconProps,
     ),
 );
 
-export const ArrowheadCrowfootIcon = React.memo(
+export const ArrowheadBarIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
-        stroke="currentColor"
+        transform={flip ? "translate(40, 0) scale(-1, 1)" : ""}
+        stroke="var(--icon-fill-color)" //zsviczian
+        strokeWidth={2}
+        fill="none"
+        strokeLinecap="round"
+      >
+        <path d="M11,11 H31 M31,5 V17" />
+      </g>,
+      arrowheadPreviewIconProps,
+    ),
+);
+
+export const ArrowheadCardinalityOneIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke="var(--icon-fill-color)" //zsviczian
         fill="none"
         transform={flip ? "" : "translate(40, 0) scale(-1, 1)"}
         strokeLinejoin="round"
         strokeWidth={2}
       >
-        <path d="M34,10 H6 M15,10 L7,5 M15,10 L7,15" />
+        <path d="M35,11 H7 M15,5 V17" />
       </g>,
-      { width: 40, height: 20 },
+      arrowheadPreviewIconProps,
     ),
 );
 
-export const ArrowheadCrowfootOneIcon = React.memo(
+export const ArrowheadCardinalityManyIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)" //zsviczian
         fill="none"
         transform={flip ? "" : "translate(40, 0) scale(-1, 1)"}
         strokeLinejoin="round"
         strokeWidth={2}
       >
-        <path d="M34,10 H6 M15,10 L15,15 L15,5" />
+        <path d="M35,11 H7 M15,11 L7,5 M15,11 L7,17" />
       </g>,
-      { width: 40, height: 20 },
+      arrowheadPreviewIconProps,
     ),
 );
 
-export const ArrowheadCrowfootOneOrManyIcon = React.memo(
+export const ArrowheadCardinalityOneOrManyIcon = React.memo(
   ({ flip = false }: { flip?: boolean }) =>
     createIcon(
       <g
-        stroke="currentColor"
+        stroke="var(--icon-fill-color)" //zsviczian
         fill="none"
         transform={flip ? "" : "translate(40, 0) scale(-1, 1)"}
         strokeLinejoin="round"
         strokeWidth={2}
       >
-        <path d="M34,10 H6 M15,10 L15,16 L15,4 M15,10 L7,5 M15,10 L7,15" />
+        <path d="M35,11 H7 M23,5 V17 M15,11 L7,5 M15,11 L7,17" />
       </g>,
-      { width: 40, height: 20 },
+      arrowheadPreviewIconProps,
+    ),
+);
+
+export const ArrowheadCardinalityExactlyOneIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke="var(--icon-fill-color)" //zsviczian
+        fill="none"
+        transform={flip ? "" : "translate(40, 0) scale(-1, 1)"}
+        strokeLinejoin="round"
+        strokeWidth={2}
+      >
+        <path d="M35,11 H7 M15,5 V17 M7,5 V17" />
+      </g>,
+      arrowheadPreviewIconProps,
+    ),
+);
+
+export const ArrowheadCardinalityZeroOrOneIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke="var(--icon-fill-color)" //zsviczian
+        fill="none"
+        transform={flip ? "" : "translate(40, 0) scale(-1, 1)"}
+        strokeLinejoin="round"
+        strokeWidth={2}
+      >
+        <path d="M35,11 H19 M11,11 H7 M7,5 V17" />
+        <circle cx="15" cy="11" r="4" />
+      </g>,
+      arrowheadPreviewIconProps,
+    ),
+);
+
+export const ArrowheadCardinalityZeroOrManyIcon = React.memo(
+  ({ flip = false }: { flip?: boolean }) =>
+    createIcon(
+      <g
+        stroke="var(--icon-fill-color)" //zsviczian
+        fill="none"
+        transform={flip ? "" : "translate(40, 0) scale(-1, 1)"}
+        strokeLinejoin="round"
+        strokeWidth={2}
+      >
+        <path d="M35,11 H27 M19,11 H7 M15,11 L7,5 M15,11 L7,17" />
+        <circle cx="23" cy="11" r="4" />
+      </g>,
+      arrowheadPreviewIconProps,
     ),
 );
 
@@ -1595,7 +1654,7 @@ export const fontSizeIcon = createIcon(
 export const FontFamilyHeadingIcon = createIcon(
   <>
     <g
-      stroke="currentColor"
+      stroke="var(--icon-fill-color)" //zsviczian
       strokeWidth="1.25"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -1900,7 +1959,7 @@ export const frameToolIcon = createIcon(
 
 export const mermaidLogoIcon = createIcon(
   <path
-    fill="currentColor"
+    fill="var(--icon-fill-color)" //zsviczian
     d="M407.48,111.18C335.587,108.103 269.573,152.338 245.08,220C220.587,152.338 154.573,108.103 82.68,111.18C80.285,168.229 107.577,222.632 154.74,254.82C178.908,271.419 193.35,298.951 193.27,328.27L193.27,379.13L296.9,379.13L296.9,328.27C296.816,298.953 311.255,271.42 335.42,254.82C382.596,222.644 409.892,168.233 407.48,111.18Z"
   />,
 );
@@ -1938,7 +1997,7 @@ export const ArrowRightIcon = createIcon(
 export const laserPointerToolIcon = createIcon(
   <g
     fill="none"
-    stroke="currentColor"
+    stroke="var(--icon-fill-color)" //zsviczian
     strokeWidth="1.25"
     strokeLinecap="round"
     strokeLinejoin="round"
@@ -1955,7 +2014,7 @@ export const laserPointerToolIcon = createIcon(
 );
 
 export const MagicIcon = createIcon(
-  <g stroke="currentColor" fill="none">
+  <g stroke="var(--icon-fill-color)" fill="none">
     <path stroke="none" d="M0 0h24v24H0z" />
     <path d="M6 21l15 -15l-3 -3l-15 15l3 3" />
     <path d="M15 6l3 3" />
@@ -1977,7 +2036,7 @@ export const MagicIconThin = createIcon(
 );
 
 export const OpenAIIcon = createIcon(
-  <g stroke="currentColor" fill="none">
+  <g stroke="var(--icon-fill-color)" fill="none">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M11.217 19.384a3.501 3.501 0 0 0 6.783 -1.217v-5.167l-6 -3.35" />
     <path d="M5.214 15.014a3.501 3.501 0 0 0 4.446 5.266l4.34 -2.534v-6.946" />
@@ -1990,7 +2049,7 @@ export const OpenAIIcon = createIcon(
 );
 
 export const fullscreenIcon = createIcon(
-  <g stroke="currentColor" fill="none">
+  <g stroke="var(--icon-fill-color)" fill="none">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />
     <path d="M4 16v2a2 2 0 0 0 2 2h2" />
@@ -2001,7 +2060,7 @@ export const fullscreenIcon = createIcon(
 );
 
 export const eyeIcon = createIcon(
-  <g stroke="currentColor" fill="none" strokeWidth={1.5}>
+  <g stroke="var(--icon-fill-color)" fill="none" strokeWidth={1.5}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
     <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
@@ -2010,7 +2069,7 @@ export const eyeIcon = createIcon(
 );
 
 export const eyeClosedIcon = createIcon(
-  <g stroke="currentColor" fill="none">
+  <g stroke="var(--icon-fill-color)" fill="none">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" />
     <path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" />
@@ -2020,7 +2079,7 @@ export const eyeClosedIcon = createIcon(
 );
 
 export const brainIcon = createIcon(
-  <g stroke="currentColor" fill="none">
+  <g stroke="var(--icon-fill-color)" fill="none">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M15.5 13a3.5 3.5 0 0 0 -3.5 3.5v1a3.5 3.5 0 0 0 7 0v-1.8" />
     <path d="M8.5 13a3.5 3.5 0 0 1 3.5 3.5v1a3.5 3.5 0 0 1 -7 0v-1.8" />
@@ -2238,7 +2297,7 @@ export const coffeeIcon = createIcon(
 );
 
 export const DeviceDesktopIcon = createIcon(
-  <g stroke="currentColor">
+  <g stroke="var(--icon-fill-color)">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M3 5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-16a1 1 0 0 1-1-1v-10zM7 20h10M9 16v4M15 16v4" />
   </g>,
