@@ -360,6 +360,12 @@ body.excalidraw-cursor-resize * {
     width: 100%;
     overflow-x: hidden;
     overflow-y: auto;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      display: none;
+    }
     box-sizing: border-box;
     margin-bottom: var(--bar-padding);
 
