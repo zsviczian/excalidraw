@@ -53,7 +53,7 @@ const TextToDiagramContent = ({
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useAtom(errorAtom);
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom);
-  const showPreview = useAtomValue(showPreviewAtom);
+  const showPreview = true; //zsviczian (always show preview, on-screen keyboard issue) useAtomValue(showPreviewAtom);
 
   const { savedChats } = useTTDChatStorage({ persistenceAdapter });
 

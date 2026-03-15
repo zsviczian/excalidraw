@@ -16,8 +16,13 @@
     margin: -0.25rem 0 0 0.125rem;
     padding: 0.5rem 0;
     background-color: var(--popup-secondary-bg-color);
-    border: 1px solid var(--button-gray-3);
+    //border: 1px solid var(--button-gray-3); //zsviczian
     cursor: default;
+
+    body.is-mobile & { //zsviczian
+      padding: 5px 0.5rem 5px 2rem;
+      border: inherit;
+    }
   }
 
   .context-menu button {
@@ -46,6 +51,10 @@
       left: 6px;
       margin-bottom: 1px;
       content: "\2713";
+
+      body.is-mobile & { //zsiviczian
+        left: -1.3rem;
+      }
     }
 
     &.dangerous {

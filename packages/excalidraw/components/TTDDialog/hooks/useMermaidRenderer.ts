@@ -68,6 +68,7 @@ export const useMermaidRenderer = ({
       }
 
       if (isRenderingRef.current) {
+        pendingContentRef.current = mermaidDefinition; //zsviczian
         return false;
       }
 
@@ -93,6 +94,15 @@ export const useMermaidRenderer = ({
       }
 
       isRenderingRef.current = false;
+
+      if (pendingContentRef.current) { //zsviczian mermaid preview not rendering when response is received.
+        const latestContent = pendingContentRef.current;
+        pendingContentRef.current = null;
+        if (latestContent !== mermaidDefinition) {
+          return renderMermaid(latestContent);
+        }
+      }
+
       return result.success;
     },
     [canvasRef, mermaidToExcalidrawLib, setError, theme],
@@ -174,6 +184,19 @@ export const useMermaidRenderer = ({
     lastAssistantMessage?.isGenerating,
     lastAssistantMessage?.content,
   ]);
+
+  useEffect(() => { //zsviczian mermaid preview not rendering when response is received.
+    const msg = lastAssistantMessageRef.current;
+
+    if (!mermaidToExcalidrawLib.loaded || !showPreview) {
+      return;
+    }
+    if (!msg?.content || msg.error || msg.isGenerating) {
+      return;
+    }
+
+    renderMermaid(msg.content);
+  }, [mermaidToExcalidrawLib.loaded, renderMermaid, showPreview]);
 
   // render the last message if the user navigates between the existing chats
   useEffect(() => {

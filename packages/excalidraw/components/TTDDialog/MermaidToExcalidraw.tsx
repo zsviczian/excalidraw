@@ -73,9 +73,10 @@ const MermaidToExcalidraw = ({
   const selectedMermaidImage = selectedElements.filter(
     (el) => el.type === "image" && el.customData?.mermaidText,
   )[0]; //zsviczian
+  const selectedMermaidText = selectedMermaidImage?.customData?.mermaidText; //zsviczian
   const [text, setText] = useState(
     () =>
-      selectedMermaidImage?.customData?.mermaidText || //zsviczian
+      selectedMermaidText || //zsviczian
       EditorLocalStorage.get<string>(EDITOR_LS_KEYS.MERMAID_TO_EXCALIDRAW) ||
       MERMAID_EXAMPLE,
   );
