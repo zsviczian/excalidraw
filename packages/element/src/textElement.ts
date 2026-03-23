@@ -349,6 +349,7 @@ export const getContainerCenter = (
     midSegmentMidpoint = LinearElementEditor.getSegmentMidPoint(
       container,
       index + 1,
+      elementsMap,
     );
   }
   return { x: midSegmentMidpoint[0], y: midSegmentMidpoint[1] };
