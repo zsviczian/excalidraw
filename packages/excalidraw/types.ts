@@ -22,7 +22,6 @@ import type {
   ExcalidrawBindableElement,
   Arrowhead,
   FontFamilyValues,
-  ExcalidrawTextElement,
   FileId,
   Theme,
   StrokeRoundness,
