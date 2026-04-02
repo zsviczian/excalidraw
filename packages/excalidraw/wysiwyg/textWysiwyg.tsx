@@ -401,7 +401,7 @@ export const textWysiwyg = ({
         maxHeight: `${editorMaxHeight}px`,
         caretColor:
           updatedTextElement.strokeColor === "transparent" //zsviczian
-            ? "var(excalidraw-caret-color)"
+            ? "var(--excalidraw-caret-color)"
             : updatedTextElement.strokeColor, //zsviczian Set caret color
       });
       currentTextLayout = {
