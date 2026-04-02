@@ -280,6 +280,8 @@ export type ObservedElementsAppState = {
   activeLockedId: AppState["activeLockedId"];
 };
 
+export type BoxSelectionMode = "contain" | "overlap";
+
 export interface AppState {
   contextMenu: {
     items: ContextMenuItems;
@@ -318,6 +320,8 @@ export interface AppState {
    * `bindingPreference` and keyboard modifiers (ctrl/alt)
    */
   isBindingEnabled: boolean;
+  /** user box selection preference; defaults to "contain" when unset */
+  boxSelectionMode: BoxSelectionMode;
   /** user arrow binding preference */
   bindingPreference: "enabled" | "disabled";
   /** user preference whether arrow snap to midpoints while binding */
