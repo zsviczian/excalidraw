@@ -36,7 +36,7 @@ export const RadioGroup = function <T>({
             type="radio"
             checked={choice.value === value}
             onChange={() => onChange(choice.value)}
-            aria-label={choice.ariaLabel}
+            //aria-label={choice.ariaLabel} //zsviczian
           />
           {choice.label}
         </div>
