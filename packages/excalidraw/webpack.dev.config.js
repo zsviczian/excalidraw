@@ -45,6 +45,7 @@ module.exports = {
       "@excalidraw/math": path.resolve(__dirname, "../math/src"),
       "@excalidraw/common": path.resolve(__dirname, "../common/src"),
       "@excalidraw/element": path.resolve(__dirname, "../element/src"),
+      "@excalidraw/fractional-indexing": path.resolve(__dirname, "../fractional-indexing/src"),
     }
   },
   module: {

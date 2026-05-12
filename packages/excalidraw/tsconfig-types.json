@@ -23,6 +23,8 @@
       "@excalidraw/excalidraw/*": ["../excalidraw/*"],
       "@excalidraw/element": ["../element/src/index.ts"],
       "@excalidraw/element/*": ["../element/src/*"],
+      "@excalidraw/fractional-indexing": ["../fractional-indexing/src/index.ts"],
+      "@excalidraw/fractional-indexing/*": ["../fractional-indexing/src/*"],
       "@excalidraw/math": ["../math/src/index.ts"],
       "@excalidraw/math/*": ["../math/src/*"],
       "@excalidraw/utils": ["../utils/src/index.ts"],
