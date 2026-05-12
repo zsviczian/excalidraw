@@ -2417,6 +2417,7 @@ class App extends React.Component<AppProps, AppState> {
                             <NewElementCanvas
                               appState={this.state}
                               newElement={newElementCanvasElement}
+                              newElement={newElementCanvasElement}
                               scale={window.devicePixelRatio}
                               rc={this.rc}
                               elementsMap={elementsMap}
@@ -6095,7 +6096,7 @@ class App extends React.Component<AppProps, AppState> {
       this.onImageToolbarButtonClick();
     }
 
-    setTimeout(() => {    
+    setTimeout(() => {   
       this.setState((prevState) => {
         const commonResets = {
           snapLines: prevState.snapLines.length ? [] : prevState.snapLines,
