@@ -2417,7 +2417,6 @@ class App extends React.Component<AppProps, AppState> {
                             <NewElementCanvas
                               appState={this.state}
                               newElement={newElementCanvasElement}
-                              newElement={newElementCanvasElement}
                               scale={window.devicePixelRatio}
                               rc={this.rc}
                               elementsMap={elementsMap}
