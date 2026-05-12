@@ -112,6 +112,9 @@ export const duplicateElements = (
          * user interaction.
          */
         type: "everything";
+        // TODO remove/review this once we add frame children order migration
+        // and invariant checks
+        preserveFrameChildrenOrder?: boolean;
       }
     | {
         /**
@@ -171,6 +174,8 @@ export const duplicateElements = (
     opts.type === "in-place"
       ? opts.idsOfElementsToDuplicate
       : new Map(elements.map((el) => [el.id, el]));
+  const preserveFrameChildrenOrder =
+    opts.type === "everything" && opts.preserveFrameChildrenOrder;
 
   // For sanity
   if (opts.type === "in-place") {
@@ -278,7 +283,7 @@ export const duplicateElements = (
     if (groupId) {
       const groupElements = getElementsInGroup(elements, groupId).flatMap(
         (element) =>
-          isFrameLikeElement(element)
+          isFrameLikeElement(element) && !preserveFrameChildrenOrder
             ? [...getFrameChildren(elements, element.id), element]
             : [element],
       );
@@ -294,12 +299,24 @@ export const duplicateElements = (
     // frame duplication
     // -------------------------------------------------------------------------
 
-    if (element.frameId && frameIdsToDuplicate.has(element.frameId)) {
+    if (
+      !preserveFrameChildrenOrder &&
+      element.frameId &&
+      frameIdsToDuplicate.has(element.frameId)
+    ) {
       continue;
     }
 
     if (isFrameLikeElement(element)) {
       const frameId = element.id;
+
+      if (preserveFrameChildrenOrder) {
+        insertBeforeOrAfterIndex(
+          findLastIndex(elementsWithDuplicates, (el) => el.id === frameId),
+          copyElements(element),
+        );
+        continue;
+      }
 
       const frameChildren = getFrameChildren(elements, frameId);
 
