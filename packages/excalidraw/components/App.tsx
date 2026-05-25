@@ -346,7 +346,6 @@ import { ActionManager } from "../actions/manager";
 import { actions } from "../actions/register";
 import { getShortcutFromShortcutName } from "../actions/shortcuts";
 import { trackEvent } from "../analytics";
-import { AnimationFrameHandler } from "../animation-frame-handler";
 import {
   getDefaultAppState,
   isEraserActive,
@@ -422,7 +421,7 @@ import {
   clearEraserCanvasCache,
 } from "../cursor";
 import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
-import { LaserTrails } from "../laser-trails";
+import { LaserTrails } from "../laserTrails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
 import { textWysiwyg } from "../wysiwyg/textWysiwyg";
@@ -714,11 +713,9 @@ class App extends React.Component<AppProps, AppState> {
   lastViewportPosition = { x: 0, y: 0 };
   allowMobileMode: boolean = true; //zsviczian
 
-  animationFrameHandler = new AnimationFrameHandler();
-
-  laserTrails = new LaserTrails(this.animationFrameHandler, this);
-  eraserTrail = new EraserTrail(this.animationFrameHandler, this);
-  lassoTrail = new LassoTrail(this.animationFrameHandler, this);
+  laserTrails = new LaserTrails(this);
+  eraserTrail = new EraserTrail(this);
+  lassoTrail = new LassoTrail(this);
 
   onChangeEmitter = new Emitter<
     [
@@ -5070,6 +5067,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (collaborators) {
+        this.laserTrails.updateCollabTrails(collaborators);
         this.setState({ collaborators });
       }
     },
