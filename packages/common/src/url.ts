@@ -23,6 +23,7 @@ export const isLocalLink = (link: string | null) => {
  * iframe's src attribute or <a> href attributes.
  */
 export const toValidURL = (link: string) => {
+  link = link.match(/https:\/\/[^\s)]+/)?.[0] ?? link; //zsviczian removes markup like [](https://..) or (ontology: [](https://..))
   link = normalizeLink(link);
 
   // make relative links into fully-qualified urls
