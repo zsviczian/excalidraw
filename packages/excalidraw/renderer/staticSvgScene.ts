@@ -428,9 +428,10 @@ const renderElementToSvg = (
           /*
           path.setAttribute(
             "fill",
-            renderConfig.theme === THEME.DARK
-              ? applyDarkModeFilter(element.strokeColor)
-              : element.strokeColor,
+            applyDarkModeFilter(
+              element.strokeColor,
+              renderConfig.theme === THEME.DARK,
+            ),
           );
           path.setAttribute("d", shape); 
           */ //zsviczian
@@ -681,9 +682,10 @@ const renderElementToSvg = (
               element.customData?.frameColor?.stroke ?? //zsviczian
               renderConfig.frameColor?.stroke ?? //zsviczian
               FRAME_STYLE.strokeColor; //zsviczian
-            return renderConfig.theme === THEME.DARK
-              ? applyDarkModeFilter(color)
-              : color;
+            return applyDarkModeFilter(
+              color, //zsviczian
+              renderConfig.theme === THEME.DARK,
+            )
           })(),
         );
         rect.setAttribute(
@@ -743,9 +745,10 @@ const renderElementToSvg = (
           text.setAttribute("font-size", `${element.fontSize}px`);
           text.setAttribute(
             "fill",
-            renderConfig.theme === THEME.DARK
-              ? applyDarkModeFilter(element.strokeColor)
-              : element.strokeColor,
+            applyDarkModeFilter(
+              element.strokeColor,
+              renderConfig.theme === THEME.DARK,
+            ),
           );
           text.setAttribute("text-anchor", textAnchor);
           text.setAttribute("style", "white-space: pre;");
