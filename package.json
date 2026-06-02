@@ -90,7 +90,10 @@
     "clean-install": "yarn rm:node_modules && yarn install"
   },
   "resolutions": {
-    "strip-ansi": "6.0.1"
+    "strip-ansi": "6.0.1",
+    "//lodash": "Addresses https://github.com/advisories/GHSA-f23m-r3pf-42rh based on Obsidian scanner results",
+    "lodash": "^4.18.1",
+    "lodash-es": "^4.18.1"
   },
   "dependencies": {
     "yarn": "1.22.22"

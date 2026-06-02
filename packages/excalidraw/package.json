@@ -1,6 +1,6 @@
 {
   "name": "@zsviczian/excalidraw",
-  "version": "0.18.95",
+  "version": "0.18.97",
   "main": "main.js",
   "module": "./dist/prod/index.js",
   "source": "./index.tsx",
@@ -95,7 +95,7 @@
     "jotai-scope": "0.7.2",
     "lodash.debounce": "4.0.8",
     "lodash.throttle": "4.1.1",
-    "nanoid": "3.3.3",
+    "nanoid": "^5.1.11",
     "pako": "2.0.3",
     "perfect-freehand": "1.2.0",
     "pica": "7.1.1",
