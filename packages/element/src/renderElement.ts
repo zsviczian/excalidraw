@@ -434,17 +434,16 @@ const drawElementOnCanvas = (
             const fillColor = hasOutline
               ? element.backgroundColor
               : element.strokeColor;
-            const fillStyle =
-              renderConfig.theme === THEME.DARK
-                ? applyDarkModeFilter(fillColor)
-                : fillColor;
-
+            const fillStyle = applyDarkModeFilter(
+              fillColor,
+              renderConfig.theme === THEME.DARK,
+            );
             if (hasOutline) {
               context.lineWidth = element.strokeWidth * outlineWidth;
-              context.strokeStyle =
-                renderConfig.theme === THEME.DARK
-                  ? applyDarkModeFilter(element.strokeColor)
-                  : element.strokeColor;
+              context.strokeStyle = applyDarkModeFilter(
+                element.strokeColor,
+                renderConfig.theme === THEME.DARK,
+              );
               context.stroke(path);
             }
 
@@ -454,10 +453,10 @@ const drawElementOnCanvas = (
           context.fillStyle = fillStyle; //zsviczian
           context.fill(path); //zsviczian
           /*
-          context.fillStyle =
-            renderConfig.theme === THEME.DARK
-              ? applyDarkModeFilter(element.strokeColor)
-              : element.strokeColor;
+          context.fillStyle = applyDarkModeFilter(
+            element.strokeColor,
+            renderConfig.theme === THEME.DARK,
+          );
           context.fill(new Path2D(shape));
           */ //zsviczian
         } else {
@@ -590,10 +589,10 @@ const drawElementOnCanvas = (
         context.canvas.setAttribute("dir", rtl ? "rtl" : "ltr");
         context.save();
         context.font = getFontString(element);
-        context.fillStyle =
-          renderConfig.theme === THEME.DARK
-            ? applyDarkModeFilter(element.strokeColor)
-            : element.strokeColor;
+        context.fillStyle = applyDarkModeFilter(
+          element.strokeColor,
+          renderConfig.theme === THEME.DARK,
+        );
         context.textAlign = element.textAlign as CanvasTextAlign;
 
         // Canvas does not support multiline text by default
@@ -853,16 +852,12 @@ export const renderElement = (
           "rgba(0, 0, 200, 0.04)"; //zsviczian
 
         context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
-        context.strokeStyle =
-          appState.theme === THEME.DARK
-            ? applyDarkModeFilter(
-                element.customData?.frameColor?.stroke ??
-                  appState?.frameColor?.stroke ??
-                  FRAME_STYLE.strokeColor, //zsviczian
-              )
-            : element.customData?.frameColor?.stroke ??
-              appState?.frameColor?.stroke ??
-              FRAME_STYLE.strokeColor; //zsviczian
+        context.strokeStyle = applyDarkModeFilter(
+          element.customData?.frameColor?.stroke ??
+            appState?.frameColor?.stroke ??
+            FRAME_STYLE.strokeColor, //zsviczian
+          appState.theme === THEME.DARK,
+        );
 
         // TODO change later to only affect AI frames
         if (isMagicFrameElement(element)) {
