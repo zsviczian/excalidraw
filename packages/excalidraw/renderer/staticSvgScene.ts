@@ -295,6 +295,14 @@ const renderElementToSvg = (
         );
         offsetX = offsetX || 0;
         offsetY = offsetY || 0;
+        //zsviczian BEGIN
+        //https://github.com/excalidraw/excalidraw/pull/11441 by krishhna24
+        maskPath.setAttribute("maskUnits", "userSpaceOnUse");
+        maskPath.setAttribute("x", "0");
+        maskPath.setAttribute("y", "0");
+        maskPath.setAttribute("width", `${element.width + 100 + offsetX}`);
+        maskPath.setAttribute("height", `${element.height + 100 + offsetY}`);
+        //zsviczian END
         maskRectVisible.setAttribute("x", "0");
         maskRectVisible.setAttribute("y", "0");
         maskRectVisible.setAttribute("fill", "#fff");
