@@ -315,8 +315,10 @@ const repairBinding = <T extends ExcalidrawArrowElement>(
       };
     }
 
-    console.error(
+    //zsviczian
+    console.warn (
       `Could not repair binding for element "${boundElement?.id}" out of (${elementsMap?.size}) elements`,
+      { element, binding, targetElementsMap, existingElementsMap, startOrEnd }
     );
   } catch (error) {
     console.error("Error repairing binding:", error);
