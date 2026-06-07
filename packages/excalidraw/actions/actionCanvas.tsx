@@ -498,23 +498,27 @@ export const actionToggleTheme = register<AppState["theme"]>({
   viewMode: true,
   trackEvent: { category: "canvas" },
   perform: (_, appState, value, app) => {
-    //zsviczian
+    const nextTheme =
+      value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT);
+
     if (app.props.onThemeChange) {
-      //zsviczian
-      app.props.onThemeChange(
-        value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
-      );
+      app.props.onThemeChange(nextTheme);
+      //return false; //zsviczian (I don't understand why the return false here)
     }
+
     return {
       appState: {
         ...appState,
-        theme:
-          value || (appState.theme === THEME.LIGHT ? THEME.DARK : THEME.LIGHT),
+        theme: nextTheme,
       },
       captureUpdate: CaptureUpdateAction.EVENTUALLY,
     };
   },
-  keyTest: (event) => event.altKey && event.shiftKey && event.code === CODES.D,
+  keyTest: (event) =>
+    !event[KEYS.CTRL_OR_CMD] &&
+    event.altKey &&
+    event.shiftKey &&
+    event.code === CODES.D,
   predicate: (elements, appState, props, app) => {
     return !!app.props.UIOptions.canvasActions.toggleTheme;
   },
