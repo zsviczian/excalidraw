@@ -1,6 +1,6 @@
 {
   "name": "@zsviczian/excalidraw",
-  "version": "0.18.98",
+  "version": "0.18.99",
   "main": "main.js",
   "module": "./dist/prod/index.js",
   "source": "./index.tsx",
@@ -162,6 +162,13 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zsviczian/excalidraw.git"
+  },
+  "resolutions": {
+    "strip-ansi": "^7.0.1",
+    "//lodash": "Addresses https://github.com/advisories/GHSA-f23m-r3pf-42rh based on Obsidian scanner results",
+    "lodash": "^4.18.1",
+    "lodash-es": "^4.18.1",
+    "nanoid": "^5.1.11"
   },
   "scripts": {
     "gen:types": "rimraf ./types && tsc --project tsconfig-types.json",
