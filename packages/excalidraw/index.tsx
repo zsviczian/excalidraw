@@ -96,7 +96,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onBeforeTextEdit, //zsviczian
     onBeforeTextSubmit, //zsviczian
     generateIdForFile,
-    onThemeChange, //zsviczian
     onLinkOpen,
     onLinkHover, //zsviczian
     onViewModeChange, //zsviczian
@@ -228,7 +227,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onBeforeTextEdit={onBeforeTextEdit} //zsviczian
           onBeforeTextSubmit={onBeforeTextSubmit} //zsviczian
           generateIdForFile={generateIdForFile}
-          onThemeChange={onThemeChange} //zsviczian
           onLinkOpen={onLinkOpen}
           onLinkHover={onLinkHover} //zsviczian
           onViewModeChange={onViewModeChange} //zsviczian

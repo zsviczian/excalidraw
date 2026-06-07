@@ -707,7 +707,6 @@ export interface ExcalidrawProps {
     isDeleted: boolean,
   ) => { updatedNextOriginalText: string; nextLink: string }; //zsviczian [updatedText: string, updatedOriginalText: string, link: string]; //zsviczian
   generateIdForFile?: (file: File) => string | Promise<string>;
-  onThemeChange?: (newTheme: string) => void; //zsviczian
   onViewModeChange?: (isViewModeEnabled: boolean) => void; //zsviczian
   generateLinkForSelection?: (id: string, type: "element" | "group") => string;
   onLinkOpen?: (
