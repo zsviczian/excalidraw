@@ -94,6 +94,12 @@
     "//lodash": "Addresses https://github.com/advisories/GHSA-f23m-r3pf-42rh based on Obsidian scanner results",
     "lodash": "^4.18.1",
     "lodash-es": "^4.18.1",
+    "nanoid": "^5.1.11",
+    "ws": "^8.20.1"
+  },
+  "overrides": {
+    "lodash": "^4.18.1",
+    "lodash-es": "^4.18.1",
     "nanoid": "^5.1.11"
   },
   "dependencies": {
