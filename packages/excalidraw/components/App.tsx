@@ -503,7 +503,7 @@ import type {
 } from "../types";
 import type { RoughCanvas } from "roughjs/bin/canvas";
 import type { Action, ActionName, ActionResult } from "../actions/types";
-import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, isTouchInPenMode, isPanWithRightMouseEnabled, shouldDisableZoom, isContextMenuDisabled, refreshAllArrows, syncElementLinkWithText } from "../obsidianUtils";
+import { allowDoubleTapEraser, disableDoubleClickTextEditing, getExcalidrawContentEl, getMaxZoom, getZoomStep, hideFreedrawPenmodeCursor, isTouchInPenMode, isPanWithRightMouseEnabled, shouldDisableZoom, isContextMenuDisabled, refreshAllArrows, syncElementLinkWithText, getSharedMermaidInstance } from "../obsidianUtils";
 import { initializeObsidianUtils } from "@excalidraw/common";
 import { getTooltipDiv } from "./Tooltip";
 import { getFontSize } from "../actions/actionProperties";
@@ -3988,7 +3988,9 @@ class App extends React.Component<AppProps, AppState> {
 
     // ------------------- Successful Mermaid -------------------
     if (!isPlainPaste && isMaybeMermaidDefinition(data.text)) {
-      const api = await import("@excalidraw/mermaid-to-excalidraw");
+      //const api = await import("@excalidraw/mermaid-to-excalidraw"); //zsviczian
+      const sharedMermaid = await getSharedMermaidInstance(); //zsviczian
+      const api = await sharedMermaid.api; //zsviczian
       try {
         const { elements: skeletonElements, files = {} } =
           await api.parseMermaidToExcalidraw(data.text);

@@ -1,5 +1,4 @@
 import { useRef } from "react";
-import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
 import { isFiniteNumber } from "@excalidraw/math";
 
 import { useAtom } from "../../../editor-jotai";
@@ -19,6 +18,7 @@ import {
 } from "../utils/chat";
 
 import type { LLMMessage, TTTDDialog } from "../types";
+import { getSharedMermaidInstance } from "@excalidraw/excalidraw/obsidianUtils";
 
 const MIN_PROMPT_LENGTH = 3;
 const MAX_PROMPT_LENGTH = 10000;
@@ -191,7 +191,9 @@ export const useTextGeneration = ({
       }
 
       try {
-        await parseMermaidToExcalidraw(generatedResponse ?? "");
+        const sharedMermaid = await getSharedMermaidInstance(); //zsviczian
+        const api = await sharedMermaid.api; //zsviczian
+        await api.parseMermaidToExcalidraw(generatedResponse ?? ""); //zsviczian
         trackEvent("ai", "mermaid parse success", "ttd");
       } catch (error: any) {
         trackEvent("ai", "mermaid parse failed", "ttd");
