@@ -86,6 +86,11 @@ const TTDDialogBase = withInternalFallback(
       fn();
     }, [mermaidToExcalidrawLib.api]);
 
+    //zsviczian
+    if (!mermaidToExcalidrawLib.loaded) {
+      return null;
+    }
+
     const appState = useUIAppState(); //zsviczian
     return (
       <Dialog
