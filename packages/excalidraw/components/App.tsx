@@ -11181,6 +11181,27 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (newElement.type === "freedraw") {
+          //distelbus-svg START --Apple Pencil stroke lag fix via getCoalescedEvents(). Replaces inline freedraw point logic with extracted helper and coalesced event harvesting. #402
+
+          /**
+           * Purpose:
+           *   Extract a single freedraw point addition so the same logic can be
+           *   reused for both coalesced pointer events and the current event.
+           *   This avoids duplicating the dedup, pressure, and stroke-options
+           *   logic across the coalesced and non-coalesced code paths.
+           *
+           * Author:
+           *   distelbus-svg
+           *
+           * References:
+           *   #402
+           *
+           * Notes:
+           *   Previously this logic was inlined in the pointer-move handler and
+           *   ran once per event. Extracting it into a helper allows the coalesced
+           *   path to call it for each recovered sample without code duplication.
+           *   The dedup and pressure behavior is identical to the original.
+           */
           const addFreedrawPoint = (
             coords: { x: number; y: number },
             pressure: number,
@@ -11203,8 +11224,10 @@ class App extends React.Component<AppProps, AppState> {
             return false;
           };
 
+          //distelbus-svg --only activate coalesced harvesting for pen input (Apple Pencil), #402
           const isStylus = event.pointerType === "pen";
           const nativeEvent = event.nativeEvent;
+          //distelbus-svg --recover 240 Hz pen samples dropped between 60 Hz pointer-move frames in WKWebView, #402
           const coalescedEvents =
             isStylus &&
             typeof nativeEvent.getCoalescedEvents === "function"
@@ -11213,22 +11236,26 @@ class App extends React.Component<AppProps, AppState> {
           let pointsChanged = false;
 
           if (coalescedEvents && coalescedEvents.length > 0) {
+            //distelbus-svg --inject each coalesced pen sample as a freedraw point, #402
             for (const ce of coalescedEvents) {
-              const cp = viewportCoordsToSceneCoords(ce, this.state);
-              if (addFreedrawPoint(cp, ce.pressure ?? 0.5)) {
+              const cp = viewportCoordsToSceneCoords(ce, this.state); //distelbus-svg --transform coalesced event coords to scene space, #402
+              if (addFreedrawPoint(cp, ce.pressure ?? 0.5)) { //distelbus-svg --coalesced events may lack pressure, fallback to 0.5, #402
                 pointsChanged = true;
               }
             }
-            if (addFreedrawPoint(pointerCoords, event.pressure ?? 0.5)) {
+            //distelbus-svg --also add the current (non-coalesced) event as the final point, #402
+            if (addFreedrawPoint(pointerCoords, event.pressure ?? 0.5)) { //distelbus-svg --current event may also lack pressure, #402
               pointsChanged = true;
             }
           } else {
+            //distelbus-svg --fallback: no coalesced events available, process the current event directly, #402
             if (addFreedrawPoint(pointerCoords, event.pressure)) {
               pointsChanged = true;
             }
           }
 
           if (pointsChanged) {
+            //distelbus-svg --batch-update element with all accumulated points/pressures from this move, #402
             this.scene.mutateElement(
               newElement,
               {
@@ -11245,6 +11272,7 @@ class App extends React.Component<AppProps, AppState> {
               newElement,
             });
           }
+          //distelbus-svg END
         } else if (isLinearElement(newElement) && !newElement.isDeleted) {
           pointerDownState.drag.hasOccurred = true;
           const points = newElement.points;
