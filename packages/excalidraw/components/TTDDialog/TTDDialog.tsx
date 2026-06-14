@@ -68,11 +68,14 @@ const TTDDialogBase = withInternalFallback(
   )) => {
     const app = useApp();
 
+    //zsviczian - start (replacing dynamic import with a dummy promise)
     const [mermaidToExcalidrawLib, setMermaidToExcalidrawLib] =
       useState<MermaidToExcalidrawLibProps>({
         loaded: false,
-        api: import("@excalidraw/mermaid-to-excalidraw"),
+        // The useEffect below will replace this with the real loaded API.
+        api: Promise.resolve({} as any),
       });
+    //zsviczian - end
 
     useEffect(() => {
       const fn = async () => {
@@ -82,6 +85,11 @@ const TTDDialogBase = withInternalFallback(
       };
       fn();
     }, [mermaidToExcalidrawLib.api]);
+
+    //zsviczian
+    if (!mermaidToExcalidrawLib.loaded) {
+      return null;
+    }
 
     const appState = useUIAppState(); //zsviczian
     return (

@@ -14,9 +14,6 @@ const TRANSPILE_NODE_MODULES = new RegExp(
       "browser-fs-access",
       "canvas-roundrect-polyfill",
       "@excalidraw[\\\\/]laser-pointer",
-      "@excalidraw[\\\\/]mermaid-to-excalidraw",
-      "@mermaid-js[\\\\/]parser",
-      "mermaid",
     ].join("|") +
     ")[\\\\/]",
 );

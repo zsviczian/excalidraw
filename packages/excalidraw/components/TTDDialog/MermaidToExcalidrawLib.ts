@@ -15,16 +15,11 @@ export const loadMermaidToExcalidrawLib =
     return mermaidToExcalidrawLib as MermaidToExcalidrawLibProps;
   };
 
+//zsviczian (replaced bundled mermaid-to-excalidraw with instance from obsidianUtils > Excalidraw Extras plugin)
 export const loadMermaidLib =
   async (): Promise<MermaidToExcalidrawLibProps> => {
     if (!mermaidToExcalidrawLib) {
-      const api = import("@excalidraw/mermaid-to-excalidraw").then((module) => ({
-        parseMermaidToExcalidraw: module.parseMermaidToExcalidraw,
-      }));
-      mermaidToExcalidrawLib = {
-        loaded: true,
-        api,
-      };
+      mermaidToExcalidrawLib = await getSharedMermaidInstance();
     }
     return mermaidToExcalidrawLib;
   };
