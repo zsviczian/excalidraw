@@ -102,7 +102,14 @@ export const getDefaultAppState = (): Omit<
       panels: STATS_PANELS.generalStats | STATS_PANELS.elementProperties,
     },
     suggestedBinding: null,
-    frameRendering: { enabled: true, clip: true, name: true, outline: true, markerName: true, markerEnabled: true }, //zsviczian
+    frameRendering: {
+      enabled: true,
+      clip: true,
+      name: true,
+      outline: true,
+      markerName: true,
+      markerEnabled: true,
+    }, //zsviczian
     frameToHighlight: null,
     editingFrame: null,
     elementsToHighlight: null,
