@@ -11181,29 +11181,59 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (newElement.type === "freedraw") {
-          const points = newElement.points;
-          const dx = pointerCoords.x - newElement.x;
-          const dy = pointerCoords.y - newElement.y;
-
-          const lastPoint = points.length > 0 && points[points.length - 1];
-          const discardPoint =
-            lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
-
-          if (!discardPoint) {
-            const strokeOptions = this.state.currentStrokeOptions; //zsviczian
-            const pressures = newElement.simulatePressure
-              ? newElement.pressures
-              : [
-                  //zsviczian
+          const addFreedrawPoint = (
+            coords: { x: number; y: number },
+            pressure: number,
+          ) => {
+            const pts = newElement.points;
+            const dx = coords.x - newElement.x;
+            const dy = coords.y - newElement.y;
+            const lastPoint = pts.length > 0 && pts[pts.length - 1];
+            if (!(lastPoint && lastPoint[0] === dx && lastPoint[1] === dy)) {
+              const strokeOptions = this.state.currentStrokeOptions; //zsviczian
+              newElement.points = [...pts, pointFrom<LocalPoint>(dx, dy)];
+              if (!newElement.simulatePressure) {
+                newElement.pressures = [
                   ...newElement.pressures,
-                  strokeOptions?.constantPressure ? 1 : event.pressure,
+                  strokeOptions?.constantPressure ? 1 : pressure,
                 ];
+              }
+              return true;
+            }
+            return false;
+          };
 
+          const isStylus = event.pointerType === "pen";
+          const nativeEvent = event.nativeEvent;
+          const coalescedEvents =
+            isStylus &&
+            typeof nativeEvent.getCoalescedEvents === "function"
+              ? nativeEvent.getCoalescedEvents()
+              : null;
+          let pointsChanged = false;
+
+          if (coalescedEvents && coalescedEvents.length > 0) {
+            for (const ce of coalescedEvents) {
+              const cp = viewportCoordsToSceneCoords(ce, this.state);
+              if (addFreedrawPoint(cp, ce.pressure ?? 0.5)) {
+                pointsChanged = true;
+              }
+            }
+            if (addFreedrawPoint(pointerCoords, event.pressure ?? 0.5)) {
+              pointsChanged = true;
+            }
+          } else {
+            if (addFreedrawPoint(pointerCoords, event.pressure)) {
+              pointsChanged = true;
+            }
+          }
+
+          if (pointsChanged) {
             this.scene.mutateElement(
               newElement,
               {
-                points: [...points, pointFrom<LocalPoint>(dx, dy)],
-                pressures,
+                points: newElement.points,
+                pressures: newElement.pressures,
               },
               {
                 informMutation: false,
