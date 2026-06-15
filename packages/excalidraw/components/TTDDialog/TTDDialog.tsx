@@ -16,13 +16,13 @@ import { TTDDialogTab } from "./TTDDialogTab";
 import "./TTDDialog.scss";
 
 import { TTDWelcomeMessage } from "./TTDWelcomeMessage";
+import { loadMermaidToExcalidrawLib } from "./MermaidToExcalidrawLib";
 
 import type {
   MermaidToExcalidrawLibProps,
   TTDPersistenceAdapter,
   TTTDDialog,
 } from "./types";
-import { loadMermaidToExcalidrawLib } from "./MermaidToExcalidrawLib";
 
 export const TTDDialog = (
   props:
@@ -78,20 +78,35 @@ const TTDDialogBase = withInternalFallback(
     //zsviczian - end
 
     useEffect(() => {
+      let isMounted = true; //zsviczian
+
       const fn = async () => {
-        //zsviczian decupling loding of API so it is available without opening TTDDialog
-        const mermaidToExcalidrawLib = await loadMermaidToExcalidrawLib();
-        setMermaidToExcalidrawLib(mermaidToExcalidrawLib);
+        try {
+          //zsviczian decupling loding of API so it is available without opening TTDDialog
+          const mermaidToExcalidrawLib = await loadMermaidToExcalidrawLib();
+          if (isMounted && mermaidToExcalidrawLib.loaded) {
+            setMermaidToExcalidrawLib(mermaidToExcalidrawLib);
+          } else if (isMounted) {
+            // Keep TTD unmounted so host can show Mermaid enable prompt.
+            app.setOpenDialog(null);
+          }
+        } catch {
+          if (isMounted) {
+            app.setOpenDialog(null); //zsviczian
+          }
+        }
       };
       fn();
-    }, [mermaidToExcalidrawLib.api]);
+      return () => {
+        isMounted = false; //zsviczian
+      };
+    }, [app]);
 
     //zsviczian
     if (!mermaidToExcalidrawLib.loaded) {
       return null;
     }
-
-    const appState = useUIAppState(); //zsviczian
+    const appState = app.state; //zsviczian
     return (
       <Dialog
         className="ttd-dialog"
