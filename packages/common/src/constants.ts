@@ -590,7 +590,11 @@ export const FREEDRAW_STROKE_WIDTH: Readonly<
 export const getStrokeWidthByKey = (
   elementType: ExcalidrawElement["type"],
   strokeWidthKey: StrokeWidthKey,
+  strokeWidth?: number, //zsviczian legacy strokewidth support used in custom pens
 ): ExcalidrawElement["strokeWidth"] => {
+  if (strokeWidth) { //zsviczian
+    return strokeWidth;
+  }
   return elementType === "freedraw"
     ? FREEDRAW_STROKE_WIDTH[strokeWidthKey]
     : STROKE_WIDTH[strokeWidthKey];

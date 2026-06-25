@@ -9784,9 +9784,7 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     const strokeOptions = this.state.currentStrokeOptions; //zsviczian
-    const simulatePressure = strokeOptions?.constantPressure //zsviczian
-      ? false
-      : event.pressure === 0.5;
+    const simulatePressure = event.pressure === 0.5;
 
     const strokeVariability = this.state.currentItemStrokeVariability;
 
@@ -9818,9 +9816,7 @@ class App extends React.Component<AppProps, AppState> {
       points: [pointFrom<LocalPoint>(0, 0)],
       // pressures are only consumed when rendering a real-pressure stroke, so
       // skip persisting them while pressure is being simulated
-      pressures: simulatePressure
-        ? []
-        : [strokeOptions?.constantPressure ? 1 : event.pressure], //zsviczian
+      pressures: simulatePressure ? [] : [event.pressure],
     });
 
     //zsviczian
@@ -10321,6 +10317,7 @@ class App extends React.Component<AppProps, AppState> {
     return getStrokeWidthByKey(
       elementType,
       this.state.currentItemStrokeWidthKey,
+      this.state.currentItemStrokeWidth, //zsviczian
     );
   }
 
@@ -11207,14 +11204,9 @@ class App extends React.Component<AppProps, AppState> {
             lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
 
           if (!discardPoint) {
-            const strokeOptions = this.state.currentStrokeOptions; //zsviczian
             const pressures = newElement.simulatePressure
               ? newElement.pressures
-              : [
-                  //zsviczian
-                  ...newElement.pressures,
-                  strokeOptions?.constantPressure ? 1 : event.pressure,
-                ];
+              : [...newElement.pressures, event.pressure];
 
             this.scene.mutateElement(
               newElement,

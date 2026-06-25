@@ -42,6 +42,7 @@ export const getDefaultAppState = (): Omit<
     currentItemRoundness: isTestEnv() ? "sharp" : "round",
     currentItemArrowType: ARROW_TYPE.round,
     currentItemStrokeStyle: DEFAULT_ELEMENT_PROPS.strokeStyle,
+    currentItemStrokeWidth: undefined, //zsviczian
     currentItemStrokeWidthKey: DEFAULT_ELEMENT_STROKE_WIDTH_KEY,
     currentItemTextAlign: DEFAULT_TEXT_ALIGN,
     currentHoveredFontFamily: null,
@@ -204,6 +205,7 @@ const APP_STATE_STORAGE_CONF = (<
   currentItemStartArrowhead: { browser: true, export: false, server: false },
   currentItemStrokeColor: { browser: true, export: false, server: false },
   currentItemStrokeStyle: { browser: true, export: false, server: false },
+  currentItemStrokeWidth: { browser: true, export: false, server: false }, //zsviczian
   currentItemStrokeWidthKey: { browser: true, export: false, server: false },
   currentItemTextAlign: { browser: true, export: false, server: false },
   currentHoveredFontFamily: { browser: false, export: false, server: false },

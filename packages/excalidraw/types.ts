@@ -377,6 +377,7 @@ export interface AppState {
   currentItemStrokeColor: string;
   currentItemBackgroundColor: string;
   currentItemFillStyle: ExcalidrawElement["fillStyle"];
+  currentItemStrokeWidth: number | undefined; //zsviczian
   currentItemStrokeWidthKey: StrokeWidthKey;
   currentItemStrokeStyle: ExcalidrawElement["strokeStyle"];
   currentItemRoughness: number;
