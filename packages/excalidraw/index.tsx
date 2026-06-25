@@ -10,6 +10,7 @@ import {
   applyDarkModeFilter,
   DEFAULT_IMAGE_OPTIONS,
   DEFAULT_UI_OPTIONS,
+  getStrokeWidthByKey,
   isShallowEqual,
 } from "@excalidraw/common";
 
@@ -503,4 +504,4 @@ export function useExcalidrawStateValue(
 
 export { _useOnAppStateChange as useOnExcalidrawStateChange };
 
-export { applyDarkModeFilter };
+export { applyDarkModeFilter, getStrokeWidthByKey };
