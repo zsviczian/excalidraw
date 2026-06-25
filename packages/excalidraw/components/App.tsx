@@ -9784,7 +9784,9 @@ class App extends React.Component<AppProps, AppState> {
     });
 
     const strokeOptions = this.state.currentStrokeOptions; //zsviczian
-    const simulatePressure = event.pressure === 0.5;
+    const simulatePressure = strokeOptions?.constantPressure //zsviczian
+      ? false
+      : event.pressure === 0.5;
 
     const strokeVariability = this.state.currentItemStrokeVariability;
 
@@ -11204,9 +11206,14 @@ class App extends React.Component<AppProps, AppState> {
             lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
 
           if (!discardPoint) {
+            const strokeOptions = this.state.currentStrokeOptions; //zsviczian
             const pressures = newElement.simulatePressure
               ? newElement.pressures
-              : [...newElement.pressures, event.pressure];
+              : [
+                  //zsviczian
+                  ...newElement.pressures,
+                  strokeOptions?.constantPressure ? 1 : event.pressure,
+                ];
 
             this.scene.mutateElement(
               newElement,

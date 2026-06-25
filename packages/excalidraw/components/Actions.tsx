@@ -214,8 +214,9 @@ export const SelectedShapeActions = ({
         targetElements.some((element) => hasStrokeWidth(element.type))) &&
         renderAction("changeStrokeWidth")}
 
-      {(hasFreedrawMode(appState.activeTool.type) ||
-        targetElements.some((element) => hasFreedrawMode(element.type))) &&
+      {(hasFreedrawMode(appState.activeTool.type)  && !appState.currentStrokeOptions || //zsviczian
+        targetElements.some((element) => 
+          hasFreedrawMode(element.type) && !element.customData?.strokeOptions)) && //zsviczian
         renderAction("changeFreedrawMode")}
 
       {(hasStrokeStyle(appState.activeTool.type) ||
@@ -427,9 +428,9 @@ const CombinedShapeProperties = ({
                   standalone cycle button in the compact actions list; we render
                   it in the combined properties popup as well for clarity
                 */
-                (hasFreedrawMode(appState.activeTool.type) ||
+                (hasFreedrawMode(appState.activeTool.type) && !appState.currentStrokeOptions || //zsviczian
                   targetElements.some((element) =>
-                    hasFreedrawMode(element.type),
+                    hasFreedrawMode(element.type) && !element.customData?.strokeOptions //zsviczian
                   )) &&
                   renderAction("changeFreedrawMode")
               }
@@ -875,8 +876,9 @@ export const CompactShapeActions = ({
       )}
 
       {/* Freedraw pressure: standalone button cycling the variability mode */}
-      {(hasFreedrawMode(appState.activeTool.type) ||
-        targetElements.some((element) => hasFreedrawMode(element.type))) && (
+      {(hasFreedrawMode(appState.activeTool.type)  && !appState.currentStrokeOptions || //zsviczian
+        targetElements.some((element) => 
+          hasFreedrawMode(element.type) && !element.customData?.strokeOptions)) && ( //zsviczian
         <div className="compact-action-item">
           {renderAction("changeFreedrawMode", { cycle: true })}
         </div>

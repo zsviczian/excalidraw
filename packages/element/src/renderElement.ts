@@ -427,7 +427,9 @@ const drawElementOnCanvas = (
       for (const shape of shapes) {
         if (typeof shape === "string") {
           const { path, fillStyle } = (() => { //zsviczian
-            const path = new Path2D(getFreeDrawSvgPath(element));
+            const path = element.customData?.strokeOptions
+              ? new Path2D(getFreeDrawSvgPath(element))
+              : new Path2D(shape);
             const hasOutline = element.customData?.strokeOptions?.hasOutline;
             const outlineWidth =
               element.customData?.strokeOptions?.outlineWidth ?? 1;

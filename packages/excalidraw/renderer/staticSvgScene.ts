@@ -397,7 +397,9 @@ const renderElementToSvg = (
 
           //zsviczian - custom stroke options start
           const { pathD, fillColorThemed } = (() => {
-            const pathD = getFreeDrawSvgPath(element);
+            const pathD = element.customData?.strokeOptions
+              ? getFreeDrawSvgPath(element)
+              : shape;
             const hasOutline = element.customData?.strokeOptions?.hasOutline;
             const outlineWidth =
               element.customData?.strokeOptions?.outlineWidth ?? 1;

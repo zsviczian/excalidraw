@@ -612,7 +612,11 @@ export const actionChangeStrokeWidth = register<StrokeWidthKey>({
           strokeWidth: getStrokeWidthForElement(el, value),
         }),
       ),
-      appState: { ...appState, currentItemStrokeWidthKey: value },
+      appState: {
+        ...appState,
+        currentItemStrokeWidthKey: value,
+        currentItemStrokeWidth: undefined, //zsviczian
+      },
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
