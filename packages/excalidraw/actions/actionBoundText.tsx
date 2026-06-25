@@ -5,6 +5,7 @@ import {
   VERTICAL_ALIGN,
   arrayToMap,
   getFontString,
+  getStrokeWidthByKey,
 } from "@excalidraw/common";
 import {
   getOriginalContainerHeightFromCache,
@@ -257,7 +258,10 @@ export const actionWrapTextInContainer = register({
           fillStyle: appState.currentItemFillStyle,
           strokeColor: appState.currentItemStrokeColor,
           roughness: appState.currentItemRoughness,
-          strokeWidth: appState.currentItemStrokeWidth,
+          strokeWidth: getStrokeWidthByKey(
+            "rectangle",
+            appState.currentItemStrokeWidthKey,
+          ),
           strokeStyle: appState.currentItemStrokeStyle,
           roundness:
             appState.currentItemRoundness === "round"

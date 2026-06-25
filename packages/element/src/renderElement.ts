@@ -939,10 +939,10 @@ export const renderElement = (
     case "embeddable": {
       if (renderConfig.isExporting) {
         const [x1, y1, x2, y2] = getElementAbsoluteCoords(element, elementsMap);
-        const centerX = (x1 + x2) / 2; //zsviczian see arrow with text below
-        const centerY = (y1 + y2) / 2; //zsviczian
-        const cx = centerX + appState.scrollX; //zsviczian
-        const cy = centerY + appState.scrollY; //zsviczian
+        const centerX = (x1 + x2) / 2;
+        const centerY = (y1 + y2) / 2;
+        const cx = centerX + appState.scrollX;
+        const cy = centerY + appState.scrollY;
         let shiftX = (x2 - x1) / 2 - (element.x - x1);
         let shiftY = (y2 - y1) / 2 - (element.y - y1);
         if (isTextElement(element)) {
@@ -963,7 +963,6 @@ export const renderElement = (
 
         const boundTextElement = getBoundTextElement(element, elementsMap);
         if (isArrowElement(element) && boundTextElement) {
-          //zsviczian: https://github.com/excalidraw/excalidraw/pull/11492
           // Draw arrow directly as vector and clear label hole separately.
           // This avoids temp-canvas bitmap blit which introduces resampling blur.
           shiftX = element.width / 2 - (element.x - x1);
