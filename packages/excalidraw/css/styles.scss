@@ -183,7 +183,7 @@ body.excalidraw-cursor-resize * {
     .buttonList {
       flex-wrap: wrap;
       display: flex;
-      column-gap: 0.5rem;
+      column-gap: 0.25rem; //zsviczian
       row-gap: 0.5rem;
 
       label {

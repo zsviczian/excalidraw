@@ -1162,13 +1162,28 @@ export const FillSolidIcon = createIcon(
   { ...modifiedTablerIconProps, fill: "var(--icon-fill-color)" },
 );
 
+
+export const StrokeWidthExtraThinIcon = createIcon(
+  //zsviczian
+  <>
+    <path
+      d="M4.167 10h11.666"
+      stroke="var(--icon-fill-color)"
+      strokeWidth="0.4" //zsviczian
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </>,
+  modifiedTablerIconProps,
+);
+
 export const StrokeWidthThinIcon = createIcon(
   //zsviczian
   <>
     <path
       d="M4.167 10h11.666"
       stroke="var(--icon-fill-color)"
-      strokeWidth="0.75" //zsviczian
+      strokeWidth="1" //zsviczian
       strokeLinecap="round"
       strokeLinejoin="round"
     />
@@ -1193,7 +1208,7 @@ export const StrokeWidthBoldIcon = createIcon(
   <path
     d="M5 10h10"
     stroke="var(--icon-fill-color)"
-    strokeWidth="4" //zsviczian
+    strokeWidth="4.5" //zsviczian
     strokeLinecap="round"
     strokeLinejoin="round"
   />,
@@ -1204,7 +1219,7 @@ export const StrokeWidthExtraBoldIcon = createIcon(
   <path
     d="M5 10h10"
     stroke="var(--icon-fill-color)"
-    strokeWidth="6" //zsviczian
+    strokeWidth="8" //zsviczian
     strokeLinecap="round"
     strokeLinejoin="round"
   />,
@@ -1632,6 +1647,20 @@ export const ArrowheadCardinalityZeroOrManyIcon = React.memo(
       arrowheadPreviewIconProps,
     ),
 );
+
+export const FontSizeExtraSmallIcon = createIcon(
+  <>
+    <path
+      d="m1.667 3.333 6.666 13.334M8.333 3.333 1.667 16.667M18.333 6.667a3.333 3.333 0 0 0-3.333-3.334a3.333 3.333 0 0 0 0 6.667a3.333 3.333 0 0 1 0 6.667a3.333 3.333 0 0 1-3.333-3.334"
+      stroke="var(--icon-fill-color)"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </>,
+  modifiedTablerIconProps,
+);
+
 
 export const FontSizeSmallIcon = createIcon(
   <>

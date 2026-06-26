@@ -141,6 +141,8 @@ import {
   markerFrameIcon,
   strokeVariabilityConstantIcon,
   strokeVariabilityVariableIcon,
+  StrokeWidthExtraThinIcon,
+  FontSizeExtraSmallIcon,
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -628,6 +630,12 @@ export const actionChangeStrokeWidth = register<StrokeWidthKey>({
           group="stroke-width"
           options={[
             {
+              value: "extraThin",
+              text: t("labels.extraThin"),
+              icon: StrokeWidthExtraThinIcon, //zsviczian
+              testId: "strokeWidth-extraThin",
+            },
+            {
               value: "thin",
               text: t("labels.thin"),
               icon: StrokeWidthThinIcon, //zsviczian
@@ -906,6 +914,10 @@ let useFibonacci = false; //zsviczian
 //with a random noise of +-0.05 to avoid duplicates
 const fibonacciValues = [
   [
+    110.92, 68.56, 42.38, 26.22, 16.21, 10, 6.17, 3.81, 2.37, 1.48, 0.91, 0.56,
+    0.34,
+  ],
+  [
     177.38, 109.63, 67.75, 41.9, 25.91, 16, 9.9, 6.14, 3.83, 2.29, 1.47, 0.9,
     0.57,
   ],
@@ -926,6 +938,10 @@ const fibonacciValues = [
 //zsviczian
 const normalValues = [
   [
+    136.67, 91.13, 60.74, 40.51, 26.98, 18.01, 12, 8.01, 5.34, 3.54, 2.36,
+    1.59, 1.04, 0.72, 0.48,
+  ],
+  [
     182.22, 121.46, 80, 53, 35.99, 23.96, 16, 10.68, 7.1, 4.74, 3.16, 2.11,
     1.45, 0.97, 0.66,
   ],
@@ -945,10 +961,11 @@ const normalValues = [
 
 //zsviczian
 const valueToIndex: { [key: number]: number } = {
-  16: 0,
-  20: 1,
-  28: 2,
-  36: 3,
+  12: 0,
+  16: 1,
+  20: 2,
+  28: 3,
+  36: 4,
 };
 
 //zsviczian
@@ -1030,13 +1047,13 @@ const findIndex = (values: number[][], value: number): number | null => {
 export const getFontSize = (size: number, zoom: number): number => {
   zoom = scaleFontSize ? zoom : 1;
   let normalizedSizeIdx = findIndex(fibonacciValues, size);
-  if (!normalizedSizeIdx) {
+  if (normalizedSizeIdx === null) {
     normalizedSizeIdx = findIndex(normalValues, size);
   }
   if (normalizedSizeIdx === null) {
     return size;
   }
-  size = [16, 20, 28, 36][normalizedSizeIdx];
+  size = [12, 16, 20, 28, 36][normalizedSizeIdx];
   const nextValue = useFibonacci
     ? getFibonacciFontSize(zoom, size)
     : getScaledFontSize(zoom, size);
@@ -1078,10 +1095,11 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
           idx = findIndex(fibonacciValues, size);
         }
       }
-      const isSmall = idx === 0;
-      const isMedium = idx === 1;
-      const isLarge = idx === 2;
-      const isVeryLarge = idx === 3;
+      const isExtraSmall = idx === 0;
+      const isSmall = idx === 1;
+      const isMedium = idx === 2;
+      const isLarge = idx === 3;
+      const isVeryLarge = idx === 4;
       // zsviczian - end insert
 
       const { isCompact } = getStylesPanelInfo(app);
@@ -1094,6 +1112,13 @@ export const actionChangeFontSize = register<ExcalidrawTextElement["fontSize"]>(
               type="button" //zsviczian
               //group="font-size" //zsviczian
               options={[
+                {
+                  value: FONT_SIZES.xs,
+                  text: `${t("labels.extraSmall")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
+                  icon: FontSizeExtraSmallIcon,
+                  testId: "fontSize-extraSmall",
+                  active: isExtraSmall ? true : undefined, //zsviczian
+                },
                 {
                   value: FONT_SIZES.sm,
                   text: `${t("labels.small")}\nSHIFT: zoomed, ALT/OPT: Fibonacci`, //zsviczian
