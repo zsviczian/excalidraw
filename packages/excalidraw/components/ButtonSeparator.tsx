@@ -4,7 +4,7 @@ export const ButtonSeparator = () => (
       width: 1,
       height: "1rem",
       backgroundColor: "var(--default-border-color)",
-      margin: "0 auto",
+      //margin: "0 auto", //zsviczian
     }}
   />
 );

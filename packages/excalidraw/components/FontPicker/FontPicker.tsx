@@ -10,6 +10,7 @@ import { t } from "../../i18n";
 import { RadioSelection } from "../RadioSelection";
 import { ButtonSeparator } from "../ButtonSeparator";
 import {
+  FontFamilyBoldIcon,
   FontFamilyCodeIcon,
   FontFamilyNormalIcon,
   FreedrawIcon,
@@ -38,6 +39,12 @@ export const DEFAULT_FONTS = [
     icon: FontFamilyCodeIcon,
     text: t("labels.code"),
     testId: "font-family-code",
+  },
+  { //zsviczian
+    value: FONT_FAMILY["Lilita One"],
+    icon: FontFamilyBoldIcon,
+    text: t("labels.bold"),
+    testId: "font-family-bold",
   },
 ];
 

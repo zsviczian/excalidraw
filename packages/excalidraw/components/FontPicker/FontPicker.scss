@@ -3,13 +3,13 @@
 .excalidraw {
   .FontPicker__container {
     display: grid;
-    grid-template-columns: calc(1rem + 3 * var(--default-button-size)) 1rem 1fr; // calc ~ 2 gaps + 4 buttons
+    grid-template-columns: calc(1rem + 4 * var(--default-button-size)) 0.25rem 1fr; // calc ~ 2 gaps + 4 buttons //zsviczian
     align-items: center;
 
     @include isMobile {
       max-width: calc(
-        2rem + 4 * var(--default-button-size)
-      ); // 4 gaps + 4 buttons
+        2rem + 5 * var(--default-button-size) //zsviczian
+      ); // 4 gaps + 5 buttons
     }
 
     &--compact {
