@@ -1193,7 +1193,7 @@ export const StrokeWidthBoldIcon = createIcon(
   <path
     d="M5 10h10"
     stroke="var(--icon-fill-color)"
-    strokeWidth="3.5" //zsviczian
+    strokeWidth="4" //zsviczian
     strokeLinecap="round"
     strokeLinejoin="round"
   />,
@@ -1204,7 +1204,7 @@ export const StrokeWidthExtraBoldIcon = createIcon(
   <path
     d="M5 10h10"
     stroke="var(--icon-fill-color)"
-    strokeWidth="5.75" //zsviczian
+    strokeWidth="6" //zsviczian
     strokeLinecap="round"
     strokeLinejoin="round"
   />,

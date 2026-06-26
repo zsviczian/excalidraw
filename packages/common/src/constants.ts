@@ -556,12 +556,13 @@ export const ROUGHNESS = {
   cartoonist: 2,
 } as const;
 
-export type StrokeWidthKey = "thin" | "medium" | "bold";
+export type StrokeWidthKey = "thin" | "medium" | "bold" | "extraBold"; //zsviczian
 
 export const STROKE_WIDTH_KEYS: readonly StrokeWidthKey[] = [
   "thin",
   "medium",
   "bold",
+  "extraBold", //zsviczian
 ];
 
 export const STROKE_WIDTH: Readonly<

@@ -630,20 +630,26 @@ export const actionChangeStrokeWidth = register<StrokeWidthKey>({
             {
               value: "thin",
               text: t("labels.thin"),
-              icon: StrokeWidthBaseIcon,
+              icon: StrokeWidthThinIcon, //zsviczian
               testId: "strokeWidth-thin",
             },
             {
               value: "medium",
               text: t("labels.medium"),
-              icon: StrokeWidthBoldIcon,
+              icon: StrokeWidthBaseIcon, //zsviczian
               testId: "strokeWidth-medium",
             },
             {
               value: "bold",
               text: t("labels.bold"),
-              icon: StrokeWidthExtraBoldIcon,
+              icon: StrokeWidthBoldIcon, //zsviczian
               testId: "strokeWidth-bold",
+            },
+            {
+              value: "extraBold",
+              text: t("labels.extraBold"),
+              icon: StrokeWidthExtraBoldIcon, //zsviczian
+              testId: "strokeWidth-extraBold",
             },
           ]}
           value={getFormValue(
