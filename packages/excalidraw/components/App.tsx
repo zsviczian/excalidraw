@@ -3225,6 +3225,12 @@ class App extends React.Component<AppProps, AppState> {
     const files = filesMap ?? this.files;
     this.scene.getNonDeletedElements().forEach((element) => {
       if (isInitializedImageElement(element) && files[element.fileId]) {
+        //zsviczian cancel any pending image load promises to avoid memory leaks
+        const cacheData = this.imageCache.get(element.fileId);
+        if (cacheData && cacheData.image instanceof Promise && typeof (cacheData.image as any).cancel === "function") {
+          (cacheData.image as any).cancel();
+        }
+
         this.imageCache.delete(element.fileId);
         ShapeCache.delete(element);
       }
@@ -3358,6 +3364,14 @@ class App extends React.Component<AppProps, AppState> {
     this.fonts = new Fonts(this.scene);
     this.renderer = new Renderer(this.scene);
     this.files = {};
+
+    //zsviczian
+    for (const data of this.imageCache.values()) {
+      if (data.image instanceof Promise && typeof (data.image as any).cancel === "function") {
+        (data.image as any).cancel();
+      }
+    }
+
     this.imageCache.clear();
     this.resizeObserver?.disconnect();
     this.unmounted = true;

@@ -18,9 +18,14 @@ import type {
   InitializedExcalidrawImageElement,
 } from "./types";
 
+//zsviczian: added promise.cancel to handle the case when ExcalidrawView is terminated before the image is loaded, leading to a memory leak.
 export const loadHTMLImageElement = (dataURL: DataURL) => {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    const image = new Image();
+  let rejectPromise: (reason?: any) => void; //zsviczian
+  let image: HTMLImageElement; //zsviczian
+
+  const promise = new Promise<HTMLImageElement>((resolve, reject) => {
+    rejectPromise = reject;
+    image = new Image();
     image.onload = () => {
       resolve(image);
     };
@@ -29,6 +34,19 @@ export const loadHTMLImageElement = (dataURL: DataURL) => {
     };
     image.src = dataURL;
   });
+
+  //zsviczian Expose a cancellation method on the Promise
+  (promise as any).cancel = () => {
+    if (image) {
+      // Removing the src immediately halts the browser's background decoding task
+      image.removeAttribute("src");
+    }
+    if (rejectPromise) {
+      // Reject the promise to free the async closure holding the dataURL
+      rejectPromise(new Error("cancelled"));
+    }
+  };
+  return promise;
 };
 
 /** NOTE: updates cache even if already populated with given image. Thus,
