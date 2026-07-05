@@ -3,6 +3,7 @@ import {
   VERTICAL_ALIGN,
   escapeDoubleQuotes,
   getFontString,
+  getObsidianDeviceInfo,
 } from "@excalidraw/common";
 
 import type { ExcalidrawProps } from "@excalidraw/excalidraw/types";
@@ -205,19 +206,25 @@ export const getEmbedLink = (
     const startTime = parseYouTubeLikeTimestamp(originalLink);
     const time = startTime > 0 ? `&start=${startTime}` : ``;
     const isPortrait = link.includes("shorts");
+    const DEVICE = getObsidianDeviceInfo();
+    const isDesktopOriOS = DEVICE?.isDesktop || DEVICE?.isIOS;
     type = "video";
     switch (ytLink[1]) {
       case "embed/":
       case "watch?v=":
       case "shorts/":
-        link = `https://releases.obsidian.md/youtube?v=${ytLink[2]}&enablejsapi=1${time}`; //zsviczian
+        link = isDesktopOriOS
+          ? `https://releases.obsidian.md/youtube?v=${ytLink[2]}&enablejsapi=1${time}`
+          : `https://www.youtube.com/embed/${ytLink[2]}?enablejsapi=1${time}`; //zsviczian
         break;
       case "playlist?list=":
       case "embed/videoseries?list=":
         link = `https://www.youtube.com/embed/videoseries?list=${ytLink[2]}&enablejsapi=1${time}`;
         break;
       default:
-        link = `https://releases.obsidian.md/youtube?v=${ytLink[2]}&enablejsapi=1${time}`; //zsviczian
+        link = isDesktopOriOS
+          ? `https://releases.obsidian.md/youtube?v=${ytLink[2]}&enablejsapi=1${time}`
+          : `https://www.youtube.com/embed/${ytLink[2]}?enablejsapi=1${time}`; //zsviczian
         break;
     }
     aspectRatio = isPortrait ? { w: 315, h: 560 } : { w: 560, h: 315 };
