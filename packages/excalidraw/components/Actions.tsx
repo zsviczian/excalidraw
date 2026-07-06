@@ -96,7 +96,6 @@ import type {
   AppClassProperties,
   AppProps,
   UIAppState,
-  Zoom,
   AppState,
 } from "../types";
 import type { ActionManager } from "../actions/manager";
@@ -1421,11 +1420,9 @@ export const ShapesSwitcher = ({
 
 export const ZoomActions = ({
   renderAction,
-  zoom,
   trayMode = false, //zsviczian
 }: {
   renderAction: ActionManager["renderAction"];
-  zoom: Zoom;
   trayMode?: boolean; //zsviczian note also changes to Stack.Col and Stack.Row
 }) => (
   <Stack.Col

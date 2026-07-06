@@ -167,7 +167,7 @@ export const insertToEditor = ({
     elements: newElements,
     files,
     position: "center",
-    fitToContent: true,
+    fit: "scale-down",
   });
   app.setOpenDialog(null);
 
