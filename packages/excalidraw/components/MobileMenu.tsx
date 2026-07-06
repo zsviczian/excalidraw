@@ -4,7 +4,7 @@ import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
 import { useTunnels } from "../context/tunnels";
 import { t } from "../i18n";
-import { calculateScrollCenter, isSomeElementSelected } from "../scene";
+import { getScrollToContentState } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
 import { ExitViewModeButton, MobileShapeActions } from "./Actions";
@@ -157,6 +157,7 @@ export const MobileMenu = ({
           style={{
             marginBottom: SCROLLBAR_WIDTH + SCROLLBAR_MARGIN,
           }}
+          data-viewport-ui="bottom"
         >
           <MobileShapeActions
             appState={appState}
@@ -178,7 +179,7 @@ export const MobileMenu = ({
                   className="scroll-back-to-content"
                   onClick={() => {
                     setAppState((appState) => ({
-                      ...calculateScrollCenter(elements, appState),
+                      ...getScrollToContentState(elements, appState),
                     }));
                   }}
                 >

@@ -71,6 +71,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     onThemeChange,
     onIncrement,
     initialData,
+    initialState,
     onExcalidrawAPI,
     onMount,
     onUnmount,
@@ -201,6 +202,7 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onThemeChange={onThemeChange}
           onIncrement={onIncrement}
           initialData={initialData}
+          initialState={initialState}
           onExcalidrawAPI={handleExcalidrawAPI}
           onMount={onMount}
           onUnmount={onUnmount}
@@ -447,7 +449,8 @@ export type {
   SavedChats,
 } from "./components/TTDDialog/types";
 
-export { zoomToFitBounds } from "./actions/actionCanvas";
+export { zoomToFitBounds, DEFAULT_OVERSCROLL } from "./viewport";
+
 export {
   getCommonBounds,
   getVisibleSceneBounds,

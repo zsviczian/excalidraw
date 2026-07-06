@@ -1583,12 +1583,10 @@ const _renderInteractiveScene = ({
   deltaTime,
 }: InteractiveSceneRenderConfig): {
   scrollBars?: ReturnType<typeof getScrollBars>;
-  atLeastOneVisibleElement: boolean;
-  elementsMap: RenderableElementsMap;
   animationState?: typeof animationState;
 } => {
   if (canvas === null) {
-    return { atLeastOneVisibleElement: false, elementsMap };
+    return {};
   }
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
@@ -2088,8 +2086,6 @@ const _renderInteractiveScene = ({
 
   return {
     scrollBars,
-    atLeastOneVisibleElement: visibleElements.length > 0,
-    elementsMap,
     animationState: nextAnimationState,
   };
 };
