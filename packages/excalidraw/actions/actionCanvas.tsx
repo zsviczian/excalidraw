@@ -42,10 +42,7 @@ import { useAppStateValue } from "../hooks/useAppStateValue";
 import { t } from "../i18n";
 import { getNormalizedZoom } from "../scene";
 import { getStateForZoom } from "../scene/zoom";
-import {
-  constrainScrollState,
-  zoomToFitBounds,
-} from "../viewport";
+import { constrainScrollState, zoomToFitBounds } from "../viewport";
 import { getShortcutKey } from "../shortcut";
 
 import { register } from "./register";
