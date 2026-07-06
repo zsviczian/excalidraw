@@ -12,7 +12,7 @@ import type { EditorInterface } from "@excalidraw/common";
 import { isHandToolActive } from "../appState";
 import { useTunnels } from "../context/tunnels";
 import { t } from "../i18n";
-import { calculateScrollCenter, isSomeElementSelected } from "../scene";
+import { getScrollToContentState, isSomeElementSelected } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
 import { actionToggleStats } from "../actions";
@@ -286,7 +286,7 @@ export const TrayMenu = ({
                   className="scroll-back-to-content"
                   onClick={() => {
                     setAppState((appState) => ({
-                      ...calculateScrollCenter(elements, appState),
+                      ...getScrollToContentState(elements, appState),
                     }));
                   }}
                 >
@@ -298,7 +298,6 @@ export const TrayMenu = ({
         <Island padding={1} style={{ marginLeft: `4px` }}>
           <ZoomActions
             renderAction={actionManager.renderAction}
-            zoom={appState.zoom}
             trayMode={true}
           />
         </Island>

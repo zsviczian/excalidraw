@@ -727,7 +727,7 @@ const stripIrrelevantAppStateProps = (appState: AppState): UIAppState => {
     cursorButton,
     scrollX,
     scrollY,
-    zoom,
+    //zoom, //zsviczian
     shouldCacheIgnoreZoom,
     snapLines,
     originSnapOffset,

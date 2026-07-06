@@ -583,7 +583,7 @@ export type UIAppState = Omit<
   | "cursorButton"
   | "scrollX"
   | "scrollY"
-  | "zoom"
+  //| "zoom" //zsviczian
   | "shouldCacheIgnoreZoom"
   // canvas-interaction transients (snapping, binding & frame
   // highlights) — identity churns per pointermove while interacting
