@@ -2,6 +2,7 @@ import { pointFrom, pointRotateRads } from "@excalidraw/math";
 
 import {
   getBoundTextElement,
+  getNonDeletedElements,
   isBindingElement,
   unbindBindingElement,
 } from "@excalidraw/element";
@@ -114,7 +115,7 @@ export const newOrigin = (
 export const moveElement = (
   newTopLeftX: number,
   newTopLeftY: number,
-  originalElement: ExcalidrawElement,
+  originalElement: NonDeletedExcalidrawElement,
   scene: Scene,
   appState: AppState,
   originalElementsMap: ElementsMap,
@@ -226,7 +227,7 @@ export const moveElement = (
         { informMutation: shouldInformMutation, isDragging: false },
       );
       updateBindings(latestChildElement, scene, appState, {
-        simultaneouslyUpdated: originalChildren,
+        simultaneouslyUpdated: getNonDeletedElements(originalChildren),
       });
     });
   }
