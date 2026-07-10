@@ -235,7 +235,7 @@ const rotateSingleElement = (
   if (isBindingElement(element)) {
     update = {
       ...update,
-    } as ElementUpdate<ExcalidrawArrowElement>;
+    } as ElementUpdate<NonDeletedExcalidrawElement>;
 
     if (element.startBinding) {
       unbindBindingElement(element, "start", scene);
@@ -389,7 +389,7 @@ export const resizeSingleTextElement = (
       shouldResizeFromCenter,
     );
 
-    const resizedElement: Partial<ExcalidrawTextElement> = {
+    const resizedElement: Partial<NonDeleted<ExcalidrawTextElement>> = {
       width: Math.abs(newWidth),
       height: Math.abs(metrics.height),
       x: newOrigin.x,
@@ -723,8 +723,8 @@ const getResizedOrigin = (
 export const resizeSingleElement = (
   nextWidth: number,
   nextHeight: number,
-  latestElement: ExcalidrawElement,
-  origElement: ExcalidrawElement,
+  latestElement: NonDeletedExcalidrawElement,
+  origElement: NonDeletedExcalidrawElement,
   originalElementsMap: ElementsMap,
   scene: Scene,
   handleDirection: TransformHandleDirection,
@@ -935,6 +935,7 @@ export const resizeSingleElement = (
       scene,
       handleDirection,
       shouldMaintainAspectRatio,
+      shouldResizeFromCenter,
     );
 
     updateBoundElements(latestElement, scene);
@@ -1217,7 +1218,10 @@ export const resizeMultipleElements = (
       }[],
       element,
     ) => {
-      const origElement = originalElementsMap!.get(element.id);
+      // originalElementsMap holds snapshots of the (non-deleted) selection
+      const origElement = originalElementsMap!.get(element.id) as
+        | NonDeletedExcalidrawElement
+        | undefined;
       if (origElement) {
         acc.push({ orig: origElement, latest: element });
       }
@@ -1256,9 +1260,10 @@ export const resizeMultipleElements = (
       ];
     }, [] as ExcalidrawTextElementWithContainer[]);
 
-    boundingBox = getCommonBoundingBox(
-      targetElements.map(({ orig }) => orig).concat(boundTextElements),
-    );
+    boundingBox = getCommonBoundingBox([
+      ...targetElements.map(({ orig }) => orig),
+      ...boundTextElements,
+    ]);
   }
   const { minX, minY, maxX, maxY, midX, midY } = boundingBox;
   const width = maxX - minX;
@@ -1522,7 +1527,13 @@ export const resizeMultipleElements = (
           fontSize: boundTextFontSize,
           angle: isLinearElement(element) ? undefined : angle,
         });
-        handleBindTextResize(element, scene, handleDirection, true);
+        handleBindTextResize(
+          element,
+          scene,
+          handleDirection,
+          true,
+          shouldResizeFromCenter,
+        );
       }
     }
 
