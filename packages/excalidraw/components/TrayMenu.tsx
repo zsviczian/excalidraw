@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { showSelectedShapeActions } from "@excalidraw/element";
 
 import clsx from "clsx";
 import { getNonDeletedElements } from "@excalidraw/element";
+
+import { KEYS } from "@excalidraw/common";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
@@ -17,17 +19,46 @@ import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
 import { actionToggleStats } from "../actions";
 
-import { SelectedShapeActions, ShapesSwitcher, ZoomActions } from "./Actions";
+import { SelectedShapeActions, ZoomActions } from "./Actions";
+import { useAppProps, useStylesPanelMode } from "./App";
 import { FixedSideContainer } from "./FixedSideContainer";
-import { HandButton } from "./HandButton";
 import { HintViewer } from "./HintViewer";
 import { Island } from "./Island";
 import { LockButton } from "./LockButton";
 import { PenModeButton } from "./PenModeButton";
 import { Section } from "./Section";
 import Stack from "./Stack";
+import DropdownMenu from "./dropdownMenu/DropdownMenu";
+import {
+  EmbedIcon,
+  extraToolsIcon,
+  frameToolIcon,
+  ImageIcon,
+  InsertAnyFileIcon,
+  Card,
+  LaTeXIcon,
+  LassoIcon,
+  laserPointerToolIcon,
+  MagicIcon,
+  mermaidLogoIcon,
+} from "./icons";
+import {
+  ArrowToolButton,
+  DiamondToolButton,
+  EllipseToolButton,
+  EraserToolButton,
+  FreedrawToolButton,
+  HandToolButton,
+  isToolButtonDisabled,
+  LineToolButton,
+  RectangleToolButton,
+  SelectionToolButton,
+  TextToolButton,
+  LassoToolButton,
+} from "./Tools";
 
 import { Stats } from "./Stats";
+import { runAction, t2 } from "../obsidianUtils";
 
 import type { ActionManager } from "../actions/manager";
 import type {
@@ -47,7 +78,6 @@ type TrayMenuProps = {
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
   onLockToggle: () => void;
-  onHandToolToggle: () => void;
   onPenModeToggle: AppClassProperties["togglePenMode"];
 
   renderTopRightUI?: (
@@ -62,13 +92,219 @@ type TrayMenuProps = {
   app: AppClassProperties;
 };
 
+const TrayToolbar = ({
+  app,
+  appState,
+  setAppState,
+  UIOptions,
+}: {
+  app: AppClassProperties;
+  appState: UIAppState;
+  setAppState: React.Component<any, AppState>["setState"];
+  UIOptions: AppProps["UIOptions"];
+}) => {
+  const { TTDDialogTriggerTunnel } = useTunnels();
+  const { renderMermaid } = useAppProps(); //zsviczian
+  const stylesPanelMode = useStylesPanelMode(); //zsviczian
+  const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
+  const [isImageMenuOpen, setIsImageMenuOpen] = useState(false); //zsviczian
+
+  const activeTool = appState.activeTool;
+  const toolProps = { app, activeTool };
+
+  const isFullStylesPanel = stylesPanelMode === "full";
+  const isTrayModePanel = stylesPanelMode === "tray"; //zsviczian
+
+  const frameToolSelected = activeTool.type === "frame";
+  const laserToolSelected = activeTool.type === "laser";
+  const embeddableToolSelected = activeTool.type === "embeddable";
+  const lassoToolSelected =
+    (isFullStylesPanel || isTrayModePanel) &&
+    activeTool.type === "lasso" &&
+    app.state.preferredSelectionTool.type !== "lasso";
+
+  const showLassoTool = isFullStylesPanel || isTrayModePanel; //zsviczian
+  const showImageTool = UIOptions.tools?.image !== false;
+
+  return (
+    <>
+      <HandToolButton {...toolProps} hideKeyBinding />
+      {appState.preferredSelectionTool.type === "lasso" ? (
+        <LassoToolButton {...toolProps} />
+      ) : (
+        <SelectionToolButton {...toolProps} />
+      )}
+      <RectangleToolButton {...toolProps} />
+      <DiamondToolButton {...toolProps} />
+      <EllipseToolButton {...toolProps} />
+      <ArrowToolButton {...toolProps} />
+      <LineToolButton {...toolProps} />
+      <FreedrawToolButton {...toolProps} />
+      <TextToolButton {...toolProps} />
+      {showImageTool && (
+        <DropdownMenu open={isImageMenuOpen}>
+          <DropdownMenu.Trigger
+            className={clsx("App-toolbar__extra-tools-trigger")}
+            onToggle={() => {
+              if (!isImageMenuOpen) {
+                setIsExtraToolsMenuOpen(false);
+              }
+              setIsImageMenuOpen(!isImageMenuOpen);
+            }}
+            title={t2("COMP_IMG")}
+          >
+            {ImageIcon}
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content
+            onClickOutside={() => setIsImageMenuOpen(false)}
+            onSelect={() => setIsImageMenuOpen(false)}
+            className="App-toolbar__extra-tools-dropdown"
+          >
+            <DropdownMenu.Item
+              onSelect={() => app.setActiveTool({ type: "image" })}
+              icon={ImageIcon}
+              data-testid="toolbar-image-import"
+              disabled={isToolButtonDisabled(app, "image")}
+            >
+              {t2("COMP_IMG_FROM_SYSTEM")}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              onSelect={() => runAction("anyFile")}
+              icon={InsertAnyFileIcon}
+              data-testid="toolbar-any-file"
+            >
+              {t2("COMP_IMG_ANY_FILE")}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              onSelect={() => runAction("card")}
+              icon={Card}
+              data-testid="toolbar-card"
+            >
+              {t2("INSERT_CARD")}
+            </DropdownMenu.Item>
+            <DropdownMenu.Item
+              onSelect={() => runAction("LaTeX")}
+              icon={LaTeXIcon}
+              data-testid="toolbar-latex"
+            >
+              {t2("COMP_IMG_LaTeX")}
+            </DropdownMenu.Item>
+          </DropdownMenu.Content>
+        </DropdownMenu>
+      )}
+      <EraserToolButton {...toolProps} />
+
+      <div className="App-toolbar__divider" />
+
+      <DropdownMenu open={isExtraToolsMenuOpen}>
+        <DropdownMenu.Trigger
+          className={clsx("App-toolbar__extra-tools-trigger", {
+            "App-toolbar__extra-tools-trigger--selected":
+              frameToolSelected ||
+              embeddableToolSelected ||
+              lassoToolSelected ||
+              (laserToolSelected && !app.props.isCollaborating),
+          })}
+          onToggle={() => {
+            if (!isExtraToolsMenuOpen) {
+              setIsImageMenuOpen(false); //zsviczian
+            }
+            setIsExtraToolsMenuOpen(!isExtraToolsMenuOpen);
+            setAppState({ openMenu: null, openPopup: null });
+          }}
+          title={t("toolBar.extraTools")}
+        >
+          {frameToolSelected
+            ? frameToolIcon
+            : embeddableToolSelected
+            ? EmbedIcon
+            : laserToolSelected && !app.props.isCollaborating
+            ? laserPointerToolIcon
+            : lassoToolSelected
+            ? LassoIcon
+            : extraToolsIcon}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content
+          onClickOutside={() => setIsExtraToolsMenuOpen(false)}
+          onSelect={() => setIsExtraToolsMenuOpen(false)}
+          className="App-toolbar__extra-tools-dropdown"
+        >
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "frame" })}
+            icon={frameToolIcon}
+            shortcut={KEYS.F.toLocaleUpperCase()}
+            data-testid="toolbar-frame"
+            selected={frameToolSelected}
+            disabled={isToolButtonDisabled(app, "frame")}
+          >
+            {t("toolBar.frame")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "embeddable" })}
+            icon={EmbedIcon}
+            data-testid="toolbar-embeddable"
+            selected={embeddableToolSelected}
+            disabled={isToolButtonDisabled(app, "embeddable")}
+          >
+            {t("toolBar.embeddable")}
+          </DropdownMenu.Item>
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "laser" })}
+            icon={laserPointerToolIcon}
+            data-testid="toolbar-laser"
+            selected={laserToolSelected}
+            shortcut={KEYS.K.toLocaleUpperCase()}
+            disabled={isToolButtonDisabled(app, "laser")}
+          >
+            {t("toolBar.laser")}
+          </DropdownMenu.Item>
+          {showLassoTool && (
+            <DropdownMenu.Item
+              onSelect={() => app.setActiveTool({ type: "lasso" })}
+              icon={LassoIcon}
+              data-testid="toolbar-lasso"
+              selected={lassoToolSelected}
+              disabled={isToolButtonDisabled(app, "lasso")}
+            >
+              {t("toolBar.lasso")}
+            </DropdownMenu.Item>
+          )}
+          <div style={{ margin: "6px 0", fontSize: 14, fontWeight: 600 }}>
+            Generate
+          </div>
+          {app.props.aiEnabled !== false && <TTDDialogTriggerTunnel.Out />}
+          {renderMermaid && ( //zsviczian
+            <DropdownMenu.Item
+              onSelect={() => app.setOpenDialog({ name: "ttd", tab: "mermaid" })}
+              icon={mermaidLogoIcon}
+              data-testid="toolbar-embeddable"
+            >
+              {t("toolBar.mermaidToExcalidraw")}
+            </DropdownMenu.Item>
+          )}
+          {app.props.aiEnabled !== false && app.plugins.diagramToCode && (
+            <DropdownMenu.Item
+              onSelect={() => app.onMagicframeToolSelect()}
+              icon={MagicIcon}
+              data-testid="toolbar-magicframe"
+              badge={<DropdownMenu.Item.Badge>AI</DropdownMenu.Item.Badge>}
+              disabled={isToolButtonDisabled(app, "magicframe")}
+            >
+              {t("toolBar.magicframe")}
+            </DropdownMenu.Item>
+          )}
+        </DropdownMenu.Content>
+      </DropdownMenu>
+    </>
+  );
+};
+
 export const TrayMenu = ({
   appState,
   elements,
   actionManager,
   setAppState,
   onLockToggle,
-  onHandToolToggle,
   onPenModeToggle,
   renderTopRightUI,
   renderCustomStats,
@@ -103,9 +339,9 @@ export const TrayMenu = ({
                 <Island padding={1} className="App-toolbar">
                   {heading}
                   <Stack.Row gap={1}>
-                    <ShapesSwitcher
+                    <TrayToolbar
+                      appState={appState}
                       setAppState={setAppState}
-                      activeTool={appState.activeTool}
                       UIOptions={UIOptions}
                       app={app}
                     />
@@ -140,12 +376,6 @@ export const TrayMenu = ({
                     checked={appState.activeTool.locked}
                     onChange={onLockToggle}
                     title={t("toolBar.lock")}
-                    isMobile
-                  />
-                  <HandButton
-                    checked={isHandToolActive(appState)}
-                    onChange={() => onHandToolToggle()}
-                    title={t("toolBar.hand")}
                     isMobile
                   />
                 </div>

@@ -8,7 +8,7 @@ import { getScrollToContentState } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
 import { ExitViewModeButton, MobileShapeActions } from "./Actions";
-import { MobileToolBar } from "./MobileToolBar";
+import { MobileToolbar } from "./MobileToolbar";
 import { FixedSideContainer } from "./FixedSideContainer";
 
 import { Island } from "./Island";
@@ -35,7 +35,6 @@ type MobileMenuProps = {
   renderImageExportDialog: () => React.ReactNode;
   setAppState: React.Component<any, AppState>["setState"];
   elements: readonly NonDeletedExcalidrawElement[];
-  onHandToolToggle: () => void;
   onPenModeToggle: AppClassProperties["togglePenMode"];
 
   renderTopRightUI?: (
@@ -48,6 +47,7 @@ type MobileMenuProps = {
   ) => JSX.Element | null;
   renderSidebars: () => JSX.Element | null;
   renderWelcomeScreen: boolean;
+  defaultUIEnabled: boolean;
   UIOptions: AppProps["UIOptions"];
   app: AppClassProperties;
   renderCustomStats?: ExcalidrawProps["renderCustomStats"]; //zsviczian
@@ -58,11 +58,11 @@ export const MobileMenu = ({
   elements,
   actionManager,
   setAppState,
-  onHandToolToggle,
   renderTopLeftUI,
   renderTopRightUI,
   renderSidebars,
   renderWelcomeScreen,
+  defaultUIEnabled,
   UIOptions,
   app,
   renderCustomStats, //zsviczian
@@ -97,11 +97,13 @@ export const MobileMenu = ({
             <DefaultSidebarTriggerTunnel.Out />
           </div>
         )}
-        {appState.viewModeEnabled && (
-          <div className="excalidraw-ui-top-right">
-            <ExitViewModeButton actionManager={actionManager} />
-          </div>
-        )}
+        {defaultUIEnabled &&
+          appState.viewModeEnabled &&
+          app.isInteractionEnabled() && (
+            <div className="excalidraw-ui-top-right">
+              <ExitViewModeButton actionManager={actionManager} />
+            </div>
+          )}
       </>
     );
 
@@ -128,13 +130,7 @@ export const MobileMenu = ({
   };
 
   const renderToolbar = () => {
-    return (
-      <MobileToolBar
-        app={app}
-        onHandToolToggle={onHandToolToggle}
-        setAppState={setAppState}
-      />
-    );
+    return <MobileToolbar app={app} setAppState={setAppState} />;
   };
 
   const shouldShowStats = //zsviczian
@@ -151,7 +147,7 @@ export const MobileMenu = ({
         {renderWelcomeScreen && <WelcomeScreenCenterTunnel.Out />}
       </div>
 
-      {!appState.viewModeEnabled && (
+      {defaultUIEnabled && !appState.viewModeEnabled && (
         <div
           className="App-bottom-bar"
           style={{

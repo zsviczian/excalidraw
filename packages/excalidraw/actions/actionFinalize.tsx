@@ -36,9 +36,9 @@ import type {
 } from "@excalidraw/element/types";
 
 import { t } from "../i18n";
-import { resetCursor } from "../cursor";
 import { done } from "../components/icons";
-import { ToolButton } from "../components/ToolButton";
+import { TOGGLE_TOOLS } from "../components/Tools";
+import { IconButton } from "../components/IconButton";
 
 import { register } from "./register";
 
@@ -56,7 +56,7 @@ export const actionFinalize = register<FormData>({
   perform: (elements, appState, data, app) => {
     let shouldCommit = true;
     let newElements = elements;
-    const { interactiveCanvas, focusContainer, scene } = app;
+    const { focusContainer, scene } = app;
     const elementsMap = scene.getNonDeletedElementsMap();
 
     if (data && appState.selectedLinearElement) {
@@ -321,26 +321,30 @@ export const actionFinalize = register<FormData>({
       }
     }
 
-    if (
-      (!appState.activeTool.locked &&
-        appState.activeTool.type !== "freedraw") ||
-      !element
-    ) {
-      resetCursor(interactiveCanvas);
-    }
-
     let activeTool: AppState["activeTool"];
-    if (appState.activeTool.type === "eraser") {
+    if (TOGGLE_TOOLS.includes(appState.activeTool.type)) {
       activeTool = updateActiveTool(appState, {
         ...(appState.activeTool.lastActiveTool || {
           type: app.state.preferredSelectionTool.type,
         }),
-        lastActiveToolBeforeEraser: null,
+        lastActiveTool: null,
       });
     } else {
       activeTool = updateActiveTool(appState, {
         type: app.state.preferredSelectionTool.type,
       });
+    }
+
+    // locked via the tool lock or host-forced (`props.activeTool`)
+    const isToolLocked = app.isToolLocked();
+
+    if (
+      (!isToolLocked && appState.activeTool.type !== "freedraw") ||
+      !element
+    ) {
+      // the active tool reverts (see the returned `appState.activeTool`) —
+      // apply the reverted tool's cursor
+      app.cursor.applyForTool(activeTool);
     }
 
     let selectedLinearElement =
@@ -368,9 +372,7 @@ export const actionFinalize = register<FormData>({
         ...appState,
         cursorButton: "up",
         activeTool:
-          (appState.activeTool.locked ||
-            appState.activeTool.type === "freedraw") &&
-          element
+          (isToolLocked || appState.activeTool.type === "freedraw") && element
             ? appState.activeTool
             : activeTool,
         activeEmbeddable: null,
@@ -381,9 +383,7 @@ export const actionFinalize = register<FormData>({
         suggestedBinding: null,
         frameToHighlight: null,
         selectedElementIds:
-          element &&
-          !appState.activeTool.locked &&
-          appState.activeTool.type !== "freedraw"
+          element && !isToolLocked && appState.activeTool.type !== "freedraw"
             ? {
                 ...appState.selectedElementIds,
                 [element.id]: true,
@@ -403,7 +403,7 @@ export const actionFinalize = register<FormData>({
     ((event.key === KEYS.ESCAPE || event.key === KEYS.ENTER) &&
       appState.multiElement !== null),
   PanelComponent: ({ appState, updateData, data }) => (
-    <ToolButton
+    <IconButton
       type="button"
       icon={done}
       title={t("buttons.done")}
