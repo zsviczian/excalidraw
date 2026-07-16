@@ -232,7 +232,7 @@ export const SearchMenu = () => {
               zoom: app.state.zoom,
             },
             app.scene.getNonDeletedElementsMap(),
-            app.getViewportOffsets(),
+            app.viewport.getOffsets(),
           ) ||
           isTextTiny
         ) {
@@ -243,7 +243,7 @@ export const SearchMenu = () => {
               ? "contain"
               : "scale-down";
 
-          app.setViewport({
+          app.viewport.setViewport({
             target: getCommonBounds([matchAsElement]),
             fit: behavior,
             animation: { duration: 300 },

@@ -116,7 +116,7 @@ const Shortcut = ({
     <div className="HelpDialog__shortcut">
       <div>{label}</div>
       <div className="HelpDialog__key-container">
-        {[...intersperse(splitShortcutKeys, isOr ? t("helpDialog.or") : null)]}
+        {[...intersperse(splitShortcutKeys, isOr ? t("helpDialog.or") : "")]}
       </div>
     </div>
   );

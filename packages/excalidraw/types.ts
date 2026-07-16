@@ -383,7 +383,10 @@ export interface AppState {
     markerName: boolean; //zsviczian
     markerEnabled: boolean; //zsviczian
   };
-  editingFrame: string | null;
+  /**
+   * frame-like element whose name is currently being edited
+   */
+  editingFrame: ExcalidrawFrameLikeElement["id"] | null;
   elementsToHighlight: readonly NonDeletedExcalidrawElement[] | null;
   /**
    * set when a new text is created or when an existing text is being edited
@@ -668,6 +671,92 @@ export type OnExportProgress = {
   progress?: number;
 };
 
+export type InteractionConfig = {
+  /**
+   * Interactions that stay enabled while the editor is otherwise
+   * non-interactive. Opt-in: anything omitted or `false` is disabled.
+   */
+  enabled?: {
+    /**
+     * Element links render their link icon and stay clickable — clicking
+     * anywhere on a linked element opens the link, same as in view mode.
+     * When disabled, link icons are not rendered at all.
+     *
+     * @default false
+     */
+    links?: boolean;
+    /**
+     * Embeddable & iframe elements stay interactive — hovering & clicking
+     * activates them so their content can be used, same as in view mode.
+     *
+     * @default false
+     */
+    embeds?: boolean;
+    /**
+     * Umbrella for all interactive content on canvas — shorthand for
+     * enabling `links` & `embeds` (and future interactive content kinds)
+     * together. Additive: `interactiveContent: true` enables them
+     * regardless of their individual values.
+     *
+     * @default false
+     */
+    interactiveContent?: boolean;
+    /**
+     * Canvas navigation — panning (pointer drag, wheel, PageUp/PageDown)
+     * and zooming (ctrl/cmd + wheel, pinch, and the canvas zoom &
+     * zoom-to-fit shortcuts: ctrl/cmd +/-/0, shift+1/2/3), same as in view
+     * mode. Respects `appState.scrollConstraints` if set, so it composes
+     * with viewport locking. The rest of the keyboard stays disabled. Note
+     * the editor consumes wheel & touch input again when enabled, so the
+     * page no longer scrolls over the editor.
+     *
+     * @default false
+     */
+    navigation?: boolean;
+    /**
+     * Whether the browser's own zoom remains available over the editor —
+     * ctrl/cmd + wheel, pinch, and (while the editor has focus)
+     * ctrl/cmd +/-/0 shortcuts. Prevented by default, mirroring the
+     * interactive editor. Regular page scrolling stays available either way.
+     * With `navigation` enabled, the zoom input (wheel, pinch, keyboard
+     * shortcuts) zooms the canvas instead either way, making this moot.
+     *
+     * @default false
+     */
+    browserZoom?: boolean;
+    /**
+     * Tools that stay user-driven while the editor is otherwise
+     * non-interactive: pointer input keeps driving the listed tool when it's
+     * the active tool. Does not enable user-driven tool *switching* — the
+     * keyboard stays disabled and tool selection remains host-driven
+     * (`ExcalidrawAPI.setActiveTool`).
+     *
+     * Composes with `navigation`: the enabled tool wins the primary-pointer
+     * drag, while wheel input (and wheel-button drag) still pans/zooms.
+     */
+    tools?: {
+      /**
+       * The laser pointer stays usable — pointer strokes draw laser trails
+       * and pointer positions keep broadcasting via `onPointerUpdate`, so
+       * e.g. collaborators see a presenter's laser & cursor.
+       *
+       * @default false
+       */
+      laser?: boolean;
+      /**
+       * Custom tools (`activeTool.type === "custom"`) stay usable — the
+       * editor keeps dispatching `onPointerDown` / `onPointerUp` for them.
+       * Tool behavior is host-implemented; activate custom tools with
+       * `locked: true` or they revert to the selection tool (and go inert)
+       * after the first pointer interaction.
+       *
+       * @default false
+       */
+      custom?: boolean;
+    };
+  };
+};
+
 export interface ExcalidrawProps {
   onChange?: (
     elements: readonly OrderedExcalidrawElement[],
@@ -740,6 +829,60 @@ export interface ExcalidrawProps {
   ) => JSX.Element | null;
   langCode?: Language["code"];
   viewModeEnabled?: boolean;
+  /**
+   * Whether the editor accepts user input (pointer, keyboard, wheel, touch,
+   * clipboard, drag&drop). When `false`, the scene still renders and reacts
+   * to programmatic updates (imperative API), but the user cannot affect it
+   * in any way. Implies view mode.
+   *
+   * Pass a config object to keep specific interactions enabled while the
+   * editor is otherwise non-interactive (see `InteractionConfig`):
+   *
+   * ```tsx
+   * <Excalidraw interaction={{ enabled: { links: true } }} />
+   * ```
+   *
+   * @default true
+   */
+  interaction?: boolean | InteractionConfig;
+  /**
+   * Whether Excalidraw's default UI is rendered — toolbar, default menus,
+   * footer controls, sidebars, and canvas popups. Host UI passed through
+   * children (including exported components such as `MainMenu` and `Footer`)
+   * or render props continues to render, together with any supporting dialogs
+   * it opens.
+   *
+   * Canvas content (elements, text editing surface, frame names, embeds) still
+   * renders, and the editor remains interactive unless `interaction` is set to
+   * `false`.
+   *
+   * NOTE: this is WIP and what default UI is/is not rendered when ui=false
+   * may yet change.
+   *
+   * @default true
+   */
+  ui?: boolean;
+  /**
+   * Forces the active editor tool (controlled). While set, user- and
+   * API-driven tool switching is ignored — `setActiveTool` refuses with a
+   * console warning, non-forced toolbar buttons render disabled — and the
+   * editor snaps back if internal flows reset the tool. The forced tool
+   * behaves as if locked (see the tool lock / padlock): it doesn't revert to
+   * the selection tool after use, and elements drawn with it aren't
+   * auto-selected — without mutating `appState.activeTool.locked`, so the
+   * user's persisted padlock preference stays untouched. Unset to return
+   * tool control to the editor (the current tool stays active).
+   *
+   * The forced tool must be activatable to take effect: not disabled via
+   * `UIOptions.tools`, and — while the editor is non-interactive — allowed
+   * via `interaction.enabled.tools`. Otherwise the editor stays on (or, when
+   * non-interactive, resets to) the `selection` tool, and the forced tool is
+   * applied once it becomes activatable. `image` cannot be forced (its
+   * activation opens the file picker).
+   */
+  activeTool?:
+    | { type: Exclude<ToolType, "image"> }
+    | { type: "custom"; customType: string };
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
   objectsSnapModeEnabled?: boolean;
@@ -959,8 +1102,7 @@ export type AppClassProperties = {
   id: App["id"];
   onInsertElements: App["onInsertElements"];
   onExportImage: App["onExportImage"];
-  lastViewportPosition: App["lastViewportPosition"];
-  setViewport: App["setViewport"];
+  viewport: App["viewport"];
   addFiles: App["addFiles"];
   addElementsFromPasteOrLibrary: App["addElementsFromPasteOrLibrary"];
   setSelection: App["setSelection"]; //zsviczian
@@ -972,11 +1114,12 @@ export type AppClassProperties = {
   onMagicframeToolSelect: App["onMagicframeToolSelect"];
   getName: App["getName"];
   dismissLinearEditor: App["dismissLinearEditor"];
-  flowChartCreator: App["flowChartCreator"];
+  flowchart: App["flowchart"];
+  cursor: App["cursor"];
+  isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];
   setPlugins: App["setPlugins"];
   plugins: App["plugins"];
-  getViewportOffsets: App["getViewportOffsets"];
   visibleElements: App["visibleElements"];
   excalidrawContainerValue: App["excalidrawContainerValue"];
 
@@ -991,6 +1134,9 @@ export type AppClassProperties = {
   bindModeHandler: App["bindModeHandler"];
 
   setAppState: App["setAppState"];
+
+  isInteractionEnabled: App["isInteractionEnabled"];
+  isNavigationEnabled: App["isNavigationEnabled"];
 };
 
 export type PointerDownState = Readonly<{
@@ -1116,8 +1262,8 @@ export interface ExcalidrawImperativeAPI {
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];
   getName: InstanceType<typeof App>["getName"];
-  setViewport: InstanceType<typeof App>["setViewport"];
-  getViewportOffsets: InstanceType<typeof App>["getViewportOffsets"];
+  setViewport: InstanceType<typeof App>["viewport"]["setViewport"];
+  getViewportOffsets: InstanceType<typeof App>["viewport"]["getOffsets"];
   registerAction: (action: Action) => void;
   refresh: InstanceType<typeof App>["refresh"];
   setToast: InstanceType<typeof App>["setToast"];
@@ -1133,8 +1279,8 @@ export interface ExcalidrawImperativeAPI {
   sendToBack: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   bringToFront: (elements: readonly ExcalidrawElement[]) => void; //zsviczian
   setActiveTool: InstanceType<typeof App>["setActiveTool"];
-  setCursor: InstanceType<typeof App>["setCursor"];
-  resetCursor: InstanceType<typeof App>["resetCursor"];
+  setCursor: InstanceType<typeof App>["cursor"]["set"];
+  resetCursor: InstanceType<typeof App>["cursor"]["reset"];
   toggleSidebar: InstanceType<typeof App>["toggleSidebar"];
   getHTMLIFrameElement: InstanceType<typeof App>["getHTMLIFrameElement"]; //zsviczian
   getEditorInterface: () => EditorInterface;
@@ -1183,7 +1329,6 @@ export type FrameNameBounds = {
   y: number;
   width: number;
   height: number;
-  angle: number;
 };
 
 export type FrameNameBoundsCache = {

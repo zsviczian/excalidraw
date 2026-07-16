@@ -42,7 +42,7 @@ import { getTooltipDiv, updateTooltipPosition } from "../../components/Tooltip";
 import { t } from "../../i18n";
 
 import { useAppProps, useEditorInterface, useExcalidrawAppState } from "../App";
-import { ToolButton } from "../ToolButton";
+import { IconButton } from "../IconButton";
 import { FreedrawIcon, TrashIcon, elementLinkIcon, searchIcon } from "../icons";
 import { getSelectedElements } from "../../scene";
 
@@ -352,7 +352,7 @@ export const Hyperlink = ({
       )}
       <div className="excalidraw-hyperlinkContainer__buttons">
         {!isEditing && (
-          <ToolButton
+          <IconButton
             type="button"
             title={t("buttons.edit")}
             aria-label={t("buttons.edit")}
@@ -365,7 +365,7 @@ export const Hyperlink = ({
         {
           //zsviczian - show the Obsidian search button
           Boolean(appProps.insertLinkAction) && (
-            <ToolButton
+            <IconButton
               type="button"
               title="Obsidian Search"
               aria-label="Obsidian Search"
@@ -381,7 +381,7 @@ export const Hyperlink = ({
           )
         }
         {/* //zsviczian - do not show the link to element button
-        <ToolButton
+        <IconButton
           type="button"
           title={t("labels.linkToElement")}
           aria-label={t("labels.linkToElement")}
@@ -398,7 +398,7 @@ export const Hyperlink = ({
         />
         */}
         {linkVal && !isEmbeddableElement(element) && (
-          <ToolButton
+          <IconButton
             type="button"
             title={t("buttons.remove")}
             aria-label={t("buttons.remove")}
