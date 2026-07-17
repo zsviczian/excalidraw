@@ -1,10 +1,10 @@
 import { getNonDeletedElements } from "@excalidraw/element";
+import { IconButton } from "../components/IconButton";
 
 import { showSelectedShapeActions } from "@excalidraw/element";
 
 import { CaptureUpdateAction } from "@excalidraw/element";
 
-import { ToolButton } from "../components/ToolButton";
 import { palette } from "../components/icons";
 import { t } from "../i18n";
 
@@ -22,16 +22,16 @@ export const actionToggleTrayEditMenu = register({
     captureUpdate: CaptureUpdateAction.EVENTUALLY,
   }),
   PanelComponent: ({ elements, appState, updateData }) => (
-    <ToolButton
+    <IconButton
       visible={showSelectedShapeActions(
         appState,
         getNonDeletedElements(elements),
       )}
-      type="button"
+      type="toggle"
       icon={palette}
       aria-label={t("buttons.edit")}
-      onClick={updateData}
-      selected={appState.openMenu === "shape"}
+      onSelect={updateData}
+      checked={appState.openMenu === "shape"}
     />
   ),
 });
