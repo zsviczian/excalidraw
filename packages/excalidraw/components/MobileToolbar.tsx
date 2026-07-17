@@ -31,9 +31,6 @@ import {
   laserPointerToolIcon,
   mermaidLogoIcon,
   MagicIcon,
-  LaTeXIcon,
-  Card,
-  InsertAnyFileIcon,
 } from "./icons";
 
 import "./ToolIcon.scss";
@@ -50,8 +47,6 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const activeTool = app.state.activeTool;
   const [isOtherShapesMenuOpen, setIsOtherShapesMenuOpen] = useState(false);
   const [isImageMenuOpen, setIsImageMenuOpen] = useState(false); //zsviczian
-  const [isImageMenuInOtherShapes, setIsImageMenuInOtherShapes] =
-    useState(false); //zsviczian
   const [lastActiveGenericShape, setLastActiveGenericShape] = useState<
     "rectangle" | "diamond" | "ellipse"
   >("rectangle");
@@ -162,30 +157,8 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
     );
   };
 
-  const showImageToolMenuInOtherShapes = () => {
-    if (showImageToolOutside || !isImageMenuInOtherShapes) {
-      return null;
-    }
-
-    return (
-      <>
-        <DropdownMenu.Item
-          onSelect={(event) => {
-            event.preventDefault();
-            setIsImageMenuInOtherShapes(false);
-          }}
-          icon={extraToolsIcon}
-        >
-          {t("toolBar.extraTools")}
-        </DropdownMenu.Item>
-        <ImageMenuItems app={app} />
-      </>
-    );
-  };
-
   const handleOtherShapesClose = () => {
     setIsOtherShapesMenuOpen(false);
-    setIsImageMenuInOtherShapes(false);
   };
 
   const handleOtherShapesSelect = (event?: any) => {
@@ -198,7 +171,6 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
     handleOtherShapesClose();
   };
 
-  const imageMenuInsideOtherShapes = showImageToolMenuInOtherShapes();
   /*zsviczian - shoImageToolMenu end*/
 
   // zsviczian: added excalidraw- prefix due to Obsidian style conflict
@@ -390,18 +362,15 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
               )}
 
               {!showImageToolOutside && (
-                <DropdownMenu.Item
-                  onSelect={(event) => {
-                    //zsviczian replaced app.setActiveTool({ type: "image" })
-                    event.preventDefault();
-                    setIsImageMenuInOtherShapes(true);
-                  }}
-                  icon={ImageIcon}
-                  data-testid="toolbar-image"
-                  selected={activeTool.type === "image"}
-                >
-                  {t("toolBar.image")}
-                </DropdownMenu.Item>
+                //zsviczian replaced <ImageToolButton /> with ImageMenuItems
+                <DropdownMenu.Sub>
+                  <DropdownMenu.Sub.Trigger icon={ImageIcon}>
+                    {t("toolBar.image")}
+                  </DropdownMenu.Sub.Trigger>
+                  <DropdownMenu.Sub.Content className="App-toolbar__extra-tools-dropdown">
+                    <ImageMenuItems app={app} />
+                  </DropdownMenu.Sub.Content>
+                </DropdownMenu.Sub>
               )}
               {!showFrameToolOutside && (
                 <DropdownMenu.Item
