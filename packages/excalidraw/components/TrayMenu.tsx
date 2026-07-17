@@ -23,6 +23,7 @@ import { SelectedShapeActions, ZoomActions } from "./Actions";
 import { useAppProps, useStylesPanelMode } from "./App";
 import { FixedSideContainer } from "./FixedSideContainer";
 import { HintViewer } from "./HintViewer";
+import { ImageMenu } from "./ImageMenu";
 import { Island } from "./Island";
 import { LockButton } from "./LockButton";
 import { PenModeButton } from "./PenModeButton";
@@ -33,10 +34,6 @@ import {
   EmbedIcon,
   extraToolsIcon,
   frameToolIcon,
-  ImageIcon,
-  InsertAnyFileIcon,
-  Card,
-  LaTeXIcon,
   LassoIcon,
   laserPointerToolIcon,
   MagicIcon,
@@ -58,7 +55,6 @@ import {
 } from "./Tools";
 
 import { Stats } from "./Stats";
-import { runAction, t2 } from "../obsidianUtils";
 
 import type { ActionManager } from "../actions/manager";
 import type {
@@ -142,55 +138,17 @@ const TrayToolbar = ({
       <FreedrawToolButton {...toolProps} />
       <TextToolButton {...toolProps} />
       {showImageTool && (
-        <DropdownMenu open={isImageMenuOpen}>
-          <DropdownMenu.Trigger
-            className={clsx("App-toolbar__extra-tools-trigger")}
-            onToggle={() => {
-              if (!isImageMenuOpen) {
-                setIsExtraToolsMenuOpen(false);
-              }
-              setIsImageMenuOpen(!isImageMenuOpen);
-            }}
-            title={t2("COMP_IMG")}
-          >
-            {ImageIcon}
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content
-            onClickOutside={() => setIsImageMenuOpen(false)}
-            onSelect={() => setIsImageMenuOpen(false)}
-            className="App-toolbar__extra-tools-dropdown"
-          >
-            <DropdownMenu.Item
-              onSelect={() => app.setActiveTool({ type: "image" })}
-              icon={ImageIcon}
-              data-testid="toolbar-image-import"
-              disabled={isToolButtonDisabled(app, "image")}
-            >
-              {t2("COMP_IMG_FROM_SYSTEM")}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              onSelect={() => runAction("anyFile")}
-              icon={InsertAnyFileIcon}
-              data-testid="toolbar-any-file"
-            >
-              {t2("COMP_IMG_ANY_FILE")}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              onSelect={() => runAction("card")}
-              icon={Card}
-              data-testid="toolbar-card"
-            >
-              {t2("INSERT_CARD")}
-            </DropdownMenu.Item>
-            <DropdownMenu.Item
-              onSelect={() => runAction("LaTeX")}
-              icon={LaTeXIcon}
-              data-testid="toolbar-latex"
-            >
-              {t2("COMP_IMG_LaTeX")}
-            </DropdownMenu.Item>
-          </DropdownMenu.Content>
-        </DropdownMenu>
+        <ImageMenu
+          app={app}
+          open={isImageMenuOpen}
+          onToggle={() => {
+            if (!isImageMenuOpen) {
+              setIsExtraToolsMenuOpen(false);
+            }
+            setIsImageMenuOpen(!isImageMenuOpen);
+          }}
+          onClose={() => setIsImageMenuOpen(false)}
+        />
       )}
       <EraserToolButton {...toolProps} />
 

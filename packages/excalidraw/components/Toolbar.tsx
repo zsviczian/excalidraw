@@ -8,6 +8,7 @@ import { t } from "../i18n";
 
 import { useEditorInterface, useStylesPanelMode } from "./App";
 import { HintViewer } from "./HintViewer";
+import { ImageMenu } from "./ImageMenu";
 import { Island } from "./Island";
 import { LockButton } from "./LockButton";
 import { PenModeButton } from "./PenModeButton";
@@ -29,7 +30,7 @@ import {
   EraserToolButton,
   FreedrawToolButton,
   HandToolButton,
-  ImageToolButton,
+  //ImageToolButton,
   isToolButtonDisabled,
   LassoToolButton,
   LineToolButton,
@@ -188,6 +189,7 @@ export const Toolbar = ({
 }) => {
   const editorInterface = useEditorInterface();
   const isCompactStylesPanel = useStylesPanelMode() === "compact";
+  const [isImageMenuOpen, setIsImageMenuOpen] = useState(false); //zsviczian
 
   const activeTool = appState.activeTool;
   const toolProps = { app, activeTool };
@@ -248,7 +250,16 @@ export const Toolbar = ({
         <LineToolButton {...toolProps} />
         <FreedrawToolButton {...toolProps} />
         <TextToolButton {...toolProps} />
-        {UIOptions.tools?.image !== false && <ImageToolButton {...toolProps} />}
+        {/*UIOptions.tools?.image !== false && <ImageToolButton {...toolProps} />*/}
+        {/*zsviczian custom image menu replaces default ImageToolButton */}
+        {UIOptions.tools?.image !== false && (
+          <ImageMenu
+            app={app}
+            open={isImageMenuOpen}
+            onToggle={() => setIsImageMenuOpen(!isImageMenuOpen)}
+            onClose={() => setIsImageMenuOpen(false)}
+          />
+        )}
         <EraserToolButton {...toolProps} />
 
         <div className="App-toolbar__divider" />

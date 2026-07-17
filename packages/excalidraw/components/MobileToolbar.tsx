@@ -8,13 +8,14 @@ import { t } from "../i18n";
 import { useTunnels } from "../context/tunnels";
 
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
+import { ImageMenu, ImageMenuItems } from "./ImageMenu";
 import { ToolPopover } from "./ToolPopover";
 import {
   EraserToolButton,
   FrameToolButton,
   FreedrawToolButton,
   HandToolButton,
-  ImageToolButton,
+  //ImageToolButton,
   isToolButtonDisabled,
   SelectionToolPopover,
   TextToolButton,
@@ -39,7 +40,6 @@ import "./ToolIcon.scss";
 import "./MobileToolbar.scss";
 
 import type { AppClassProperties, UIAppState } from "../types";
-import { runAction, t2 } from "../obsidianUtils";
 
 type MobileToolbarProps = {
   app: AppClassProperties;
@@ -142,66 +142,23 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
     : extraToolsIcon;
 
   /*zsviczian - showImageToolMenu start*/
-  const renderImageToolMenuItems = () => (
-    <>
-      <DropdownMenu.Item
-        onSelect={() => app.setActiveTool({ type: "image" })}
-        icon={ImageIcon}
-        data-testid="toolbar-image-import"
-      >
-        {t2("COMP_IMG_FROM_SYSTEM")}
-      </DropdownMenu.Item>
-      <DropdownMenu.Item
-        onSelect={() => runAction("anyFile")}
-        icon={InsertAnyFileIcon}
-        data-testid="toolbar-any-file"
-      >
-        {t2("COMP_IMG_ANY_FILE")}
-      </DropdownMenu.Item>
-      <DropdownMenu.Item
-        onSelect={() => runAction("card")}
-        icon={Card}
-        data-testid="toolbar-card"
-      >
-        {t2("INSERT_CARD")}
-      </DropdownMenu.Item>
-      <DropdownMenu.Item
-        onSelect={() => runAction("LaTeX")}
-        icon={LaTeXIcon}
-        data-testid="toolbar-latex"
-      >
-        {t2("COMP_IMG_LaTeX")}
-      </DropdownMenu.Item>
-    </>
-  );
-
   const showImageToolMenu = () => {
     if (!showImageToolOutside) {
       return null;
     }
 
     return (
-      <DropdownMenu open={isImageMenuOpen}>
-        <DropdownMenu.Trigger
-          className={clsx("App-toolbar__extra-tools-trigger")}
-          onToggle={() => {
-            if (!isImageMenuOpen) {
-              setIsOtherShapesMenuOpen(false);
-            }
-            setIsImageMenuOpen(!isImageMenuOpen);
-          }}
-          title={t2("COMP_IMG")}
-        >
-          {ImageIcon}
-        </DropdownMenu.Trigger>
-        <DropdownMenu.Content
-          onClickOutside={() => setIsImageMenuOpen(false)}
-          onSelect={() => setIsImageMenuOpen(false)}
-          className="App-toolbar__extra-tools-dropdown"
-        >
-          {renderImageToolMenuItems()}
-        </DropdownMenu.Content>
-      </DropdownMenu>
+      <ImageMenu
+        app={app}
+        open={isImageMenuOpen}
+        onToggle={() => {
+          if (!isImageMenuOpen) {
+            setIsOtherShapesMenuOpen(false);
+          }
+          setIsImageMenuOpen(!isImageMenuOpen);
+        }}
+        onClose={() => setIsImageMenuOpen(false)}
+      />
     );
   };
 
@@ -221,7 +178,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
         >
           {t("toolBar.extraTools")}
         </DropdownMenu.Item>
-        {renderImageToolMenuItems()}
+        <ImageMenuItems app={app} />
       </>
     );
   };
