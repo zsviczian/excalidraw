@@ -124,7 +124,7 @@ export const IconButton = React.forwardRef(
           style={props.style}
           data-testid={props["data-testid"]}
           hidden={props.hidden}
-          //title={props.title} //zsviczian
+          // zsviczian -- omit the native title to avoid duplicate Obsidian tooltips, zsviczian/obsidian-excalidraw-plugin#2912
           aria-label={props["aria-label"]}
           type="button"
           onClick={onClick}
@@ -163,7 +163,7 @@ export const IconButton = React.forwardRef(
         })}
         type="button"
         style={props.style}
-        title={props.title}
+        // zsviczian -- omit the native title to avoid duplicate Obsidian tooltips, zsviczian/obsidian-excalidraw-plugin#2912
         aria-label={props["aria-label"]}
         aria-keyshortcuts={props["aria-keyshortcuts"]}
         aria-pressed={props.checked}
