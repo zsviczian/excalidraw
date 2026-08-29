@@ -9826,7 +9826,7 @@ class App extends React.Component<AppProps, AppState> {
         scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
         scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
       });
-    });
+    }, this.ownerWindow); // zsviczian -- pan on the mounted editor's frame scheduler
     const teardown = withBatchedUpdates(
       (lastPointerUp = () => {
         lastPointerUp = null;
@@ -9883,7 +9883,7 @@ class App extends React.Component<AppProps, AppState> {
         scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
         scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
       });
-    });
+    }, this.ownerWindow); // zsviczian -- right-button pan on the mounted editor's frame scheduler
 
     const teardown = withBatchedUpdates(() => {
       isPanning = false;
@@ -10097,7 +10097,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       this.handlePointerMoveOverScrollbars(event, pointerDownState);
-    });
+    }, this.ownerWindow); // zsviczian -- scrollbar drag on the mounted editor's frame scheduler
     const onPointerUp = withBatchedUpdates(() => {
       lastPointerUp = null;
       isDraggingScrollBar = false;
@@ -12310,7 +12310,7 @@ class App extends React.Component<AppProps, AppState> {
           });
         }
       }
-    });
+    }, this.ownerWindow); // zsviczian -- pointer drag on the mounted editor's frame scheduler
   }
 
   // Returns whether the pointer move happened over either scrollbar

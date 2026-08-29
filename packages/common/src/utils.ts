@@ -182,12 +182,19 @@ export const debounce = <T extends any[]>(
 };
 
 // throttle callback to execute once per animation frame using the latest args
-export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
+export const throttleRAF = <T extends any[]>(
+  fn: (...args: T) => void,
+  ownerWindow: Pick<
+    Window,
+    "requestAnimationFrame" | "cancelAnimationFrame"
+  > = window, // zsviczian -- schedule cross-document editor work in its owning window
+) => {
   let timerId: number | null = null;
   let lastArgs: T | null = null;
 
   const scheduleFunc = () => {
-    timerId = window.requestAnimationFrame(() => {
+    timerId = ownerWindow.requestAnimationFrame(() => {
+      // zsviczian -- keep frames active when the main window is occluded
       timerId = null;
       const args = lastArgs;
       lastArgs = null;
@@ -206,7 +213,7 @@ export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
   };
   ret.flush = () => {
     if (timerId !== null) {
-      cancelAnimationFrame(timerId);
+      ownerWindow.cancelAnimationFrame(timerId); // zsviczian -- cancel through the scheduler that created the frame
       timerId = null;
     }
     if (lastArgs) {
@@ -217,7 +224,7 @@ export const throttleRAF = <T extends any[]>(fn: (...args: T) => void) => {
   ret.cancel = () => {
     lastArgs = null;
     if (timerId !== null) {
-      cancelAnimationFrame(timerId);
+      ownerWindow.cancelAnimationFrame(timerId); // zsviczian -- cancel through the scheduler that created the frame
       timerId = null;
     }
   };

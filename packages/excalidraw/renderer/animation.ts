@@ -9,16 +9,35 @@ type AnimationRecord = {
   animation: Animation<any>;
   lastTime: number;
   state: any;
+  scheduler: AnimationScheduler; // zsviczian -- retain the window that owns this animation
 };
 
+// zsviczian START -- cross-document editors must not depend on the evaluated window's throttled timers
+type AnimationScheduler = Pick<
+  Window,
+  | "requestAnimationFrame"
+  | "cancelAnimationFrame"
+  | "setTimeout"
+  | "clearTimeout"
+>;
+
+type ScheduledFrame =
+  | { id: number; type: "raf" }
+  | { id: number; type: "timeout" };
+// zsviczian END
+
 export class AnimationController {
-  private static scheduledFrame:
-    | { id: ReturnType<typeof requestAnimationFrame>; type: "raf" }
-    | { id: ReturnType<typeof setTimeout>; type: "timeout" }
-    | null = null;
+  private static scheduledFrames = new Map<
+    AnimationScheduler,
+    ScheduledFrame
+  >(); // zsviczian -- schedule each mounted window independently
   private static animations = new Map<string, AnimationRecord>();
 
-  static start<R extends object>(key: string, animation: Animation<R>) {
+  static start<R extends object>(
+    key: string,
+    animation: Animation<R>,
+    scheduler: AnimationScheduler = window, // zsviczian -- default preserves the upstream single-window API
+  ) {
     if (AnimationController.animations.has(key)) {
       return;
     }
@@ -27,6 +46,7 @@ export class AnimationController {
       animation,
       lastTime: 0,
       state: undefined,
+      scheduler, // zsviczian -- use the mounted editor window for future frames
     };
     AnimationController.animations.set(key, record);
 
@@ -39,7 +59,7 @@ export class AnimationController {
     } catch (error) {
       if (AnimationController.animations.get(key) === record) {
         AnimationController.animations.delete(key);
-        AnimationController.cancelScheduledFrameIfIdle();
+        AnimationController.cancelScheduledFrameIfIdle(record.scheduler); // zsviczian -- release only this window's pending frame
       }
       throw error;
     }
@@ -53,63 +73,77 @@ export class AnimationController {
 
     if (!initialState) {
       AnimationController.animations.delete(key);
-      AnimationController.cancelScheduledFrameIfIdle();
+      AnimationController.cancelScheduledFrameIfIdle(record.scheduler); // zsviczian -- release only this window's pending frame
       return;
     }
 
     record.state = initialState;
-    AnimationController.scheduleNextFrame();
+    AnimationController.scheduleNextFrame(record.scheduler); // zsviczian -- do not depend on an occluded host window
   }
 
-  private static scheduleNextFrame() {
-    if (AnimationController.scheduledFrame) {
+  private static scheduleNextFrame(scheduler: AnimationScheduler) {
+    // zsviczian -- one queue per mounted window
+    if (AnimationController.scheduledFrames.has(scheduler)) {
       return;
     }
 
     if (isRenderThrottlingEnabled()) {
-      AnimationController.scheduledFrame = {
-        id: requestAnimationFrame(AnimationController.tick),
+      AnimationController.scheduledFrames.set(scheduler, {
+        id: scheduler.requestAnimationFrame(() =>
+          AnimationController.tick(scheduler),
+        ), // zsviczian -- request the frame from the animation's owning window
         type: "raf",
-      };
+      });
     } else {
-      AnimationController.scheduledFrame = {
-        id: setTimeout(AnimationController.tick, 0),
+      AnimationController.scheduledFrames.set(scheduler, {
+        id: scheduler.setTimeout(() => AnimationController.tick(scheduler), 0), // zsviczian -- request the timer from the animation's owning window
         type: "timeout",
-      };
+      });
     }
   }
 
-  private static cancelScheduledFrame() {
-    if (!AnimationController.scheduledFrame) {
+  private static cancelScheduledFrame(scheduler: AnimationScheduler) {
+    // zsviczian -- cancel the owning window's queue only
+    const scheduledFrame = AnimationController.scheduledFrames.get(scheduler); // zsviczian -- avoid retaining an idle popout window
+    if (!scheduledFrame) {
       return;
     }
 
-    if (AnimationController.scheduledFrame.type === "raf") {
-      cancelAnimationFrame(AnimationController.scheduledFrame.id);
+    if (scheduledFrame.type === "raf") {
+      scheduler.cancelAnimationFrame(scheduledFrame.id); // zsviczian -- cancel through the window that created the frame
     } else {
-      clearTimeout(AnimationController.scheduledFrame.id);
+      scheduler.clearTimeout(scheduledFrame.id); // zsviczian -- cancel through the window that created the timer
     }
 
-    AnimationController.scheduledFrame = null;
+    AnimationController.scheduledFrames.delete(scheduler); // zsviczian -- release the window when its queue is idle
   }
 
-  private static cancelScheduledFrameIfIdle() {
-    if (AnimationController.animations.size > 0) {
+  private static cancelScheduledFrameIfIdle(scheduler: AnimationScheduler) {
+    // zsviczian -- other windows must not keep this queue alive
+    if (
+      [...AnimationController.animations.values()].some(
+        (animation) => animation.scheduler === scheduler,
+      )
+    ) {
       return false;
     }
 
-    AnimationController.cancelScheduledFrame();
+    AnimationController.cancelScheduledFrame(scheduler); // zsviczian -- release only the idle window
     return true;
   }
 
-  private static tick() {
-    AnimationController.scheduledFrame = null;
+  private static tick(scheduler: AnimationScheduler) {
+    // zsviczian -- advance only animations owned by this window
+    AnimationController.scheduledFrames.delete(scheduler); // zsviczian -- the current callback is no longer pending
 
-    if (AnimationController.animations.size > 0) {
+    const animations = [...AnimationController.animations].filter(
+      ([, animation]) => animation.scheduler === scheduler,
+    ); // zsviczian -- isolate main-window and popout animation queues
+
+    if (animations.length > 0) {
       // A callback may synchronously add, cancel, or replace animations. Work
       // from the frame's starting set so newly started animations begin on the
       // next frame and every record runs at most once per tick.
-      const animations = [...AnimationController.animations];
       for (const [key, animation] of animations) {
         if (AnimationController.animations.get(key) !== animation) {
           continue;
@@ -133,7 +167,8 @@ export class AnimationController {
         if (!state) {
           AnimationController.animations.delete(key);
 
-          if (AnimationController.cancelScheduledFrameIfIdle()) {
+          if (AnimationController.cancelScheduledFrameIfIdle(scheduler)) {
+            // zsviczian -- stop only this window's queue
             return;
           }
         } else {
@@ -142,11 +177,12 @@ export class AnimationController {
         }
       }
 
-      if (AnimationController.cancelScheduledFrameIfIdle()) {
+      if (AnimationController.cancelScheduledFrameIfIdle(scheduler)) {
+        // zsviczian -- stop only this window's queue
         return;
       }
 
-      AnimationController.scheduleNextFrame();
+      AnimationController.scheduleNextFrame(scheduler); // zsviczian -- continue on the owning window
     }
   }
 
@@ -155,12 +191,17 @@ export class AnimationController {
   }
 
   static cancel(key: string) {
+    const record = AnimationController.animations.get(key); // zsviczian -- recover the queue that owns this animation
     AnimationController.animations.delete(key);
-    AnimationController.cancelScheduledFrameIfIdle();
+    if (record) {
+      AnimationController.cancelScheduledFrameIfIdle(record.scheduler); // zsviczian -- release an idle popout queue immediately
+    }
   }
 
   static reset() {
     AnimationController.animations.clear();
-    AnimationController.cancelScheduledFrame();
+    for (const scheduler of [...AnimationController.scheduledFrames.keys()]) {
+      AnimationController.cancelScheduledFrame(scheduler); // zsviczian -- clear every mounted window's pending frame
+    }
   }
 }
