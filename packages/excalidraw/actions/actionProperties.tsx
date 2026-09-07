@@ -45,6 +45,7 @@ import { LinearElementEditor } from "@excalidraw/element";
 
 import { newElementWith } from "@excalidraw/element";
 import { getArrowheadForPicker } from "@excalidraw/element";
+import { removeAllElementsFromFrame } from "@excalidraw/element"; // zsviczian -- marker frames cannot own member elements
 
 import {
   getBoundTextElement,
@@ -2506,6 +2507,12 @@ export const actionToggleFrameRole = register({
         }
         return el;
       });
+
+      // zsviczian START -- marker frames cannot own member elements
+      if (targetRole === "marker") {
+        frames.forEach((frame) => removeAllElementsFromFrame(next, frame));
+      }
+      // zsviczian END
 
       return {
         elements: next,
