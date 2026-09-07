@@ -17,9 +17,11 @@ import {
   FRAME_STYLE,
   getFeatureFlag,
   getHighlightColor,
+  hasObsidianCommonHost,
   invariant,
   shouldRotateWithDiscreteAngle,
   THEME,
+  applyDarkModeFilter,
 } from "@excalidraw/common";
 
 import {
@@ -112,6 +114,66 @@ import type {
   RenderableElementsMap,
 } from "../scene/types";
 
+// The interactive canvas used to be inverted in dark mode via a CSS filter
+// (`invert(93%) hue-rotate(180deg)`), which is prohibitively slow in browsers
+// that composite in software (e.g. Firefox on software WebRender). We now map
+// the colors in JS instead (see `applyDarkModeFilter`), so the dark-mode
+// values below are the post-filter equivalents of the previous ones.
+// ---------------------------------------------------------------------------
+
+const BINDING_HIGHLIGHT_RGB = {
+  [THEME.LIGHT]: "106, 189, 252",
+  [THEME.DARK]: "104, 182, 240",
+} as const;
+
+const BINDING_MIDPOINT_COLOR = {
+  [THEME.LIGHT]: "rgba(65, 65, 65, 0.5)",
+  [THEME.DARK]: "rgba(237, 237, 237, 0.8)",
+} as const;
+
+const SEARCH_MATCH_COLOR = {
+  [THEME.LIGHT]: {
+    focus: "rgba(255, 124, 0, 0.4)",
+    match: "rgba(255, 226, 0, 0.4)",
+  },
+  [THEME.DARK]: {
+    focus: "rgba(250, 123, 53, 0.4)",
+    match: "rgba(221, 181, 136, 0.4)",
+  },
+} as const;
+
+/** maps a light-mode UI color to its dark-mode counterpart when in dark mode */
+const getThemedColor = (
+  color: string,
+  theme: InteractiveCanvasAppState["theme"],
+) => applyDarkModeFilter(color, theme === THEME.DARK);
+
+/**
+ * Purpose:
+ *   Preserve Obsidian's host-provided, scene-aware highlight colors after
+ *   upstream removed the interactive canvas's CSS dark-mode filter. Host
+ *   colors still need the equivalent JS transform, while standalone usage
+ *   must retain upstream's exact themed fallback for each rendering context.
+ *
+ * Author:
+ *   zsviczian
+ *
+ * References:
+ *   https://github.com/excalidraw/excalidraw/pull/12050
+ *   https://github.com/zsviczian/excalidraw/pull/433
+ */
+const getHostAwareHighlightColor = (
+  appState: InteractiveCanvasAppState,
+  fallbackColor: string,
+  opacity = 1,
+) =>
+  hasObsidianCommonHost()
+    ? getThemedColor(
+        getHighlightColor(appState.viewBackgroundColor, opacity),
+        appState.theme,
+      )
+    : fallbackColor;
+
 const renderElbowArrowMidPointHighlight = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
@@ -164,7 +226,10 @@ const highlightPoint = <Point extends LocalPoint | GlobalPoint>(
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  context.fillStyle = "rgba(105, 101, 219, 0.4)";
+  context.fillStyle = getThemedColor(
+    "rgba(105, 101, 219, 0.4)",
+    appState.theme,
+  );
 
   fillCircle(
     context,
@@ -221,13 +286,22 @@ const renderSingleLinearPoint = <Point extends GlobalPoint | LocalPoint>(
   isPhantomPoint: boolean,
   isOverlappingPoint: boolean,
 ) => {
-  context.strokeStyle = "#5e5ad8";
+  context.strokeStyle = getThemedColor("#5e5ad8", appState.theme);
   context.setLineDash([]);
-  context.fillStyle = "rgba(255, 255, 255, 0.9)";
+  context.fillStyle = getThemedColor(
+    "rgba(255, 255, 255, 0.9)",
+    appState.theme,
+  );
   if (isSelected) {
-    context.fillStyle = "rgba(134, 131, 226, 0.9)";
+    context.fillStyle = getThemedColor(
+      "rgba(134, 131, 226, 0.9)",
+      appState.theme,
+    );
   } else if (isPhantomPoint) {
-    context.fillStyle = "rgba(177, 151, 252, 0.7)";
+    context.fillStyle = getThemedColor(
+      "rgba(177, 151, 252, 0.7)",
+      appState.theme,
+    );
   }
 
   fillCircle(
@@ -256,8 +330,10 @@ const renderBindingHighlightForBindableElement_simple = (
   if (enclosingFrame && isFrameLikeElement(enclosingFrame)) {
     context.translate(enclosingFrame.x, enclosingFrame.y);
 
-    const highlightColor = getHighlightColor(appState.viewBackgroundColor); //zsviczian
-    context.fillStyle = highlightColor ?? "rgba(0,0,0,.05)"; //zsviczian
+    context.fillStyle = getHostAwareHighlightColor(
+      appState,
+      getThemedColor("rgba(0,0,0,.05)", appState.theme),
+    ); // zsviczian -- preserve host scene contrast without the removed canvas filter
     context.beginPath();
 
     if (FRAME_STYLE.radius && context.roundRect) {
@@ -282,14 +358,13 @@ const renderBindingHighlightForBindableElement_simple = (
     case "frame":
       context.save();
 
-      const highlightColor = getHighlightColor(appState.viewBackgroundColor); //zsviczian
       context.translate(suggestedBinding.element.x, suggestedBinding.element.y);
 
-      context.lineWidth = 1.5 * FRAME_STYLE.strokeWidth / appState.zoom.value; //zsviczian was 1
-      context.strokeStyle = highlightColor ?? //zsviczian
-        (appState.theme === THEME.DARK
-          ? `rgba(3, 93, 161, 1)`
-          : `rgba(106, 189, 252, 1)`);
+      context.lineWidth = (1.5 * FRAME_STYLE.strokeWidth) / appState.zoom.value; //zsviczian was 1
+      context.strokeStyle = getHostAwareHighlightColor(
+        appState,
+        `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, 1)`,
+      ); // zsviczian -- prefer the host scene color over the upstream fallback
 
       if (FRAME_STYLE.radius && context.roundRect) {
         context.beginPath();
@@ -316,8 +391,6 @@ const renderBindingHighlightForBindableElement_simple = (
     default:
       context.save();
 
-      const highlightColor2 = getHighlightColor(appState.viewBackgroundColor); //zsviczian
-
       const center = elementCenterPoint(suggestedBinding.element, elementsMap);
 
       context.translate(center[0], center[1]);
@@ -326,13 +399,15 @@ const renderBindingHighlightForBindableElement_simple = (
 
       context.translate(suggestedBinding.element.x, suggestedBinding.element.y);
 
-      context.lineWidth = 1.5 * //zsviczian was 1
-        clamp(1.75, suggestedBinding.element.strokeWidth, 10) / //zsviczian was max was 4
+      context.lineWidth =
+        (1.5 * //zsviczian was 1
+          clamp(1.75, suggestedBinding.element.strokeWidth, 10)) / //zsviczian was max was 4
         Math.max(0.25, appState.zoom.value);
-      context.strokeStyle = highlightColor2 ?? //zsviczian
-        (appState.theme === THEME.DARK
-          ? `rgba(3, 93, 161, 1)`
-          : `rgba(106, 189, 252, 1)`);
+      // zsviczian -- prefer the host scene color over the upstream fallback
+      context.strokeStyle = getHostAwareHighlightColor(
+        appState,
+        `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, 1)`,
+      );
 
       switch (suggestedBinding.element.type) {
         case "ellipse":
@@ -558,19 +633,15 @@ const renderBindingHighlightForBindableElement_simple = (
               hoveredMidpoint.distance <= highlightThreshold * 2));
 
         if (isHighlighted) {
-          context.fillStyle =
-            appState.theme === THEME.DARK
-              ? `rgba(3, 93, 161, 1)`
-              : `rgba(106, 189, 252, 1)`;
+          context.fillStyle = `rgba(${
+            BINDING_HIGHLIGHT_RGB[appState.theme]
+          }, 1)`;
 
           context.beginPath();
           context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
           context.fill();
         } else if (isShown) {
-          context.fillStyle =
-            appState.theme === THEME.DARK
-              ? `rgba(0, 0, 0, 0.8)`
-              : `rgba(65, 65, 65, 0.5)`;
+          context.fillStyle = BINDING_MIDPOINT_COLOR[appState.theme];
           context.beginPath();
           context.arc(midpoint[0], midpoint[1], midpointRadius, 0, 2 * Math.PI);
           context.fill();
@@ -629,15 +700,12 @@ const renderBindingHighlightForBindableElement_complex = (
       context.save();
 
       context.translate(element.x, element.y);
-      const highlightColor = getHighlightColor(
-        appState.viewBackgroundColor,
+      context.lineWidth = (1.5 * FRAME_STYLE.strokeWidth) / appState.zoom.value; //zsviczian was 1
+      context.strokeStyle = getHostAwareHighlightColor(
+        appState,
+        `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, ${opacity})`,
         opacity,
-      ); //zsviczian
-      context.lineWidth = 1.5 * FRAME_STYLE.strokeWidth / appState.zoom.value; //zsviczian was 1
-      context.strokeStyle = highlightColor ?? //zsviczian
-        (appState.theme === THEME.DARK
-          ? `rgba(3, 93, 161, ${opacity})`
-          : `rgba(106, 189, 252, ${opacity})`);
+      ); // zsviczian -- prefer the host scene color over the upstream fallback
 
       if (FRAME_STYLE.radius && context.roundRect) {
         context.beginPath();
@@ -672,18 +740,16 @@ const renderBindingHighlightForBindableElement_complex = (
         element.y + appState.scrollY - offset,
       );
 
-      const highlightColor2 = getHighlightColor(
-        appState.viewBackgroundColor,
-        opacity / 2,
-      ); //zsviczian
-
-      context.lineWidth = 1.5 * //zsviczian was 1
-        clamp(2.5, element.strokeWidth * 1.75, 10) / //zsviczian max was 4
+      context.lineWidth =
+        (1.5 * //zsviczian was 1
+          clamp(2.5, element.strokeWidth * 1.75, 10)) / //zsviczian max was 4
         Math.max(0.25, appState.zoom.value);
-      context.strokeStyle = highlightColor2 ?? //zsviczian
-        (appState.theme === THEME.DARK
-          ? `rgba(3, 93, 161, ${opacity / 2})`
-          : `rgba(106, 189, 252, ${opacity / 2})`);
+      // zsviczian -- prefer the host scene color over the upstream fallback
+      context.strokeStyle = getHostAwareHighlightColor(
+        appState,
+        `rgba(${BINDING_HIGHLIGHT_RGB[appState.theme]}, ${opacity / 2})`,
+        opacity / 2,
+      );
 
       switch (element.type) {
         case "ellipse":
@@ -808,7 +874,7 @@ const renderBindingHighlightForBindableElement_complex = (
 
     const PROGRESS_RATIO = (1 / BIND_MODE_TIMEOUT) * remainingTime;
 
-    context.strokeStyle = "rgba(0, 0, 0, 0.2)";
+    context.strokeStyle = getThemedColor("rgba(0, 0, 0, 0.2)", appState.theme);
     context.lineWidth = 1 / appState.zoom.value;
     context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
     context.lineDashOffset = (-PROGRESS_RATIO * 10) / appState.zoom.value;
@@ -825,10 +891,11 @@ const renderBindingHighlightForBindableElement_complex = (
     );
     context.stroke();
 
-    const highlightColor = getHighlightColor(appState.viewBackgroundColor); //zsviczian
-
     // context.strokeStyle = "transparent";
-    context.fillStyle = highlightColor ?? "rgba(128,128,128,.1)"; //zsviczian "rgba(0, 0, 0, 0.04)";
+    context.fillStyle = getHostAwareHighlightColor(
+      appState,
+      getThemedColor("rgba(0, 0, 0, 0.04)", appState.theme),
+    ); // zsviczian -- prefer the host scene color over the upstream fallback
     context.beginPath();
     context.ellipse(
       element.width / 2,
@@ -909,10 +976,9 @@ const renderBindingHighlightForBindableElement_complex = (
         );
       });
 
-      context.fillStyle =
-        appState.theme === THEME.DARK
-          ? `rgba(3, 93, 161, ${opacity})`
-          : `rgba(106, 189, 252, ${opacity})`;
+      context.fillStyle = `rgba(${
+        BINDING_HIGHLIGHT_RGB[appState.theme]
+      }, ${opacity})`;
 
       midpoints.forEach((midpoint) => {
         context.beginPath();
@@ -1056,8 +1122,10 @@ const renderFrameHighlight = (
   const width = x2 - x1;
   const height = y2 - y1;
 
-  const highlightColor = getHighlightColor(appState.viewBackgroundColor); //zsviczian
-  context.strokeStyle = highlightColor ?? "rgb(0,118,255)"; //zsviczian
+  context.strokeStyle = getHostAwareHighlightColor(
+    appState,
+    getThemedColor("rgb(0,118,255)", appState.theme),
+  ); // zsviczian -- prefer the host scene color over the upstream fallback
   context.lineWidth = FRAME_STYLE.strokeWidth / appState.zoom.value;
 
   context.save();
@@ -1083,8 +1151,15 @@ const renderElementsBoxHighlight = (
   elements: readonly NonDeletedExcalidrawElement[],
   config?: { colors?: string[]; dashed?: boolean },
 ) => {
-  const highlightColor = getHighlightColor(appState.viewBackgroundColor); //zsviczian
-  const { colors = [highlightColor], dashed = false } = config || {}; //zsviczian
+  const {
+    colors = [
+      getHostAwareHighlightColor(
+        appState,
+        getThemedColor("rgb(0,118,255)", appState.theme),
+      ), // zsviczian -- prefer the host scene color over the upstream fallback
+    ],
+    dashed = false,
+  } = config || {};
   const individualElements = elements.filter(
     (element) => element.groupIds.length === 0,
   );
@@ -1260,7 +1335,10 @@ const renderFocusPointConnectionLine = (
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
 
-  context.strokeStyle = "rgba(134, 131, 226, 0.6)";
+  context.strokeStyle = getThemedColor(
+    "rgba(134, 131, 226, 0.6)",
+    appState.theme,
+  );
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([4 / appState.zoom.value, 4 / appState.zoom.value]);
 
@@ -1281,12 +1359,16 @@ const renderFocusPointCicle = (
 ) => {
   context.save();
   context.translate(appState.scrollX, appState.scrollY);
-  context.strokeStyle = "rgba(134, 131, 226, 0.6)";
+  context.strokeStyle = getThemedColor(
+    "rgba(134, 131, 226, 0.6)",
+    appState.theme,
+  );
   context.lineWidth = 1 / appState.zoom.value;
   context.setLineDash([]);
-  context.fillStyle = isHovered
-    ? "rgba(134, 131, 226, 0.9)"
-    : "rgba(255, 255, 255, 0.9)";
+  context.fillStyle = getThemedColor(
+    isHovered ? "rgba(134, 131, 226, 0.9)" : "rgba(255, 255, 255, 0.9)",
+    appState.theme,
+  );
 
   fillCircle(
     context,
@@ -1749,7 +1831,7 @@ const _renderInteractiveScene = ({
       appState,
       elements as NonDeletedExcalidrawElement[], // We don't typecheck runtime because of performance
       {
-        colors: ["#ced4da"],
+        colors: [getThemedColor("#ced4da", appState.theme)],
         dashed: true,
       },
     );
@@ -1842,7 +1924,10 @@ const _renderInteractiveScene = ({
         elementsMap,
       );
     }
-    const selectionColor = renderConfig.selectionColor || "#000";
+    const selectionColor =
+      renderConfig.selectionColor || getThemedColor("#000", appState.theme);
+    const lockedSelectionColor = getThemedColor("#ced4da", appState.theme);
+    const groupSelectionColor = getThemedColor("#000", appState.theme);
 
     if (showBoundingBox) {
       // Optimisation for finding quickly relevant element ids
@@ -1898,7 +1983,9 @@ const _renderInteractiveScene = ({
             y1,
             x2,
             y2,
-            selectionColors: element.locked ? ["#ced4da"] : selectionColors,
+            selectionColors: element.locked
+              ? [lockedSelectionColor]
+              : selectionColors,
             dashed: !!remoteClients || element.locked,
             cx,
             cy,
@@ -1924,8 +2011,8 @@ const _renderInteractiveScene = ({
           y1,
           y2,
           selectionColors: groupElements.some((el) => el.locked)
-            ? ["#ced4da"]
-            : ["#000"],
+            ? [lockedSelectionColor]
+            : [groupSelectionColor],
           dashed: true,
           cx: x1 + (x2 - x1) / 2,
           cy: y1 + (y2 - y1) / 2,
@@ -1951,7 +2038,7 @@ const _renderInteractiveScene = ({
     context.translate(appState.scrollX, appState.scrollY);
 
     if (selectedElements.length === 1) {
-      context.fillStyle = "#fff";
+      context.fillStyle = getThemedColor("#fff", appState.theme);
       const transformHandles = getTransformHandles(
         selectedElements[0],
         appState.zoom,
@@ -1996,7 +2083,7 @@ const _renderInteractiveScene = ({
     ) {
       const dashedLinePadding =
         (DEFAULT_TRANSFORM_HANDLE_SPACING * 2) / appState.zoom.value;
-      context.fillStyle = "#fff";
+      context.fillStyle = getThemedColor("#fff", appState.theme);
       const [x1, y1, x2, y2] = getCommonBounds(selectedElements, elementsMap);
       const initialLineDash = context.getLineDash();
       context.setLineDash([2 / appState.zoom.value]);
@@ -2051,17 +2138,8 @@ const _renderInteractiveScene = ({
       );
 
       context.save();
-      if (appState.theme === THEME.LIGHT) {
-        if (focus) {
-          context.fillStyle = "rgba(255, 124, 0, 0.4)";
-        } else {
-          context.fillStyle = "rgba(255, 226, 0, 0.4)";
-        }
-      } else if (focus) {
-        context.fillStyle = "rgba(229, 82, 0, 0.4)";
-      } else {
-        context.fillStyle = "rgba(99, 52, 0, 0.4)";
-      }
+      context.fillStyle =
+        SEARCH_MATCH_COLOR[appState.theme][focus ? "focus" : "match"];
 
       const zoomFactor = isFrameLikeElement(element) ? appState.zoom.value : 1;
 
@@ -2106,8 +2184,11 @@ const _renderInteractiveScene = ({
     );
 
     context.save();
-    context.fillStyle = SCROLLBAR_COLOR;
-    context.strokeStyle = "rgba(255,255,255,0.8)";
+    context.fillStyle = getThemedColor(SCROLLBAR_COLOR, appState.theme);
+    context.strokeStyle = getThemedColor(
+      "rgba(255,255,255,0.8)",
+      appState.theme,
+    );
     [scrollBars.horizontal, scrollBars.vertical].forEach((scrollBar) => {
       if (scrollBar) {
         roundRect(
@@ -2138,9 +2219,10 @@ export const renderInteractiveScene = <
 >(
   renderConfig: InteractiveSceneRenderConfig,
 ): ReturnType<U> => {
-  renderConfig.renderConfig.selectionColor = getHighlightColor(
-    renderConfig.appState.viewBackgroundColor,
-  ); //zsviczian
+  renderConfig.renderConfig.selectionColor = getHostAwareHighlightColor(
+    renderConfig.appState,
+    renderConfig.renderConfig.selectionColor,
+  ); // zsviczian -- preserve CSS selection colors unless the host supplies a scene-aware override
   const ret = _renderInteractiveScene(renderConfig);
   renderConfig.callback(ret);
   return ret as ReturnType<U>;

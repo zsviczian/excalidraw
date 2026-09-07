@@ -1,6 +1,10 @@
 import { COLOR_WHITE } from "@excalidraw/common";
 
-import { bootstrapCanvas } from "./helpers";
+import {
+  DEFAULT_SELECTION_COLOR,
+  bootstrapCanvas,
+  getSelectionColor,
+} from "./helpers";
 
 const setup = () => {
   const canvas = document.createElement("canvas");
@@ -88,3 +92,23 @@ describe("bootstrapCanvas background painting", () => {
     expect(fillRect).not.toHaveBeenCalled();
   });
 });
+
+// zsviczian START -- selection colors must resolve in the owning popout window
+describe("getSelectionColor", () => {
+  it("reads the computed style from the element's owning window", () => {
+    const getComputedStyle = vi.fn(() => ({
+      getPropertyValue: () => " #123456 ",
+    }));
+    const element = {
+      ownerDocument: { defaultView: { getComputedStyle } },
+    } as unknown as Element;
+
+    expect(getSelectionColor(element)).toBe("#123456");
+    expect(getComputedStyle).toHaveBeenCalledWith(element);
+  });
+
+  it("falls back when no owning window is available", () => {
+    expect(getSelectionColor(null)).toBe(DEFAULT_SELECTION_COLOR);
+  });
+});
+// zsviczian END

@@ -3,6 +3,19 @@ import { COLOR_WHITE, THEME, applyDarkModeFilter } from "@excalidraw/common";
 import type { StaticCanvasRenderConfig } from "../scene/types";
 import type { AppState, StaticCanvasAppState } from "../types";
 
+export const DEFAULT_SELECTION_COLOR = "#6965db";
+
+/**
+ * Returns the theme's selection color (`--color-selection`), read from the
+ * computed style of any element inside the editor container so that host
+ * overrides are respected. Falls back to the default when unavailable.
+ */
+export const getSelectionColor = (element: Element | null | undefined) =>
+  element?.ownerDocument.defaultView
+    ?.getComputedStyle(element)
+    .getPropertyValue("--color-selection")
+    .trim() || DEFAULT_SELECTION_COLOR; // zsviczian -- read popout styles through the element's owning window
+
 export const fillCircle = (
   context: CanvasRenderingContext2D,
   cx: number,

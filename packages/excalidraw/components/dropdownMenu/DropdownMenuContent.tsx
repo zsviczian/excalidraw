@@ -1,10 +1,12 @@
 import clsx from "clsx";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 
 import { CLASSES, EVENT, KEYS } from "@excalidraw/common";
 
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 
+import { useUIAppState } from "../../context/ui-appState";
+import { useCallbackRefState } from "../../hooks/useCallbackRefState";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useStable } from "../../hooks/useStable";
 import { useEditorInterface, useExcalidrawContainer } from "../App";
@@ -13,7 +15,6 @@ import { ObsidianRadixPortal } from "../ObsidianRadixPortal";
 import Stack from "../Stack";
 
 import { DropdownMenuContentPropsContext } from "./common";
-import { useUIAppState } from "@excalidraw/excalidraw/context/ui-appState";
 
 const MenuContent = ({
   children,
@@ -38,7 +39,10 @@ const MenuContent = ({
   const editorInterface = useEditorInterface();
   const { container } = useExcalidrawContainer(); //zsviczian -- resolve the correct Obsidian popout document and collision boundary
   const appState = useUIAppState(); //zsviczian
-  const menuRef = useRef<HTMLDivElement>(null);
+  const [menuNode, setMenuNode] = useCallbackRefState<HTMLDivElement>();
+  // Radix mounts the content lazily. Rebind outside-click listeners when the
+  // node becomes available so they attach to its owner document.
+  const menuRef = useMemo(() => ({ current: menuNode }), [menuNode]);
 
   const callbacksRef = useStable({ onClickOutside });
 
@@ -48,9 +52,7 @@ const MenuContent = ({
       (event) => {
         // prevents closing if clicking on the trigger button
         if (
-          !menuRef.current
-            ?.closest(`.${CLASSES.DROPDOWN_MENU_EVENT_WRAPPER}`)
-            ?.contains(event.target)
+          !event.target.closest(`.${CLASSES.DROPDOWN_MENU_EVENT_WRAPPER}`) // zsviczian -- portaled content is not a DOM descendant of the trigger wrapper
         ) {
           callbacksRef.onClickOutside?.();
         }
@@ -60,7 +62,7 @@ const MenuContent = ({
   );
 
   useEffect(() => {
-    if (!open) {
+    if (!open || !menuNode) {
       return;
     }
     const onKeyDown = (event: KeyboardEvent) => {
@@ -77,16 +79,18 @@ const MenuContent = ({
       capture: true,
     };
 
-    document.addEventListener(EVENT.KEYDOWN, onKeyDown, option);
+    const ownerDocument = menuNode.ownerDocument;
+    ownerDocument.addEventListener(EVENT.KEYDOWN, onKeyDown, option);
     return () => {
-      document.removeEventListener(EVENT.KEYDOWN, onKeyDown, option);
+      ownerDocument.removeEventListener(EVENT.KEYDOWN, onKeyDown, option);
     };
-  }, [callbacksRef, open]);
+  }, [callbacksRef, open, menuNode]);
 
   const classNames = clsx(`dropdown-menu ${className}`, {
     "dropdown-menu--mobile": editorInterface.formFactor === "phone",
     "dropdown-menu--tray":
-      editorInterface.formFactor !== "phone" && editorInterface.desktopUIMode === "tray" &&
+      editorInterface.formFactor !== "phone" &&
+      editorInterface.desktopUIMode === "tray" &&
       appState.openMenu === "canvas", //zsviczian
   }).trim();
 
@@ -98,7 +102,7 @@ const MenuContent = ({
         container={container}
       >
         <DropdownMenuPrimitive.Content
-          ref={menuRef}
+          ref={setMenuNode}
           className={classNames}
           style={style}
           data-testid="dropdown-menu"
@@ -110,7 +114,9 @@ const MenuContent = ({
           {/* the zIndex ensures this menu has higher stacking order,
     see https://github.com/excalidraw/excalidraw/pull/1445 */}
           {editorInterface.formFactor === "phone" ? (
-            <Stack.Col className="dropdown-menu-container">{children}</Stack.Col>
+            <Stack.Col className="dropdown-menu-container">
+              {children}
+            </Stack.Col>
           ) : (
             <Island className="dropdown-menu-container" padding={2}>
               {children}
