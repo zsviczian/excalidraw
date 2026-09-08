@@ -76,6 +76,7 @@ export type ElementConstructorOpts = MarkOptional<
   | "locked"
   | "opacity"
   | "customData"
+  | "created"
 >;
 
 const _newElementBase = <T extends ExcalidrawElement>(
@@ -125,6 +126,8 @@ const _newElementBase = <T extends ExcalidrawElement>(
     });
   }
 
+  const timestamp = getUpdatedTimestamp();
+
   // assign type to guard against excess properties
   const element: Merge<
     ExcalidrawGenericElement,
@@ -153,7 +156,9 @@ const _newElementBase = <T extends ExcalidrawElement>(
     versionNonce: rest.versionNonce ?? 0,
     isDeleted: false as false,
     boundElements,
-    updated: getUpdatedTimestamp(),
+    updated: timestamp,
+    // Preserve explicit null when reconstructing a legacy element with its id.
+    created: rest.created === undefined ? timestamp : rest.created,
     link,
     locked,
     //...(rest.customData ? { customData: rest.customData } : {}), //zsviczian
