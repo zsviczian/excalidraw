@@ -226,3 +226,4 @@ When uncertain, choose the solution that:
 4. maintains public and serialized compatibility;
 5. can be built and tested as one small checkpoint; and
 6. will create the least friction during the next upstream merge.
+- When overriding properties of an existing type, prefer `Merge<Base, Overrides>` from `@excalidraw/common/utility-types` over `Omit<Base, keyof Overrides> & Overrides`.

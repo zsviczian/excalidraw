@@ -481,6 +481,7 @@ const restoreElementWithProperties = <
       ? element.boundElementIds.map((id) => ({ type: "arrow", id }))
       : element.boundElements ?? [],
     updated: element.updated ?? getUpdatedTimestamp(),
+    created: element.created ?? null,
     link: element.link ? normalizeLink(element.link) : null,
     hasTextLink: element.hasTextLink ?? false, //zsviczian
     locked: element.locked ?? false,
