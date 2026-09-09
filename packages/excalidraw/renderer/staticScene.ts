@@ -35,7 +35,11 @@ import {
   getLinkHandleFromCoords,
 } from "../components/hyperlink/helpers";
 
-import { bootstrapCanvas, getNormalizedCanvasDimensions } from "./helpers";
+import {
+  bootstrapCanvas,
+  getNormalizedCanvasDimensions,
+  snapScrollToDevicePixels,
+} from "./helpers";
 
 import type {
   StaticCanvasRenderConfig,
@@ -68,6 +72,7 @@ const strokeGrid = (
   height: number,
   gridLineColor: { Bold: string; Regular: string }, //zsviczian
   gridDirection: { horizontal: boolean; vertical: boolean } = { horizontal: true, vertical: true }, //zsviczian
+  scale: number,
 ) => {
   const bold = //zsviczian
     theme === THEME.DARK
@@ -84,15 +89,35 @@ const strokeGrid = (
 
   const spaceWidth = 1 / zoom.value;
 
-  context.save();
+  // scene units → device pixels
+  const devicePixels = zoom.value * scale;
 
-  // Offset rendering by 0.5 to ensure that 1px wide lines are crisp.
-  // We only do this when zoomed to 100% because otherwise the offset is
-  // fractional, and also visibly offsets the elements.
-  // We also do this per-axis, as each axis may already be offset by 0.5.
-  if (zoom.value === 1) {
-    context.translate(offsetX % 1 ? 0 : 0.5, offsetY % 1 ? 0 : 0.5);
-  }
+  // A line at least a device pixel wide is drawn a whole number of device
+  // pixels wide and centered to cover them exactly — on the half pixel when
+  // the count is odd. Straddling a pixel boundary renders it as two lighter
+  // pixels, which is how the grid looked at every zoom but 100%. Thinner
+  // lines (zoomed far out) keep their sub-pixel width: their lightness is
+  // the point.
+  const snap = (position: number, maxWidthInCssPixels: number) => {
+    // a line is `min(1 / zoom, max)` scene units wide; computed straight in
+    // device pixels, so `(1 / zoom) × zoom` never lands just under 1
+    const widthInDevicePixels = Math.min(
+      scale,
+      maxWidthInCssPixels * devicePixels,
+    );
+    if (widthInDevicePixels < 1) {
+      return { position, lineWidth: widthInDevicePixels / devicePixels };
+    }
+    const wholeWidth = Math.round(widthInDevicePixels);
+    const center = wholeWidth % 2 ? 0.5 : 0;
+    return {
+      position:
+        (Math.round(position * devicePixels - center) + center) / devicePixels,
+      lineWidth: wholeWidth / devicePixels,
+    };
+  };
+
+  context.save();
 
   // vertical lines
   if (gridDirection.vertical) { //zsviczian
@@ -104,15 +129,15 @@ const strokeGrid = (
         continue;
       }
 
-      const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
+      const { position, lineWidth } = snap(x, isBold ? 4 : 1);
       context.lineWidth = lineWidth;
       const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
 
       context.beginPath();
       context.setLineDash(isBold ? [] : lineDash);
       context.strokeStyle = isBold ? bold : regular; //zsviczian
-      context.moveTo(x, offsetY - gridSize);
-      context.lineTo(x, Math.ceil(offsetY + height + gridSize * 2));
+      context.moveTo(position, offsetY - gridSize);
+      context.lineTo(position, Math.ceil(offsetY + height + gridSize * 2));
       context.stroke();
     }
   }
@@ -125,15 +150,15 @@ const strokeGrid = (
         continue;
       }
 
-      const lineWidth = Math.min(1 / zoom.value, isBold ? 4 : 1);
+      const { position, lineWidth } = snap(y, isBold ? 4 : 1);
       context.lineWidth = lineWidth;
       const lineDash = [lineWidth * 3, spaceWidth + (lineWidth + spaceWidth)];
 
       context.beginPath();
       context.setLineDash(isBold ? [] : lineDash);
       context.strokeStyle = isBold ? bold : regular; //zsviczian
-      context.moveTo(offsetX - gridSize, y);
-      context.lineTo(Math.ceil(offsetX + width + gridSize * 2), y);
+      context.moveTo(offsetX - gridSize, position);
+      context.lineTo(Math.ceil(offsetX + width + gridSize * 2), position);
       context.stroke();
     }
   }
@@ -255,7 +280,7 @@ const _renderStaticScene = ({
   allElementsMap,
   visibleElements,
   scale,
-  appState,
+  appState: unsnappedAppState,
   renderConfig,
 }: StaticSceneRenderConfig) => {
   if (canvas === null) {
@@ -267,6 +292,10 @@ const _renderStaticScene = ({
     isExporting,
     isHighlighterPenDrawing = false,
   } = renderConfig; //zsviczian
+  // export draws vectors, not cached bitmaps — nothing to keep on the grid
+  const appState = isExporting
+    ? unsnappedAppState
+    : snapScrollToDevicePixels(unsnappedAppState, scale);
 
   const [normalizedWidth, normalizedHeight] = getNormalizedCanvasDimensions(
     canvas,
@@ -302,6 +331,7 @@ const _renderStaticScene = ({
       normalizedHeight / appState.zoom.value,
       appState.gridColor, //zsviczian
       appState.gridDirection, //zsviczian
+      scale,
     );
   }
 
