@@ -95,6 +95,16 @@ export type ExcalidrawRectangleElement = _ExcalidrawElementBase & {
   type: "rectangle";
 };
 
+export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
+  Readonly<{
+    type: "stickynote";
+    /**
+     * The height the user set, from which the layout derives `height`: the
+     * note grows above it to fit its label and never shrinks below it
+     */
+    baseHeight: number;
+  }>;
+
 export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {
   type: "diamond";
 };
@@ -215,11 +225,13 @@ export type ExcalidrawGenericElement =
 
 export type ExcalidrawFlowchartNodeElement =
   | ExcalidrawRectangleElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement;
 
 export type ExcalidrawRectanguloidElement =
   | ExcalidrawRectangleElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawImageElement
   | ExcalidrawTextElement
   | ExcalidrawFreeDrawElement
@@ -235,6 +247,7 @@ export type ExcalidrawRectanguloidElement =
  */
 export type ExcalidrawElement =
   | ExcalidrawGenericElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawTextElement
   | ExcalidrawLinearElement
   | ExcalidrawArrowElement
@@ -267,11 +280,20 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
     type: "text";
     fontSize: number;
     fontFamily: FontFamilyValues;
+    /**
+     * The font size the user picked, from which the layout derives `fontSize`.
+     * Today only sticky note labels have one: the auto-fit shrinks below it
+     * and never above it (compare `baseHeight`, which the note grows above).
+     * `null` for every other text. Read it through `getBaseFontSize` —
+     * generic binding repair can detach a label without clearing this, so
+     * the container decides its meaning.
+     */
+    baseFontSize: number | null;
     text: string;
     rawText: string;
     textAlign: TextAlign;
     verticalAlign: VerticalAlign;
-    containerId: ExcalidrawGenericElement["id"] | null;
+    containerId: ExcalidrawTextContainer["id"] | null;
     originalText: string;
     /**
      * If `true` the width will fit the text. If `false`, the text will
@@ -296,6 +318,7 @@ export type ExcalidrawTextElement = _ExcalidrawElementBase &
 
 export type ExcalidrawBindableElement =
   | ExcalidrawRectangleElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawTextElement
@@ -307,6 +330,7 @@ export type ExcalidrawBindableElement =
 
 export type ExcalidrawTextContainer =
   | ExcalidrawRectangleElement
+  | ExcalidrawStickyNoteElement
   | ExcalidrawDiamondElement
   | ExcalidrawEllipseElement
   | ExcalidrawArrowElement;

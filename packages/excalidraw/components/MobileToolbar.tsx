@@ -34,6 +34,7 @@ import {
   bucketFillIcon,
   mermaidLogoIcon,
   MagicIcon,
+  stickyNoteToolIcon,
 } from "./icons";
 
 import "./ToolIcon.scss";
@@ -80,6 +81,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const laserToolSelected = activeTool.type === "laser";
   const embeddableToolSelected = activeTool.type === "embeddable";
   const bucketFillToolSelected = activeTool.type === "bucketfill";
+  const stickyNoteToolSelected = activeTool.type === "stickynote";
 
   const { TTDDialogTriggerTunnel } = useTunnels();
 
@@ -116,6 +118,7 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
   const extraTools: readonly typeof activeTool.type[] = (
     [
       "text",
+      "stickynote",
       "frame",
       "embeddable",
       "laser",
@@ -139,6 +142,8 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
       ? ImageIcon
       : activeTool.type === "frame"
       ? frameToolIcon
+      : activeTool.type === "stickynote"
+      ? stickyNoteToolIcon
       : activeTool.type === "embeddable"
       ? EmbedIcon
       : activeTool.type === "laser"
@@ -318,6 +323,17 @@ export const MobileToolbar = ({ app, setAppState }: MobileToolbarProps) => {
               </DropdownMenu.Sub.Content>
             </DropdownMenu.Sub>
           )}
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "stickynote" })}
+            icon={stickyNoteToolIcon}
+            shortcut={KEYS.N.toLocaleUpperCase()}
+            data-testid="toolbar-stickynote"
+            selected={stickyNoteToolSelected}
+            disabled={isToolButtonDisabled(app, "stickynote")}
+          >
+            {t("toolBar.stickynote")}
+          </DropdownMenu.Item>
+
           {!showFrameToolOutside && (
             <DropdownMenu.Item
               onSelect={() => app.setActiveTool({ type: "frame" })}
