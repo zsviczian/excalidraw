@@ -18,6 +18,7 @@ import {
   drawShapeToolIcon,
   EmbedIcon,
   frameToolIcon,
+  ImageIcon,
   LassoIcon,
   laserPointerToolIcon,
   bucketFillIcon,
@@ -41,6 +42,7 @@ import {
   RectangleToolButton,
   SelectionToolButton,
   SelectionToolPopover,
+  StickyNoteToolButton,
   TextToolButton,
 } from "./Tools";
 
@@ -55,15 +57,18 @@ const ExtraToolsDropdown = ({
   app,
   activeTool,
   setAppState,
+  UIOptions,
 }: {
   app: AppClassProperties;
   activeTool: UIAppState["activeTool"];
   setAppState: React.Component<any, AppState>["setState"];
+  UIOptions: AppProps["UIOptions"];
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
   const isFullStylesPanel = useStylesPanelMode() === "full";
   const { TTDDialogTriggerTunnel } = useTunnels();
 
+  const imageToolSelected = activeTool.type === "image";
   const frameToolSelected = activeTool.type === "frame";
   const drawShapeToolSelected = activeTool.type === "autoshape";
   const laserToolSelected = activeTool.type === "laser";
@@ -79,6 +84,7 @@ const ExtraToolsDropdown = ({
       <DropdownMenu.Trigger
         className={clsx("App-toolbar__extra-tools-trigger", {
           "App-toolbar__extra-tools-trigger--selected":
+            imageToolSelected ||
             frameToolSelected ||
             embeddableToolSelected ||
             (isFullStylesPanel && drawShapeToolSelected) ||
@@ -95,7 +101,9 @@ const ExtraToolsDropdown = ({
         }}
         title={t("toolBar.extraTools")}
       >
-        {frameToolSelected
+        {imageToolSelected
+          ? ImageIcon
+          : frameToolSelected
           ? frameToolIcon
           : embeddableToolSelected
           ? EmbedIcon
@@ -114,6 +122,18 @@ const ExtraToolsDropdown = ({
         onSelect={() => setIsExtraToolsMenuOpen(false)}
         className="App-toolbar__extra-tools-dropdown"
       >
+        {UIOptions.tools?.image !== false && (
+          <DropdownMenu.Item
+            onSelect={() => app.setActiveTool({ type: "image" })}
+            icon={ImageIcon}
+            shortcut={KEYS["9"]}
+            data-testid="toolbar-image"
+            selected={imageToolSelected}
+            disabled={isToolButtonDisabled(app, "image")}
+          >
+            {t("toolBar.image")}
+          </DropdownMenu.Item>
+        )}
         <DropdownMenu.Item
           onSelect={() => app.setActiveTool({ type: "frame" })}
           icon={frameToolIcon}
@@ -299,6 +319,7 @@ export const Toolbar = ({
             onClose={() => setIsImageMenuOpen(false)}
           />
         )}
+        <StickyNoteToolButton {...toolProps} />
         <EraserToolButton {...toolProps} />
 
         <div
@@ -310,6 +331,7 @@ export const Toolbar = ({
           app={app}
           activeTool={activeTool}
           setAppState={setAppState}
+          UIOptions={UIOptions}
         />
       </Stack.Row>
     </Island>

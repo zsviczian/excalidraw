@@ -10,6 +10,7 @@ import {
 import {
   MIN_FONT_SIZE,
   SHIFT_LOCKING_ANGLE,
+  STICKY_NOTE_MIN_SIZE,
   rescalePoints,
   getFontString,
 } from "@excalidraw/common";
@@ -58,10 +59,16 @@ import {
   isIframeLikeElement,
   isImageElement,
   isLinearElement,
+  isStickyNoteElement,
   isTextElement,
 } from "./typeChecks";
 
 import { isInGroup } from "./groups";
+import {
+  getStickyNoteMinSize,
+  getStickyNoteResizeIntent,
+  updateStickyNoteLayout,
+} from "./stickyNote";
 
 import type { Scene } from "./Scene";
 
@@ -753,11 +760,54 @@ export const resizeSingleElement = (
     );
   }
 
-  let boundTextFont: { fontSize?: number } = {};
+  // Constraints and font scaling use magnitudes. Keep the signs for the
+  // geometry below, where crossing the opposite edge flips the element.
+  const flipFactorX = nextWidth < 0 ? -1 : 1;
+  const flipFactorY = nextHeight < 0 ? -1 : 1;
+  nextWidth = Math.abs(nextWidth);
+  nextHeight = Math.abs(nextHeight);
+
   const elementsMap = scene.getNonDeletedElementsMap();
   const boundTextElement = getBoundTextElement(latestElement, elementsMap);
+  const isResizingStickyNote = isStickyNoteElement(latestElement);
+  let minSize: { width: number; height: number } | undefined;
+  if (isResizingStickyNote) {
+    // A note must fit one line at its label's font ceiling.
+    minSize = boundTextElement
+      ? getStickyNoteMinSize({
+          fontSize: boundTextElement.baseFontSize ?? boundTextElement.fontSize,
+          fontFamily: boundTextElement.fontFamily,
+        })
+      : { width: STICKY_NOTE_MIN_SIZE, height: STICKY_NOTE_MIN_SIZE };
+  } else if (boundTextElement && !shouldMaintainAspectRatio) {
+    minSize = {
+      width: getApproxMinLineWidth(
+        getFontString(boundTextElement),
+        boundTextElement.lineHeight,
+      ),
+      height: getApproxMinLineHeight(
+        boundTextElement.fontSize,
+        boundTextElement.lineHeight,
+      ),
+    };
+  }
 
-  if (boundTextElement) {
+  if (minSize) {
+    nextWidth = Math.max(nextWidth, minSize.width);
+    nextHeight = Math.max(nextHeight, minSize.height);
+    if (shouldMaintainAspectRatio) {
+      // Both dimensions must use the same scale even at the minimum size.
+      const scale = Math.max(
+        nextWidth / origElement.width,
+        nextHeight / origElement.height,
+      );
+      nextWidth = origElement.width * scale;
+      nextHeight = origElement.height * scale;
+    }
+  }
+
+  let boundTextFont: { fontSize?: number } = {};
+  if (boundTextElement && !isResizingStickyNote) {
     const stateOfBoundTextElementAtResize = originalElementsMap.get(
       boundTextElement.id,
     ) as typeof boundTextElement | undefined;
@@ -784,19 +834,11 @@ export const resizeSingleElement = (
       boundTextFont = {
         fontSize: nextFont.size,
       };
-    } else {
-      const minWidth = getApproxMinLineWidth(
-        getFontString(boundTextElement),
-        boundTextElement.lineHeight,
-      );
-      const minHeight = getApproxMinLineHeight(
-        boundTextElement.fontSize,
-        boundTextElement.lineHeight,
-      );
-      nextWidth = Math.max(nextWidth, minWidth);
-      nextHeight = Math.max(nextHeight, minHeight);
     }
   }
+
+  nextWidth *= flipFactorX;
+  nextHeight *= flipFactorY;
 
   const rescaledPoints = rescalePointsInElement(
     origElement,
@@ -881,7 +923,7 @@ export const resizeSingleElement = (
     shouldMaintainAspectRatio
   ) {
     const fontSize =
-      (nextWidth / latestElement.width) * boundTextElement.fontSize;
+      (Math.abs(nextWidth) / latestElement.width) * boundTextElement.fontSize;
     if (fontSize < MIN_FONT_SIZE) {
       return;
     }
@@ -925,18 +967,35 @@ export const resizeSingleElement = (
       isDragging: false,
     });
 
-    if (boundTextElement && boundTextFont != null) {
-      scene.mutateElement(boundTextElement, {
-        fontSize: boundTextFont.fontSize,
+    if (isStickyNoteElement(latestElement)) {
+      updateStickyNoteLayout(latestElement, scene, {
+        ...getStickyNoteResizeIntent(
+          latestElement,
+          originalElementsMap,
+          handleDirection,
+          {
+            proportional: shouldMaintainAspectRatio,
+            fromCenter: shouldResizeFromCenter,
+          },
+        ),
+        // the arrow pass below is this function's — keep it single
+        bindings: false,
       });
+    } else {
+      if (boundTextElement && boundTextFont != null) {
+        scene.mutateElement(boundTextElement, {
+          fontSize: boundTextFont.fontSize,
+        });
+      }
+      handleBindTextResize(
+        latestElement,
+        scene,
+        handleDirection,
+        shouldMaintainAspectRatio,
+        shouldResizeFromCenter,
+        flipFactorY < 0,
+      );
     }
-    handleBindTextResize(
-      latestElement,
-      scene,
-      handleDirection,
-      shouldMaintainAspectRatio,
-      shouldResizeFromCenter,
-    );
 
     updateBoundElements(latestElement, scene);
   }
@@ -1472,7 +1531,8 @@ export const resizeMultipleElements = (
         getBoundTextElementId(orig) ?? "",
       ) as ExcalidrawTextElementWithContainer | undefined;
 
-      if (boundTextElement) {
+      // sticky notes derive their label's size from the layout below
+      if (boundTextElement && !isStickyNoteElement(orig)) {
         if (keepAspectRatio) {
           const newFontSize = boundTextElement.fontSize * scale;
           if (newFontSize < MIN_FONT_SIZE) {
@@ -1504,9 +1564,27 @@ export const resizeMultipleElements = (
 
       scene.mutateElement(element, update);
 
-      updateBoundElements(element, scene, {
-        simultaneouslyUpdated: elementsToUpdate,
-      });
+      if (isStickyNoteElement(element)) {
+        // the content correction runs before the (single) arrow pass, which
+        // must still skip arrows resized in the same gesture
+        updateStickyNoteLayout(element, scene, {
+          ...getStickyNoteResizeIntent(
+            element,
+            originalElementsMap,
+            handleDirection,
+            {
+              proportional: keepAspectRatio,
+              fromCenter: shouldResizeFromCenter,
+              flip: flipByX || flipByY,
+            },
+          ),
+          bindings: { simultaneouslyUpdated: elementsToUpdate },
+        });
+      } else {
+        updateBoundElements(element, scene, {
+          simultaneouslyUpdated: elementsToUpdate,
+        });
+      }
 
       if (isBindingElement(element)) {
         if (element.startBinding) {
@@ -1522,7 +1600,11 @@ export const resizeMultipleElements = (
       }
 
       const boundTextElement = getBoundTextElement(element, elementsMap);
-      if (boundTextElement && boundTextFontSize) {
+      if (
+        boundTextElement &&
+        boundTextFontSize &&
+        !isStickyNoteElement(element)
+      ) {
         scene.mutateElement(boundTextElement, {
           fontSize: boundTextFontSize,
           angle: isLinearElement(element) ? undefined : angle,
@@ -1533,6 +1615,7 @@ export const resizeMultipleElements = (
           handleDirection,
           true,
           shouldResizeFromCenter,
+          flipByY,
         );
       }
     }
