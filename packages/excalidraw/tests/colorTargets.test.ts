@@ -1,9 +1,9 @@
 import {
   COLOR_PALETTE,
-  DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE,
   DEFAULT_ELEMENT_STROKE_PICKS,
   DEFAULT_STICKY_NOTE_BG,
   STICKY_NOTE_BACKGROUND_PICKS,
+  STICKY_NOTE_STROKE_PICKS,
 } from "@excalidraw/common";
 
 import {
@@ -86,8 +86,8 @@ describe("resolveColorTarget", () => {
     expect(target.excludedColors).toBeUndefined();
   });
 
-  // zsviczian START -- verify host palettes do not replace sticky-note colors
-  it("uses host palettes for regular and mixed targets only", () => {
+  // zsviczian START -- sticky notes share host palettes but retain their top picks
+  it("uses host palettes for every target and keeps sticky top picks", () => {
     const customPalette: NonNullable<AppState["colorPalette"]> = {
       canvasBackground: { canvas: "#111111" },
       elementBackground: { background: "#222222" },
@@ -133,7 +133,7 @@ describe("resolveColorTarget", () => {
     expect(mixed.palette).toBe(customPalette.elementBackground);
     expect(mixed.topPicks).toBe(customPalette.topPicks.elementBackground);
 
-    const sticky = resolveColorTarget(
+    const stickyBackground = resolveColorTarget(
       appState({
         colorPalette: customPalette,
         selectedElementIds: { note: true },
@@ -141,8 +141,19 @@ describe("resolveColorTarget", () => {
       elements,
       "backgroundColor",
     );
-    expect(sticky.palette).toBe(DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE);
-    expect(sticky.topPicks).toBe(STICKY_NOTE_BACKGROUND_PICKS);
+    expect(stickyBackground.palette).toBe(customPalette.elementBackground);
+    expect(stickyBackground.topPicks).toBe(STICKY_NOTE_BACKGROUND_PICKS);
+
+    const stickyStroke = resolveColorTarget(
+      appState({
+        colorPalette: customPalette,
+        selectedElementIds: { note: true },
+      }),
+      elements,
+      "strokeColor",
+    );
+    expect(stickyStroke.palette).toBe(customPalette.elementStroke);
+    expect(stickyStroke.topPicks).toBe(STICKY_NOTE_STROKE_PICKS);
   });
   // zsviczian END
 

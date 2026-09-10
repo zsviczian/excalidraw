@@ -149,7 +149,7 @@ export const resolveColorTarget = (
 
   const keys = DEFAULT_KEYS[property];
   const isStroke = property === "strokeColor";
-  // zsviczian START -- use host palettes for regular and mixed targets while keeping upstream sticky-note palettes
+  // zsviczian START -- use host palettes for every target while keeping sticky-note-specific top picks
   const regularPalette = isStroke
     ? appState.colorPalette?.elementStroke ??
       DEFAULT_ELEMENT_STROKE_COLOR_PALETTE
@@ -167,12 +167,7 @@ export const resolveColorTarget = (
     property,
     appStateKeys: kind === "mixed" ? [keys.regular, keys.sticky] : [keys[kind]],
     currentValue: appState[kind === "sticky" ? keys.sticky : keys.regular],
-    palette:
-      kind === "sticky"
-        ? isStroke
-          ? DEFAULT_ELEMENT_STROKE_COLOR_PALETTE
-          : DEFAULT_ELEMENT_BACKGROUND_COLOR_PALETTE
-        : regularPalette, // zsviczian -- mixed selections intentionally show the regular host palette
+    palette: regularPalette,
     topPicks:
       kind === "sticky"
         ? isStroke
