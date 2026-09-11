@@ -747,6 +747,7 @@ export const restoreElement = (
             element.baseHeight ??
             (element as typeof element & { maxHeight?: number }).maxHeight ??
             element.height,
+          showFooter: element.showFooter ?? true, // zsviczian -- legacy notes keep their date footer
         }),
       );
     case "magicframe":

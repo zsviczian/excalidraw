@@ -1045,6 +1045,25 @@ describe("sticky note creation date", () => {
     ).toBeNull();
   });
 
+  // zsviczian START -- prototype per-note footer visibility
+  it("shows the footer by default and omits it when disabled", () => {
+    const sticky = newStickyNoteElement({
+      type: "stickynote",
+      x: 0,
+      y: 0,
+      width: DEFAULT_STICKY_NOTE_SIZE,
+      height: DEFAULT_STICKY_NOTE_SIZE,
+      created: at(2025, 4, 30),
+    });
+
+    expect(sticky.showFooter).toBe(true);
+    expect(getStickyNoteFooter(sticky, NOW)).not.toBeNull();
+    expect(
+      getStickyNoteFooter(newElementWith(sticky, { showFooter: false }), NOW),
+    ).toBeNull();
+  });
+  // zsviczian END
+
   it("reserves the footer below the label body", () => {
     const { scene, stickyId, textId } = createStickyWithText("A");
     const sticky = getSticky(scene, stickyId);
@@ -1053,6 +1072,34 @@ describe("sticky note creation date", () => {
     );
     scene.destroy();
   });
+
+  // zsviczian START -- hidden footers use equal top and bottom text margins
+  it("lays out hidden-footer text with symmetric vertical padding", () => {
+    const { scene, stickyId, textId } = createStickyWithText("A");
+    const sticky = newElementWith(getSticky(scene, stickyId), {
+      showFooter: false,
+    });
+    const text = getBoundText(scene, textId);
+    const elementsMap = arrayToMap([sticky, text]);
+    const topText = newElementWith(text, {
+      verticalAlign: VERTICAL_ALIGN.TOP,
+    });
+    const bottomText = newElementWith(text, {
+      verticalAlign: VERTICAL_ALIGN.BOTTOM,
+    });
+    const top = computeBoundTextPosition(sticky, topText, elementsMap);
+    const bottom = computeBoundTextPosition(sticky, bottomText, elementsMap);
+
+    expect(getBoundTextMaxHeight(sticky, text)).toBe(
+      sticky.height - STICKY_NOTE_PADDING * 2,
+    );
+    expect(top.y - sticky.y).toBe(STICKY_NOTE_PADDING);
+    expect(sticky.y + sticky.height - (bottom.y + bottomText.height)).toBe(
+      STICKY_NOTE_PADDING,
+    );
+    scene.destroy();
+  });
+  // zsviczian END
 });
 
 describe("sticky note ink", () => {

@@ -777,6 +777,7 @@ export const resizeSingleElement = (
       ? getStickyNoteMinSize({
           fontSize: boundTextElement.baseFontSize ?? boundTextElement.fontSize,
           fontFamily: boundTextElement.fontFamily,
+          showFooter: latestElement.showFooter, // zsviczian -- hidden footer uses symmetric minimum padding
         })
       : { width: STICKY_NOTE_MIN_SIZE, height: STICKY_NOTE_MIN_SIZE };
   } else if (boundTextElement && !shouldMaintainAspectRatio) {

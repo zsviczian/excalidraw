@@ -234,6 +234,7 @@ export const newStickyNoteElement = (
   opts: {
     type: "stickynote";
     baseHeight?: number;
+    showFooter?: boolean; // zsviczian -- prototype per-note footer visibility
   } & ElementConstructorOpts,
 ): NonDeleted<ExcalidrawStickyNoteElement> => {
   const base = _newElementBase<ExcalidrawStickyNoteElement>("stickynote", opts);
@@ -242,6 +243,7 @@ export const newStickyNoteElement = (
   return normalizeStickyNoteStyle({
     ...base,
     baseHeight: opts.baseHeight ?? base.height,
+    showFooter: opts.showFooter ?? true, // zsviczian -- existing behavior remains the default
   });
 };
 

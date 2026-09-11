@@ -144,7 +144,8 @@ export type ActionName =
   | "cropEditor"
   | "wrapSelectionInFrame"
   | "toggleShapeSwitch"
-  | "togglePolygon";
+  | "togglePolygon"
+  | "toggleStickyNoteFooter"; // zsviczian -- prototype footer visibility action
 
 export type PanelComponentProps = {
   elements: readonly ExcalidrawElement[];

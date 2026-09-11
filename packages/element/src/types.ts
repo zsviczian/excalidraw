@@ -103,6 +103,7 @@ export type ExcalidrawStickyNoteElement = _ExcalidrawElementBase &
      * note grows above it to fit its label and never shrinks below it
      */
     baseHeight: number;
+    showFooter: boolean; // zsviczian -- prototype per-note footer visibility
   }>;
 
 export type ExcalidrawDiamondElement = _ExcalidrawElementBase & {

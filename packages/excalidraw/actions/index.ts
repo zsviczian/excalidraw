@@ -20,6 +20,7 @@ export {
   actionChangeFontFamily,
   actionChangeTextAlign,
   actionChangeVerticalAlign,
+  actionToggleStickyNoteFooter, // zsviczian -- prototype footer visibility action
   actionChangeArrowProperties,
 } from "./actionProperties";
 

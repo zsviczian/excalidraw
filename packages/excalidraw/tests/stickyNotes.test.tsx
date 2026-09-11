@@ -14,6 +14,7 @@ import {
   getStickyNoteLayout,
   getTransformHandles,
   getBaseFontSize,
+  newElementWith, // zsviczian -- construct a hidden-footer export fixture
   resizeMultipleElements,
   resizeSingleElement,
   updateStickyNoteLayout,
@@ -33,6 +34,7 @@ import {
   actionChangeFontSize,
   actionChangeRoundness,
   actionIncreaseFontSize,
+  actionToggleStickyNoteFooter, // zsviczian -- prototype footer visibility
 } from "../actions/actionProperties";
 import { actionCopyStyles, actionPasteStyles } from "../actions/actionStyles";
 import { activeEyeDropperAtom } from "../components/EyeDropper";
@@ -1139,6 +1141,38 @@ describe("sticky notes", () => {
   });
 
   describe("creation date", () => {
+    // zsviczian START -- prototype footer toggle UI and history behavior
+    it("toggles the footer from the text-align row and supports undo", () => {
+      const { note, label } = createNote({
+        id: "note",
+        text: "hello",
+        fontSize: 28,
+      });
+      API.setElements([note, label]);
+      API.setSelectedElements([note]);
+
+      expect(getElement<ExcalidrawStickyNoteElement>(note.id).showFooter).toBe(
+        true,
+      );
+      const toggle = queryByTestId(document.body, "toggle-sticky-note-footer");
+      expect(toggle).not.toBeNull();
+      fireEvent.click(toggle!);
+      expect(getElement<ExcalidrawStickyNoteElement>(note.id).showFooter).toBe(
+        false,
+      );
+
+      Keyboard.undo();
+      expect(getElement<ExcalidrawStickyNoteElement>(note.id).showFooter).toBe(
+        true,
+      );
+
+      API.executeAction(actionToggleStickyNoteFooter);
+      expect(getElement<ExcalidrawStickyNoteElement>(note.id).showFooter).toBe(
+        false,
+      );
+    });
+    // zsviczian END
+
     it("exports the same absolute date to SVG and canvas, omitting unknown dates", async () => {
       const elements = [
         API.createElement({
@@ -1155,6 +1189,17 @@ describe("sticky notes", () => {
           height: DEFAULT_STICKY_NOTE_SIZE,
           created: null,
         }),
+        // zsviczian -- hidden footers are omitted from every export renderer
+        newElementWith(
+          API.createElement({
+            type: "stickynote",
+            x: 600,
+            width: DEFAULT_STICKY_NOTE_SIZE,
+            height: DEFAULT_STICKY_NOTE_SIZE,
+            created: new Date(2024, 1, 6, 12).getTime(),
+          }),
+          { showFooter: false },
+        ),
       ];
 
       const svg = await exportToSvg(
@@ -1172,6 +1217,11 @@ describe("sticky notes", () => {
         expect.any(Number),
         expect.any(Number),
       );
+      expect(canvas.getContext("2d")?.fillText).not.toHaveBeenCalledWith(
+        "6 Feb 2024",
+        expect.any(Number),
+        expect.any(Number),
+      ); // zsviczian
     });
   });
 });

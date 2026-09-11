@@ -31,6 +31,7 @@ import {
   normalizeStickyNote,
   getNonDeletedElements,
   isNonDeletedElement,
+  relayoutStickyNotes, // zsviczian -- footer toggles immediately reflow their labels
   syncStickyNoteInk,
 } from "@excalidraw/element";
 
@@ -88,6 +89,7 @@ import type {
   ExcalidrawElement,
   ExcalidrawFreeDrawElement,
   ExcalidrawLinearElement,
+  ExcalidrawStickyNoteElement,
   ExcalidrawTextElement,
   ExcalidrawFrameElement,
   FontFamilyValues,
@@ -159,6 +161,7 @@ import {
   strokeVariabilityVariableIcon,
   StrokeWidthExtraThinIcon,
   FontSizeExtraSmallIcon,
+  eyeIcon, // zsviczian -- prototype sticky-note footer visibility control
 } from "../components/icons";
 
 import { Fonts } from "../fonts";
@@ -1899,6 +1902,117 @@ export const actionChangeTextAlign = register<TextAlign>({
   },
 });
 
+// zsviczian START -- prototype per-note footer visibility beside vertical text alignment
+const getTargetStickyNotes = (
+  elements: readonly ExcalidrawElement[],
+  appState: Parameters<typeof getTargetElements>[1],
+) => {
+  const elementsMap = arrayToMap(elements);
+  const stickyNotes = new Map<string, ExcalidrawStickyNoteElement>();
+
+  for (const target of getTargetElements(elementsMap, appState)) {
+    const stickyNote = isStickyNoteElement(target)
+      ? target
+      : isTextElement(target) && target.containerId
+      ? elementsMap.get(target.containerId)
+      : null;
+
+    if (
+      stickyNote &&
+      !stickyNote.isDeleted &&
+      isStickyNoteElement(stickyNote)
+    ) {
+      stickyNotes.set(stickyNote.id, stickyNote);
+    }
+  }
+
+  return [...stickyNotes.values()];
+};
+
+const getStickyNoteFooterLabel = (
+  stickyNotes: readonly ExcalidrawStickyNoteElement[],
+) =>
+  stickyNotes.every((stickyNote) => stickyNote.showFooter !== false)
+    ? "labels.stickyNote.hideFooter"
+    : "labels.stickyNote.showFooter";
+
+export const actionToggleStickyNoteFooter = register({
+  name: "toggleStickyNoteFooter",
+  label: (elements, appState) =>
+    getStickyNoteFooterLabel(getTargetStickyNotes(elements, appState)),
+  keywords: ["sticky note", "footer", "date"],
+  trackEvent: { category: "element" },
+  predicate: (elements, appState) =>
+    getTargetStickyNotes(elements, appState).length > 0,
+  perform: (elements, appState, _, app) => {
+    const stickyNotes = getTargetStickyNotes(elements, appState);
+    if (stickyNotes.length === 0) {
+      return false;
+    }
+
+    const targetIds = new Set(stickyNotes.map((stickyNote) => stickyNote.id));
+    const showFooter = stickyNotes.some(
+      (stickyNote) => stickyNote.showFooter === false,
+    );
+
+    const prevElementsMap = arrayToMap(elements);
+    const toggledElements = elements.map((element) =>
+        targetIds.has(element.id) && isStickyNoteElement(element)
+          ? newElementWith(element, { showFooter })
+          : element,
+      );
+    const nextElements = relayoutStickyNotes(toggledElements, targetIds, {
+      prevElementsMap,
+    });
+
+    // zsviczian -- a reflowed note may shrink or grow, so bound arrows follow
+    for (const element of nextElements) {
+      const prev = prevElementsMap.get(element.id);
+      if (
+        isStickyNoteElement(element) &&
+        isNonDeletedElement(element) &&
+        prev &&
+        (prev.x !== element.x ||
+          prev.y !== element.y ||
+          prev.height !== element.height)
+      ) {
+        updateBoundElements(element, app.scene);
+      }
+    }
+
+    return {
+      elements: nextElements,
+      appState,
+      captureUpdate: CaptureUpdateAction.IMMEDIATELY,
+    };
+  },
+  PanelComponent: ({ elements, appState, updateData }) => {
+    const stickyNotes = getTargetStickyNotes(elements, appState);
+    if (stickyNotes.length === 0) {
+      return null;
+    }
+
+    const showFooter = stickyNotes.every(
+      (stickyNote) => stickyNote.showFooter !== false,
+    );
+    const label = t(getStickyNoteFooterLabel(stickyNotes));
+
+    return (
+      <IconButton
+        type="toggle"
+        icon={eyeIcon}
+        title={label}
+        aria-label={label}
+        data-testid="toggle-sticky-note-footer"
+        checked={showFooter}
+        onSelect={() => updateData(null)}
+        style={{ marginLeft: "auto" }}
+      />
+    );
+  },
+});
+// zsviczian END
+
 export const actionChangeVerticalAlign = register<VerticalAlign>({
   name: "changeVerticalAlign",
   label: "Change vertical alignment",
@@ -1933,7 +2047,14 @@ export const actionChangeVerticalAlign = register<VerticalAlign>({
       captureUpdate: CaptureUpdateAction.IMMEDIATELY,
     };
   },
-  PanelComponent: ({ elements, appState, updateData, app, data }) => {
+  PanelComponent: ({
+    elements,
+    appState,
+    updateData,
+    app,
+    data,
+    renderAction,
+  }) => {
     const { isCompact } = getStylesPanelInfo(app);
     return (
       <fieldset>
@@ -1993,6 +2114,8 @@ export const actionChangeVerticalAlign = register<VerticalAlign>({
               );
             }}
           />
+          {/* zsviczian -- compact right-aligned footer toggle */}
+          {renderAction("toggleStickyNoteFooter")}
         </div>
       </fieldset>
     );

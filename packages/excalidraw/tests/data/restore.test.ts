@@ -339,6 +339,34 @@ describe("restoreElements", () => {
     expect(restored.colorTopPicks.stickyNoteStroke).toBe(null);
   });
 
+  // zsviczian START -- prototype sticky-note footer persistence and legacy default
+  it("should restore sticky-note footer visibility", () => {
+    const visible = API.createElement({
+      type: "stickynote",
+      id: "visible",
+      width: 250,
+      height: 250,
+    });
+    const hidden = newElementWith(
+      API.createElement({
+        type: "stickynote",
+        id: "hidden",
+        width: 250,
+        height: 250,
+      }),
+      { showFooter: false },
+    );
+
+    const restored = restore.restoreElements(
+      [{ ...visible, showFooter: undefined } as any, hidden],
+      null,
+    ) as ExcalidrawStickyNoteElement[];
+
+    expect(restored[0].showFooter).toBe(true);
+    expect(restored[1].showFooter).toBe(false);
+  });
+  // zsviczian END
+
   it("should refit a sticky note together with its label when refreshing dimensions", () => {
     const stickyNote = API.createElement({
       type: "stickynote",

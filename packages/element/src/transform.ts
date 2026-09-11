@@ -208,7 +208,9 @@ export type ValidStickyNote = {
   id?: ExcalidrawStickyNoteElement["id"];
   label?: Extract<ValidContainer, { label?: unknown }>["label"];
 } & ElementConstructorOpts &
-  Partial<Pick<ExcalidrawStickyNoteElement, "baseHeight">>;
+  Partial<
+    Pick<ExcalidrawStickyNoteElement, "baseHeight" | "showFooter"> // zsviczian -- expose footer visibility through skeletons
+  >;
 
 export type ExcalidrawElementSkeleton =
   | Extract<

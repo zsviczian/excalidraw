@@ -255,6 +255,7 @@ const cloneFlowchartNode = (
           type: "stickynote",
           ...commonNodeProps,
           baseHeight: template.baseHeight,
+          showFooter: template.showFooter, // zsviczian -- preserve the sticky-note style when branching
         })
       : newElement({
           type: template.type,

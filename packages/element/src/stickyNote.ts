@@ -469,10 +469,12 @@ export const getStickyNoteDateLabel = (
  * the data floor, where the band would overlap the top padding.
  */
 export const getStickyNoteFooter = (
-  element: Pick<ExcalidrawStickyNoteElement, "created" | "width" | "height">,
+  element: Pick<ExcalidrawStickyNoteElement, "created" | "width" | "height"> &
+    Partial<Pick<ExcalidrawStickyNoteElement, "showFooter">>, // zsviczian -- prototype footer visibility
   now = Date.now(),
 ) => {
   if (
+    element.showFooter === false || // zsviczian -- hidden footers are omitted from canvas and SVG rendering
     element.width < STICKY_NOTE_MIN_SIZE ||
     element.height < STICKY_NOTE_MIN_SIZE
   ) {
@@ -494,6 +496,14 @@ export const getStickyNoteFooter = (
   };
 };
 
+// zsviczian -- hidden footers give the label equal top and bottom padding
+export const getStickyNoteBodyInsetY = (
+  element: Partial<Pick<ExcalidrawStickyNoteElement, "showFooter">>,
+) =>
+  element.showFooter === false
+    ? STICKY_NOTE_PADDING * 2
+    : STICKY_NOTE_BODY_INSET_Y;
+
 /**
  * The smallest note the UI lets a user create or resize to: one line at the
  * label's font ceiling plus padding (and, vertically, the footer), never below
@@ -504,7 +514,9 @@ export const getStickyNoteFooter = (
 export const getStickyNoteMinSize = ({
   fontSize,
   fontFamily,
-}: Pick<ExcalidrawTextElement, "fontSize" | "fontFamily">) => {
+  showFooter,
+}: Pick<ExcalidrawTextElement, "fontSize" | "fontFamily"> &
+  Partial<Pick<ExcalidrawStickyNoteElement, "showFooter">>) => {
   const lineHeightPx = Math.ceil(
     normalizeStickyNoteFontSize(fontSize) * getLineHeight(fontFamily),
   );
@@ -515,7 +527,7 @@ export const getStickyNoteMinSize = ({
     ),
     height: Math.max(
       STICKY_NOTE_MIN_SIZE,
-      lineHeightPx + STICKY_NOTE_BODY_INSET_Y,
+      lineHeightPx + getStickyNoteBodyInsetY({ showFooter }), // zsviczian
     ),
   };
 };
@@ -697,7 +709,8 @@ export const getStickyNoteLayout = (
   );
   const fontSizeMin = Math.min(STICKY_NOTE_MIN_FONT_SIZE, baseFontSize);
   const maxWidth = Math.max(baseWidth - STICKY_NOTE_PADDING * 2, 1);
-  const maxHeight = Math.max(baseHeight - STICKY_NOTE_BODY_INSET_Y, 0);
+  const bodyInsetY = getStickyNoteBodyInsetY(container); // zsviczian -- footer visibility changes the label body
+  const maxHeight = Math.max(baseHeight - bodyInsetY, 0);
   const { fontFamily, lineHeight } = textElement;
 
   const fit = (fontSize: number): FontFit => {
@@ -727,7 +740,7 @@ export const getStickyNoteLayout = (
 
   const height = isBlank
     ? baseHeight
-    : Math.max(baseHeight, fitted.height + STICKY_NOTE_BODY_INSET_Y);
+    : Math.max(baseHeight, fitted.height + bodyInsetY);
   const nextContainer = {
     ...getPositionAfterHeightChange(container, height, anchor),
     width: baseWidth,
@@ -865,7 +878,7 @@ export const updateStickyNoteLayout = (
 };
 
 const STICKY_NOTE_LAYOUT_INPUTS = {
-  container: ["x", "y", "width", "baseHeight", "angle"],
+  container: ["x", "y", "width", "baseHeight", "angle", "showFooter"], // zsviczian -- footer visibility changes layout
   text: [
     "originalText",
     "baseFontSize",

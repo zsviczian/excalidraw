@@ -167,6 +167,10 @@
       "breakPolygon": "Break polygon",
       "convertToPolygon": "Convert to polygon"
     },
+    "stickyNote": {
+      "showFooter": "Show footer",
+      "hideFooter": "Hide footer"
+    },
     "elementLock": {
       "lock": "Lock",
       "unlock": "Unlock",
