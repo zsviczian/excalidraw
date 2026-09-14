@@ -15,7 +15,7 @@ import {
   DEFAULT_STICKY_NOTE_BG,
 } from "@excalidraw/common";
 
-import type { AppState, NormalizedZoomValue } from "./types";
+import type { AppState, InputDevice, NormalizedZoomValue } from "./types";
 
 const defaultExportScale = 1; //zsviczian - iPad scaling issue on export
 /*EXPORT_SCALES.includes(devicePixelRatio)
@@ -80,6 +80,7 @@ export const getDefaultAppState = (): Omit<
     isBindingEnabled: true,
     bindingPreference: "enabled",
     isMidpointSnappingEnabled: true,
+    inputDevice: "auto",
     defaultSidebarDockedPreference: false,
     isLoading: false,
     isResizing: false,
@@ -253,6 +254,7 @@ const APP_STATE_STORAGE_CONF = (<
   boxSelectionMode: { browser: true, export: false, server: false },
   bindingPreference: { browser: true, export: false, server: false },
   isMidpointSnappingEnabled: { browser: true, export: false, server: false },
+  inputDevice: { browser: true, export: false, server: false },
   defaultSidebarDockedPreference: {
     browser: true,
     export: false,
@@ -384,4 +386,17 @@ export const isLaserPointerActive = ({
   activeTool: AppState["activeTool"];
 }) => {
   return activeTool.type === "laser";
-};
+}; //zsviczian
+/**
+ * The device the wheel mappings follow for the given preference.
+ *
+ * `auto` is meant to detect the device from the wheel events themselves
+ * (line vs. pixel delta modes, whole vs. fractional deltas, one vs. two axes
+ * moving, event cadence and momentum tails). That is not implemented yet, so
+ * it resolves to `trackpad` — the mapping the editor has always had, and the
+ * default to keep until detection exists.
+ */
+export const resolveInputDevice = (
+  inputDevice: InputDevice,
+): Exclude<InputDevice, "auto"> =>
+  inputDevice === "auto" ? "trackpad" : inputDevice;
