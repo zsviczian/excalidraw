@@ -50,8 +50,6 @@ import {
   TOUCH_CTX_MENU_TIMEOUT,
   VERTICAL_ALIGN,
   YOUTUBE_STATES,
-  ZOOM_STEP,
-  MIN_ZOOM,
   POINTER_EVENTS,
   TOOL_TYPE,
   DEFAULT_COLLISION_THRESHOLD,
@@ -472,6 +470,7 @@ import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppFlowchart } from "./App.flowchart";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
+import { AppWheel } from "./App.wheel";
 import BraveMeasureTextError from "./BraveMeasureTextError";
 import { ContextMenu, CONTEXT_MENU_SEPARATOR } from "./ContextMenu";
 import { activeEyeDropperAtom } from "./EyeDropper";
@@ -646,6 +645,9 @@ let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
 
 let lastPointerUp: (() => void) | null = null;
+/** applies the pointer movement the active drag-pan is holding back for its
+ * next frame, if any */
+let flushPanMove: (() => void) | null = null;
 const gesture: Gesture = {
   pointers: new Map(),
   lastCenter: null,
@@ -742,6 +744,10 @@ class App extends React.Component<AppProps, AppState> {
     getContainer: () => this.excalidrawContainerRef.current,
     getStylesPanelMode: () => this.stylesPanelMode,
     isGestureActive: () => gesture.pointers.size >= 2 || isPanning,
+  });
+  public wheel: AppWheel = new AppWheel(this, {
+    isPanning: () => isPanning,
+    flushPanMove: () => flushPanMove?.(),
   });
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
@@ -2380,7 +2386,6 @@ class App extends React.Component<AppProps, AppState> {
               : POINTER_EVENTS.enabled,
           }}
           onPointerDown={(event) => this.handleCanvasPointerDown(event)}
-          onWheel={(event) => this.handleWheel(event)}
           onContextMenu={this.handleCanvasContextMenu}
           onDoubleClick={() => {
             this.setState({
@@ -3330,15 +3335,6 @@ class App extends React.Component<AppProps, AppState> {
     event.preventDefault();
   };
 
-  // prevent the browser's own zoom over the non-interactive editor while
-  // letting regular scroll through (trackpad pinch is delivered as
-  // ctrl+wheel)
-  private preventBrowserZoomWheel = (event: WheelEvent) => {
-    if (event[KEYS.CTRL_OR_CMD]) {
-      event.preventDefault();
-    }
-  };
-
   // handles only the navigation keyboard: page-scroll keys and
   // `navigation`-flagged action shortcuts (canvas zoom & zoom-to-fit — see
   // `ActionManager.handleKeyDown` gates); the rest of the keyboard handling
@@ -4213,7 +4209,7 @@ class App extends React.Component<AppProps, AppState> {
           addEventListener(
             this.excalidrawContainerRef.current,
             EVENT.WHEEL,
-            this.handleWheel,
+            this.wheel.handle,
             { passive: false },
           ),
           // navigation action shortcuts (canvas zoom & zoom-to-fit)
@@ -4264,7 +4260,7 @@ class App extends React.Component<AppProps, AppState> {
             addEventListener(
               this.excalidrawContainerRef.current,
               EVENT.WHEEL,
-              this.preventBrowserZoomWheel,
+              this.wheel.preventBrowserZoom,
               { passive: false },
             ),
             // Safari-only desktop pinch
@@ -4321,7 +4317,7 @@ class App extends React.Component<AppProps, AppState> {
       addEventListener(
         this.excalidrawContainerRef.current,
         EVENT.WHEEL,
-        this.handleWheel,
+        this.wheel.handle,
         { passive: false },
       ),
       addEventListener(this.ownerDocument, EVENT.COPY, this.onCopy, {
@@ -4392,7 +4388,7 @@ class App extends React.Component<AppProps, AppState> {
       /*addEventListener( //zsviczian (duplicate)
         this.excalidrawContainerRef.current,
         EVENT.WHEEL,
-        this.handleWheel,
+        this.wheel.handle,
         { passive: false },
       ),*/
       addEventListener(
@@ -9923,14 +9919,19 @@ class App extends React.Component<AppProps, AppState> {
         this.ownerWindow.addEventListener(EVENT.POINTER_UP, enableNextPaste);
       }
 
-      this.viewport.translate({
-        scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
-        scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
-      });
+      // an updater, not a snapshot of `this.state`: a wheel zoom queued in
+      // the same React flush would otherwise be overwritten by a pan
+      // computed from the pre-zoom state
+      this.viewport.translate((state) => ({
+        scrollX: state.scrollX - deltaX / state.zoom.value,
+        scrollY: state.scrollY - deltaY / state.zoom.value,
+      }));
     }, this.ownerWindow); // zsviczian -- pan on the mounted editor's frame scheduler
+    flushPanMove = onPointerMove.flush;
     const teardown = withBatchedUpdates(
       (lastPointerUp = () => {
         lastPointerUp = null;
+        flushPanMove = null;
         isPanning = false;
         if (!isHoldingSpace) {
           this.cursor.reset();
@@ -14916,117 +14917,6 @@ class App extends React.Component<AppProps, AppState> {
     ];
   };
 
-  private handleWheel = withBatchedUpdates(
-    (
-      event: WheelEvent | React.WheelEvent<HTMLDivElement | HTMLCanvasElement>,
-    ) => {
-      // if not scrolling on canvas/wysiwyg, ignore
-      //zsviczian - begin
-      const path = (event as any).composedPath?.() as EventTarget[] | undefined;
-      const isOnExcalidrawCanvas =
-        path?.some(
-          (n) =>
-            n instanceof this.ownerWindow.HTMLCanvasElement &&
-            n.classList?.contains("excalidraw__canvas"),
-        ) ||
-        (event.target as Element | null)?.closest?.(
-          "canvas.excalidraw__canvas",
-        ) != null;
-      //zsviczian - end
-      // NOTE no preventDefault so the page can scroll over the editor
-      if (!this.isNavigationEnabled()) {
-        return;
-      }
-      if (
-        !(
-          isOnExcalidrawCanvas || //zsviczian
-          event.target instanceof this.ownerWindow.HTMLTextAreaElement ||
-          event.target instanceof this.ownerWindow.HTMLIFrameElement ||
-          (event.target instanceof this.ownerWindow.HTMLElement &&
-            event.target.classList.contains(CLASSES.FRAME_NAME))
-        )
-      ) {
-        // prevent zooming the browser (but allow scrolling DOM)
-        if (event[KEYS.CTRL_OR_CMD]) {
-          event.preventDefault();
-        }
-
-        return;
-      }
-
-      event.preventDefault();
-
-      if (isPanning) {
-        return;
-      }
-
-      const { deltaX, deltaY } = event;
-      // note that event.ctrlKey is necessary to handle pinch zooming
-      if (
-        //zsviczian
-        ((event.metaKey || event.ctrlKey) && !this.state.allowWheelZoom) ||
-        (!(event.metaKey || event.ctrlKey) && this.state.allowWheelZoom)
-      ) {
-        const sign = Math.sign(deltaY);
-        const MAX_STEP = getZoomStep() * 100;
-        const absDelta = Math.abs(deltaY);
-        let delta = deltaY;
-        if (absDelta > MAX_STEP) {
-          delta = MAX_STEP * sign;
-        }
-
-        let newZoom = this.state.zoom.value - delta / 100;
-        // increase zoom steps the more zoomed-in we are (applies to >100% only)
-        newZoom +=
-          Math.log10(Math.max(1, this.state.zoom.value)) *
-          -sign *
-          // reduced amplification for small deltas (small movements on a trackpad)
-          Math.min(1, absDelta / 20);
-
-        const minZoom = this.state.scrollConstraints?.lockZoom
-          ? this.state.scrollConstraints.zoom
-          : MIN_ZOOM;
-        newZoom = Math.max(newZoom, minZoom);
-
-        const didTranslate = this.viewport.translate(
-          (state) => ({
-            ...getViewportForZoomWithScrollConstraints(
-              {
-                viewportX: this.viewport.lastPosition.x,
-                viewportY: this.viewport.lastPosition.y,
-                nextZoom: getNormalizedZoom(newZoom),
-              },
-              state,
-            ),
-            shouldCacheIgnoreZoom: true,
-          }),
-          {
-            zoomPreConstrained: true,
-            preserveScrollConstraintsSnapBack: true,
-          },
-        );
-        if (didTranslate) {
-          this.resetShouldCacheIgnoreZoomDebounced();
-        }
-        return;
-      }
-
-      // scroll horizontally when shift pressed
-      if (event.shiftKey) {
-        this.viewport.translate(({ zoom, scrollX }) => ({
-          // on Mac, shift+wheel tends to result in deltaX
-          scrollX: scrollX - (deltaY || deltaX) / zoom.value,
-        }));
-        return;
-      }
-
-      this.viewport.translate(({ zoom, scrollX, scrollY }) => ({
-        scrollX: scrollX - deltaX / zoom.value,
-        scrollY: scrollY - deltaY / zoom.value,
-      }));
-    },
-  );
-
   getTextWysiwygSnappedToCenterPosition(
     x: number,
     y: number,
@@ -15097,7 +14987,7 @@ class App extends React.Component<AppProps, AppState> {
     });
   };
 
-  private resetShouldCacheIgnoreZoomDebounced = debounce(() => {
+  public resetShouldCacheIgnoreZoomDebounced = debounce(() => {
     if (!this.unmounted) {
       this.setState({ shouldCacheIgnoreZoom: false });
     }
