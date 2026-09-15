@@ -12,6 +12,7 @@ import type {
   AppClassProperties,
   AppState,
   EmbedsValidationStatus,
+  ElementRenderOverrides,
   ElementsPendingErasure,
   InteractiveCanvasAppState,
   StaticCanvasAppState,
@@ -41,6 +42,7 @@ export type StaticCanvasRenderConfig = {
   pendingFlowchartNodes: PendingExcalidrawElements | null;
   isHighlighterPenDrawing?: boolean; //zsiviczian
   theme: AppState["theme"];
+  elementRenderOverrides?: ElementRenderOverrides;
 };
 
 export type SVGRenderConfig = {
