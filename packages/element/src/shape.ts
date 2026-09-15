@@ -1,5 +1,5 @@
 import { simplify } from "points-on-curve";
-import { getStroke, getStrokePoints } from "perfect-freehand";
+import { getStrokePoints } from "perfect-freehand";
 import { LaserPointer } from "@excalidraw/laser-pointer";
 
 import {
@@ -45,6 +45,7 @@ import type {
 } from "@excalidraw/excalidraw/scene/types";
 
 import { elementWithCanvasCache } from "./renderElement";
+import { getStrokeWithRelativeEndNoise } from "./freedrawPath";
 
 import {
   canBecomePolygon,
@@ -1220,7 +1221,7 @@ const getVariableWidthFreedrawOutline = (
       )
     : [[0, 0, 0.5]];
 
-  return getStroke(inputPoints as number[][], {
+  return getStrokeWithRelativeEndNoise(inputPoints as number[][], {
     simulatePressure: element.simulatePressure,
     size: element.strokeWidth * VARIABLE_WIDTH_FREEDRAW.SIZE_FACTOR,
     thinning: VARIABLE_WIDTH_FREEDRAW.THINNING,
