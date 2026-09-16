@@ -267,6 +267,8 @@ import {
   getBindingStrategyForDraggingBindingElementEndpoints,
   isNonDeletedElement,
   DEFAULT_BOUND_TEXT_LABEL_POSITION,
+  appendFreedrawSamples,
+  collectPointerSamples,
 } from "@excalidraw/element";
 
 import type { GlobalPoint, LocalPoint, Radians } from "@excalidraw/math";
@@ -9798,8 +9800,25 @@ class App extends React.Component<AppProps, AppState> {
       );
     }
 
-    const onPointerMove =
+    const throttledPointerMove =
       this.onPointerMoveFromPointerDownHandler(pointerDownState);
+
+    // withBatchedUpdatesThrottled is throttleRAF: it keeps only the last
+    // pointermove of each animation frame. A pen reports far faster than a
+    // display refreshes (commonly ~250Hz against 60-120Hz) and the browser
+    // coalesces further samples into each event, so a freedraw stroke was
+    // built from a fraction of what the digitizer reported. Record them all
+    // here, unthrottled, for the freedraw branch of the handler to drain.
+    const onPointerMove = ((event: PointerEvent) => {
+      if (this.state.newElement?.type === "freedraw") {
+        pointerDownState.pendingPointerSamples.push(
+          ...collectPointerSamples(event),
+        );
+      }
+      throttledPointerMove(event);
+    }) as typeof throttledPointerMove;
+    onPointerMove.flush = throttledPointerMove.flush;
+    onPointerMove.cancel = throttledPointerMove.cancel;
 
     const onPointerUp =
       this.onPointerUpFromPointerDownHandler(pointerDownState);
@@ -10264,6 +10283,7 @@ class App extends React.Component<AppProps, AppState> {
         onKeyUp: null,
         onKeyDown: null,
       },
+      pendingPointerSamples: [],
       boxSelection: {
         hasOccurred: false,
       },
@@ -12341,35 +12361,27 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (newElement.type === "freedraw") {
-          const points = newElement.points;
-          const dx = pointerCoords.x - newElement.x;
-          const dy = pointerCoords.y - newElement.y;
+          const strokeOptions = this.state.currentStrokeOptions; //zsviczian
+          // Every sample recorded since this handler last ran, so the stroke
+          // keeps the detail the frame throttle would otherwise drop. Falls
+          // back to this event where no samples were recorded.
+          const samples = pointerDownState.pendingPointerSamples.length
+            ? [...pointerDownState.pendingPointerSamples]
+            : collectPointerSamples(event);
+          pointerDownState.pendingPointerSamples.length = 0;
 
-          const lastPoint = points.length > 0 && points[points.length - 1];
-          const discardPoint =
-            lastPoint && lastPoint[0] === dx && lastPoint[1] === dy;
+          const appended = appendFreedrawSamples({
+            element: newElement,
+            samples,
+            appState: this.state,
+            constantPressure: Boolean(strokeOptions?.constantPressure), //zsviczian
+          });
 
-          if (!discardPoint) {
-            const strokeOptions = this.state.currentStrokeOptions; //zsviczian
-            const pressures = newElement.simulatePressure
-              ? newElement.pressures
-              : [
-                  //zsviczian
-                  ...newElement.pressures,
-                  strokeOptions?.constantPressure ? 1 : event.pressure,
-                ];
-
-            this.scene.mutateElement(
-              newElement,
-              {
-                points: [...points, pointFrom<LocalPoint>(dx, dy)],
-                pressures,
-              },
-              {
-                informMutation: false,
-                isDragging: false,
-              },
-            );
+          if (appended) {
+            this.scene.mutateElement(newElement, appended, {
+              informMutation: false,
+              isDragging: false,
+            });
 
             this.setState({
               newElement,

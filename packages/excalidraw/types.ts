@@ -1366,6 +1366,14 @@ export type PointerDownState = Readonly<{
     // It's defined on the initial pointer down event
     onKeyUp: null | ((event: KeyboardEvent) => void);
   };
+  // Pointer samples recorded since the throttled pointermove handler last ran,
+  // including the ones the browser coalesced into a single event. Drained by
+  // the freedraw branch of that handler.
+  pendingPointerSamples: {
+    clientX: number;
+    clientY: number;
+    pressure: number;
+  }[];
   boxSelection: {
     // If the box selection tool is activated on pointer down
     hasOccurred: boolean;
