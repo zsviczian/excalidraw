@@ -4,6 +4,7 @@ import { useState } from "react";
 import { KEYS } from "@excalidraw/common";
 
 import { useTunnels } from "../context/tunnels";
+import { isFullPanelMode } from "../obsidianUtils";
 import { t } from "../i18n";
 
 import { useEditorInterface, useStylesPanelMode } from "./App";
@@ -65,7 +66,7 @@ const ExtraToolsDropdown = ({
   UIOptions: AppProps["UIOptions"];
 }) => {
   const [isExtraToolsMenuOpen, setIsExtraToolsMenuOpen] = useState(false);
-  const isFullStylesPanel = useStylesPanelMode() === "full";
+  const isFullStylesPanel = isFullPanelMode(app); //zsviczian -- the Obsidian tray is also a full panel
   const { TTDDialogTriggerTunnel } = useTunnels();
 
   const imageToolSelected = activeTool.type === "image";
