@@ -474,6 +474,7 @@ import { AppToolDrag, TOOL_DRAG_PREVIEW_OPACITY } from "./App.toolDrag";
 import { AppCursor } from "./App.cursor";
 import { AppDrawShape } from "./App.drawshape";
 import { AppFlowchart } from "./App.flowchart";
+import { AppPan } from "./App.pan";
 import { AppViewport, RIGHT_SIDEBAR_WIDTH } from "./App.viewport";
 import { AppWheel } from "./App.wheel";
 import BraveMeasureTextError from "./BraveMeasureTextError";
@@ -630,8 +631,6 @@ export const useExcalidrawAPI = () => useContext(ExcalidrawAPIContext);
 let didTapTwice: boolean = false;
 let tappedTwiceTimer = 0;
 let firstTapPosition: { x: number; y: number } | null = null;
-let isHoldingSpace: boolean = false;
-let isPanning: boolean = false;
 let isDraggingScrollBar: boolean = false;
 let currentScrollBars: ScrollBars = { horizontal: null, vertical: null };
 let touchTimeout = 0;
@@ -652,9 +651,6 @@ let IS_PLAIN_PASTE_TIMER = 0;
 let PLAIN_PASTE_TOAST_SHOWN = false;
 
 let lastPointerUp: (() => void) | null = null;
-/** applies the pointer movement the active drag-pan is holding back for its
- * next frame, if any */
-let flushPanMove: (() => void) | null = null;
 const gesture: Gesture = {
   pointers: new Map(),
   lastCenter: null,
@@ -747,15 +743,15 @@ class App extends React.Component<AppProps, AppState> {
   public flowchart: AppFlowchart = new AppFlowchart(this);
   public cursor: AppCursor = new AppCursor(this);
   public arrowText: AppArrowText = new AppArrowText(this);
+  public pan: AppPan = new AppPan(this, {
+    getPointerCount: () => gesture.pointers.size,
+  });
   public viewport: AppViewport = new AppViewport(this, {
     getContainer: () => this.excalidrawContainerRef.current,
     getStylesPanelMode: () => this.stylesPanelMode,
-    isGestureActive: () => gesture.pointers.size >= 2 || isPanning,
+    isGestureActive: () => gesture.pointers.size >= 2 || this.pan.isActive(),
   });
-  public wheel: AppWheel = new AppWheel(this, {
-    isPanning: () => isPanning,
-    flushPanMove: () => flushPanMove?.(),
-  });
+  public wheel: AppWheel = new AppWheel(this);
 
   bindModeHandler: ReturnType<typeof setTimeout> | null = null;
   private textWysiwygSubmitHandler: ReturnType<typeof textWysiwyg> | null =
@@ -1659,7 +1655,7 @@ class App extends React.Component<AppProps, AppState> {
       // middle-click or something other than primary
       this.lastPointerDownEvent.button !== POINTER_BUTTON.MAIN ||
       // panning
-      isHoldingSpace ||
+      this.pan.isSpaceHeld() ||
       // wrong tool
       !oneOf(this.state.activeTool.type, ["laser", "selection", "lasso"])
     ) {
@@ -3371,7 +3367,7 @@ class App extends React.Component<AppProps, AppState> {
   // Lifecycle
 
   private onBlur = withBatchedUpdates(() => {
-    isHoldingSpace = false;
+    this.pan.setSpaceHeld(false);
     this.setState({
       isBindingEnabled: this.state.bindingPreference === "enabled",
     });
@@ -3454,8 +3450,7 @@ class App extends React.Component<AppProps, AppState> {
     // relies on. Among other things this tears down window-level listeners.
     this.maybeCleanupAfterMissingPointerUp(null);
 
-    isHoldingSpace = false;
-    isPanning = false;
+    this.pan.setSpaceHeld(false);
     isDraggingScrollBar = false;
     lastPointerUp = null;
 
@@ -6208,7 +6203,6 @@ class App extends React.Component<AppProps, AppState> {
 
       //mfuria #329. open context menu with 'm' if not editing text and container focused
       if (
-        isPanWithRightMouseEnabled() &&
         event.key.toLowerCase() === 'm' &&
         !this.state.editingTextElement &&
         // don't trigger when typing in inputs
@@ -6509,7 +6503,7 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (event.key === KEYS.SPACE && gesture.pointers.size === 0) {
-        isHoldingSpace = true;
+        this.pan.setSpaceHeld(true);
         this.cursor.set(CURSOR_TYPE.GRAB);
         event.preventDefault();
       }
@@ -6617,7 +6611,7 @@ class App extends React.Component<AppProps, AppState> {
           activeEmbeddable: null,
         });
       }
-      isHoldingSpace = false;
+      this.pan.setSpaceHeld(false);
     }
 
     if (event.key === KEYS.ALT) {
@@ -6795,7 +6789,7 @@ class App extends React.Component<AppProps, AppState> {
         : updateActiveTool(this.state, tool);
     if (nextActiveTool.type === "hand") {
       this.cursor.set(CURSOR_TYPE.GRAB);
-    } else if (!isHoldingSpace) {
+    } else if (!this.pan.isSpaceHeld()) {
       this.cursor.applyForTool(nextActiveTool);
     }
     if (isToolIcon(this.ownerDocument.activeElement)) {
@@ -8572,7 +8566,10 @@ class App extends React.Component<AppProps, AppState> {
         // the pan session set up on pointerdown)
         this.updateMultiTouchGesture(event);
       }
-      if ((this.isLinksEnabled() || this.isEmbedsEnabled()) && !isPanning) {
+      if (
+        (this.isLinksEnabled() || this.isEmbedsEnabled()) &&
+        !this.pan.isActive()
+      ) {
         this.handleInteractiveContentPointerMove(event);
       }
       return;
@@ -8589,8 +8586,8 @@ class App extends React.Component<AppProps, AppState> {
     this.updateMultiTouchGesture(event);
 
     if (
-      isHoldingSpace ||
-      isPanning ||
+      this.pan.isSpaceHeld() ||
+      this.pan.isActive() ||
       isDraggingScrollBar ||
       isHandToolActive(this.state)
     ) {
@@ -9287,26 +9284,6 @@ class App extends React.Component<AppProps, AppState> {
   private handleCanvasPointerDown = (
     event: React.PointerEvent<HTMLElement>,
   ) => {
-    //mfuria #329. Right-click pan support when enabled via host plugin setting
-    if (
-      isPanWithRightMouseEnabled() &&
-      event.pointerType === "mouse" &&
-      event.button === POINTER_BUTTON.SECONDARY &&
-      !this.state.editingTextElement
-    ) {
-      // prevent native context menu
-      const onContextMenu = (e: MouseEvent) => {
-        e.preventDefault();
-      };
-      this.ownerWindow.addEventListener("contextmenu", onContextMenu, {
-        once: true,
-      });
-
-      // Start right-click panning
-      this.startRightClickPanning(event);
-      return;
-    }
-
     //zsviczian - begin
     const isInsideEmbeddableContainer = !!(
       event.target as Element | null
@@ -9325,10 +9302,10 @@ class App extends React.Component<AppProps, AppState> {
       }
       if (this.isNavigationEnabled()) {
         this.updateGestureOnPointerDown(event);
-        if (!isPanning) {
+        if (!this.pan.isActive()) {
           // pans on drag same as view mode (the pan session manages its own
           // window listeners & teardown)
-          this.handleCanvasPanUsingWheelOrSpaceDrag(event);
+          this.pan.start(event);
         }
       }
       return;
@@ -9477,7 +9454,7 @@ class App extends React.Component<AppProps, AppState> {
       });
     }
 
-    if (isPanning) {
+    if (this.pan.isActive()) {
       return;
     }
 
@@ -9486,7 +9463,7 @@ class App extends React.Component<AppProps, AppState> {
     // we must exit before we set `cursorButton` state and `savePointer`
     // else it will send pointer state & laser pointer events in collab when
     // panning
-    /*if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+    /*if (this.pan.start(event)) {
       return;
     }*/ //zsviczian this broke on pointer down in onPointerUpdate
 
@@ -9496,7 +9473,7 @@ class App extends React.Component<AppProps, AppState> {
     });
     this.savePointer(event.clientX, event.clientY, "down");
 
-    if (this.handleCanvasPanUsingWheelOrSpaceDrag(event)) {
+    if (this.pan.start(event)) {
       return;
     } //zsviczian moved it here, because else pointer down in onPointerUpdate did not work
 
@@ -9770,7 +9747,7 @@ class App extends React.Component<AppProps, AppState> {
       // onPointerDown/onPointerUp callbacks, pointer-up teardown,
       // missing-pointer-up cleanup — runs for bucket clicks too. In view
       // mode this branch is unreachable:
-      // `handleCanvasPanUsingWheelOrSpaceDrag` swallows the pointer-down.
+      // `pan.start` swallows the pointer-down.
       this.bucketFill.handlePointerDown(scenePointer);
     } else if (
       this.state.activeTool.type !== "eraser" &&
@@ -9916,189 +9893,9 @@ class App extends React.Component<AppProps, AppState> {
    * pointerup handlers manually
    */
   private maybeCleanupAfterMissingPointerUp = (event: PointerEvent | null) => {
+    this.pan.end();
     lastPointerUp?.();
     this.missingPointerEventCleanupEmitter.trigger(event).clear();
-  };
-
-  // Returns whether the event is a panning
-  public handleCanvasPanUsingWheelOrSpaceDrag = (
-    event: React.PointerEvent<HTMLElement> | MouseEvent,
-  ): boolean => {
-    if (
-      !(
-        gesture.pointers.size <= 1 &&
-        (((event.button === POINTER_BUTTON.WHEEL ||
-          (event.button === POINTER_BUTTON.MAIN && isHoldingSpace) ||
-          isHandToolActive(this.state) ||
-          isTouchInPenMode(this.state, event)) && //zsviczian
-          // reachable while non-interactive when the active tool is allowed
-          // via `interaction.enabled.tools` — panning must remain gated on
-          // `navigation` then
-          (this.isInteractionEnabled() || this.isNavigationEnabled())) ||
-          (this.state.viewModeEnabled && !this.isActiveToolPointerCapturing()))
-      )
-    ) {
-      return false;
-    }
-    isPanning = true;
-
-    // due to event.preventDefault below, container wouldn't get focus
-    // automatically
-    this.focusContainer();
-
-    // preventing defualt while text editing messes with cursor/focus
-    if (!this.state.editingTextElement) {
-      // necessary to prevent browser from scrolling the page if excalidraw
-      // not full-page #4489
-      //
-      // as such, the above is broken when panning canvas while in wysiwyg
-      event.preventDefault();
-    }
-
-    let nextPastePrevented = false;
-    const isLinux = /Linux/.test(this.ownerWindow.navigator.platform);
-
-    this.cursor.set(CURSOR_TYPE.GRABBING);
-    let { clientX: lastX, clientY: lastY } = event;
-    const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
-      const deltaX = lastX - event.clientX;
-      const deltaY = lastY - event.clientY;
-      lastX = event.clientX;
-      lastY = event.clientY;
-
-      /*
-       * Prevent paste event if we move while middle clicking on Linux.
-       * See issue #1383.
-       */
-      if (
-        isLinux &&
-        !nextPastePrevented &&
-        (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1)
-      ) {
-        nextPastePrevented = true;
-
-        /* Prevent the next paste event */
-        const preventNextPaste = (event: ClipboardEvent) => {
-          this.ownerDocument.body.removeEventListener(
-            EVENT.PASTE,
-            preventNextPaste,
-          );
-          event.stopPropagation();
-        };
-
-        /*
-         * Reenable next paste in case of disabled middle click paste for
-         * any reason:
-         * - right click paste
-         * - empty clipboard
-         */
-        const enableNextPaste = () => {
-          setTimeout(() => {
-            this.ownerDocument.body.removeEventListener(
-              EVENT.PASTE,
-              preventNextPaste,
-            );
-            this.ownerWindow.removeEventListener(
-              EVENT.POINTER_UP,
-              enableNextPaste,
-            );
-          }, 100);
-        };
-
-        this.ownerDocument.body.addEventListener(EVENT.PASTE, preventNextPaste);
-        this.ownerWindow.addEventListener(EVENT.POINTER_UP, enableNextPaste);
-      }
-
-      // an updater, not a snapshot of `this.state`: a wheel zoom queued in
-      // the same React flush would otherwise be overwritten by a pan
-      // computed from the pre-zoom state
-      this.viewport.translate((state) => ({
-        scrollX: state.scrollX - deltaX / state.zoom.value,
-        scrollY: state.scrollY - deltaY / state.zoom.value,
-      }));
-    }, this.ownerWindow); // zsviczian -- pan on the mounted editor's frame scheduler
-    flushPanMove = onPointerMove.flush;
-    const teardown = withBatchedUpdates(
-      (lastPointerUp = () => {
-        lastPointerUp = null;
-        flushPanMove = null;
-        isPanning = false;
-        if (!isHoldingSpace) {
-          this.cursor.reset();
-        }
-        this.setState(
-          {
-            cursorButton: "up",
-          },
-          // Runs after the trailing throttled pointer move has committed, so
-          // the snap-back starts from the pan's actual final viewport.
-          this.viewport.releaseOverscroll,
-        );
-        this.savePointer(event.clientX, event.clientY, "up");
-        this.ownerWindow.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-        this.ownerWindow.removeEventListener(EVENT.POINTER_UP, teardown);
-        this.ownerWindow.removeEventListener(EVENT.BLUR, teardown);
-        onPointerMove.flush();
-      }),
-    );
-    this.ownerWindow.addEventListener(EVENT.BLUR, teardown);
-    this.ownerWindow.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
-      passive: true,
-    });
-    this.ownerWindow.addEventListener(EVENT.POINTER_UP, teardown);
-    return true;
-  };
-
-  //mfuria #329. start right-click panning
-  private startRightClickPanning(
-    event: React.PointerEvent<HTMLElement>,
-  ): void {
-    // Set up right-click panning similar to hand tool
-    isPanning = true;
-    this.focusContainer();
-
-    if (!this.state.editingTextElement) {
-      event.preventDefault();
-    }
-
-    this.cursor.set(CURSOR_TYPE.GRABBING);
-
-    let { clientX: lastX, clientY: lastY } = event;
-
-    const onPointerMove = withBatchedUpdatesThrottled((event: PointerEvent) => {
-      const deltaX = lastX - event.clientX;
-      const deltaY = lastY - event.clientY;
-      lastX = event.clientX;
-      lastY = event.clientY;
-
-      this.viewport.translate({
-        scrollX: this.state.scrollX - deltaX / this.state.zoom.value,
-        scrollY: this.state.scrollY - deltaY / this.state.zoom.value,
-      });
-    }, this.ownerWindow); // zsviczian -- right-button pan on the mounted editor's frame scheduler
-
-    const teardown = withBatchedUpdates(() => {
-      isPanning = false;
-      if (this.state.viewModeEnabled) {
-        this.cursor.set(CURSOR_TYPE.GRAB);
-      } else {
-        this.cursor.applyForTool();
-      }
-      this.setState({
-        cursorButton: "up",
-      });
-      this.savePointer(event.clientX, event.clientY, "up");
-      this.ownerWindow.removeEventListener(EVENT.POINTER_MOVE, onPointerMove);
-      this.ownerWindow.removeEventListener(EVENT.POINTER_UP, teardown);
-      this.ownerWindow.removeEventListener(EVENT.BLUR, teardown);
-      onPointerMove.flush();
-    });
-
-    this.ownerWindow.addEventListener(EVENT.BLUR, teardown);
-    this.ownerWindow.addEventListener(EVENT.POINTER_MOVE, onPointerMove, {
-      passive: true,
-    });
-    this.ownerWindow.addEventListener(EVENT.POINTER_UP, teardown);
   };
 
   private updateGestureOnPointerDown(
@@ -14445,23 +14242,38 @@ class App extends React.Component<AppProps, AppState> {
     event: React.MouseEvent<HTMLElement | HTMLCanvasElement>,
     isMiroKeyboardShortcut = false, //zsviczian #329
   ) => {
-    // NOTE no preventDefault so the browser default context menu applies
-    //zsviczian #329 allow the Miro keyboard shortcut through the upstream interaction gate
-    if (!this.isInteractionEnabled() && !isMiroKeyboardShortcut) {
-      return;
-    }
+    // Always suppress the native menu over the canvas.
     event.preventDefault();
-    if (this.state.disableContextMenu) { //zsviczian
+    // a secondary-button press is a pan session: this event is not a click
+    // when it comes with the press (macOS and Linux fire it on mousedown,
+    // and the session opens the menu on release if no drag follows), nor
+    // when it follows a release that was a drag
+    if (this.pan.consumesContextMenuEvent() && !isMiroKeyboardShortcut) { //zsviczian
       return;
     }
-    //mfuria #329. if right-click pan is enabled, we suppress opening our custom menu too.
-    //zsviczian #329 preserve right-click panning while allowing the M shortcut
-    if (isPanWithRightMouseEnabled() && !isMiroKeyboardShortcut) {
+    if (this.state.disableContextMenu && !isMiroKeyboardShortcut) { //zsviczian
       return;
     }
-    // Always suppress the native menu over the canvas. In non-interactive
-    // mode we stop here so it cannot be mistaken for Excalidraw's own menu.
-    event.preventDefault();
+    this.openContextMenu({
+      clientX: event.clientX,
+      clientY: event.clientY,
+      button: event.button,
+      pointerType:
+        "pointerType" in event.nativeEvent
+          ? (event.nativeEvent as PointerEvent).pointerType
+          : undefined,
+    });
+  };
+
+  /** opens the context menu for the element under the pointer, or the canvas */
+  public openContextMenu = (pointer: {
+    clientX: number;
+    clientY: number;
+    button?: number;
+    pointerType?: string;
+  }) => {
+    // In non-interactive mode there is no menu, so the native one cannot be
+    // mistaken for Excalidraw's own.
     if (!this.isInteractionEnabled()) {
       return;
     }
@@ -14471,18 +14283,16 @@ class App extends React.Component<AppProps, AppState> {
     this.bucketFill.cancel();
 
     if (
-      (("pointerType" in event.nativeEvent &&
-        event.nativeEvent.pointerType === "touch") ||
-        ("pointerType" in event.nativeEvent &&
-          event.nativeEvent.pointerType === "pen" &&
+      (pointer.pointerType === "touch" ||
+        (pointer.pointerType === "pen" &&
           // always allow if user uses a pen secondary button
-          event.button !== POINTER_BUTTON.SECONDARY)) &&
+          pointer.button !== POINTER_BUTTON.SECONDARY)) &&
       this.state.activeTool.type !== this.state.preferredSelectionTool.type
     ) {
       return;
     }
 
-    const { x, y } = viewportCoordsToSceneCoords(event, this.state);
+    const { x, y } = viewportCoordsToSceneCoords(pointer, this.state);
     const element = this.getElementAtPosition(x, y, {
       preferSelected: true,
       includeLockedElements: true,
@@ -14500,8 +14310,8 @@ class App extends React.Component<AppProps, AppState> {
     const container = this.excalidrawContainerRef.current!;
     const { top: offsetTop, left: offsetLeft } =
       container.getBoundingClientRect();
-    const left = event.clientX - offsetLeft;
-    const top = event.clientY - offsetTop;
+    const left = pointer.clientX - offsetLeft;
+    const top = pointer.clientY - offsetTop;
 
     trackEvent("contextMenu", "openContextMenu", type);
 
@@ -15041,7 +14851,12 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
-  private savePointer = (x: number, y: number, button: "up" | "down") => {
+  public savePointer = (x: number, y: number, button: "up" | "down") => {
+    // Pan teardown broadcasts once the viewport has settled. Updates during
+    // the drag use a viewport that can lag behind the pointer and flicker.
+    if (this.pan.isActive()) {
+      return;
+    }
     // don't broadcast pointer updates (props.onPointerUpdate) when
     // non-interactive, unless the active tool stays user-driven via
     // `interaction.enabled.tools` — collaborators render e.g. a presenter's
