@@ -18,7 +18,6 @@ import {
   getZoomStep,
   hideFreedrawPenmodeCursor,
   isContextMenuDisabled,
-  isPanWithRightMouseEnabled,
   isTouchInPenMode,
   runAction,
   syncElementLinkWithText,
@@ -30,7 +29,6 @@ import type { AppState } from "./types";
 const createFakeHost = (): ObsidianExcalidrawHostAdapter => ({
   protocolVersion: OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION,
   isDoubleTapEraserEnabled: () => true,
-  isRightClickPanEnabled: () => true,
   getZoomToFitMaxLevel: () => 2.5,
   isPenModeCrosshairVisible: () => false,
   isSingleFingerPanningEnabled: () => true,
@@ -75,7 +73,6 @@ describe("Obsidian Excalidraw host registry", () => {
 
   it("uses safe defaults or an explicit error without a configured host", async () => {
     expect(allowDoubleTapEraser()).toBe(false);
-    expect(isPanWithRightMouseEnabled()).toBe(false);
     expect(getMaxZoom()).toBe(1);
     expect(hideFreedrawPenmodeCursor()).toBe(false);
     expect(disableDoubleClickTextEditing()).toBe(false);
@@ -95,7 +92,6 @@ describe("Obsidian Excalidraw host registry", () => {
     configure(createFakeHost());
 
     expect(allowDoubleTapEraser()).toBe(true);
-    expect(isPanWithRightMouseEnabled()).toBe(true);
     expect(getMaxZoom()).toBe(2.5);
     expect(hideFreedrawPenmodeCursor()).toBe(true);
     expect(disableDoubleClickTextEditing()).toBe(true);

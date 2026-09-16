@@ -448,7 +448,6 @@ import {
   getZoomStep,
   hideFreedrawPenmodeCursor,
   isTouchInPenMode,
-  isPanWithRightMouseEnabled,
   shouldDisableZoom,
   isContextMenuDisabled,
   refreshAllArrows,
@@ -1037,9 +1036,6 @@ class App extends React.Component<AppProps, AppState> {
   public isNavigationEnabled(
     props: Pick<AppProps, "interaction"> = this.props,
   ): boolean {
-    if (isPanWithRightMouseEnabled()) { //zsviczian #329 Miro-style right-button panning is canvas navigation
-      return true;
-    }
     if (typeof props.interaction === "object" && props.interaction !== null) {
       return props.interaction.enabled?.navigation === true;
     }
@@ -2724,7 +2720,7 @@ class App extends React.Component<AppProps, AppState> {
                               </ElementCanvasButtons>
                             )}
 
-                          {(this.isDefaultUIEnabled() || isPanWithRightMouseEnabled()) && this.state.contextMenu && ( //zsviczian #329 render the Miro-style keyboard context menu
+                          {this.isDefaultUIEnabled() && this.state.contextMenu && (
                             <ContextMenu
                               items={this.state.contextMenu.items}
                               top={this.state.contextMenu.top}
@@ -3387,7 +3383,7 @@ class App extends React.Component<AppProps, AppState> {
   // stays disabled while non-interactive
   private handleNavigationModeKeyDown = (event: KeyboardEvent) => {
     //zsviczian START #329 keep the Miro-style context-menu shortcut in navigation-only mode
-    if (isPanWithRightMouseEnabled() && event.key.toLowerCase() === "m") {
+    if (event.key.toLowerCase() === "m") {
       this.onKeyDown(event);
       return;
     }
@@ -6053,7 +6049,7 @@ class App extends React.Component<AppProps, AppState> {
       if (
         !this.isInteractionEnabled() &&
         //zsviczian #329 allow the Miro-style context-menu shortcut dispatched by navigation mode
-        !(isPanWithRightMouseEnabled() && event.key.toLowerCase() === "m")
+        !(event.key.toLowerCase() === "m")
       ) {
         return;
       }

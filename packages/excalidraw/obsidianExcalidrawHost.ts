@@ -28,7 +28,6 @@ export interface ObsidianExcalidrawHostAdapter {
   readonly protocolVersion: typeof OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION;
 
   isDoubleTapEraserEnabled(): boolean;
-  isRightClickPanEnabled(): boolean;
   getZoomToFitMaxLevel(): number;
   isPenModeCrosshairVisible(): boolean;
   isSingleFingerPanningEnabled(): boolean;

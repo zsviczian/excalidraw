@@ -51,15 +51,6 @@ export function allowDoubleTapEraser() {
   return getObsidianExcalidrawHost()?.isDoubleTapEraserEnabled() ?? false;
 }
 
-//mfuria #329. Enable panning with right mouse button if host plugin setting allows
-export function isPanWithRightMouseEnabled(): boolean {
-  try {
-    return !!getObsidianExcalidrawHost()?.isRightClickPanEnabled();
-  } catch (e) {
-    return false;
-  }
-}
-
 export function getMaxZoom(): number {
   return getObsidianExcalidrawHost()?.getZoomToFitMaxLevel() ?? 1;
 }
