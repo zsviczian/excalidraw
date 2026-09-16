@@ -146,7 +146,7 @@ const InteractiveCanvas = (props: InteractiveCanvasProps) => {
       visibleElements: props.visibleElements,
       selectedElements: props.selectedElements,
       allElementsMap: props.allElementsMap,
-      scale: window.devicePixelRatio,
+      scale: props.scale, // zsviczian -- use the mounted editor's DPI in shared-runtime popouts, #2940/#11997
       appState: props.appState,
       renderConfig: {
         remotePointerViewportCoords,
