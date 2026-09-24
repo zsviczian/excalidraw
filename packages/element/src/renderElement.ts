@@ -31,6 +31,7 @@ import {
   STICKY_NOTE_EDGE_SHADOW_WIDTH,
   STICKY_NOTE_FOOTER,
   STICKY_NOTE_SHADOW_OPACITY,
+  DEFAULT_ZOOM,
 } from "@excalidraw/common";
 
 import type {
@@ -38,7 +39,6 @@ import type {
   StaticCanvasAppState,
   Zoom,
   InteractiveCanvasAppState,
-  NormalizedZoomValue,
   ElementRenderOverrides,
 } from "@excalidraw/excalidraw/types";
 
@@ -726,11 +726,7 @@ const generateElementWithCanvas = (
   renderConfig: StaticCanvasRenderConfig,
   appState: StaticCanvasAppState | InteractiveCanvasAppState,
 ) => {
-  const zoom: Zoom = renderConfig
-    ? appState.zoom
-    : {
-        value: 1 as NormalizedZoomValue,
-      };
+  const zoom: Zoom = renderConfig ? appState.zoom : DEFAULT_ZOOM;
   const prevElementWithCanvas = elementWithCanvasCache.get(element);
   const shouldRegenerateBecauseZoom =
     prevElementWithCanvas &&
