@@ -173,17 +173,22 @@ export const actionZoomIn = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      <IconButton
-        type="button"
-        className="zoom-in-button zoom-button"
-        icon={ZoomInIcon}
-        title={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
-        aria-label={t("buttons.zoomIn")}
-        disabled={zoomValue >= getZoomMax()} //zsviczian
-        onClick={() => {
-          updateData(null);
-        }}
-      />
+      /* <Tooltip
+        label={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
+        className="zoom-in-button-wrapper"
+        delay
+      > */ //zsviczian
+        <IconButton
+          type="button"
+          className="zoom-in-button zoom-button"
+          icon={ZoomInIcon}
+          aria-label={t("buttons.zoomIn")}
+          disabled={zoomValue >= getZoomMax()} //zsviczian
+          onClick={() => {
+            updateData(null);
+          }}
+        />
+      /* </Tooltip> */ //zsviczian
     );
   },
   keyTest: (event) =>
@@ -220,17 +225,22 @@ export const actionZoomOut = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      <IconButton
-        type="button"
-        className="zoom-out-button zoom-button"
-        icon={ZoomOutIcon}
-        title={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
-        aria-label={t("buttons.zoomOut")}
-        disabled={zoomValue <= getZoomMin()} //zsviczian
-        onClick={() => {
-          updateData(null);
-        }}
-      />
+      /* <Tooltip
+        label={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
+        className="zoom-out-button-wrapper"
+        delay
+      > */ //zsviczian
+        <IconButton
+          type="button"
+          className="zoom-out-button zoom-button"
+          icon={ZoomOutIcon}
+          aria-label={t("buttons.zoomOut")}
+          disabled={zoomValue <= getZoomMin()} //zsviczian
+          onClick={() => {
+            updateData(null);
+          }}
+        />
+      /* </Tooltip> */ //zsviczian
     );
   },
   keyTest: (event) =>
@@ -272,11 +282,15 @@ export const actionResetZoom = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      //zsviczian <Tooltip label={t("buttons.resetZoom")} style={{ height: "100%" }}>
+      /* <Tooltip
+        label={t("buttons.resetZoom")}
+        style={{ height: "100%" }}
+        className="reset-zoom-button-wrapper"
+        delay
+      > */ //zsviczian
         <IconButton
           type="button"
           className="reset-zoom-button zoom-button"
-          title={t("buttons.resetZoom")}
           aria-label={t("buttons.resetZoom")}
           onClick={() => {
             updateData(null);
@@ -284,7 +298,7 @@ export const actionResetZoom = register({
         >
           {(zoomValue * 100).toFixed(0)}%
         </IconButton>
-      //zsviczian </Tooltip>
+      /* </Tooltip> */ //zsviczian
     );
   },
   keyTest: (event) =>

@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import React, { useEffect, useRef } from "react"; // zsviczian -- retain the trigger's document for cross-document cleanup, upstream #11974 follow-up
 
 import "./Tooltip.scss";
@@ -67,6 +68,42 @@ export const updateTooltipPosition = (
   });
 };
 
+/** ms before a `delay`ed tooltip shows */
+const TOOLTIP_DELAY = 500;
+/**
+ * ms after a tooltip hides during which a `delay`ed tooltip shows right away
+ * (e.g. when moving across adjacent buttons)
+ */
+const TOOLTIP_WARM_WINDOW = 300;
+
+// zsviczian START -- isolate delayed tooltip state per owner document, upstream #11997
+type TooltipRuntimeState = {
+  showTooltipTimer: number;
+  tooltipHiddenAt: number;
+};
+
+const tooltipRuntimeState = new WeakMap<Document, TooltipRuntimeState>();
+
+const getTooltipRuntimeState = (ownerDocument: Document) => {
+  let state = tooltipRuntimeState.get(ownerDocument);
+  if (!state) {
+    state = { showTooltipTimer: 0, tooltipHiddenAt: 0 };
+    tooltipRuntimeState.set(ownerDocument, state);
+  }
+  return state;
+};
+
+const hideTooltip = (ownerDocument: Document) => {
+  const state = getTooltipRuntimeState(ownerDocument);
+  ownerDocument.defaultView?.clearTimeout(state.showTooltipTimer);
+  const tooltip = getTooltipDiv(ownerDocument);
+  if (tooltip.classList.contains("excalidraw-tooltip--visible")) {
+    tooltip.classList.remove("excalidraw-tooltip--visible");
+    state.tooltipHiddenAt = Date.now();
+  }
+};
+// zsviczian END
+
 const updateTooltip = (
   item: HTMLDivElement,
   tooltip: HTMLDivElement,
@@ -88,7 +125,10 @@ type TooltipProps = {
   label: string;
   long?: boolean;
   style?: React.CSSProperties;
+  className?: string;
   disabled?: boolean;
+  /** show after a short delay (unless a tooltip was visible just now) */
+  delay?: boolean;
 };
 
 export const Tooltip = ({
@@ -96,15 +136,17 @@ export const Tooltip = ({
   label,
   long = false,
   style,
+  className,
   disabled,
+  delay = false,
 }: TooltipProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null); // zsviczian -- capture this tooltip trigger's document, upstream #11974 follow-up
   useEffect(() => {
     const ownerDocument = wrapperRef.current?.ownerDocument; // zsviczian -- retain the live owner before ref cleanup, upstream #11974 follow-up
     return () => {
-      ownerDocument
-        ?.querySelector(".excalidraw-tooltip")
-        ?.classList.remove("excalidraw-tooltip--visible"); // zsviczian -- clean only this document's tooltip, upstream #11974 follow-up
+      if (ownerDocument) {
+        hideTooltip(ownerDocument); // zsviczian -- clean only this document's tooltip and delayed timer, upstream #11997
+      }
     };
   }, []);
   if (disabled) {
@@ -115,19 +157,35 @@ export const Tooltip = ({
       ref={
         wrapperRef /* zsviczian -- expose the trigger document to cleanup, upstream #11974 follow-up */
       }
-      className="excalidraw-tooltip-wrapper"
-      onPointerEnter={(event) =>
-        updateTooltip(
-          event.currentTarget as HTMLDivElement,
-          getTooltipDiv(event.currentTarget.ownerDocument), // zsviczian -- show in the trigger document, upstream #11974 follow-up
-          label,
-          long,
-        )
-      }
-      onPointerLeave={(event) =>
-        getTooltipDiv(
-          event.currentTarget.ownerDocument, // zsviczian -- hide in the trigger document, upstream #11974 follow-up
-        ).classList.remove("excalidraw-tooltip--visible")
+      className={clsx("excalidraw-tooltip-wrapper", className)}
+      onPointerEnter={(event) => {
+        const item = event.currentTarget as HTMLDivElement;
+        const ownerDocument = item.ownerDocument;
+        const ownerWindow = ownerDocument.defaultView;
+        if (!ownerWindow) {
+          return;
+        }
+        const state = getTooltipRuntimeState(ownerDocument); // zsviczian -- use this trigger document's delay state, upstream #11997
+        const show = () =>
+          updateTooltip(
+            item,
+            getTooltipDiv(ownerDocument), // zsviczian -- show in the trigger document, upstream #11974 follow-up
+            label,
+            long,
+          );
+        ownerWindow.clearTimeout(state.showTooltipTimer); // zsviczian -- manage delayed work through the trigger window, upstream #11997
+        if (delay && Date.now() - state.tooltipHiddenAt > TOOLTIP_WARM_WINDOW) {
+          state.showTooltipTimer = ownerWindow.setTimeout(
+            // zsviczian -- schedule in the trigger window, upstream #11997
+            show,
+            TOOLTIP_DELAY,
+          );
+        } else {
+          show();
+        }
+      }}
+      onPointerLeave={
+        (event) => hideTooltip(event.currentTarget.ownerDocument) // zsviczian -- hide only in the trigger document, upstream #11997
       }
       style={style}
     >
