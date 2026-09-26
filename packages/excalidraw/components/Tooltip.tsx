@@ -80,6 +80,11 @@ const TOOLTIP_WARM_WINDOW = 300;
 type TooltipRuntimeState = {
   showTooltipTimer: number;
   tooltipHiddenAt: number;
+  /**
+   * while a tooltip is visible, hides it once its item is removed from the DOM
+   * (e.g. unmounted while hovered, which doesn't fire pointerleave)
+   */
+  tooltipItemObserver: MutationObserver | null;
 };
 
 const tooltipRuntimeState = new WeakMap<Document, TooltipRuntimeState>();
@@ -87,15 +92,29 @@ const tooltipRuntimeState = new WeakMap<Document, TooltipRuntimeState>();
 const getTooltipRuntimeState = (ownerDocument: Document) => {
   let state = tooltipRuntimeState.get(ownerDocument);
   if (!state) {
-    state = { showTooltipTimer: 0, tooltipHiddenAt: 0 };
+    state = {
+      showTooltipTimer: 0,
+      tooltipHiddenAt: 0,
+      tooltipItemObserver: null,
+    };
     tooltipRuntimeState.set(ownerDocument, state);
   }
   return state;
 };
 
-const hideTooltip = (ownerDocument: Document) => {
+type TooltipOwner = Document | React.PointerEvent<HTMLElement>;
+
+const getTooltipOwnerDocument = (owner?: TooltipOwner) =>
+  owner && "currentTarget" in owner
+    ? owner.currentTarget.ownerDocument
+    : owner ?? document;
+
+export const hideTooltip = (owner?: TooltipOwner) => {
+  const ownerDocument = getTooltipOwnerDocument(owner);
   const state = getTooltipRuntimeState(ownerDocument);
   ownerDocument.defaultView?.clearTimeout(state.showTooltipTimer);
+  state.tooltipItemObserver?.disconnect();
+  state.tooltipItemObserver = null;
   const tooltip = getTooltipDiv(ownerDocument);
   if (tooltip.classList.contains("excalidraw-tooltip--visible")) {
     tooltip.classList.remove("excalidraw-tooltip--visible");
@@ -105,10 +124,11 @@ const hideTooltip = (ownerDocument: Document) => {
 // zsviczian END
 
 const updateTooltip = (
-  item: HTMLDivElement,
+  item: HTMLElement,
   tooltip: HTMLDivElement,
   label: string,
   long: boolean,
+  position: "bottom" | "top",
 ) => {
   tooltip.classList.add("excalidraw-tooltip--visible");
   tooltip.style.minWidth = long ? "50ch" : "10ch";
@@ -117,7 +137,62 @@ const updateTooltip = (
   tooltip.textContent = label;
 
   const itemRect = item.getBoundingClientRect();
-  updateTooltipPosition(tooltip, itemRect);
+  updateTooltipPosition(tooltip, itemRect, position);
+
+  const ownerDocument = item.ownerDocument; // zsviczian -- observe the mounted editor document, upstream #11997
+  const ownerWindow = ownerDocument.defaultView; // zsviczian -- construct the observer in the item's realm, upstream #11997
+  if (!ownerWindow) {
+    return;
+  }
+  const state = getTooltipRuntimeState(ownerDocument);
+  state.tooltipItemObserver?.disconnect();
+  state.tooltipItemObserver = new ownerWindow.MutationObserver(() => {
+    if (!item.isConnected) {
+      hideTooltip(ownerDocument); // zsviczian -- hide only this document's tooltip, upstream #11997
+    }
+  });
+  state.tooltipItemObserver.observe(ownerDocument.body, {
+    childList: true,
+    subtree: true,
+  });
+};
+
+/**
+ * Shows the tooltip for `item`. For elements that can't be wrapped
+ * in <Tooltip>. Pair with `hideTooltip()`.
+ */
+export const showTooltip = (
+  item: HTMLElement,
+  label: string,
+  {
+    long = false,
+    delay = false,
+    position = "bottom",
+  }: {
+    long?: boolean;
+    /** show after a short delay (unless a tooltip was visible just now) */
+    delay?: boolean;
+    position?: "bottom" | "top";
+  } = {},
+) => {
+  const ownerDocument = item.ownerDocument; // zsviczian -- keep the tooltip in the item's document, upstream #11997
+  const ownerWindow = ownerDocument.defaultView; // zsviczian -- schedule delayed work in the item's realm, upstream #11997
+  if (!ownerWindow) {
+    return;
+  }
+  const state = getTooltipRuntimeState(ownerDocument);
+  const show = () => {
+    // item may have been unmounted while the delayed tooltip was pending
+    if (item.isConnected) {
+      updateTooltip(item, getTooltipDiv(ownerDocument), label, long, position);
+    }
+  };
+  ownerWindow.clearTimeout(state.showTooltipTimer);
+  if (delay && Date.now() - state.tooltipHiddenAt > TOOLTIP_WARM_WINDOW) {
+    state.showTooltipTimer = ownerWindow.setTimeout(show, TOOLTIP_DELAY);
+  } else {
+    show();
+  }
 };
 
 type TooltipProps = {
@@ -158,35 +233,10 @@ export const Tooltip = ({
         wrapperRef /* zsviczian -- expose the trigger document to cleanup, upstream #11974 follow-up */
       }
       className={clsx("excalidraw-tooltip-wrapper", className)}
-      onPointerEnter={(event) => {
-        const item = event.currentTarget as HTMLDivElement;
-        const ownerDocument = item.ownerDocument;
-        const ownerWindow = ownerDocument.defaultView;
-        if (!ownerWindow) {
-          return;
-        }
-        const state = getTooltipRuntimeState(ownerDocument); // zsviczian -- use this trigger document's delay state, upstream #11997
-        const show = () =>
-          updateTooltip(
-            item,
-            getTooltipDiv(ownerDocument), // zsviczian -- show in the trigger document, upstream #11974 follow-up
-            label,
-            long,
-          );
-        ownerWindow.clearTimeout(state.showTooltipTimer); // zsviczian -- manage delayed work through the trigger window, upstream #11997
-        if (delay && Date.now() - state.tooltipHiddenAt > TOOLTIP_WARM_WINDOW) {
-          state.showTooltipTimer = ownerWindow.setTimeout(
-            // zsviczian -- schedule in the trigger window, upstream #11997
-            show,
-            TOOLTIP_DELAY,
-          );
-        } else {
-          show();
-        }
-      }}
-      onPointerLeave={
-        (event) => hideTooltip(event.currentTarget.ownerDocument) // zsviczian -- hide only in the trigger document, upstream #11997
+      onPointerEnter={(event) =>
+        showTooltip(event.currentTarget, label, { long, delay })
       }
+      onPointerLeave={hideTooltip}
       style={style}
     >
       {children}
