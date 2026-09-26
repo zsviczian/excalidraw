@@ -33,6 +33,7 @@ import type {
   UIAppState,
 } from "../types";
 import type { JSX } from "react";
+import { Tooltip } from "./Tooltip";
 
 type TrayMenuProps = {
   appState: UIAppState;
@@ -206,8 +207,12 @@ export const TrayMenu = ({
           <div className="ToolIcon__icon" aria-hidden="true" />
         )}
         <div>
-          {actionManager.renderAction("undo")}
-          {actionManager.renderAction("redo")}
+          <Tooltip label={t("buttons.undo")} delay>
+            {actionManager.renderAction("undo")}
+          </Tooltip>
+          <Tooltip label={t("buttons.redo")} delay>
+            {actionManager.renderAction("redo")}
+          </Tooltip>
         </div>
       </div>
     );

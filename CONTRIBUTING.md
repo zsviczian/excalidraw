@@ -135,6 +135,17 @@ The marker should explain:
 
 This makes future merge conflicts substantially easier to understand and resolve.
 
+## Never Delete Upstream Code: Always Comment Out
+
+Never delete upstream Excalidraw code blocks. Deleting upstream code makes it difficult to reconcile and resolve merge conflicts during future upstream synchronizations.
+
+Instead:
+
+* Always comment out upstream code rather than deleting it.
+* Wrap the disabled block in `// zsviczian START -- reason` and `// zsviczian END` (or `/* ... */ // zsviczian` for inline/single expressions).
+* Provide a clear explanation and fingerprint for why the code is commented out or disabled.
+* Solutions that delete upstream Excalidraw code blocks will be rejected.
+
 ## Typed Obsidian Host Boundary
 
 The plugin supplies Obsidian-specific capabilities to the evaluated component through `ObsidianCommonHostAdapter` and `ObsidianExcalidrawHostAdapter`.

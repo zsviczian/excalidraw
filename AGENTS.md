@@ -36,6 +36,7 @@ Every fork-specific difference in an upstream-owned file must carry the exact `z
 - TypeScript/JavaScript single line: `// zsviczian -- reason`
 - CSS/SCSS single line: `/* zsviczian -- reason */` or the file's established equivalent
 - Inserted block: `// zsviczian START -- reason` and `// zsviczian END`
+- Never delete upstream code blocks: when disabling or replacing upstream logic, always comment it out and enclose it with `// zsviczian START -- reason` and `// zsviczian END` (or `/* ... */ // zsviczian` for inline/single expressions). Solutions that delete upstream code will be rejected because it complicates future upstream merges.
 - New helper or module: include high-signal documentation explaining purpose, author/fingerprint, references, and why the behavior belongs in the fork.
 
 Prefer the ringfenced files when suitable:

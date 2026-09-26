@@ -173,11 +173,11 @@ export const actionZoomIn = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      /* <Tooltip
+      <Tooltip
         label={`${t("buttons.zoomIn")} — ${getShortcutKey("CtrlOrCmd++")}`}
         className="zoom-in-button-wrapper"
         delay
-      > */ //zsviczian
+      >
         <IconButton
           type="button"
           className="zoom-in-button zoom-button"
@@ -188,7 +188,7 @@ export const actionZoomIn = register({
             updateData(null);
           }}
         />
-      /* </Tooltip> */ //zsviczian
+      </Tooltip>
     );
   },
   keyTest: (event) =>
@@ -225,11 +225,11 @@ export const actionZoomOut = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      /* <Tooltip
+      <Tooltip
         label={`${t("buttons.zoomOut")} — ${getShortcutKey("CtrlOrCmd+-")}`}
         className="zoom-out-button-wrapper"
         delay
-      > */ //zsviczian
+      >
         <IconButton
           type="button"
           className="zoom-out-button zoom-button"
@@ -240,7 +240,7 @@ export const actionZoomOut = register({
             updateData(null);
           }}
         />
-      /* </Tooltip> */ //zsviczian
+      </Tooltip>
     );
   },
   keyTest: (event) =>
@@ -282,12 +282,12 @@ export const actionResetZoom = register({
   PanelComponent: ({ updateData }) => {
     const zoomValue = useAppStateValue((appState) => appState.zoom.value);
     return (
-      /* <Tooltip
+      <Tooltip
         label={t("buttons.resetZoom")}
         style={{ height: "100%" }}
         className="reset-zoom-button-wrapper"
         delay
-      > */ //zsviczian
+      >
         <IconButton
           type="button"
           className="reset-zoom-button zoom-button"
@@ -298,7 +298,7 @@ export const actionResetZoom = register({
         >
           {(zoomValue * 100).toFixed(0)}%
         </IconButton>
-      /* </Tooltip> */ //zsviczian
+      </Tooltip>
     );
   },
   keyTest: (event) =>

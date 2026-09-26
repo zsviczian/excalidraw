@@ -933,14 +933,14 @@ export const UndoRedoActions = ({
 }) => (
   <div className={`undo-redo-buttons ${className}`}>
     <div className="undo-button-container">
-      /* <Tooltip label={t("buttons.undo")} delay> */ //zsviczian
+      <Tooltip label={t("buttons.undo")} delay>
         {renderAction("undo")}
-      /* </Tooltip> */ //zsviczian
+      </Tooltip>
     </div>
     <div className="redo-button-container">
-      /* <Tooltip label={t("buttons.redo")} delay> */ //zsviczian
+      <Tooltip label={t("buttons.redo")} delay>
         {renderAction("redo")}
-      /* </Tooltip> */ //zsviczian
+      </Tooltip>
     </div>
   </div>
 );
