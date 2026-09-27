@@ -5557,7 +5557,8 @@ class App extends React.Component<AppProps, AppState> {
   };
 
   /** emits an UNFOLLOW intent if currently following someone — use on
-   *  user-initiated viewport changes which should break follow mode */
+   *  viewport changes that take the view over from the followed user (user
+   *  pans and zooms, `setViewport` navigation) */
   public requestUnfollow = () => {
     if (this.props.userToFollow) {
       this.emitUserFollowIntent({
