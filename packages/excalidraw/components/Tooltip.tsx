@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import React, { useEffect, useRef } from "react"; // zsviczian -- retain the trigger's document for cross-document cleanup, upstream #11974 follow-up
+import React from "react";
 
 import "./Tooltip.scss";
 
@@ -115,8 +115,11 @@ export const hideTooltip = (owner?: TooltipOwner) => {
   ownerDocument.defaultView?.clearTimeout(state.showTooltipTimer);
   state.tooltipItemObserver?.disconnect();
   state.tooltipItemObserver = null;
-  const tooltip = getTooltipDiv(ownerDocument);
-  if (tooltip.classList.contains("excalidraw-tooltip--visible")) {
+  // a plain query, so that hiding never creates the tooltip node
+  const tooltip = ownerDocument.querySelector<HTMLDivElement>( // zsviczian -- query only the mounted editor document, upstream #11997
+    ".excalidraw-tooltip",
+  );
+  if (tooltip?.classList.contains("excalidraw-tooltip--visible")) {
     tooltip.classList.remove("excalidraw-tooltip--visible");
     state.tooltipHiddenAt = Date.now();
   }
@@ -215,23 +218,11 @@ export const Tooltip = ({
   disabled,
   delay = false,
 }: TooltipProps) => {
-  const wrapperRef = useRef<HTMLDivElement>(null); // zsviczian -- capture this tooltip trigger's document, upstream #11974 follow-up
-  useEffect(() => {
-    const ownerDocument = wrapperRef.current?.ownerDocument; // zsviczian -- retain the live owner before ref cleanup, upstream #11974 follow-up
-    return () => {
-      if (ownerDocument) {
-        hideTooltip(ownerDocument); // zsviczian -- clean only this document's tooltip and delayed timer, upstream #11997
-      }
-    };
-  }, []);
   if (disabled) {
     return null;
   }
   return (
     <div
-      ref={
-        wrapperRef /* zsviczian -- expose the trigger document to cleanup, upstream #11974 follow-up */
-      }
       className={clsx("excalidraw-tooltip-wrapper", className)}
       onPointerEnter={(event) =>
         showTooltip(event.currentTarget, label, { long, delay })
