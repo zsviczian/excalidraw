@@ -48,6 +48,7 @@ import {
 import * as dataModule from "../data";
 import { actionBindText } from "../actions";
 import { actionTextAutoResize } from "../actions/actionTextAutoResize";
+import { getTextAutoResizeHandle } from "../textAutoResizeHandle";
 
 import { CARET_FOLLOW_PADDING } from "./textWysiwyg";
 
@@ -86,6 +87,50 @@ describe("textWysiwyg", () => {
     beforeEach(async () => {
       await render(<Excalidraw handleKeyboardGlobally={true} />);
       API.setElements([]);
+    });
+
+    it("edits raw Obsidian text and saves the parsed text and link", async () => {
+      unmountComponent();
+      const onBeforeTextEdit = vi.fn(() => "[[page]]");
+      const onBeforeTextSubmit = vi.fn(() => ({
+        updatedNextOriginalText: "Page",
+        nextLink: "[[page]]",
+      }));
+      await render(
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          onBeforeTextEdit={onBeforeTextEdit}
+          onBeforeTextSubmit={onBeforeTextSubmit}
+        />,
+      );
+      const text = API.createElement({ type: "text", text: "Page" });
+      API.setElements([text]);
+
+      mouse.doubleClickOn(text);
+      const editor = await getTextEditor();
+      expect(editor.value).toBe("[[page]]");
+      expect(onBeforeTextEdit).toHaveBeenCalledWith(
+        expect.objectContaining({ id: text.id }),
+        true,
+      );
+
+      updateTextEditor(editor, "[[page|alias]]");
+      Keyboard.exitTextEditor(editor);
+
+      expect(onBeforeTextSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ id: text.id }),
+        expect.any(String),
+        "[[page|alias]]",
+        false,
+      );
+      expect(h.elements[0]).toEqual(
+        expect.objectContaining({
+          rawText: "[[page|alias]]",
+          originalText: "Page",
+          link: "[[page]]",
+          hasTextLink: true,
+        }),
+      );
     });
 
     it("should prefer editing selected text element (non-bindable container present)", async () => {
@@ -3321,6 +3366,34 @@ describe("textWysiwyg", () => {
         expect(edge(text)).toBeCloseTo(before, 4);
       },
     );
+
+    it("unwraps a text clicked on its handle", async () => {
+      // the handle's shown on desktop only
+      unmountComponent();
+      await render(
+        <Excalidraw
+          handleKeyboardGlobally={true}
+          UIOptions={{ getFormFactor: () => "desktop" }}
+        />,
+      );
+      API.setElements([wrappedText()]);
+      API.setAppState({ selectedElementIds: { text: true } });
+      const [x, y] = getTextAutoResizeHandle(
+        h.elements[0] as ExcalidrawTextElement,
+        h.state.zoom.value,
+        "desktop",
+      )!.center;
+
+      mouse.moveTo(x, y);
+      expect(GlobalTestState.interactiveCanvas.style.cursor).toBe(
+        CURSOR_TYPE.POINTER,
+      );
+
+      mouse.clickAt(x, y);
+      const text = h.elements[0] as ExcalidrawTextElement;
+      expect(text.autoResize).toBe(true);
+      expect(text.text).toBe(text.originalText);
+    });
   });
 
   describe("history", () => {
