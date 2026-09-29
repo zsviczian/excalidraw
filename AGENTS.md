@@ -6,6 +6,7 @@ Before changing this repository, read these files completely:
 
 1. `CONTRIBUTING.md` — fork policy, fingerprinting, Obsidian artifact contract, and cross-repository handoff.
 2. `CLAUDE.md` — upstream monorepo structure and standard commands.
+3. [`dev-docs/Obsidian/README.md`](dev-docs/Obsidian/README.md) — persisted fork inventory, source baselines, maintenance workflow, and decustomization gates. Read the linked catalog entries and contracts for the area being changed.
 
 This file adds agent-specific execution rules. If instructions conflict, preserve the stricter rule and ask before expanding scope.
 
@@ -41,6 +42,14 @@ Follow `CONTRIBUTING.md` → **Merging Changes From Upstream** for every upstrea
 6. Run the focused checks, Obsidian artifact build, and cross-repository plugin build described below. Test the affected user workflow in a live vault when that is essential to validate the change. If an essential check is unavailable, leave validation incomplete and report the risk before finalizing the merge; never equate a successful build with zero plugin regression.
 
 Do not mix documentation-policy edits or opportunistic cleanup into an upstream merge unless the maintainer requested them as part of that merge.
+
+## Maintain The Persisted Fork Inventory
+
+[`dev-docs/Obsidian/`](dev-docs/Obsidian/README.md) is the durable inventory, not a one-off audit report. In the same patch as every added, changed, moved, or retired fork customization (including an upstream merge), update the affected stable `OBS-xxx` entries, file ledger, consumer/compatibility evidence, and validation status. Include unmarked changes, tests, types, assets, packaging, and upstream-only paths; fingerprint searches are not a completeness check.
+
+Run the inventory comparison against the explicitly identified upstream snapshot using the commands in its README. Review drift before refreshing hashes; never make an unexplained difference pass by accepting its checksum. If an upstream checkout is unavailable, state that the comparison remains unverified. The inventory checker is not a substitute for source tests, builds, or a live Obsidian check.
+
+A removal candidate is not permission to remove code. Before retirement, document the replacement or proof of inertness, trace plugin and public scripting consumers, preserve saved-scene compatibility, and record the relevant validation. Keep retired IDs and their replacement/history; never reuse an ID. During an upstream extraction, update old and new file ownership together and account for the behavior exactly once. Keep upstream provenance current and do not infer Git ancestry from ZIP filenames or absent files.
 
 ## Fork Fingerprinting
 

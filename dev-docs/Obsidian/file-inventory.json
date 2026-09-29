@@ -1,0 +1,3010 @@
+{
+  "schema_version": 1,
+  "review": {
+    "date": "2026-09-29",
+    "method": "Byte-complete comparison of supplied snapshots plus source/call-site review. Local Git objects now verify both snapshot commit IDs and the upstream merge base; classifications still require behavioral review.",
+    "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
+    "handoff_note": "Original archive provenance below is immutable. The comparison fingerprints reflect this documentation handoff, including root policy edits; production code and dependencies are unchanged.",
+    "original_snapshot_counts": {
+      "fork_files": 1296,
+      "upstream_files": 1307,
+      "modified": 163,
+      "fork_only": 28,
+      "upstream_only": 39,
+      "differing_paths": 230
+    },
+    "runtime_validation": "Basic exact-build Obsidian CLI main-window smoke passed on 2026-09-29; feature-specific and physical-device gates remain open. See validation.md.",
+    "git_verification": {
+      "fork_commit": "c36b852a0acacf556277f71e850f22462a4454a6",
+      "fork_tree": "d9ac1098f143480a9e4266d7baa2156ed3bdbd30",
+      "upstream_commit": "5a406e51875157bece389b9bc92d41ff241d5f3d",
+      "upstream_tree": "e46b0b2d38f591cdb42ed30982ec237cab0c6528",
+      "merge_base": "5a406e51875157bece389b9bc92d41ff241d5f3d",
+      "plugin_commit": "bd40308a83c1c278fcdc13afa35ac779c24d90d5"
+    }
+  },
+  "sources": {
+    "fork": {
+      "archive": "excalidraw-obsidian-fork-master.zip",
+      "archive_root": "excalidraw-master/",
+      "zip_comment": "c36b852a0acacf556277f71e850f22462a4454a6",
+      "archive_sha256": "ec0f4c3d296e8be103254ff30327cf48b0bf28a69f21d90b5c9fa77a6c02aee1",
+      "package": "@zsviczian/excalidraw",
+      "version": "0.18.140"
+    },
+    "upstream": {
+      "archive": "excalidraw-upstream-master.zip",
+      "archive_root": "excalidraw-master/",
+      "zip_comment": "5a406e51875157bece389b9bc92d41ff241d5f3d",
+      "archive_sha256": "76d4d6bccc865b93eeda37b21e289649d504ef65bf7a4bb396884c94e81fe136",
+      "package": "@excalidraw/excalidraw",
+      "version": "0.18.0"
+    },
+    "plugin": {
+      "archive": "obsidian-excalidraw-plugin-master.zip",
+      "archive_root": "obsidian-excalidraw-plugin-master/",
+      "zip_comment": "bd40308a83c1c278fcdc13afa35ac779c24d90d5",
+      "archive_sha256": "78f503dcd308122acf15fc8100cc49122cb6f7d3df859fb34b537dd7804776a7",
+      "version": "2.2.5",
+      "fork_dependency": "0.18.140"
+    }
+  },
+  "comparison": {
+    "fork": {
+      "files": 1296,
+      "sha256": "449b72a36153aa1b9834aa8e377c0b8f566006bc17582c997b8d775616dd3700"
+    },
+    "upstream": {
+      "files": 1307,
+      "sha256": "9cef5d303407f073822162e36cb57187f4b33bfaa30347a30cffd5eb6cfef530"
+    }
+  },
+  "customizations": [
+    {
+      "id": "OBS-001",
+      "title": "Fork policies and durable inventory",
+      "review_state": "maintain",
+      "owner": "Fork maintainer"
+    },
+    {
+      "id": "OBS-002",
+      "title": "Package identity and dependency graph",
+      "review_state": "minimize",
+      "owner": "Package/build maintainer"
+    },
+    {
+      "id": "OBS-003",
+      "title": "Single-artifact Obsidian delivery",
+      "review_state": "retain",
+      "owner": "Package/build and plugin runtime maintainers"
+    },
+    {
+      "id": "OBS-004",
+      "title": "Declarations and build-time dependency boundaries",
+      "review_state": "review",
+      "owner": "Package/build maintainer"
+    },
+    {
+      "id": "OBS-005",
+      "title": "Common host capability registry (protocol 1)",
+      "review_state": "retain",
+      "owner": "Common host and plugin adapter maintainers"
+    },
+    {
+      "id": "OBS-006",
+      "title": "Excalidraw host service registry (protocol 2)",
+      "review_state": "retain",
+      "owner": "Component host and plugin adapter maintainers"
+    },
+    {
+      "id": "OBS-007",
+      "title": "Public props, imperative methods, and library exports",
+      "review_state": "preserve-public-contract",
+      "owner": "Component API and ExcalidrawAutomate maintainers"
+    },
+    {
+      "id": "OBS-008",
+      "title": "Host AppState and synchronous initialization",
+      "review_state": "minimize",
+      "owner": "Component state and plugin view maintainers"
+    },
+    {
+      "id": "OBS-009",
+      "title": "Raw Markdown text lifecycle",
+      "review_state": "retain-compatibility",
+      "owner": "Text and plugin view maintainers"
+    },
+    {
+      "id": "OBS-010",
+      "title": "Obsidian links, suggestions, and link presentation",
+      "review_state": "retain-compatibility",
+      "owner": "Text/link and plugin view maintainers"
+    },
+    {
+      "id": "OBS-011",
+      "title": "Drop and paste interception",
+      "review_state": "retain",
+      "owner": "Input and plugin drop-manager maintainers"
+    },
+    {
+      "id": "OBS-012",
+      "title": "Element IDs and restoration compatibility",
+      "review_state": "retain-compatibility",
+      "owner": "Scene and plugin persistence maintainers"
+    },
+    {
+      "id": "OBS-013",
+      "title": "Local fonts and host font loading",
+      "review_state": "retain-compatibility",
+      "owner": "Font and plugin asset maintainers"
+    },
+    {
+      "id": "OBS-014",
+      "title": "Custom pens and highlighter rendering",
+      "review_state": "retain-compatibility",
+      "owner": "Pen and renderer maintainers"
+    },
+    {
+      "id": "OBS-015",
+      "title": "Marker frames and frame presentation",
+      "review_state": "retain-compatibility",
+      "owner": "Frame and plugin PDF/slideshow maintainers"
+    },
+    {
+      "id": "OBS-016",
+      "title": "Webviews, rich embeds, and embed magnification",
+      "review_state": "retain-with-boundary-review",
+      "owner": "Embeddable and plugin view maintainers"
+    },
+    {
+      "id": "OBS-017",
+      "title": "Image loading, replacement, and migration readiness",
+      "review_state": "retain",
+      "owner": "Image and plugin runtime maintainers"
+    },
+    {
+      "id": "OBS-018",
+      "title": "Image inversion, canvas limits, and export fidelity",
+      "review_state": "retain-compatibility",
+      "owner": "Renderer and plugin asset maintainers"
+    },
+    {
+      "id": "OBS-019",
+      "title": "Teardown and shared-cache cleanup",
+      "review_state": "review",
+      "owner": "Component lifecycle and plugin runtime maintainers"
+    },
+    {
+      "id": "OBS-020",
+      "title": "Owner-window animation and scheduling",
+      "review_state": "upstream-candidate",
+      "owner": "Renderer and cross-document maintainers"
+    },
+    {
+      "id": "OBS-021",
+      "title": "Owner-document portals, tooltips, and drag ghosts",
+      "review_state": "upstream-candidate",
+      "owner": "UI and cross-document maintainers"
+    },
+    {
+      "id": "OBS-022",
+      "title": "Tray layout and host device/UI preferences",
+      "review_state": "minimize",
+      "owner": "UI and plugin settings maintainers"
+    },
+    {
+      "id": "OBS-023",
+      "title": "Host commands and context-menu integration",
+      "review_state": "retain",
+      "owner": "UI and plugin command maintainers"
+    },
+    {
+      "id": "OBS-024",
+      "title": "Host CSS isolation and dynamic styling",
+      "review_state": "consolidate",
+      "owner": "UI and plugin theme maintainers"
+    },
+    {
+      "id": "OBS-025",
+      "title": "Custom palettes and sticky-note color semantics",
+      "review_state": "retain",
+      "owner": "Color and plugin settings maintainers"
+    },
+    {
+      "id": "OBS-026",
+      "title": "Font picks, extended sizes, and legacy stroke widths",
+      "review_state": "minimize",
+      "owner": "Typography and scripting maintainers"
+    },
+    {
+      "id": "OBS-027",
+      "title": "Grid, selection, and overlay presentation",
+      "review_state": "minimize",
+      "owner": "Renderer and plugin settings maintainers"
+    },
+    {
+      "id": "OBS-028",
+      "title": "Zoom, pen/touch gestures, and navigation",
+      "review_state": "minimize",
+      "owner": "Input and plugin settings maintainers"
+    },
+    {
+      "id": "OBS-029",
+      "title": "Selection, line editing, and geometry API adapters",
+      "review_state": "preserve-public-contract",
+      "owner": "Scene and ExcalidrawAutomate maintainers"
+    },
+    {
+      "id": "OBS-030",
+      "title": "Host Mermaid conversion and editable diagram metadata",
+      "review_state": "retain",
+      "owner": "Mermaid and plugin Extras maintainers"
+    },
+    {
+      "id": "OBS-031",
+      "title": "Help, welcome screen, and library workflows",
+      "review_state": "move-to-host-candidate",
+      "owner": "UI and plugin view maintainers"
+    },
+    {
+      "id": "OBS-032",
+      "title": "Theme notifications and host locale ownership",
+      "review_state": "minimize",
+      "owner": "UI and plugin settings maintainers"
+    },
+    {
+      "id": "OBS-033",
+      "title": "Fork regression tests and fixture adaptations",
+      "review_state": "retain-and-verify",
+      "owner": "Affected subsystem maintainers"
+    },
+    {
+      "id": "OBS-034",
+      "title": "Repository export and local workflow artifacts",
+      "review_state": "cleanup-candidate",
+      "owner": "Repository maintainer"
+    },
+    {
+      "id": "OBS-035",
+      "title": "Upstream-only examples and documentation lockfile",
+      "review_state": "verified-removal-purpose-review-pending",
+      "owner": "Repository maintainer"
+    },
+    {
+      "id": "OBS-036",
+      "title": "Comment-only, formatting-only, and inert differences",
+      "review_state": "cleanup-candidate",
+      "owner": "Affected subsystem maintainers"
+    },
+    {
+      "id": "OBS-037",
+      "title": "Anchored images and embed-aware resizing",
+      "review_state": "retain-compatibility",
+      "owner": "Element and plugin asset maintainers"
+    }
+  ],
+  "files": [
+    {
+      "path": ".gitignore",
+      "status": "modified",
+      "fork_sha256": "166667b06ab483c0f5166468c7ba867dd28fb43ca54bcd9b4dd9cd5cc0a94e7c",
+      "upstream_sha256": "0da6e894cbff9b19d6af59dcdd3e11e5ae63d1253b3cb462744b843b1fc0ae3b",
+      "ids": [
+        "OBS-034"
+      ],
+      "note": "Ignore locally generated repository.zip.",
+      "kind": "housekeeping"
+    },
+    {
+      "path": ".nvmrc",
+      "status": "fork-only",
+      "fork_sha256": "785f3ec7eb32f30b90cd0fcf3657d388b5ff4297f2f9716ff66e9b69c05ddd09",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-034"
+      ],
+      "note": "Pin Node major 22 for local tooling.",
+      "kind": "housekeeping"
+    },
+    {
+      "path": "AGENTS.md",
+      "status": "modified",
+      "fork_sha256": "f3ed7e5e468804724448a2aa5b4c015c19f866092a87d4f7c54095bfaf37073b",
+      "upstream_sha256": "83adc6ba0bd860a72db2e260e367ca7832fa1aaea4ce3622cca3ea7529a0f228",
+      "ids": [
+        "OBS-001"
+      ],
+      "note": "Fork execution, merge, host, artifact, and handoff policies; now requires the persisted inventory.",
+      "kind": "governance"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "status": "modified",
+      "fork_sha256": "00a4ad9cc35513340efa1e45f43a832f070c9fa9a7c97256cfd1b7618f3d430f",
+      "upstream_sha256": "7a1025044e70371afa9f9037f5b1c14c7ab356dadf9331d4a26d2d735e8cca67",
+      "ids": [
+        "OBS-001"
+      ],
+      "note": "Conservative fork contribution policy and integration gates; now requires inventory maintenance and retirement evidence.",
+      "kind": "governance"
+    },
+    {
+      "path": "dev-docs/yarn.lock",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "abf481c4aa389688aeb684be44404877f1925f36cfef2a3db169969aae6260b0",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Removed in fork commit 1d8b33260 (0.18.100). Restore only after reviewing the documentation dependency graph; absence is a verified fork removal, not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "dirtree-mine.txt",
+      "status": "fork-only",
+      "fork_sha256": "de0be729968946f3d4f3f9f3ea0a0e7386d089c5fc57e9250114cf53791ba655",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-034"
+      ],
+      "note": "Non-UTF-8 repository tree dump; no runtime consumer identified. Retain provenance until cleanup review.",
+      "kind": "housekeeping"
+    },
+    {
+      "path": "examples/with-nextjs/.gitignore",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "dec93421e074048d02ad7e412f772a26e41a0c1e2698c50e30dafa4b59213ebd",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/README.md",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "8b481703f97f73053c4a0c250c17bd137f9bc944392b696127af097004ba6b41",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/next.config.js",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "9e2516116ce70e858596c53a42965d6d9ac5ff6b84c42ffb1a89c7771ce71894",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/package.json",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "2ddea861334b2a83b043d08c62e54731a64ce5fecda3014a62e31b404d123b6b",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/public/images/doremon.png",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "bea00c7f4a10443310e12bf1da2c1be6572f07be99fb066dff6fba0d61095fa0",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/public/images/excalibot.png",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "3d3da3ffb5a15134d235c9462822abac737797947fbff27efc31ca286d35c7f7",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/public/images/pika.jpeg",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "449c1bc8593f21ebd26ae3300415a48985c51e861152dd1988ed6b9b4b13b8e1",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/public/images/rocket.jpeg",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "5e2b8c9679c6c7131331d1e27251df5426c8b47b65c1f2830cfe2c71d2f7e758",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/src/app/favicon.ico",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "2b8ad2d33455a8f736fc3a8ebf8f0bdea8848ad4c0db48a2833bd0f9cd775932",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/src/app/layout.tsx",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "81249a705e36334b8526c3b0d9dc77075d9afe928d96e490fd6d9e66400ba480",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/src/app/page.tsx",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "8afd1f91a3faaa8360f4a23a2bcd9f4ea56da30f28481e7e462557ffb8232ba8",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/src/common.scss",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "413d9ad61150e9620046d7fd9bdad23b83c81ed4c27f31e509e35b9cd4f2c532",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/src/excalidrawWrapper.tsx",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "f0ef3d2a591946e1d7983e05b2005991384a1bbca466610e06349167ec0be3e5",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/src/pages/excalidraw-in-pages.tsx",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "1d7298e872269239a40245130967cfb2f51ee71d9f6ccd979abc7dae44de6881",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/tsconfig.json",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "0e29f5ec5e299caff15e74174930d69786231c2043cbdc869cea12924d704227",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/vercel.json",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "91b8c4a303f6e3fbbc363e034e79a12f7afebcec2ea13feca6eadfdb8fd462d8",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-nextjs/yarn.lock",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "03d5bdf2f92a157f46f59334c65cc9c9899bf432bab6854627827c0a8c3c8247",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/.codesandbox/Dockerfile",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "a692dc8b567e425b510b6f86757f2056ee9d57daa2c08cbae6d96d6fb6904960",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/.codesandbox/tasks.json",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "cc0d093f3d4f820472c46e764feb759aa8986555d384aed14c62f63bde885f68",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/.gitignore",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "598f13669077ab865274c937e68595985ede6140a4db1f45512f1222aacfc208",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/components/CustomFooter.tsx",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "d34496d2c75ae1e0a52c90e7f621f07dd9f8e962fa4531720f9ceda8804a1425",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/components/ExampleApp.scss",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "dad020c5b884965626d310d9eb639f42011c5c01089a96bd60d198a5aabaf6e8",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/components/ExampleApp.tsx",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "344f04fa5be3c8a4f29009e5d3e8190880c0d0ccfea5e39bf3a23255a8310ca6",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/components/MobileFooter.tsx",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "97e76b17acfd852e2fdf4595ea5c24f24b1d90c24f3b365406483f9176c5f6c3",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/components/sidebar/ExampleSidebar.scss",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "ab8ded1f548ac0157edb55b2bccccadd7539037cd6affa29f427108f10290246",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/components/sidebar/ExampleSidebar.tsx",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "327d04397f7df896d41cab65cd3285837f13dd6df77eaa6ef1ab07938b125263",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/index.html",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "8311120844ea60eb3e095103b3af5235976a67a7da48cd5ab1218db17fa89d5b",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/index.tsx",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "d51ed50107e1d0665ffbf3d9c74b326a00e580cfb2b658489c94baba1cae44ca",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/initialData.tsx",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "d455e5c2511146ca386492a82bd43c721e19774bfd2fab8f9c486a81270bef59",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/package.json",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "9cbaeae6f9535f8a0c903e996a158db3046bd63fd179b63fbe7f61a1f7febab9",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/public/images/doremon.png",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "bea00c7f4a10443310e12bf1da2c1be6572f07be99fb066dff6fba0d61095fa0",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/public/images/excalibot.png",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "3d3da3ffb5a15134d235c9462822abac737797947fbff27efc31ca286d35c7f7",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/public/images/pika.jpeg",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "449c1bc8593f21ebd26ae3300415a48985c51e861152dd1988ed6b9b4b13b8e1",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/public/images/rocket.jpeg",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "5e2b8c9679c6c7131331d1e27251df5426c8b47b65c1f2830cfe2c71d2f7e758",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/tsconfig.json",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "e0716018c64dbbe9bf14d6c7533f4d3cd231cd0c9ce60b6dbb812b5e57a91b6a",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/utils.ts",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "b1fdc21840048601f2faf0f9b67c39ce5fc53d99521bae49f90aa814dad89134",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/vercel.json",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "d0c880f1476e81d9cffbabe15bb8d4e07827c7734633cc7ab1f905d26f902674",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "examples/with-script-in-browser/vite.config.mts",
+      "status": "upstream-only",
+      "fork_sha256": null,
+      "upstream_sha256": "e3439fad99e3c65326f7e63fdde1368050a061c34b7bd94c441fec032ce7ec23",
+      "ids": [
+        "OBS-035"
+      ],
+      "note": "Absent from the fork relative to verified merge base 5a406e5. Fork commit a385293bf removed example configuration to fix yarn.lock; complete-tree absence persists. Restore only after workspace/build review; this is not an Obsidian runtime feature.",
+      "kind": "fork-removal"
+    },
+    {
+      "path": "package.json",
+      "status": "modified",
+      "fork_sha256": "613eb383df818f29000309084822509f27477e584a7d918afcc96d086756cf6d",
+      "upstream_sha256": "7b7a3a1ac12b2a3d15ee280c02abce3fb4beafdd7156a05b4e9c5446aa66bb1c",
+      "ids": [
+        "OBS-002",
+        "OBS-034"
+      ],
+      "note": "Fork export/update scripts, dependency resolutions/overrides, and Yarn dependency; do not mistake lockfile churn for product behavior.",
+      "kind": "packaging"
+    },
+    {
+      "path": "packages/common/src/commonObsidianHost.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "dfea1b88e924c9a664e86524fdbe185ddf03352fe30ceeb273708af5b1fb6817",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-005",
+        "OBS-033"
+      ],
+      "note": "Structural fake-adapter, default, forwarding, version, and stale-disposer tests.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/common/src/commonObsidianHost.ts",
+      "status": "fork-only",
+      "fork_sha256": "d9abd2a5d936cf90147a21a17527df2e2eed6c2d5275e910b07532d10713e885",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-005"
+      ],
+      "note": "Version-1 registry for device, UI mode, canvas-limit, and highlight capabilities with token-based disposal.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/common/src/commonObsidianUtils.ts",
+      "status": "fork-only",
+      "fork_sha256": "ce53c8139f2352b7e3a7067be7231e57a20af43c9755b4c0440af39ad3341c45",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-005",
+        "OBS-022",
+        "OBS-018",
+        "OBS-027"
+      ],
+      "note": "Normalize host device/UI preferences and supply standalone limit/highlight defaults.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/common/src/constants.ts",
+      "status": "modified",
+      "fork_sha256": "c9059249cc7341e0acc3aa44a005ac9ec3a2aa664e0622ef80e83e16b9836186",
+      "upstream_sha256": "be5c14d191f218a77dad05f62127d7f846ed9a80c7151c26ebb8798df1c83f66",
+      "ids": [
+        "OBS-013",
+        "OBS-022",
+        "OBS-025",
+        "OBS-026",
+        "OBS-028",
+        "OBS-036"
+      ],
+      "note": "Tray class names, Local Font ID 4, fourth font pick, xs size, five stroke widths/legacy override, named colors, smaller default zoom step, and declaration-only PRECEDING_ELEMENT_KEY.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/common/src/editorInterface.ts",
+      "status": "modified",
+      "fork_sha256": "1392cbac5a18b7e0a991e1dac750def382aba133ca8e195ba3f21115ebad2d09",
+      "upstream_sha256": "5873bcc094c4d12376dc6e90d7e0e0099a71d48e0972b303fa731be21486a858",
+      "ids": [
+        "OBS-005",
+        "OBS-022"
+      ],
+      "note": "Host-preferred styles mode/tray, form-factor gates, zero-width handling, lower sidebar breakpoint, and early returns bypassing upstream preference logic.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/common/src/index.ts",
+      "status": "modified",
+      "fork_sha256": "e9eb7d007d7257ed69a34026a1fb2a48cd66e004ff336d2f1a040814614f3e78",
+      "upstream_sha256": "6820e1f6b57fe4858be01820a25cda69f5252274cb2f3f77e02082d277c2072c",
+      "ids": [
+        "OBS-005"
+      ],
+      "note": "Re-export common host registration and helpers.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/common/src/random.ts",
+      "status": "modified",
+      "fork_sha256": "ed82ab6482c6d277ddda554fb7970ff5f3a85f0ee900eac797a97bc7f03464d1",
+      "upstream_sha256": "bd878122bfc427cc1b7c4176f961736bbd910ed7033e33b23e38503810adfda2",
+      "ids": [
+        "OBS-012"
+      ],
+      "note": "Alphanumeric eight-character obsidianId generator for Markdown-addressable elements.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/common/src/url.ts",
+      "status": "modified",
+      "fork_sha256": "364704f1b06add24c74cd6b6c9065af5d0c9371f2754111530b09c65fb5d1113",
+      "upstream_sha256": "4a40af5baee296bb6b6f7e39e20285b5fb532c597c552671f306ee5a0f60d1e4",
+      "ids": [
+        "OBS-010",
+        "OBS-016"
+      ],
+      "note": "Empty-link tolerance, data:text/html pass-through, and extracting an embedded HTTPS URL before sanitization.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/common/src/utils.test.ts",
+      "status": "modified",
+      "fork_sha256": "70affb7efbc84e3cc126ea5bf22003ea0d327c1841f41511ac406f7def954b2d",
+      "upstream_sha256": "e9f168d5433e4ddeb0beb46b272f645832b314c131c1c247e2dc27efbf1a92db",
+      "ids": [
+        "OBS-020",
+        "OBS-033"
+      ],
+      "note": "Assert throttleRAF schedules and cancels through a supplied window.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/common/src/utils.ts",
+      "status": "modified",
+      "fork_sha256": "d48297066b4cfed23e2905134cf880c104c44226b891d7a522d92ae8ae6bea86",
+      "upstream_sha256": "bad02983aed865fd7fe89dd9cc2fbe19d135875dae5c22b6d015687202edfb53",
+      "ids": [
+        "OBS-020",
+        "OBS-004"
+      ],
+      "note": "Optional owning-window scheduler for throttleRAF and cancellation; export UnbrandForValue type.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/element/src/Scene.ts",
+      "status": "modified",
+      "fork_sha256": "69ec910a98f7964b2f8533c673bb10f9aac6c4382bb76c9241203007f346533b",
+      "upstream_sha256": "c9272616db31877872bb9f46af154adc51d6f54877627973a76303e3cd8f1f92",
+      "ids": [
+        "OBS-014",
+        "OBS-029"
+      ],
+      "note": "Optional insertion index and frame-aware insertion for single elements, including highlighters behind existing content.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/element/src/bounds.ts",
+      "status": "modified",
+      "fork_sha256": "06dbf2069fb192b9bb8803f1658a3c400707484e87e5e70ae9eb7a9d7d24eb84",
+      "upstream_sha256": "1b2dd85e6c679ae53c9da82427c0cf73d4fcc15113636d1104cc25ebf8de6a57",
+      "ids": [
+        "OBS-036"
+      ],
+      "note": "Only a zsviczian comment on an otherwise identical return expression; no behavior delta.",
+      "kind": "no-functional-delta"
+    },
+    {
+      "path": "packages/element/src/duplicate.ts",
+      "status": "modified",
+      "fork_sha256": "54eb95927d268d23f9ae0881da29baa7759c8e8f97833c4f2bc9115f6e3ab993",
+      "upstream_sha256": "6ea4e5048ab6c5cc45dbb51361e171bace0a89d9875cd7ff0d558f72bdee402b",
+      "ids": [
+        "OBS-012"
+      ],
+      "note": "Use Obsidian IDs for duplicated text/linked elements, not for every element.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/element/src/easingFunctions.ts",
+      "status": "fork-only",
+      "fork_sha256": "fea3bc8ad1a0efa36c4122a7b41e23fa36554e8dd7220be47bc9543468a89108",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-014"
+      ],
+      "note": "Named easing-function dictionary consumed by persisted custom stroke options.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/element/src/embeddable.ts",
+      "status": "modified",
+      "fork_sha256": "c69e6493629af7580001596819711d837d0a164e41760e3c85d3b6ab54eb2ef2",
+      "upstream_sha256": "032779bd471f5e87f14d67986bf2bff23fb2619db5cc02885491cf7bc5e84335",
+      "ids": [
+        "OBS-010",
+        "OBS-016",
+        "OBS-009"
+      ],
+      "note": "Data-HTML and Obsidian YouTube routing, blanket same-origin allowance, and rawText on embed placeholders.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/element/src/frame.ts",
+      "status": "modified",
+      "fork_sha256": "e516023f5555faebf290f5a3887bdaac4de8198fa28ac56d071b4a0d34c18f90",
+      "upstream_sha256": "6dd0d70f22f7528865244bee8854ca645766961af86a9468119576b5f2208871",
+      "ids": [
+        "OBS-015"
+      ],
+      "note": "Marker frames do not capture/add members; preserve appropriate prior members during resizing.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/element/src/freedrawPath.ts",
+      "status": "fork-only",
+      "fork_sha256": "ea0071b6bc3ac7b9e8f1a445c257da66df8e2e0b9dfe1eacdc756a1818480f31",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-014"
+      ],
+      "note": "Custom perfect-freehand path/outline generation with saved easing, pressure, cap, taper, and stroke options.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/element/src/image.ts",
+      "status": "modified",
+      "fork_sha256": "fa37002788d437513706261b8027aed9a043a9e8d14422608214c3a2984a59da",
+      "upstream_sha256": "d9e2a06d6c23d1d7ab972db146b4f00adfd4660d695b1b505cf5f7cc7a1ff0a9",
+      "ids": [
+        "OBS-017"
+      ],
+      "note": "Inject image factory for owning realm and attach cancellation to pending image promises.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/element/src/newElement.ts",
+      "status": "modified",
+      "fork_sha256": "ebb97dac341aa6f27b9cd56e83640ea5d18e086e5c81183ea3afcc05f70a40b8",
+      "upstream_sha256": "03d3f55fb6a19f0cb8618122e7d38ee5566705dea5b83095e39fc960bfd9e680",
+      "ids": [
+        "OBS-009",
+        "OBS-012",
+        "OBS-015",
+        "OBS-016"
+      ],
+      "note": "Raw text fields, selective Obsidian IDs, embed scale defaults, frame roles, and numbered frame names.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/element/src/renderElement.ts",
+      "status": "modified",
+      "fork_sha256": "faa0d639fb140a7f6fbd8fb6fa228f8ca71e7186235c08bd62c77930acd4f2c4",
+      "upstream_sha256": "92c12311cef36022d0a6118a5946ee1353a9a0bf6f3a2a3b6f7865773c2be49b",
+      "ids": [
+        "OBS-014",
+        "OBS-015",
+        "OBS-016",
+        "OBS-018",
+        "OBS-027"
+      ],
+      "note": "Custom pen rendering, marker frames/colors, host canvas limits, image inversion/iOS handling, embed border scaling, and selection-width tuning.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/element/src/resizeElements.ts",
+      "status": "modified",
+      "fork_sha256": "a0ee2adf0f57431ccabeb9c02f06e8dccc20481bfd021ecaa1507086b75cbb21",
+      "upstream_sha256": "db291eeaa59e817f18612f82226d1e2dfdcf7c38b58c70b450cd9f6d445c71c6",
+      "ids": [
+        "OBS-037",
+        "OBS-029"
+      ],
+      "note": "Anchored image size protection, Shift embed magnification, and exported next-container-dimension helper.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/element/src/shape.ts",
+      "status": "modified",
+      "fork_sha256": "fcc65d09dd599e085745b91b514b001a39fc4afecf96605c572c54dfe40e7785",
+      "upstream_sha256": "1121578b920a03e74e713bcf5ec454faedd09b46a327a55296948e038cfe97b2",
+      "ids": [
+        "OBS-019",
+        "OBS-036"
+      ],
+      "note": "Added Object.values(WeakMap) cleanup in ShapeCache.destroy is inert; ordinary keyed cache deletion is unchanged.",
+      "kind": "no-functional-delta"
+    },
+    {
+      "path": "packages/element/src/textElement.ts",
+      "status": "modified",
+      "fork_sha256": "35b6c4e58153944fefcc2d5076bf64a627dfc74b18568ee8ac56414d0063cedf",
+      "upstream_sha256": "e3ffdc5c9c52d631911b309ac9bee1f0fff7f9a40d0a19cbe82d897e78c8a5c5",
+      "ids": [
+        "OBS-009"
+      ],
+      "note": "Persisted legacyTextWrap bypasses inscribed ellipse/diamond geometry in positioning and available text dimensions.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/element/src/transform.ts",
+      "status": "modified",
+      "fork_sha256": "213ebdea300c5ac60164764c8aced676be4f30c8fcad6774b0327e1c15567f30",
+      "upstream_sha256": "259a11a6f85a2f13127712e14bbd800df1309399498a89d500db84eef6d81c31",
+      "ids": [
+        "OBS-009",
+        "OBS-036"
+      ],
+      "note": "Carry rawText through converted/bound labels; unused originalId argument on private ElementStore.add.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/element/src/types.ts",
+      "status": "modified",
+      "fork_sha256": "d507e39b24b413d4a6539dbfb25d84293c6343214e47d8224b5f38c686c2421c",
+      "upstream_sha256": "ae55b7f4e5e62aa33c36ae54c26b34e7c5853c0a4bb9accbf384a635b4070ef4",
+      "ids": [
+        "OBS-009",
+        "OBS-010",
+        "OBS-015",
+        "OBS-016",
+        "OBS-018"
+      ],
+      "note": "Persist rawText, hasTextLink, frameRole/colors, embed scale, and PDF/inversion metadata types.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/excalidraw/.gitignore",
+      "status": "modified",
+      "fork_sha256": "200918f2c984412edf9e29bcb47c12bc093ced8814e96344274ad81d2a0119e2",
+      "upstream_sha256": "2bdc9a5ad75d12467b8c259204ae74da1b7c0bb33eda75b080fd5674553df069",
+      "ids": [
+        "OBS-034"
+      ],
+      "note": "Ignore a local deploy.ps1; this is not a shipped runtime change.",
+      "kind": "housekeeping"
+    },
+    {
+      "path": "packages/excalidraw/CHANGELOG.md",
+      "status": "modified",
+      "fork_sha256": "c01eff241aa799092cb2b538580c52c2fd0eadebd049d6b880a12f64c7bfc8ea",
+      "upstream_sha256": "fc29dd1d0ab70c2d9b2b5932151f1bb4f1eee4af5f908161ed7d53cc5d798d2a",
+      "ids": [
+        "OBS-001",
+        "OBS-007",
+        "OBS-009",
+        "OBS-011"
+      ],
+      "note": "Historical additions describe drop/text hooks, but text-hook signatures no longer match current types; catalog is the current contract.",
+      "kind": "documentation"
+    },
+    {
+      "path": "packages/excalidraw/actions/actionBoundText.tsx",
+      "status": "modified",
+      "fork_sha256": "5824b446de58c97b62bd5827a861b5fc5b183f40e6c55a7308f9d012dfb026b8",
+      "upstream_sha256": "b46dfd8f2bf6433738f5f2e258fe2674aa48f3366655022baa8f482e2bb4023f",
+      "ids": [
+        "OBS-009",
+        "OBS-010"
+      ],
+      "note": "Move or merge text/container links when binding or wrapping text; avoid duplicate link ownership.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/excalidraw/actions/actionCanvas.tsx",
+      "status": "modified",
+      "fork_sha256": "4dd3ac2ebbfd5c6ca4861c93cbe3cadb337d4046f0e447f342e720bba21182ab",
+      "upstream_sha256": "8806f99e6f8258096adced4e7e3d23b80feb5af1704b24128d76079de8e0cdb7",
+      "ids": [
+        "OBS-008",
+        "OBS-025",
+        "OBS-028",
+        "OBS-032"
+      ],
+      "note": "Host canvas palette, preserve selected host state on clear, host zoom bounds/step, upstream-backed zoom-to-fit wrapper, and altered onThemeChange flow.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/actions/actionElementLink.ts",
+      "status": "modified",
+      "fork_sha256": "8f4c6066dc7477482e62400e7f3da41d55275c2f0435d1a9d4ced64b8d94c61c",
+      "upstream_sha256": "b08589758ad85b1f077fb284583646e7a113113db02b58f0e2674d1539a19454",
+      "ids": [
+        "OBS-010",
+        "OBS-023"
+      ],
+      "note": "Hide upstream link-to-element actions from Obsidian's action UI.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/actions/actionFinalize.tsx",
+      "status": "modified",
+      "fork_sha256": "dd77f89a6ebda0b866924015addf0162b9d16943f2b24347d6abe7d5ea8d44ff",
+      "upstream_sha256": "a4dfa6398320274e9cae17bb81ffae6378749aabfba4fc222ddbb96e1da4def7",
+      "ids": [
+        "OBS-014",
+        "OBS-024"
+      ],
+      "note": "Do not snap a freedraw stroke's endpoint closed; center the finalize control.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/actions/actionFrame.ts",
+      "status": "modified",
+      "fork_sha256": "c2a722e24e858417c34acd880abcef91dab6e09f37f1b3190086076ffb4bc336",
+      "upstream_sha256": "70d5d324c92cdc75ccc68ff3b28f1f98848caa029641ecda67780c226687e04a",
+      "ids": [
+        "OBS-015",
+        "OBS-032"
+      ],
+      "note": "Provide scene elements for sequential frame naming and explicitly retain the current theme in action result.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/actions/actionProperties.tsx",
+      "status": "modified",
+      "fork_sha256": "6120d0798616252413e451cb6d702ce5ec02b9072e1f2088ae3340e717b8f7b6",
+      "upstream_sha256": "fa0cd5c61d052e1b35279f0b87742957ae3e56a3aa60f1599fa3a6ac48492d9c",
+      "ids": [
+        "OBS-015",
+        "OBS-022",
+        "OBS-025",
+        "OBS-026"
+      ],
+      "note": "Frame-role action/member removal, tray/full panel treatment, custom palettes, sticky-aware independent bound-text ink, five stroke widths, and zoom/Fibonacci font-size controls.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/actions/actionToggleFrameRole.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "7100bd68f142adad189a077b49f2bb7a69050b7ad2c06e30e0325238083f2b64",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-015",
+        "OBS-033"
+      ],
+      "note": "Marker conversion releases members and undo restores them.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/actions/actionToggleViewMode.tsx",
+      "status": "modified",
+      "fork_sha256": "4b5eb072b33f81eb0784d56179d8ac818c10845993c7b83d60efdef997a400e3",
+      "upstream_sha256": "d6c9c7ee5c4822f0abba09771150656476b360ab8ef309a14673745560786d66",
+      "ids": [
+        "OBS-007",
+        "OBS-032"
+      ],
+      "note": "Notify host before toggling view mode.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/actions/actionTrayMenu.tsx",
+      "status": "fork-only",
+      "fork_sha256": "54836a123cd1f2071c788e33253489f8c4d1731febc3a54553ba985b66794981",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-022"
+      ],
+      "note": "Register toggleTrayEditMenu to show or hide shape properties in the tray.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/actions/colorTargets.ts",
+      "status": "modified",
+      "fork_sha256": "8008179799522085bb555af49128c8421db6709303877b3097e57c9ff6d8a2f8",
+      "upstream_sha256": "8b38fa8105245da99df44e83e38892f834a93542f05010019e74727a83a19c74",
+      "ids": [
+        "OBS-025"
+      ],
+      "note": "Use host regular palettes/top picks while retaining upstream sticky-note-specific picks and mixed-selection semantics.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/actions/index.ts",
+      "status": "modified",
+      "fork_sha256": "90aeab9db0151e413b3bc28ac9de00d47d8e7c9ce8888ffab6eb3ff83a1b63e3",
+      "upstream_sha256": "efe48bb720f92434b4d6e5d45051c2b46508af89a2351a49fd7953286b578316",
+      "ids": [
+        "OBS-015",
+        "OBS-022",
+        "OBS-028"
+      ],
+      "note": "Register/export frame-role and tray actions and expose the upstream-backed zoom-to-fit helper.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/actions/shortcuts.ts",
+      "status": "modified",
+      "fork_sha256": "20a78625117c1cee632d365b3a45bfcd8168e4765a4ed3d86922264af22207cf",
+      "upstream_sha256": "436b3143fb58100895409220eaf440fd43fe873c02a5566995fab951785d9948",
+      "ids": [
+        "OBS-028",
+        "OBS-036"
+      ],
+      "note": "Retain toggleLaserPointerTool shortcut-name metadata mapped to K; no registered action implementation found.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/actions/types.ts",
+      "status": "modified",
+      "fork_sha256": "fe99a85598dbf86da0f953276fca6370b8931161dc5b4ac6df6efc4a9c48c413",
+      "upstream_sha256": "92fdf1c6581181effa47b1e87126c8dac3536cbabd3b0d4288c38ad5788ef972",
+      "ids": [
+        "OBS-015",
+        "OBS-022",
+        "OBS-028",
+        "OBS-036"
+      ],
+      "note": "Extend action-name union for frame-role, tray, and declaration-only toggleLaserPointerTool metadata.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/animatedTrail.ts",
+      "status": "modified",
+      "fork_sha256": "209d05cee78eab0a810eff2aefce1326ffd78ce5b3f2ee0fff0401f1d1f7f27d",
+      "upstream_sha256": "06e455052d475d1b1698fe7693740039c27b0cd7d1bf234819e963a352cb19ab",
+      "ids": [
+        "OBS-020"
+      ],
+      "note": "Use owning-window animation and adjust trail container offsets for embedded/popout canvas coordinates.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/appState.ts",
+      "status": "modified",
+      "fork_sha256": "725ad38e7a92a03be7cf6dad5ac5e05cfc3c74540ba90a33ea6279b7c3e3288c",
+      "upstream_sha256": "6cf9b2d3421cad3297362e6661fa4f4972146e04552a75d7757644a069e104bb",
+      "ids": [
+        "OBS-008",
+        "OBS-015",
+        "OBS-025",
+        "OBS-026",
+        "OBS-027",
+        "OBS-028",
+        "OBS-036"
+      ],
+      "note": "Host state defaults/storage rules, exportScale 1, frame flags, legacy width/default role, and declaration-only isLaserPointerActive.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/excalidraw/components/Actions.scss",
+      "status": "modified",
+      "fork_sha256": "a9c119e8dcf1bdd4b5499324cdacc7240fda4c988c98aa2fee5a3bf83007edd4",
+      "upstream_sha256": "19b0907a98d6a47744da2d53116f3cf71bbb25f5f0dd836f13303b47ebc086e9",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Narrow/reset zoom button sizing and enforce centered justification.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/Actions.tsx",
+      "status": "modified",
+      "fork_sha256": "2f2c41b91e79d8688c60ae629d90f43aaea48a3d41688e082dfa9740380b7e71",
+      "upstream_sha256": "7a174738df8cde4700f5729d7a6deca49ea17c9990913859d6de541372556f2c",
+      "ids": [
+        "OBS-015",
+        "OBS-022",
+        "OBS-023"
+      ],
+      "note": "Expose frame-role and finalize controls, and tray zoom layout; residual unused host-command imports merit local cleanup.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/App.clipboard.ts",
+      "status": "modified",
+      "fork_sha256": "b6f603cab6b89a93a512bf116764bde1ed752e84d95141f8e9ba34eaf0bfedab",
+      "upstream_sha256": "452e5e856a6a000d0c14aa1b0cb39cc84fd99e65f2cdad78d5bffc9cc24b74cd",
+      "ids": [
+        "OBS-009",
+        "OBS-011",
+        "OBS-026",
+        "OBS-030"
+      ],
+      "note": "Third onPaste argument contains parsed files before insertion, host Mermaid parsing, raw text, and zoom-aware font sizing.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/App.pan.ts",
+      "status": "modified",
+      "fork_sha256": "c839e7681f7fc238f71f56c86edbc5ba1c646db66996ed22a9c0335e3dc483e3",
+      "upstream_sha256": "07b0d9e10ba4ff210980c43a4203e2f1a327970bb2de656e56d584cb9a444eb3",
+      "ids": [
+        "OBS-020",
+        "OBS-028"
+      ],
+      "note": "Single-finger panning in pen mode and owner-window throttling; right-button panning itself already exists upstream.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/App.text.ts",
+      "status": "modified",
+      "fork_sha256": "f866bc1cb64c9da0c48c9039ccb39e8adfa1dc017f370892739e457369e5e559",
+      "upstream_sha256": "255b83d3859bd2304191047edf824db86a3fd9653eedff38976d66f45be3343a",
+      "ids": [
+        "OBS-009",
+        "OBS-026"
+      ],
+      "note": "Delegate before-edit/before-submit Markdown lifecycle to obsidianText; initialize raw text and adjusted font size.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/App.tsx",
+      "status": "modified",
+      "fork_sha256": "8ba677b0907141a77d4b2fe2f3fcbac66d9ac191f122f8edd8b233fc0614cde3",
+      "upstream_sha256": "c40f37e4a77fc5fba335b0dd790cec6dc9c60e83e647eb80fd5d8e229cdb30c3",
+      "ids": [
+        "OBS-007",
+        "OBS-008",
+        "OBS-010",
+        "OBS-011",
+        "OBS-014",
+        "OBS-015",
+        "OBS-016",
+        "OBS-017",
+        "OBS-019",
+        "OBS-020",
+        "OBS-021",
+        "OBS-022",
+        "OBS-023",
+        "OBS-024",
+        "OBS-027",
+        "OBS-028",
+        "OBS-029",
+        "OBS-030",
+        "OBS-032",
+        "OBS-037"
+      ],
+      "note": "Main cross-cutting integration: public adapters, early state, scaled webviews, highlighter layer, frame/link UI, image lifecycle, teardown/test-hook suppression, menus/input ordering, host layout, and selection/geometry wrappers. See catalog and API contract table.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/App.wheel.ts",
+      "status": "modified",
+      "fork_sha256": "94572e781f479dbf9603dfc12e7cedcba7b103dba53b6d2379c71d14f14a4d1b",
+      "upstream_sha256": "988f43a2e9e836e7e06335ecfc6928fb2c1203324f92a8d98132af175139c60f",
+      "ids": [
+        "OBS-028"
+      ],
+      "note": "Use composedPath for canvas wheel targeting and invert zoom modifier behavior when allowWheelZoom is enabled.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/ButtonSeparator.tsx",
+      "status": "modified",
+      "fork_sha256": "4b004a80aea8d9b378e1c8646292b9bb1bbd316acbd9dc245bad7f6eb018e664",
+      "upstream_sha256": "a73d0efd4cf13535b51c57b16613cc20ce0b81f9ff8f7c27f48c631a6d813941",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Remove automatic horizontal margins.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/ColorPicker/ColorInput.tsx",
+      "status": "modified",
+      "fork_sha256": "99f052db86e9b0843ab21c11a4750db3ea2f33e40cb78d82381f2051068d84e1",
+      "upstream_sha256": "2a6f9cc465bd3d40054624f6f01f20188be57f255bbaf34c107447ed3de2efa1",
+      "ids": [
+        "OBS-025",
+        "OBS-024"
+      ],
+      "note": "Native color input preserving alpha, named-color resolution, and host icon color for divider.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/ColorPicker/ColorPicker.scss",
+      "status": "modified",
+      "fork_sha256": "39da0121fa3da02908b231a68305f25418babb2e26a477de12aecb1b5a30f199",
+      "upstream_sha256": "a4e1af6234c1a7346c1021409d817e27b7bc37b2ce2e090019098cb87eeac00b",
+      "ids": [
+        "OBS-024",
+        "OBS-025"
+      ],
+      "note": "Remove conflicting popup max-height and add layout column for native color input.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/ColorPicker/ColorPicker.tsx",
+      "status": "modified",
+      "fork_sha256": "befb96ec2a7fa596c35fe1ce1107e95de2672207bf336dc2c801027d25081f56",
+      "upstream_sha256": "86ec65fa9771a9551e87c220aad6698591eaa96945f0064601a4722c74919be8",
+      "ids": [
+        "OBS-022",
+        "OBS-025"
+      ],
+      "note": "Treat tray as full rather than compact, including customizable top picks.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/ColorPicker/Picker.tsx",
+      "status": "modified",
+      "fork_sha256": "3edbe54912574a836421947a08d02a0e9ef65edc7288186af7eced470a1ebdc4",
+      "upstream_sha256": "3d506d2441007b99d2b64f0d1d9d387d256bb7e5e6f75ca7f19adfc3610c36d4",
+      "ids": [
+        "OBS-025"
+      ],
+      "note": "Default canvas-background shade index to zero.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/ColorPicker/PickerColorList.tsx",
+      "status": "modified",
+      "fork_sha256": "7c3f7231e03770473832f38d8fee0d474dda2cf405bb6c900978d401dc49b948",
+      "upstream_sha256": "df60048bf1d976a0299bfcc58ae0645bfd23dfee8229b587e3f992577f282b7b",
+      "ids": [
+        "OBS-025"
+      ],
+      "note": "Handle host palettes larger than upstream shortcut mappings without undefined titles/hotkeys.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/ColorPicker/ShadeList.tsx",
+      "status": "modified",
+      "fork_sha256": "359d534bf5bd70f6d88681af1ba326f457aca5b0be2b97cb8aa109aa75768690",
+      "upstream_sha256": "04981566c63a3f6dc9308da2bec8b557508e6ccb7dce0e7c12052dacd6d8711d",
+      "ids": [
+        "OBS-025",
+        "OBS-024"
+      ],
+      "note": "Restore outlines for light shade swatches.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/ColorPicker/TopPicks.tsx",
+      "status": "modified",
+      "fork_sha256": "be504ae05b10252c97afe008bf14cc6ff2b5ba05c901975047336342201a85b6",
+      "upstream_sha256": "daa7b920c523cd3b585c46faf99c04fea9bc6c99e92f0bb8247c2bac3a03ee4d",
+      "ids": [
+        "OBS-025"
+      ],
+      "note": "Guard host-supplied topPicks against non-object values.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/ColorPicker/colorTopPicksDnD.ts",
+      "status": "modified",
+      "fork_sha256": "e95eb05f1260606117826ac32920c6d7151012b1a09d66cfe6c99dc7245e75f2",
+      "upstream_sha256": "3e4384506a26846068425a073664bdb7475bb0d690b22c0a84473dd0ead50755",
+      "ids": [
+        "OBS-021"
+      ],
+      "note": "Create drag-ghost swatches and sample computed colors in the source document/window.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/ContextMenu.scss",
+      "status": "modified",
+      "fork_sha256": "d5138dcd554d5fc75df2680c1a2d7fdc2cbc65a58460386647a5f0d1f7ad6c1e",
+      "upstream_sha256": "f7d57c13405173ff45c8c07b7adb08ea57453200545e82afd2f343f940c1ca2c",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Host/mobile padding, checkmark offsets, separators, borders, and hover contrast.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/ContextMenu.tsx",
+      "status": "modified",
+      "fork_sha256": "c0991f6a6d2e1a0049b3393f3a51aa60470840fe7c28f90dcec1241750e4abfc",
+      "upstream_sha256": "6ae9e734ac67fa2333d2bca8f88fb00e0baee57bf599010c0ff90940ee2c348f",
+      "ids": [
+        "OBS-023"
+      ],
+      "note": "Render host menu entries with elements, appState, and onClose ahead of upstream actions.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/DarkModeToggle.tsx",
+      "status": "modified",
+      "fork_sha256": "0c9a73bc02d6f4eef9c772ef1430784e812f5118256540f65fd0fd4253ca604c",
+      "upstream_sha256": "df256a6a8ec39a3785117f9fc3db244c3b943287f2e96f829a456c527ea97857",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Use host icon-fill CSS variable in sun/moon SVGs.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/Dialog.tsx",
+      "status": "modified",
+      "fork_sha256": "72bdb5e83f5a7c154b66eaa4ac675dc4687b64b242a2947ee39d899a858f1209",
+      "upstream_sha256": "ef4b3eea3d298e701d019e462cc52bb399faf37dd986bf556654a898300de3d4",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Pass live AppState.dynamicStyle into Modal.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/DialogActionButton.scss",
+      "status": "modified",
+      "fork_sha256": "cdaec2f5e41aca2bb8049e7525414c3b2047b4af968f60e672d9ba8eaa5caa2b",
+      "upstream_sha256": "cf3daa12d0b7f79c6728fd70559af3937e0a19fa37074759a3c28621aa7f0977",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Add translucent action-button background.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/EyeDropper.scss",
+      "status": "modified",
+      "fork_sha256": "c2c8016d5b1d0451fedae36a7291c518bbc6e0fc53b06ced7ee156889696a4c2",
+      "upstream_sha256": "d77e57def6f3e50fb3337a0847ba35d9d2b68400ef8528eeed26a540ba57f4e1",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Remove color-preview padding conflicting with host sizing.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/EyeDropper.tsx",
+      "status": "modified",
+      "fork_sha256": "779e5d0bae28eea77eab46037483d0b4e38658cf591e6022d48096c760538292",
+      "upstream_sha256": "d026d9c58ed4627665b562addffea7f5c68d8917399417a9338de609eb9c3658",
+      "ids": [
+        "OBS-036"
+      ],
+      "note": "Only reformat the cursor object; no behavior delta.",
+      "kind": "no-functional-delta"
+    },
+    {
+      "path": "packages/excalidraw/components/FixedSideContainer.tsx",
+      "status": "modified",
+      "fork_sha256": "1b8d00bb160663e9a320b75805352b80deb4174aec0d1d4d8ac85a9438c74897",
+      "upstream_sha256": "80a3220a173a43c3d3ffa67d9b9dc9d9b8ff1ea6937f031dbcd47ccc0d7f4c12",
+      "ids": [
+        "OBS-022"
+      ],
+      "note": "Offset top-side controls for an open sidebar.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/FontPicker/FontPicker.scss",
+      "status": "modified",
+      "fork_sha256": "b1449d14de1cbc0e83ee5db10754654ef706340a72dea5898727cb79261bc75a",
+      "upstream_sha256": "49c89cb22c432d981cbc5ec39c68dc80f0ff30e5a706025b5ce491184f49e3b0",
+      "ids": [
+        "OBS-026",
+        "OBS-024"
+      ],
+      "note": "Allow four font picks plus controls and narrower separator spacing.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/FontPicker/FontPicker.test.tsx",
+      "status": "modified",
+      "fork_sha256": "8311f51f345aad4d344f3015d1d4efcaf341b4391c231033a2239ca2d48dca05",
+      "upstream_sha256": "c96bd319e0b512302e97b80acf95589d0b20b073aa9c1b076ad7b93cd4ec2c3d",
+      "ids": [
+        "OBS-026",
+        "OBS-033"
+      ],
+      "note": "Adjust picker expectations for fourth default pick and changed font selection flow.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/components/FontPicker/FontPicker.tsx",
+      "status": "modified",
+      "fork_sha256": "4cc2cbcd74e3b3bc6b26497f61a7eba6e380992e3ee7b7f3d78de5e93304fddb",
+      "upstream_sha256": "79166665d88d1ce370b62d7f1b7095671880ffa75b0996abba5b5f2e6ed81ef7",
+      "ids": [
+        "OBS-026"
+      ],
+      "note": "Add Lilita One as a fourth default font pick/icon.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/FontPicker/FontPickerList.tsx",
+      "status": "modified",
+      "fork_sha256": "e78d88d07476299ca95bbd03c23d64962430e49da42452c6b52cdafbe0885a55",
+      "upstream_sha256": "78b34fdaa78fabcbb0e604466baed6caed72d5ce1c8ce6a85fffad9c25776f35",
+      "ids": [
+        "OBS-013",
+        "OBS-026"
+      ],
+      "note": "Render Local Font with the hand-drawn icon.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/FontPicker/fontTopPicksDnD.ts",
+      "status": "modified",
+      "fork_sha256": "b18bb7433970d7069a24df7a90ff9232c4e0bf08c3709a4e257d3a07a7923645",
+      "upstream_sha256": "e27fb41919024c91183db43fc2067ead3a89356e00d32e0b948c1d32a99cdc30",
+      "ids": [
+        "OBS-021"
+      ],
+      "note": "Construct font drag ghosts, DOMRect, and computed styles in the source realm.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/HelpButton.tsx",
+      "status": "modified",
+      "fork_sha256": "53af8ee8bb40ecbd8268a4dd341c6f7310ebba38c20e0fae3a0bbd2ffa9c2c3f",
+      "upstream_sha256": "df53e3785905aca2901aeb2960ef4087bb0195085b70cdf8ad842aa04eb63cea",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Apply shared ToolIcon sizing class.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/HelpDialog.tsx",
+      "status": "modified",
+      "fork_sha256": "f54574555038fb089a2094daa0aa5fd3d6f6f5839b44bd40e46c627510b7beb6",
+      "upstream_sha256": "9af1dfd98f990fd228732394eb3da89a3d694ededc9ae77769ae6e35afb3669e",
+      "ids": [
+        "OBS-031"
+      ],
+      "note": "Replace documentation, blog/channel, and issue destinations with plugin-oriented links.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/HintViewer.scss",
+      "status": "modified",
+      "fork_sha256": "0c35c20fea03f056499cdad6ebec61aa64e77181ec1c1c5545613dfd4c9f6887",
+      "upstream_sha256": "ee5e1d786d536fad8e388a3e19b0db5e861bebfd4c3135d04033efdd66658f9e",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Change hint positioning and host theme text color.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/IconButton.tsx",
+      "status": "modified",
+      "fork_sha256": "e4be2b439d175b3cf6ca079c85fdc2d63f063814927ba14d0a0f80df47e01e77",
+      "upstream_sha256": "81552c381884d308632585e205efae8eb1faa292c1eaad4ac2d7f3f31499c41a",
+      "ids": [
+        "OBS-021",
+        "OBS-024"
+      ],
+      "note": "Omit native title attributes to avoid duplicate host tooltips; retain explicit accessibility labels.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/ImageMenu.tsx",
+      "status": "fork-only",
+      "fork_sha256": "5cec08d3b1090cf4bd1a27d55f63c4d714bd55a3911faff3823a6e4166eda87c",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-023"
+      ],
+      "note": "Shared image/system-file, vault-file, card, and LaTeX command menu through typed host services.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/LayerUI.scss",
+      "status": "modified",
+      "fork_sha256": "4716335fcfb518e0ba763e4a0cd7d7475275d9a1334fac096cdff8b352e8798d",
+      "upstream_sha256": "3442310abf5c49fec492c985132b62b78c4210e2ba68e01bc10b0f9aaedeeb62",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Remove generic top-right gap.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/LayerUI.tsx",
+      "status": "modified",
+      "fork_sha256": "a55180ecb79e571f9478211b9117afed2bc27d0425a6f0c1ae5f4ddbb811f9f3",
+      "upstream_sha256": "32bbc7da2b827fa87b2b6931f8ed9825884e90a8c4ddfc00ef52fe9e32fb48f4",
+      "ids": [
+        "OBS-008",
+        "OBS-022",
+        "OBS-024"
+      ],
+      "note": "Route host phone/tray/full layouts, hide view-mode controls, alter sidebar sizing/RTL placement, and include zoom in memoized UI updates.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/LibraryMenu.scss",
+      "status": "modified",
+      "fork_sha256": "87497a47441bd90900dbaa037db3df8cd6666ca813b33ed502e1fe7bac082c3f",
+      "upstream_sha256": "30c3cfa5daee3f1a85a52126c86a7c41aca60d7e5a57696185c5f684395af039",
+      "ids": [
+        "OBS-031",
+        "OBS-024"
+      ],
+      "note": "Space library tutorial link and full-width browse button.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/LibraryMenuBrowseButton.tsx",
+      "status": "modified",
+      "fork_sha256": "b074bda8e8490911c3523d05101f6378d7ec22e56ae1cbd168edb3d2dce39682",
+      "upstream_sha256": "521458da79b67ba278b67597c1d374f75825230540a657cdb1f778ea5247df0e",
+      "ids": [
+        "OBS-031"
+      ],
+      "note": "Add localized library tutorial link; upstream browse/referrer URL flow remains.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/LibraryMenuHeaderContent.tsx",
+      "status": "modified",
+      "fork_sha256": "151c001b9658e8060370cefe3822d92189ef1a36fecce389437720de10917b06",
+      "upstream_sha256": "ded5c319ed326b73029361a60334a987827885de944c7e7bc2c62715d8a28c76",
+      "ids": [
+        "OBS-031"
+      ],
+      "note": "Replace saveLibraryAsJSON with a data-URL download named my-obsidian-library.excalidrawlib using a global document.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/LibraryMenuItems.scss",
+      "status": "modified",
+      "fork_sha256": "f87aa721137afaa8a6555fe397dc2ae70fa79ff805e8724d0394d7dfb92027ef",
+      "upstream_sha256": "d7502f9f8ac8f8e98ec84d17aa006566c88dc02807c33884fe1ea8d060fcbe01",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Use pixel spacing instead of rem to accommodate host zoom.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/MobileMenu.tsx",
+      "status": "modified",
+      "fork_sha256": "624265392906b1a8b8769463f09abb4aa32609d635110f66841b4e8644c0e221",
+      "upstream_sha256": "fda2de8492aaa374b5b1684b65e967d89bd7ed4be71b8b9737b4901512f39bbd",
+      "ids": [
+        "OBS-022"
+      ],
+      "note": "Rearrange pen/library/top-right/view-mode controls and expose statistics on mobile.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/MobileToolbar.scss",
+      "status": "modified",
+      "fork_sha256": "e7646652fc48e86e2fea9d0596aaa1ae63d8866d917f6c01644f2b870a7aaadd",
+      "upstream_sha256": "6059b5e41f8320ffad4eda0f6b9a1a5c68d1c335b5de87ea30d7d3d54830b47f",
+      "ids": [
+        "OBS-022",
+        "OBS-024"
+      ],
+      "note": "Prefix mobile toolbar class family to avoid host collisions.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/MobileToolbar.tsx",
+      "status": "modified",
+      "fork_sha256": "10b2f302c284d9cf9858edbb6c396419785481c7dabfcebe4a4e4eb21e804360",
+      "upstream_sha256": "9ee65fcac6aa99375af1cda6c18b8a6e51d500e8b2360089e366d68e5b8dc690",
+      "ids": [
+        "OBS-022",
+        "OBS-023",
+        "OBS-024"
+      ],
+      "note": "Shared image menu plus overflow submenu, coordinated open/selection handling, and prefixed toolbar class.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/Modal.scss",
+      "status": "modified",
+      "fork_sha256": "5a7d32a783b546b548b38de9d156e99e88cd31e15251d3c970506c74d320949f",
+      "upstream_sha256": "f2a479567af400e3bdf117251dadf390906da17280af9d217ae9bd20beeb27d2",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Position modal background absolutely rather than fixed.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/Modal.tsx",
+      "status": "modified",
+      "fork_sha256": "69b38107a9b04ed2bbb638b03fdeca2407438ecd355f0d88774dba7ed661ec86",
+      "upstream_sha256": "761fff19bd57d755342ed9865403265b42acb72937c36b26ab1da648cd519dc5",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Pass dynamic style to the portal-container hook.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/ObsidianRadixPortal.test.tsx",
+      "status": "fork-only",
+      "fork_sha256": "122ffc9fe96b47f55a2f44fd0198d9b0968f3d91b940faa5dc422ab3ea6f2c2f",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-021",
+        "OBS-033"
+      ],
+      "note": "Verify body placement, theme-variable resync, and mounted-but-hidden tab behavior.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/components/ObsidianRadixPortal.tsx",
+      "status": "fork-only",
+      "fork_sha256": "db044990b1d32779e7aabd6bc77031f674f0ab090adcc2f1db848c0552aeae50",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-021",
+        "OBS-024"
+      ],
+      "note": "Owner-body Radix bridge with classes, live CSS variables, display:contents, resize-observed tab visibility, and outside-click marker.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/PropertiesPopover.tsx",
+      "status": "modified",
+      "fork_sha256": "22d8109771c3444622506ef2fcfe452553daabf86caaeef08d3d73ca9577352c",
+      "upstream_sha256": "e593fbf0b9adfe21108579475024c9c34431b0fde9bda558e8331fb693cd4fc2",
+      "ids": [
+        "OBS-021"
+      ],
+      "note": "Use the shared Obsidian body portal instead of the source container portal.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/RadioGroup.tsx",
+      "status": "modified",
+      "fork_sha256": "f26d0c65b94abc9c355f9f2fd05a49baf5f6c03c33fae09f93324c7cc278ee14",
+      "upstream_sha256": "e204ba3ccda340f24a58b2f54071cedd72d7c6c28f9ffe334fcee8bed441fa06",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Suppress upstream radio aria-label; accessibility justification requires revalidation.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/SearchMenu.scss",
+      "status": "modified",
+      "fork_sha256": "3213a63f17444a70d1e167789fa95dad07eabdb894d4428c2675d29fe7112d3c",
+      "upstream_sha256": "87b4388596a8844c01d26b87e03876f8752f9bc75371167970f30a4630b6e7e5",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Host-variable input backgrounds in both themes.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/SearchMenu.tsx",
+      "status": "modified",
+      "fork_sha256": "cac9340270b5497c912ab7b87cb3617f4d9aaabfe484e8075cbf7ca290beeb44",
+      "upstream_sha256": "5757e62ee3a69e3dd0573f3210ce9e1b784b8fcb7e83b3a99f2981024fd1c3c2",
+      "ids": [
+        "OBS-009"
+      ],
+      "note": "Initialize rawText for temporary match text elements.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/excalidraw/components/Section.tsx",
+      "status": "modified",
+      "fork_sha256": "3047f8545e68e75736af550a29386930693c76c5c89ce95ab59b6dc4eda778ad",
+      "upstream_sha256": "870fd8707f917b5644812a77efe5491447aaf630a8efda482ef0d7191642f4bb",
+      "ids": [
+        "OBS-022"
+      ],
+      "note": "Allow inline style for the height-constrained tray properties section.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/Sidebar/SidebarTrigger.scss",
+      "status": "modified",
+      "fork_sha256": "162d437a8e687e6628fb9feaf5d43e3594e21ace0c62c6b4661220b1478b2325",
+      "upstream_sha256": "64e59f56b454b0a4c37ae40355ebf659cc798aa92ace4b4e98cfbfb52923204d",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Remove width:auto override associated with shrinking pinned library control.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/Stats/CanvasGridSize.tsx",
+      "status": "fork-only",
+      "fork_sha256": "14fe4551fd7a3f9acc5c3af06301c788122541059fef79f181f1e4a23e48f39c",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-027"
+      ],
+      "note": "Fork-owned stats input for gridSize; upstream CanvasGrid currently edits gridStep.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/Stats/Stats.scss",
+      "status": "modified",
+      "fork_sha256": "4868974f6bfb93b54d79e61e69e2464e52393bee54c45e5910ade89218af2b0c",
+      "upstream_sha256": "dabb61106af5bf3e8fa0f00b3d832c5d43ea32c48f9fd356c9075f4591d7fa5f",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Fixed-position stats and host-relative right/RTL offsets.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/Stats/index.tsx",
+      "status": "modified",
+      "fork_sha256": "8c721dde1ba5960c9ec48c2a664467992036e2785e5bdc9db638ecf28594fa94",
+      "upstream_sha256": "cb5cf2f23b22064072a1da0acc60ad5b0e84a01d80602a85b6b394361b1b503c",
+      "ids": [
+        "OBS-027"
+      ],
+      "note": "Insert gridSize input alongside upstream gridStep control.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/Stats/utils.ts",
+      "status": "modified",
+      "fork_sha256": "68021200df5b43151a15770987b80c0019b18fc1e0aa1c907b2d592ce633670c",
+      "upstream_sha256": "782931b828f24382a2bfbe90923326f0a2b873217620d6d1d2505fbd32ddf1d7",
+      "ids": [
+        "OBS-027"
+      ],
+      "note": "Add gridSize to statistics editable-property union.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/TTDDialog/Chat/ChatHistoryMenu.tsx",
+      "status": "modified",
+      "fork_sha256": "2d4c2470c2511b62929dc1686df036886f4fab71b90c6522895fc3db587ab100",
+      "upstream_sha256": "a283582402c3dfabd65826ef65520ffbe032971e6b304e86e932bd5d7c2dc279",
+      "ids": [
+        "OBS-021",
+        "OBS-030"
+      ],
+      "note": "Add a class that travels through the body portal for modal-safe history-menu styling.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/TTDDialog/MermaidToExcalidraw.tsx",
+      "status": "modified",
+      "fork_sha256": "41232376fd87a9c800abadca765e6aaffddb4ad78758fe7a15fd399773d5a5a7",
+      "upstream_sha256": "184f196b9670b3ac97f872d81a11f4f00050f25deb21749a849e0e9d1047043f",
+      "ids": [
+        "OBS-030",
+        "OBS-031"
+      ],
+      "note": "Seed diagram input from selected image customData.mermaidText and replace default sample with plugin-support message.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/TTDDialog/MermaidToExcalidrawLib.ts",
+      "status": "fork-only",
+      "fork_sha256": "21294bf3a02ca51cb0ce9b1327c485c833881f8921d816c6eb6737327f472adc",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-030"
+      ],
+      "note": "Cache only ready host Mermaid instances, expose queued conversion, and retain editable source in image customData.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/TTDDialog/TTDDialog.scss",
+      "status": "modified",
+      "fork_sha256": "dea9351a95fa55f2ce47965dbaf2bb20eda7248bedeae9f8e7a4898b8b527cc5",
+      "upstream_sha256": "3a7fd20a0c5b1d64dc3553ee0a8ba10793a8da005be9f27cbefa27351fc4e9c9",
+      "ids": [
+        "OBS-021",
+        "OBS-024",
+        "OBS-030"
+      ],
+      "note": "Portal-safe chat-history stacking and wrapped diagram input text.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/TTDDialog/TTDDialog.tsx",
+      "status": "modified",
+      "fork_sha256": "4f6a4ec9761f1eef25907834b9cc450ccda5cc06f231060022a63bec10fb4876",
+      "upstream_sha256": "ba447051c15d7f7bb95d020d2c051224671db47924ed293893be1d42dd0ab76e",
+      "ids": [
+        "OBS-030"
+      ],
+      "note": "Replace package dynamic import with host lazy loader, mount/cancellation guard, and selected elements for diagram editing.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/TTDDialog/TextToDiagram.tsx",
+      "status": "modified",
+      "fork_sha256": "e99153d6a5c221aefb00fc2f943e79b48a4079bbfb43ef4e94647c500072cc39",
+      "upstream_sha256": "224d066a54e9aca798a51a6474867055543edb74b6396e067ab0368c1dfdfd1b",
+      "ids": [
+        "OBS-030"
+      ],
+      "note": "Always show diagram preview as keyboard/layout workaround.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/TTDDialog/common.ts",
+      "status": "modified",
+      "fork_sha256": "9c98adcb9680cba6a30d3ebc9cf0313cf854ab7558aa103667baf797246dd250",
+      "upstream_sha256": "4ced1857522c2e92f72031077a24c55938683263219264ac57ab3d6249146af3",
+      "ids": [
+        "OBS-030"
+      ],
+      "note": "Attach mermaidText to generated image elements before conversion.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/excalidraw/components/TTDDialog/hooks/useMermaidRenderer.ts",
+      "status": "modified",
+      "fork_sha256": "86406147940df700b638b024889e8fa91aa33c7663d3cdb84f78ba243c5cd0f2",
+      "upstream_sha256": "bc1139805a2b49baab8f8750feea2110f852beb28c11cabc9f29304828762036",
+      "ids": [
+        "OBS-030"
+      ],
+      "note": "Queue latest content while rendering and rerender after the host library becomes ready.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/TTDDialog/hooks/useTextGeneration.ts",
+      "status": "modified",
+      "fork_sha256": "069263e51ba51501a32e3c38d755776625dfa0fea5a28f49f6361d893002cbe8",
+      "upstream_sha256": "041305d6c557e15672b5743de92ddedf4e071df84c6de8987ac6c585a8493608",
+      "ids": [
+        "OBS-030"
+      ],
+      "note": "Validate generated Mermaid through the shared host API rather than bundled package import.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/ToolPopover.tsx",
+      "status": "modified",
+      "fork_sha256": "5c7ea14839e48a6425e67ce32087359dc0ee475a5858cc614ef773ad888dcf19",
+      "upstream_sha256": "31f9a6bb18ab2c282708e663f483f3e7bcc04a27a21cba036de2282ddeaa552e",
+      "ids": [
+        "OBS-021"
+      ],
+      "note": "Wrap tool content in owner-document body portal without replacing upstream tool selection logic.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/Toolbar.tsx",
+      "status": "modified",
+      "fork_sha256": "4faf8427a07d3781d696b3d5f721326d1add08bbb047d8ba0bb26d423b43c972",
+      "upstream_sha256": "562ee5b579ba23fe630092d4a751030cae4d8ff5417f45e6fef653ab29a28169",
+      "ids": [
+        "OBS-022",
+        "OBS-023"
+      ],
+      "note": "Treat tray as full UI and replace plain image button with shared host command menu.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/Tooltip.scss",
+      "status": "modified",
+      "fork_sha256": "250fc4e7e79ab415e449d84e5522cfc3a9776ceda0cad64ce503ece279011ff2",
+      "upstream_sha256": "db5131776f7b3229fe3d67739f540e8d388f8418ecfb1d16ff6fa66aecd4f81a",
+      "ids": [
+        "OBS-021",
+        "OBS-024"
+      ],
+      "note": "Absolute instead of fixed tooltip positioning.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/Tooltip.tsx",
+      "status": "modified",
+      "fork_sha256": "ea3993a8fb6dd5e61139b06083fab014d1234317e5ff4dafbb3a3800cf1a2bdd",
+      "upstream_sha256": "d0763aca46f41adb123dccbcf209943221ca13ed459b29cb5e00b56626677c8b",
+      "ids": [
+        "OBS-021"
+      ],
+      "note": "Document-local tooltip nodes/state, owning-window timers/observers, viewport measurement, and cleanup.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/TopPicksDnD/topPicksDnD.tsx",
+      "status": "modified",
+      "fork_sha256": "10fb9c788952fa1e9cdf8213d2875af33d0ccfe274f3761e3ab3fea20e91cf41",
+      "upstream_sha256": "b9af00d5bf5e50b69007bbafe5c64b7d45f56add3a8b6039791ec246d807406d",
+      "ids": [
+        "OBS-021"
+      ],
+      "note": "Bind ghost DOM, styling, timers, pointer/keyboard/click listeners, and disposal to one source realm.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/TrayMenu.tsx",
+      "status": "fork-only",
+      "fork_sha256": "d69f7d309869f2bf76a461620a98e3edec3ef59e25ad0c6864e9f926bbb800b6",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-022"
+      ],
+      "note": "Dedicated tray toolbar/shape actions, undo/redo, finalize/delete/duplicate, stats, sidebar, and zoom arrangement.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/canvases/InteractiveCanvas.tsx",
+      "status": "modified",
+      "fork_sha256": "26d1f849fc15417dab4324fc79fdec33634ab9d38c330e505aa8e52527b663dd",
+      "upstream_sha256": "3aefd3759f0cf236901b74662f30dedda7402d4b7cc3bf93949745cd3cae01eb",
+      "ids": [
+        "OBS-020",
+        "OBS-027",
+        "OBS-028"
+      ],
+      "note": "Use supplied owner DPI, allow double-click forwarding in view mode, and select host renderer state.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/canvases/StaticCanvas.tsx",
+      "status": "modified",
+      "fork_sha256": "6f1dea417afb2f196cf1a5200c2e4db5dbcc2b8f5b43fe622ad611493f762ec9",
+      "upstream_sha256": "b31ae1a666bebb10b338f1541c8687d19210f4b440b680ed04fcb66e56f82477",
+      "ids": [
+        "OBS-027"
+      ],
+      "note": "Include link opacity, grid colors/direction, and frame colors in render-state selection.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/dropdownMenu/DropdownMenu.scss",
+      "status": "modified",
+      "fork_sha256": "16ed8750e27cc0d8391270f23eedbef9cf10ba70b9c8a24a9e1eeee588635a5d",
+      "upstream_sha256": "31f0e1099b087ebe4efb11387bc9a909122778357b44c6964146a78685229798",
+      "ids": [
+        "OBS-022",
+        "OBS-024"
+      ],
+      "note": "Tray styles, host hover colors, and trigger sizing.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/dropdownMenu/DropdownMenu.test.tsx",
+      "status": "modified",
+      "fork_sha256": "450e4afce2b08cf70270ce41b8d1dc81147e49a942ae42e7ac706acf7d2be407",
+      "upstream_sha256": "1960dda97638853e2d26420506b105271410488d046e9ddc285abc1e0c0b424a",
+      "ids": [
+        "OBS-024",
+        "OBS-033"
+      ],
+      "note": "Select changed menu items by accessibility label instead of title.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/components/dropdownMenu/DropdownMenuContent.tsx",
+      "status": "modified",
+      "fork_sha256": "3048a05a16317e19b229592faa1d4cf4cc30c052a79ec926760d7171fa9eee81",
+      "upstream_sha256": "24113cfb29edbfb0867ad4550e8d8ab3d201ea7434fe6b1ba4743752c4d0eb7d",
+      "ids": [
+        "OBS-021",
+        "OBS-022"
+      ],
+      "note": "Owner-body portal, editor collision boundary, portal-aware outside-click logic, and tray canvas-menu class.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/dropdownMenu/DropdownMenuItem.tsx",
+      "status": "modified",
+      "fork_sha256": "fb1a8efe1692024b208d3c6f7a5dafe44b67a0bd34da8da86f97abb9d7181af8",
+      "upstream_sha256": "d0f9be9a278658961479133e7e2cdc75dac0313e91964399dfb9fd4639c32aa1",
+      "ids": [
+        "OBS-024"
+      ],
+      "note": "Use aria-label in place of native title for menu items.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/dropdownMenu/DropdownMenuTrigger.tsx",
+      "status": "modified",
+      "fork_sha256": "cfdd492c866616cc3dcff5021229560a116af0efe977cfd79148a457ea7219b6",
+      "upstream_sha256": "2f362d31c31cdd95ab2a1cf83a8ff4676367d65682fd3bfb9ff355e9fda35470",
+      "ids": [
+        "OBS-022"
+      ],
+      "note": "Add tray-mode trigger class.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/hyperlink/Hyperlink.tsx",
+      "status": "modified",
+      "fork_sha256": "f023f08acc5e79ebae31dd383f94eeca864ba8731e8343e086a6fae00222df40",
+      "upstream_sha256": "124bb011ce8060a6fd16c9c7e15693d8e5e408428286d3f8e93c56929073e3a1",
+      "ids": [
+        "OBS-010",
+        "OBS-021"
+      ],
+      "note": "Host link suggester/native-input sync and search command; suppress element-link button; owning-realm link tooltip with raw-text-link preview.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/hyperlink/helpers.ts",
+      "status": "modified",
+      "fork_sha256": "fb46f4bfc00fdb7037b0257daa7a0091aa1101fe617254a9633f138f36e527dd",
+      "upstream_sha256": "33664982789a75d1631247a4fb72b6ee25ed98dc02985192fd379a957eaa55da",
+      "ids": [
+        "OBS-010"
+      ],
+      "note": "Show link handle for hasTextLink even without an element.link value.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/excalidraw/components/icons.tsx",
+      "status": "modified",
+      "fork_sha256": "02061907d46ef9ded7dd95655d745d4904a79a24134cbe338392e8efe5061022",
+      "upstream_sha256": "1d263db1690b510571bf737b2f1733ad4579ffcc54f9a519c4db3ec9ff109cfd",
+      "ids": [
+        "OBS-015",
+        "OBS-023",
+        "OBS-024",
+        "OBS-026"
+      ],
+      "note": "Host icon-fill variables, plugin/image/LaTeX/card/search/frame icons, and extra font-size/stroke/font-pick assets.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/main-menu/DefaultItems.tsx",
+      "status": "modified",
+      "fork_sha256": "bdb5f91bc5aaa26acacf2d6b00b3128407c0220ab3629a244de148d575ddf566",
+      "upstream_sha256": "11ffeb744f9cf969e46081580e5d662dc58b8e976155dc4ee2a9e9f68d77f257",
+      "ids": [
+        "OBS-031"
+      ],
+      "note": "Replace translated help item text with Help & Issues.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/components/shapeActionPredicates.ts",
+      "status": "modified",
+      "fork_sha256": "6ca48b4b80c77f48a2390e6f5ae3400c83c10e22afd0872980d95a891b11fed0",
+      "upstream_sha256": "23ef2f2b37d2d83e1589e7bdc75656a426978364f695b16ff6ef7ff8c02a5a8e",
+      "ids": [
+        "OBS-014",
+        "OBS-015"
+      ],
+      "note": "Hide generic freedraw-mode controls for custom strokes and expose frame-role predicate.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/components/welcome-screen/WelcomeScreen.Center.tsx",
+      "status": "modified",
+      "fork_sha256": "b1fa1320fb37377ddc65a8c3e02c91fc0cbb8dc0949866be2a9f8466389cb477",
+      "upstream_sha256": "9fa1264bdd8ea2ba677f98c74aebb598be298662b53c1bfc5196e8c148c72518",
+      "ids": [
+        "OBS-031"
+      ],
+      "note": "Optional colored heading and secondary message used by the host welcome UI.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/components/welcome-screen/WelcomeScreen.scss",
+      "status": "modified",
+      "fork_sha256": "a089757117baef8483ea68687db0f00ec62114037db82d5f3a7a534e2693ae73",
+      "upstream_sha256": "aca13bb5d569e294b6ba25efe55bdf48f2f8619d4f66693a8cfc24730cb49f78",
+      "ids": [
+        "OBS-024",
+        "OBS-031"
+      ],
+      "note": "Compact welcome menu padding and columns.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/css/obsidianStylingOverrides.css",
+      "status": "fork-only",
+      "fork_sha256": "85983a5911cdee6bb1bfb09f7e680f5a2b4a7586fa390e912567a518b39d1760",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-024",
+        "OBS-016",
+        "OBS-022"
+      ],
+      "note": "Obsidian-entry-only theme/control/layout/embed/mobile/left-handed resets and portal collision-space rules; some global selectors need isolation review.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/css/styles.scss",
+      "status": "modified",
+      "fork_sha256": "5f1e35e05a4d18f031bfe92f4761ea734a0464310ff7b8cec21f23ae653f1412",
+      "upstream_sha256": "6b9e599e242f87ec217260b18592925042137b1a5dc18914b163ad2e06b06564",
+      "ids": [
+        "OBS-014",
+        "OBS-022",
+        "OBS-024"
+      ],
+      "note": "Tray layout and classes, host theme/control/sidebar adjustments, text-editor reset, and embedded placeholder sizing.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/css/variables.module.scss",
+      "status": "modified",
+      "fork_sha256": "9530e05de90299cc101400de0d55890286e385c3652d62829b00ce0c6e205f13",
+      "upstream_sha256": "8001c7266ff91ad5a1119ac4fade6d4eda5ad62471b4490d8e25bdd86e760dac",
+      "ids": [
+        "OBS-022",
+        "OBS-024"
+      ],
+      "note": "isTray mixin and selected-toolbar icon-fill variable.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/data/blob.ts",
+      "status": "modified",
+      "fork_sha256": "8e56707e691f72871f470791ddbe237ff13a1c1b68b8f478052f88578cb4ff96",
+      "upstream_sha256": "5591d8f16e1686009ad72496159998df6197d3093f345ae5b88e9072491496ca",
+      "ids": [
+        "OBS-011"
+      ],
+      "note": "Return null when Obsidian tab drag provides no matching DataTransferItem.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/data/encode.ts",
+      "status": "modified",
+      "fork_sha256": "2e5099e761da19e8d21509d32436921bdbae27c19623aec2f91c1de93e3b9906",
+      "upstream_sha256": "a5562335573adedb3d576681ad940b0836b16f8816013a17298bf702e39956bf",
+      "ids": [
+        "OBS-004"
+      ],
+      "note": "Assert Buffer's backing buffer as ArrayBuffer for declaration/type compatibility.",
+      "kind": "type-compatibility"
+    },
+    {
+      "path": "packages/excalidraw/data/filesystem.ts",
+      "status": "modified",
+      "fork_sha256": "4f6ad8e2b7badf71c3b3c067b6e948b5d046d11d2585dfa5ed78ce9fc9d3d1fd",
+      "upstream_sha256": "5a7e4dc96f057987161e45ccdfba810c806b7757ff3834c0ce495d0d1fd6e91e",
+      "ids": [
+        "OBS-036"
+      ],
+      "note": "Only an iOS/file-open TODO comment and final-newline change; no fork file-dialog implementation here.",
+      "kind": "no-functional-delta"
+    },
+    {
+      "path": "packages/excalidraw/data/restore.ts",
+      "status": "modified",
+      "fork_sha256": "f4a6a80a0fc00d5020d3ad1ad3e6003e7347391d999e813a92c88a8ddeea6114",
+      "upstream_sha256": "0da843833ddafc18962a5ef2c1c18801a296a8818f2b4753cc9c7ce63caa0808",
+      "ids": [
+        "OBS-009",
+        "OBS-010",
+        "OBS-012",
+        "OBS-013",
+        "OBS-015",
+        "OBS-016",
+        "OBS-030"
+      ],
+      "note": "Preserve rawText/hasTextLink/embed scales, avoid legacy image roundness, retain Mermaid tool, allow Local Font picks, prune one-member groups, and downgrade restore diagnostics to warnings.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/excalidraw/fonts/ExcalidrawFontFace.ts",
+      "status": "modified",
+      "fork_sha256": "2fb6e3fb85cb52159343ffdfe29d67c99a85bc85229a74089f33b16316e71cc5",
+      "upstream_sha256": "ae795b3485ca46361f56e26fc84411a94a45d1c4c9909905c155af16a998eb58",
+      "ids": [
+        "OBS-013"
+      ],
+      "note": "Vault-first font retrieval, full-face CSS support, and getContentLegacy used by plugin getCSSFontDefinition.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/fonts/Fonts.ts",
+      "status": "modified",
+      "fork_sha256": "2e0741a61fce94ab7ac117fa48b967814e99a7a901edc1cf049d5a647b2073ab",
+      "upstream_sha256": "65ad6b59ddd9dbd14075082b676758ee2727bf1efc010c10b14dfccb1349b47e",
+      "ids": [
+        "OBS-013"
+      ],
+      "note": "Host font registration/replacement, Local Font handling, empty-scene font loading, and filtering unrelated document fonts.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/fonts/fonts.css",
+      "status": "modified",
+      "fork_sha256": "3f860daf71134648707d91129a5d724eb6b8e5eabe88998fac46f23746a611ad",
+      "upstream_sha256": "45f1993459e438245df7a5d2ebeee5b6ac5f3c818a04d5cd4c86f2b0b122d398",
+      "ids": [
+        "OBS-036"
+      ],
+      "note": "Four comments added to unchanged font-face src values; bundling requirement is implemented elsewhere.",
+      "kind": "no-functional-delta"
+    },
+    {
+      "path": "packages/excalidraw/hooks/useCreatePortalContainer.ts",
+      "status": "modified",
+      "fork_sha256": "69552c3eb4b02935e513fc705defe6895fb31b94a148b250795591b6ab9ccea7",
+      "upstream_sha256": "4633eec21787dd7462d222c50599c8a827c0def3db8e166e96444032ad5cefe1",
+      "ids": [
+        "OBS-021",
+        "OBS-024"
+      ],
+      "note": "Propagate tray class and dynamic inline styles to modal portal containers.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/i18n.ts",
+      "status": "modified",
+      "fork_sha256": "4a0e1072a1ddcd331d7ff0ae91556c37e745842fa9dfd013c8c49c493c944ead",
+      "upstream_sha256": "731e71175203721d7dc393e940bb4985978357436933592a48b2e6df039087be",
+      "ids": [
+        "OBS-032"
+      ],
+      "note": "Lower translation coverage threshold to 66 and avoid mutating host document lang/dir.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/index-node.ts",
+      "status": "modified",
+      "fork_sha256": "d0340d9e6a53b56482fe3b60cfa4f94f5449381b7f94d58cc551a0f676f5d00f",
+      "upstream_sha256": "833d9ce4abbb0f02d666fcbcddb87e2af02fc407eef802a52b62fce0e26c3533",
+      "ids": [
+        "OBS-009",
+        "OBS-004"
+      ],
+      "note": "Supply rawText to Node-side text measurement fixture.",
+      "kind": "type-compatibility"
+    },
+    {
+      "path": "packages/excalidraw/index.tsx",
+      "status": "modified",
+      "fork_sha256": "f1f90ea2c874f0ecf7696633c9001c517f694741bf20bc31aeafaabb31a85ceb",
+      "upstream_sha256": "b021fd1c3e3dc7fdca1d8a719eeac7694ab097b4c12dde27dffc9ee6a6b766c9",
+      "ids": [
+        "OBS-005",
+        "OBS-006",
+        "OBS-007",
+        "OBS-009",
+        "OBS-010",
+        "OBS-013",
+        "OBS-030"
+      ],
+      "note": "Forward fork props and expose host registries, conversion/font/text/geometry helpers, and compatibility library exports.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/laserTrails.ts",
+      "status": "modified",
+      "fork_sha256": "ac9fdf0b387a358a800444c6e72296542ea93fe7cb3dba036f7d8d4a82cba978",
+      "upstream_sha256": "94c9c207dca0c7e18d65cb252ab0367d18fcd01cff8a4cc849ad48d55a75f27b",
+      "ids": [
+        "OBS-020",
+        "OBS-028"
+      ],
+      "note": "Read public ExcalidrawAutomate.LASERPOINTER settings through global window; residual untyped host discovery, not completed adapter isolation.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/locales/en.json",
+      "status": "modified",
+      "fork_sha256": "07a55036173abfe050ea69d5d6421b24601ea7250a6bc5a606dca890f3a9b58d",
+      "upstream_sha256": "73e039ab83a178519bfad9dd4dcfea38cc3d4e7add10d1ad609f1b2932e7f287",
+      "ids": [
+        "OBS-015",
+        "OBS-026"
+      ],
+      "note": "Add frame-role, extra-small, extra-thin, and extra-bold labels.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/locales/zh-CN.json",
+      "status": "modified",
+      "fork_sha256": "91e742be6972a7dc1436d5ae15105844ca432029a2a59f87b630703c5ec7f6d6",
+      "upstream_sha256": "f1eb6c63fd9aa7069030b5b4ee6c88982aea5eeddb72111c68dee87fe7cf01a0",
+      "ids": [
+        "OBS-015"
+      ],
+      "note": "Add Chinese marker-frame-role label.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/npm",
+      "status": "fork-only",
+      "fork_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-034"
+      ],
+      "note": "Empty fork-only file with no identified runtime purpose.",
+      "kind": "housekeeping"
+    },
+    {
+      "path": "packages/excalidraw/obsidianEntry.ts",
+      "status": "fork-only",
+      "fork_sha256": "f4ef12ae64aa017733d542e0a5b34a87a50428f1df8746963ff3296911f9103d",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-003",
+        "OBS-024"
+      ],
+      "note": "Isolated Obsidian package entry re-exports component and imports host-only CSS overrides.",
+      "kind": "packaging"
+    },
+    {
+      "path": "packages/excalidraw/obsidianExcalidrawHost.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "3f64739d11765956d82aa42963402da160ade95e6e43e9672573af7d7f6b22ab",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-006",
+        "OBS-033"
+      ],
+      "note": "Fake-host services, defaults/errors, live settings, pen panning, protocol rejection, and stale-disposer tests.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/obsidianExcalidrawHost.ts",
+      "status": "fork-only",
+      "fork_sha256": "14126e49eb697afa1bd5a99c2036271485b9ae714e5fb675e942f237a5d94486",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-006"
+      ],
+      "note": "Version-2 typed service boundary for settings, fonts, Mermaid, commands, labels, and inline suggestions.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/obsidianText.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "7540b31e49383ac4480974f3b7fccebe8b6c72c0c33867cdf9d009840068c720",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-009",
+        "OBS-033"
+      ],
+      "note": "Raw Markdown before edit and independent parsed text/link on submission.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/obsidianText.ts",
+      "status": "fork-only",
+      "fork_sha256": "844b14b90f86f820141bda0dcb6627c1c060688bdadcbb612d3e376f1f13836f",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-009",
+        "OBS-010"
+      ],
+      "note": "Small fork-owned before-edit/submission helpers preserving raw versus displayed text and optional link sync.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/obsidianTypes.ts",
+      "status": "fork-only",
+      "fork_sha256": "2ba168e3200bec5fa01b7100e9bb10e6a9c1f3111ebcea59b868761ec5eae537",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-014",
+        "OBS-008"
+      ],
+      "note": "Structural custom pen/style/reset types shared conceptually with the plugin without importing plugin classes.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/obsidianUtils.ts",
+      "status": "fork-only",
+      "fork_sha256": "d6082dca2124f3acb824f887642c04049386fe870c141d10d9e03b2bb4fe5ef2",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-006",
+        "OBS-007",
+        "OBS-013",
+        "OBS-014",
+        "OBS-022",
+        "OBS-028",
+        "OBS-029",
+        "OBS-030"
+      ],
+      "note": "Host setting/service delegates, local-font/CSS helpers, pen/touch and zoom helpers, Mermaid wrappers, arrow refresh, and geometry compatibility APIs.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/package.json",
+      "status": "modified",
+      "fork_sha256": "cf706472727419d9486aabbaebb7e0f3ebbf29fd522f75b9bd54903888a18409",
+      "upstream_sha256": "160dabbd052e579a5b7b0e341d653e0739d17d44d68f16be8c1cf893e1e4236d",
+      "ids": [
+        "OBS-002",
+        "OBS-003",
+        "OBS-004"
+      ],
+      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE.",
+      "kind": "packaging"
+    },
+    {
+      "path": "packages/excalidraw/reactUtils.ts",
+      "status": "modified",
+      "fork_sha256": "460061dae845f22480c37dc2a187037e0cd39136515d3d516213519e4af62d98",
+      "upstream_sha256": "fff628782edcde259fc6beef45d60a55ab84ea81d6077cbe7788d446d5405519",
+      "ids": [
+        "OBS-020"
+      ],
+      "note": "Pass an optional owning-window scheduler through batched throttled callbacks.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/renderer/animation.ts",
+      "status": "modified",
+      "fork_sha256": "bc47762b0fc38ea2f54bd2419d1960a39cf0cde02092a212b726db1f3f66f172",
+      "upstream_sha256": "8d193dca0aa5fb698b58bda73b8cf442a9f69a46e115f18d331f5a14bb338c84",
+      "ids": [
+        "OBS-020"
+      ],
+      "note": "Per-window scheduler state, animation/timer queue ownership, and cancellation/reset isolation.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/renderer/helpers.test.ts",
+      "status": "modified",
+      "fork_sha256": "632545dc34bd401cb0d24f77a89233ba635462168346f198a066499568857984",
+      "upstream_sha256": "fa9e7fc11eece7e724d3574d831328709aa13473537efc7d5a2323f95a773c7f",
+      "ids": [
+        "OBS-020",
+        "OBS-033"
+      ],
+      "note": "Owner-window computed-style selection color and fallback tests.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/renderer/helpers.ts",
+      "status": "modified",
+      "fork_sha256": "92851902da01f35b78b1c66f6d6f2042c35450890a7749eed5522d1cbe8beb7d",
+      "upstream_sha256": "081ff48697a08b1cd492603da044adf43ff79a4c98ff7de17176ab877f18bf30",
+      "ids": [
+        "OBS-020",
+        "OBS-027"
+      ],
+      "note": "Read selection CSS through container.ownerDocument.defaultView rather than runtime-global window.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/renderer/interactiveScene.ts",
+      "status": "modified",
+      "fork_sha256": "dc46ec7791a4e81403acad4e635615cad1f3a4f46e34be65b4942004bfc6fd11",
+      "upstream_sha256": "b2ce708b405ab3d9e8f9061627488d65e36298d15ce97cbe9c02f1d97e1bf75e",
+      "ids": [
+        "OBS-015",
+        "OBS-018",
+        "OBS-027"
+      ],
+      "note": "Host-aware contrast highlight colors, frame colors, search-result emphasis, and selection/binding widths.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/renderer/renderNewElementScene.ts",
+      "status": "modified",
+      "fork_sha256": "084601529606bac014240a76f06c6e35cb5e14127ac41c21c1e3930a667f73e3",
+      "upstream_sha256": "057ff8e3dd3108d34a6868fd1f892b3d51c81d92ae04aba5a055631388b4245f",
+      "ids": [
+        "OBS-014"
+      ],
+      "note": "Paint highlighter preview with background on the underlay; normal preview remains transparent.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/renderer/staticScene.ts",
+      "status": "modified",
+      "fork_sha256": "3b83c4f1b61840a6c8e867301e046b3a767aaf69132c37b276fa7548b77169f1",
+      "upstream_sha256": "711213e3422e48cf41f6aaff2c4d81b7202fdf0ebb78819f99e4a7ea33f128b2",
+      "ids": [
+        "OBS-014",
+        "OBS-018",
+        "OBS-027"
+      ],
+      "note": "Directional/custom grid, link opacity/text-link affordance, transparent highlighter scene background, and link-icon contrast adjustments.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/renderer/staticSvgScene.ts",
+      "status": "modified",
+      "fork_sha256": "1a15b9dc0224721e14a83f90e73ab8d6cdbd08e87a3f4e4c4d1a10b156ee8b59",
+      "upstream_sha256": "0e42c65dbb356a8d0d7609df053d659748479ce79fc7ea7c04480d70daf06ebe",
+      "ids": [
+        "OBS-014",
+        "OBS-015",
+        "OBS-016",
+        "OBS-018"
+      ],
+      "note": "SVG equivalents for custom strokes, embed scaling, marker visibility, frame colors, and distinct image inversion symbol IDs; frame stroke-width expression requires correction.",
+      "kind": "behavior"
+    },
+    {
+      "path": "packages/excalidraw/scene/export.ts",
+      "status": "modified",
+      "fork_sha256": "cc09c1f98ca7709c976225b8c230f1034279713699bed9d0f0bf912517960cac",
+      "upstream_sha256": "b0a1e6200370627478f2f370dd31cab071b7293275c6e12bfd2a0c2d2dd614c0",
+      "ids": [
+        "OBS-009",
+        "OBS-015",
+        "OBS-018"
+      ],
+      "note": "Custom frame-name color/raw text, exclude marker frames from export and embedded scene data, and pass frame colors to SVG renderer.",
+      "kind": "compatibility"
+    },
+    {
+      "path": "packages/excalidraw/scene/normalize.ts",
+      "status": "modified",
+      "fork_sha256": "af8bfdd9317d3e19cd5e34a2bc71467185d326c4190ba3f610b44ddd1e508c9a",
+      "upstream_sha256": "c8bb23a964c8df6090f0ca394144ab9db3382d562ca8617b9fa0bfad164e0d61",
+      "ids": [
+        "OBS-028"
+      ],
+      "note": "Clamp zoom using host-provided min/max instead of fixed upstream constants.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/scene/scrollbars.ts",
+      "status": "modified",
+      "fork_sha256": "c679d4f3fd77cd311e120fc71733cc0315858c4fefffcede5d038fd05238a04e",
+      "upstream_sha256": "628c819e400c2034f2fff0c3759ff9d97dde33be5030f21e200877d6d7e448ae",
+      "ids": [
+        "OBS-027"
+      ],
+      "note": "Use gray instead of black translucent scrollbar styling.",
+      "kind": "presentation"
+    },
+    {
+      "path": "packages/excalidraw/scene/types.ts",
+      "status": "modified",
+      "fork_sha256": "ac7440e254ee2cbd00c48124f44361924c5e06f5ae4031892acc8787f4167598",
+      "upstream_sha256": "ae0eb07ceb272918e18e3be8ea17d58d85bbd912ead24c35355bc09aa40c0778",
+      "ids": [
+        "OBS-014",
+        "OBS-015"
+      ],
+      "note": "Add highlighter and frame-color render configuration fields.",
+      "kind": "type-compatibility"
+    },
+    {
+      "path": "packages/excalidraw/scripts/ensure-npm-auth.cjs",
+      "status": "fork-only",
+      "fork_sha256": "40e32d8236b8f68263fcd263aa2b4bfef5b84377304e61fe17f1b23ab37d0272",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-002"
+      ],
+      "note": "Prepublish-only npm identity check and interactive web login; not invoked by this audit.",
+      "kind": "packaging"
+    },
+    {
+      "path": "packages/excalidraw/subset/subset-main.ts",
+      "status": "modified",
+      "fork_sha256": "17613542dc9d69d87b392a71d0cef3787e28cb56599a5cf080e2facdcd35d74e",
+      "upstream_sha256": "c290e05b12b5019bc265a7f5c76da0e001dbbbf7469f40fa43ed4f9964f4d9b5",
+      "ids": [
+        "OBS-003",
+        "OBS-013"
+      ],
+      "note": "Disable font-subset worker path so Obsidian artifact has no external worker dependency.",
+      "kind": "packaging"
+    },
+    {
+      "path": "packages/excalidraw/tests/animation.test.ts",
+      "status": "modified",
+      "fork_sha256": "059418cca086cb992d8f75dc76d9ebb61f093d96768ceb6a6fb53842d658585e",
+      "upstream_sha256": "af007dba9878431795c39735388172c36ef48220bba2142030f2f735dab60324",
+      "ids": [
+        "OBS-020",
+        "OBS-033"
+      ],
+      "note": "Independent-window animation progress and timer schedule/cancel assertions.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/tests/clipboard.test.tsx",
+      "status": "modified",
+      "fork_sha256": "b26e7e293121e412fac868074d2efdb554aab16b19b17425fde66d15858991e6",
+      "upstream_sha256": "67b18ef674fb9af8e34c4f13458e47581d41c7e12f6a84406828c5244bc58cc0",
+      "ids": [
+        "OBS-009",
+        "OBS-011",
+        "OBS-033"
+      ],
+      "note": "Assert pasted-file interception and rawText retention per pasted line.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/tests/colorTargets.test.ts",
+      "status": "modified",
+      "fork_sha256": "d1df5dacb550e7fe1f86659612a2fd3e7eca27b8318049fa26e71688052c9331",
+      "upstream_sha256": "1a94fc2094a8cc9afa36ac539ed52dbcf6d36218d56321fd309b3b257be02b7c",
+      "ids": [
+        "OBS-025",
+        "OBS-033"
+      ],
+      "note": "Host palette and sticky/mixed selection color-target tests.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/tests/crossDocument.test.tsx",
+      "status": "modified",
+      "fork_sha256": "5a4d4093d1d888dacd79d960a3a72a7fb84be1623711824400b779de39a6a112",
+      "upstream_sha256": "36c6c7d4c39c9805e21b8d99b5532ce5c640e790d3b685451fe483888a2293b4",
+      "ids": [
+        "OBS-017",
+        "OBS-020",
+        "OBS-021",
+        "OBS-033"
+      ],
+      "note": "Add owner-window drag/tooltip and awaited image decoding checks; updated element fixture.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/tests/fixtures/elementFixture.ts",
+      "status": "modified",
+      "fork_sha256": "5fa1f16232f8509e0b92027d6d48cbd3b8ae5195eb8e5d4d23a1b8d2f53cfd82",
+      "upstream_sha256": "fa3a50ed780c64e7f2e19bf50258d2259a67951e294d5f4cc578565ce0d2c42b",
+      "ids": [
+        "OBS-009",
+        "OBS-033"
+      ],
+      "note": "Add rawText fixture field.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/tests/fontTopPicks.test.ts",
+      "status": "modified",
+      "fork_sha256": "5fe4c6a27efcb7305005bf2b7b783d989208f8f6b0efa7f52cbef381b434fdd7",
+      "upstream_sha256": "2089b2f66654f4e9c3ce6674dc1013688e15d5c4b690249a26cbc393600eb553",
+      "ids": [
+        "OBS-026",
+        "OBS-033"
+      ],
+      "note": "Expected default top-pick count becomes four.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/tests/helpers/api.ts",
+      "status": "modified",
+      "fork_sha256": "d47889c3cfe5904eb645aaa97dd25308e912bc3e2a56bbc5b4cef16e7da30b11",
+      "upstream_sha256": "1908f9b06bc7fba980d669f7e2326c147c7e67268e61d1a0c04def69d4b6d3d7",
+      "ids": [
+        "OBS-009",
+        "OBS-033"
+      ],
+      "note": "Initialize text rawText in test helper.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/tsconfig-types.json",
+      "status": "fork-only",
+      "fork_sha256": "233cf8a0c41f089ff5cb89b53fa97a1de597fb707a7ebbe880cca6df2598559c",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-004"
+      ],
+      "note": "Fork declaration emitter writes ./types with workspace source aliases and separate compiler settings.",
+      "kind": "packaging"
+    },
+    {
+      "path": "packages/excalidraw/tsconfig.json",
+      "status": "modified",
+      "fork_sha256": "2c14ece7b4916f25fa133cb10a43b782a7dca47412cfb266da247e5f6a94ce0c",
+      "upstream_sha256": "12d033a132dfd080ed66071173fd3440b2bad5c181c658f6d8ca0e8d739eabd9",
+      "ids": [
+        "OBS-004",
+        "OBS-014"
+      ],
+      "note": "Explicitly include sibling easingFunctions source for component compilation.",
+      "kind": "packaging"
+    },
+    {
+      "path": "packages/excalidraw/types.ts",
+      "status": "modified",
+      "fork_sha256": "fa2d507d9c3e8fe1bf8beabf630c9cea9849cd961b43f737060fd2789b8228e9",
+      "upstream_sha256": "e3bba34d12ba1894bf3cdc2a0723ce9711ffb8bb14bf4f3dfadb5d9595d5eac9",
+      "ids": [
+        "OBS-007",
+        "OBS-008",
+        "OBS-009",
+        "OBS-010",
+        "OBS-014",
+        "OBS-015",
+        "OBS-016",
+        "OBS-017",
+        "OBS-022",
+        "OBS-027",
+        "OBS-029",
+        "OBS-030"
+      ],
+      "note": "Public/internal extensions for host props, state, renderer fields, image/geometry methods, history, and Mermaid; AppClassProperties.setSelection is not itself an imperative API member.",
+      "kind": "type-compatibility"
+    },
+    {
+      "path": "packages/excalidraw/wysiwyg/textWysiwyg.test.tsx",
+      "status": "modified",
+      "fork_sha256": "99c1ea1ec75c819426e16a9b3f8ea905857d54911b4036dea7978f4fa520e234",
+      "upstream_sha256": "8cb079a9a8cc896193b863467b34e56b2c67100b333936ecd7b597d4a3f1cead",
+      "ids": [
+        "OBS-009",
+        "OBS-033"
+      ],
+      "note": "End-to-end component text editing stores raw Markdown, parsed display, and link.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/wysiwyg/textWysiwyg.tsx",
+      "status": "modified",
+      "fork_sha256": "0305493fe6261eb00e6158e749b476712d18b6cc07908ee656b335d89985a3b0",
+      "upstream_sha256": "bf184f3cbd37cf18e8af402f3325bfcc2a468fbb02c72900ad7aab2d9c06c3b4",
+      "ids": [
+        "OBS-009",
+        "OBS-010",
+        "OBS-021",
+        "OBS-024"
+      ],
+      "note": "Attach/close host suggester, preserve editing across host panels, round scaled text width, and adjust caret; a new instanceof path still uses global constructors.",
+      "kind": "integration"
+    },
+    {
+      "path": "packages/math/src/range.ts",
+      "status": "modified",
+      "fork_sha256": "162e2fbc198042b1ca5715164df7987b410db0af53c84da9d00bfa7f61d212e9",
+      "upstream_sha256": "96f448ce1c725d788df573261800d9b1270410b170094876ba7d720670a28818",
+      "ids": [
+        "OBS-004"
+      ],
+      "note": "Inline branded-type identity helper and use type-only import to avoid runtime common/math dependency cycle.",
+      "kind": "type-compatibility"
+    },
+    {
+      "path": "packages/tsconfig.base.json",
+      "status": "modified",
+      "fork_sha256": "8ee7549dccd9cc272053448295b10fe7c2a7313a87fc5e3e6a732783c940b523",
+      "upstream_sha256": "130c2188401900193eab4b2e77823502f05272dabc81c46e1e387a82d43fe162",
+      "ids": [
+        "OBS-004"
+      ],
+      "note": "Add global test/generated/example exclusions for TypeScript projects.",
+      "kind": "packaging"
+    },
+    {
+      "path": "scripts/buildObsidianPackage.js",
+      "status": "fork-only",
+      "fork_sha256": "38eb03956e07ada7eb5dbbacce1942a586986e4a91d8f7d0db6402c6d25c1a34",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-003",
+        "OBS-013"
+      ],
+      "note": "Dedicated esbuild IIFE dev/prod JS/CSS, private React externals, workspace aliases, embedded assets, lazy CJK resolution, and scoped output cleanup.",
+      "kind": "packaging"
+    },
+    {
+      "path": "scripts/generate-repository-zip.sh",
+      "status": "fork-only",
+      "fork_sha256": "0a3c8cac239f8964d3e0c57d3fd170d5ab53da8772eeed4e2c39a4b037b61789",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-034"
+      ],
+      "note": "Optional text-focused repository exporter excludes binaries/assets; unsuitable as a complete upstream comparison baseline.",
+      "kind": "housekeeping"
+    },
+    {
+      "path": "yarn.lock",
+      "status": "modified",
+      "fork_sha256": "f6393cf58cc60c55bbbfa812f93593f222024398f6db15e3b0450b63649a3069",
+      "upstream_sha256": "2fceed8bdb8180b2d14ab0db6010f48b05da0f3a772e218a7024e88ca7a7c76e",
+      "ids": [
+        "OBS-002"
+      ],
+      "note": "Resolved dependency/transitive graph churn accompanying manifest overrides; not evidence of isolated Obsidian behavior or verified vulnerability remediation.",
+      "kind": "packaging"
+    }
+  ]
+}

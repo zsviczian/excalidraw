@@ -9,6 +9,7 @@ Before opening a pull request, please understand that this repository is **not t
 - Use Node.js 22 or newer. Verify `node --version` before diagnosing Yarn or Corepack failures; a shell that combines a different Node binary with another installation's Corepack can fail before a repository command starts.
 - This monorepo uses Yarn. Do not run npm install commands here or replace `yarn.lock` with an npm lockfile.
 - Read `CLAUDE.md` for the upstream monorepo layout and commands.
+- Read the [persisted Obsidian fork inventory](dev-docs/Obsidian/README.md) and the catalog/contracts relevant to your change before editing.
 - The main consumer for fork-only behavior is the sibling `zsviczian/obsidian-excalidraw-plugin` repository. Treat the repositories as separate Git histories and check the branch, status, and diff in each one before building or handing off changes.
 
 ## First: Can This Be Added Upstream?
@@ -62,6 +63,16 @@ When upstream extracts code into a new component or module, start with the upstr
 Keep the resulting difference from upstream as small as possible. A short customization can stay next to its integration point. Move a cohesive larger Obsidian-specific solution into a dedicated function or fork-owned helper module, leaving a small, fingerprinted call in the upstream-owned file. Avoid unrelated cleanup, formatting, or redesign during the merge.
 
 Review the **combined result** against both merge parents before completion, including cleanly auto-merged files. Verify that each inventoried customization appears exactly where it is needed and that every remaining change to upstream code has a specific reason. Retired differences need an evidenced upstream replacement. Run focused source checks and build the Obsidian artifact and consuming plugin. Exercise the affected workflow in Obsidian, with main-window, popout, offline, and physical mobile checks when that behavior depends on them. If an essential runtime check or test lane is unavailable, leave validation explicitly incomplete and report the risk before finalizing the merge; do not claim a regression-free or release-ready result from builds alone.
+
+## Maintain The Obsidian Fork Inventory
+
+The authoritative fork-specific inventory lives in [`dev-docs/Obsidian/`](dev-docs/Obsidian/README.md). Maintain it in the **same pull request** as the implementation, including when upstream code moves, a clean auto-merge changes a customized path, or a difference disappears.
+
+For each affected stable `OBS-xxx` entry, record the behavior and why it must remain in the component, its current source and plugin consumers, public/serialized compatibility, the upstream alternative considered, and verification performed or still missing. Update `file-inventory.json` for every added, changed, moved, or removed differing path and regenerate `file-inventory.md`. Include tests, declarations, styles, packaging, binary assets, and unmarked differences; do not inventory only `zsviczian` comments.
+
+Follow the README's comparison/report workflow against a named upstream baseline. Review the observed changes before copying new fingerprints into the ledger. Update baseline provenance after upstream synchronization, and report an unavailable upstream comparison rather than claiming coverage. The checker proves file accounting only; the existing source, build, cross-repository, and runtime gates still apply.
+
+Review the [decustomization backlog](dev-docs/Obsidian/decustomization.md) when touching a candidate. Retire a customization only with evidence of equivalent upstream/host behavior or demonstrable inertness, a public-API and saved-data compatibility assessment, and appropriate tests. Absence of a current plugin call is not proof that a public scripting API is unused. Retain the stable ID as a retired record with its replacement, review reference, and validation; remove obsolete active file rows only after accounting for the behavior. Do not keep duplicate historical implementations merely to preserve an inventory entry.
 
 ## Document Every Modification
 
@@ -282,6 +293,7 @@ When opening a PR, please explain:
 2. Why the change is required for the Obsidian plugin.
 3. Why the implementation was kept as small as possible.
 4. What alternatives were considered.
+5. Which `OBS-xxx` inventory entries and file-ledger rows changed, which baseline was compared, and what remains unverified (including retirement evidence where applicable).
 
 PRs that introduce broad modifications to Excalidraw internals without strong justification are unlikely to be accepted.
 
