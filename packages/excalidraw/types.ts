@@ -10,7 +10,10 @@ import type {
 
 import type { LinearElementEditor } from "@excalidraw/element";
 
-import type { MaybeTransformHandleType } from "@excalidraw/element";
+import type {
+  ListMarkerAdvance,
+  MaybeTransformHandleType,
+} from "@excalidraw/element";
 
 import type {
   PointerType,
@@ -1368,6 +1371,13 @@ export type PointerDownState = Readonly<{
     // Whether selected element(s) were duplicated, might change during the
     // pointer interaction
     hasBeenDuplicated: boolean;
+    // The list markers advanced by duplicating the selected element(s)
+    // (alt-drag)
+    advancedListMarkers: readonly ListMarkerAdvance[];
+    // The text whose editing the pointer down ended (alt-pressing it in the
+    // text editor), swapped with its duplicate when duplicated, which is
+    // then edited on drop
+    editedTextId: ExcalidrawTextElement["id"] | null;
     // Whether the pointer is hitting the common bounding box of selected
     // elements, which is useful for discriminating between selecitng
     // the entire selection vs a specific element

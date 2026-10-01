@@ -697,7 +697,9 @@ class App extends React.Component<AppProps, AppState> {
   public onStateChange: OnStateChange = this.appStateObserver.onStateChange;
 
   public bucketFill: AppBucketFill = new AppBucketFill(this);
-  public duplicate: AppDuplicate = new AppDuplicate(this);
+  public duplicate: AppDuplicate = new AppDuplicate(this, {
+    getPointerCount: () => gesture.pointers.size,
+  });
   public toolDrag: AppToolDrag = new AppToolDrag(this);
   public flowchart: AppFlowchart = new AppFlowchart(this);
   public cursor: AppCursor = new AppCursor(this);
@@ -6603,8 +6605,6 @@ class App extends React.Component<AppProps, AppState> {
   ): NonDeleted<ExcalidrawElement>[] {
     const iframeLikes: Ordered<NonDeleted<ExcalidrawIframeLikeElement>>[] = [];
 
-    const elementsMap = this.scene.getNonDeletedElementsMap();
-
     const elements = (
       opts?.includeBoundTextElement && opts?.includeLockedElements
         ? this.scene.getNonDeletedElements()
@@ -6618,25 +6618,7 @@ class App extends React.Component<AppProps, AppState> {
             )
     )
       .filter((el) => this.hitElement(x, y, el))
-      .filter((element) => {
-        // hitting a frame's element from outside the frame is not considered a hit
-        const containingFrame = getContainingFrame(element, elementsMap);
-        if (containingFrame && !isNonDeletedElement(containingFrame)) {
-          console.error("[NONDELETED][INVARIANT] Containing frame is deleted");
-        }
-        return containingFrame &&
-          this.state.frameRendering.enabled &&
-          this.state.frameRendering.clip &&
-          // iframe-like elements are rendered as DOM overlays and are not
-          // visually clipped by their containing frames
-          !isIframeLikeElement(element)
-          ? isCursorInFrame(
-              { x, y },
-              containingFrame as NonDeleted<ExcalidrawFrameLikeElement>,
-              elementsMap,
-            )
-          : true;
-      })
+      .filter((element) => !this.isClippedByFrameAt(x, y, element))
       .filter((el) => {
         // The parameter elements comes ordered from lower z-index to higher.
         // We want to preserve that order on the returned array.
@@ -6651,6 +6633,31 @@ class App extends React.Component<AppProps, AppState> {
       .concat(iframeLikes) as NonDeleted<ExcalidrawElement>[];
 
     return elements;
+  }
+
+  /**
+   * Whether the element's frame clips it away at the position — hitting a
+   * frame's element from outside the frame is not considered a hit.
+   */
+  isClippedByFrameAt(x: number, y: number, element: ExcalidrawElement) {
+    const elementsMap = this.scene.getNonDeletedElementsMap();
+    const containingFrame = getContainingFrame(element, elementsMap);
+    if (containingFrame && !isNonDeletedElement(containingFrame)) {
+      console.error("[NONDELETED][INVARIANT] Containing frame is deleted");
+    }
+    return (
+      !!containingFrame &&
+      this.state.frameRendering.enabled &&
+      this.state.frameRendering.clip &&
+      // iframe-like elements are rendered as DOM overlays and are not
+      // visually clipped by their containing frames
+      !isIframeLikeElement(element) &&
+      !isCursorInFrame(
+        { x, y },
+        containingFrame as NonDeleted<ExcalidrawFrameLikeElement>,
+        elementsMap,
+      )
+    );
   }
 
   getElementHitThreshold(element: ExcalidrawElement) {
@@ -8050,7 +8057,8 @@ class App extends React.Component<AppProps, AppState> {
       elementsMap,
     );
 
-    if (!element) {
+    // (editing text deselects the element)
+    if (!element || this.state.editingTextElement) {
       return;
     }
     if (this.state.selectedLinearElement) {
@@ -8105,15 +8113,16 @@ class App extends React.Component<AppProps, AppState> {
         this.cursor.set(CURSOR_TYPE.MOVE);
       }
 
+      // (updating the previous state, as these updates are batched)
       if (
         this.state.selectedLinearElement.hoverPointIndex !== hoverPointIndex
       ) {
-        this.setState({
-          selectedLinearElement: {
-            ...this.state.selectedLinearElement,
+        this.setState((prevState) => ({
+          selectedLinearElement: prevState.selectedLinearElement && {
+            ...prevState.selectedLinearElement,
             hoverPointIndex,
           },
-        });
+        }));
       }
 
       if (
@@ -8122,12 +8131,12 @@ class App extends React.Component<AppProps, AppState> {
           segmentMidPointHoveredCoords,
         )
       ) {
-        this.setState({
-          selectedLinearElement: {
-            ...this.state.selectedLinearElement,
+        this.setState((prevState) => ({
+          selectedLinearElement: prevState.selectedLinearElement && {
+            ...prevState.selectedLinearElement,
             segmentMidPointHoveredCoords,
           },
-        });
+        }));
       }
 
       // Check for focus point hover
@@ -8147,13 +8156,13 @@ class App extends React.Component<AppProps, AppState> {
         this.state.selectedLinearElement.hoveredFocusPointBinding !==
         hoveredFocusPointBinding
       ) {
-        this.setState({
-          selectedLinearElement: {
-            ...this.state.selectedLinearElement,
+        this.setState((prevState) => ({
+          selectedLinearElement: prevState.selectedLinearElement && {
+            ...prevState.selectedLinearElement,
             isDragging: false,
             hoveredFocusPointBinding,
           },
-        });
+        }));
       }
 
       // Set cursor to pointer when hovering over a focus point
@@ -8939,6 +8948,8 @@ class App extends React.Component<AppProps, AppState> {
         allHitElements: [],
         wasAddedToSelection: false,
         hasBeenDuplicated: false,
+        advancedListMarkers: [],
+        editedTextId: this.duplicate.handedOverTextId,
         arrowLabel: false,
         hasHitCommonBoundingBoxOfSelectedElements:
           this.isHittingCommonBoundingBoxOfSelectedElements(
@@ -9024,6 +9035,10 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
   ): boolean => {
     if (isSelectionLikeTool(this.state.activeTool.type)) {
+      if (this.duplicate.hitEditedElement(pointerDownState)) {
+        return false;
+      }
+
       const elements = this.scene.getNonDeletedElements();
       const elementsMap = this.scene.getNonDeletedElementsMap();
       const selectedElements = this.scene.getSelectedElements(this.state);
@@ -11065,6 +11080,14 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       this.textTool.handlePointerUp(childEvent, pointerDownState);
+
+      if (pointerDownState.hit.hasBeenDuplicated) {
+        this.duplicate.commitDraggedDuplicates(pointerDownState, {
+          // not for a replay by the missing-pointerup cleanup (a
+          // pointercancel, or the next interaction's pointerdown)
+          editText: childEvent.type === "pointerup",
+        });
+      }
 
       // an armed bucket fill commits only on a GENUINE pointer up. The
       // missing-pointer-up cleanup replays this handler with the pointer
