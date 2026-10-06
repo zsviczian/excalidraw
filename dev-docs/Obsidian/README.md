@@ -9,16 +9,22 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 | [Customization catalog](customizations.md) | 37 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
-| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 230 differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
+| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 232 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
 | [Validation and merge playbook](validation.md) | What was actually verified, existing regression tests, missing runtime evidence, and behavior-specific gates. |
 | [Obsidian runtime testing](OBSIDIAN_RUNTIME_TESTING.md) | Guarded CLI test-vault deployment, exact-build desktop smoke, reports, and feature-specific host probes. |
 | [Local audit checker](audit.py) / [checker tests](test_audit.py) | Dependency-free, offline source accounting; detects changed, new, or retired differences and stale tree fingerprints. |
 
 Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md](../../CONTRIBUTING.md). This inventory documents existing deviations even when they do not yet comply with those policies; it does not silently approve them.
 
-## Scope and baseline
+## Current merge checkpoint
 
-Initial source audit: **2026-09-29**, using the three supplied ZIP snapshots. The archive roots and full SHA-256 checksums are recorded in [file-inventory.json](file-inventory.json). The ZIP comments were subsequently verified against local Git commit objects; the current fork working tree and the recorded upstream commit reproduce the ledger's 230 paths and both complete-tree fingerprints exactly.
+The 2026-10-06 [PR #458 review](pr-458-merge-review.md) compares the resolved working tree with incoming upstream commit `53973c3a423fbd75a4ce68107786b4fcb90e4968`. The fork parent is `3494e26aed12bcd38c8d007925ea95e1ed224389`; their merge base is `ed10ac7dca7e40f3f4a31269b4bfba980d0db41e`. The merge commit has not been created. The current ledger contains **164 modified, 29 fork-only, and 39 upstream-only paths** (232 total); complete tree counts are 1,300 fork files and 1,310 upstream files. The two additional differing paths are the migrated selection override and its regression test. Upstream's unchanged `App.modifiers.ts` is covered by the tree fingerprint, not counted as customization.
+
+The JSON's `sources`, `review`, and `comparison` describe this checkpoint. `original_sources` and `initial_review` preserve the initial archive evidence below. Seven existing ledger rows changed since the initial comparison: upstream text/list-marker changes from the already merged PRs #456/#457, the current App extraction, locale/types, and the test helper. Their remaining fork deltas were reviewed before refreshing hashes; no customization was retired. The exact-build desktop smoke and affected main/popout probes passed; standard test-hook/typecheck and physical-mobile limits are recorded in [validation.md](validation.md).
+
+## Initial scope and baseline
+
+Initial source audit: **2026-09-29**, using the three supplied ZIP snapshots. The archive roots and full SHA-256 checksums are recorded under `original_sources` in [file-inventory.json](file-inventory.json). The ZIP comments were subsequently verified against local Git commit objects; the September 29 fork working tree and the recorded upstream commit reproduced the initial ledger's 230 paths and both complete-tree fingerprints exactly.
 
 | Snapshot | Verified local Git commit matching ZIP comment | Package/dependency evidence |
 | --- | --- | --- |
@@ -52,12 +58,12 @@ Requires Python 3.10+ only. Run from the fork monorepo root. No dependency insta
 
 ```bash
 python dev-docs/Obsidian/test_audit.py
-python dev-docs/Obsidian/audit.py --upstream-ref 5a406e51875157bece389b9bc92d41ff241d5f3d
+python dev-docs/Obsidian/audit.py --upstream-ref 53973c3a423fbd75a4ce68107786b4fcb90e4968
 ```
 
 `--upstream` can instead name the supplied upstream ZIP. `--fork` defaults to the repository containing this script and can also name a clean directory or ZIP. Comparing the **original** fork ZIP against the handoff ledger should report the two intentional root-policy edits; use the patched checkout for a clean handoff comparison.
 
-`--upstream-ref` reads a local ref from this repository through `git archive`; it never fetches or checks out code. `--git-repo` can select another local checkout. `--fork-ref HEAD` selects a committed fork tree instead of the dirty working tree when a commit-to-commit comparison is needed. The reviewed manifest describes the pinned September 28 upstream commit above. At the 2026-09-29 review, local `upstream/master` still pointed to September 10. It yielded 304 differing paths and 134 apparent drift findings against the maintained fork working tree (137 findings against committed `HEAD`). It was the **wrong baseline**, not evidence of new unreviewed fork changes. A different upstream ref or later fork will require a new review and updated provenance; never accept its hashes automatically.
+`--upstream-ref` reads a local ref from this repository through `git archive`; it never fetches or checks out code. `--git-repo` can select another local checkout. `--fork-ref HEAD` selects a committed fork tree instead of the dirty working tree when a commit-to-commit comparison is needed. Use the exact incoming commit above for this merge; `HEAD` still identifies its fork parent. At the 2026-09-29 review, local `upstream/master` still pointed to September 10. It yielded 304 differing paths and 134 apparent drift findings against the then-maintained fork working tree (137 findings against committed `HEAD`). It was the **wrong baseline**, not evidence of new unreviewed fork changes. A different upstream ref or later fork will require a new review and updated provenance; never accept its hashes automatically.
 
 For Git checkouts, the checker selects tracked and untracked nonignored files using `git ls-files`; tracked ignored files remain included. For extracted directories, use a **clean source tree**: all regular files are scanned except `.git`, `node_modules`, `__pycache__`, and this directory. It deliberately does not ignore binary assets, fonts, examples, lockfiles, or arbitrary build-output names. A dirty extraction can therefore report build artifacts as unreviewed additions. Directory symlinks/files and submodules need explicit handling; the checker rejects unsupported entries rather than silently treating them as ordinary files. Git archive ZIPs can be used for source snapshots.
 

@@ -1,62 +1,48 @@
 {
   "schema_version": 1,
   "review": {
-    "date": "2026-09-29",
-    "method": "Byte-complete comparison of supplied snapshots plus source/call-site review. Local Git objects now verify both snapshot commit IDs and the upstream merge base; classifications still require behavioral review.",
+    "date": "2026-10-06",
+    "method": "PR #458 three-way source/consumer review against both merge parents, with a byte-complete comparison against the exact incoming upstream commit. Earlier upstream-only text/list-marker changes since the initial baseline were reviewed separately; unchanged fork deltas retained. See validation.md and pr-458-merge-review.md.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
-    "handoff_note": "Original archive provenance below is immutable. The comparison fingerprints reflect this documentation handoff, including root policy edits; production code and dependencies are unchanged.",
-    "original_snapshot_counts": {
-      "fork_files": 1296,
-      "upstream_files": 1307,
-      "modified": 163,
-      "fork_only": 28,
-      "upstream_only": 39,
-      "differing_paths": 230
+    "merge": {
+      "fork_parent": "3494e26aed12bcd38c8d007925ea95e1ed224389",
+      "upstream_parent": "53973c3a423fbd75a4ce68107786b4fcb90e4968",
+      "merge_base": "ed10ac7dca7e40f3f4a31269b4bfba980d0db41e",
+      "state": "resolved working tree, merge commit not created",
+      "reference": "https://github.com/zsviczian/excalidraw/pull/458"
     },
-    "runtime_validation": "Basic exact-build Obsidian CLI main-window smoke passed on 2026-09-29; feature-specific and physical-device gates remain open. See validation.md.",
-    "git_verification": {
-      "fork_commit": "c36b852a0acacf556277f71e850f22462a4454a6",
-      "fork_tree": "d9ac1098f143480a9e4266d7baa2156ed3bdbd30",
-      "upstream_commit": "5a406e51875157bece389b9bc92d41ff241d5f3d",
-      "upstream_tree": "e46b0b2d38f591cdb42ed30982ec237cab0c6528",
-      "merge_base": "5a406e51875157bece389b9bc92d41ff241d5f3d",
-      "plugin_commit": "bd40308a83c1c278fcdc13afa35ac779c24d90d5"
-    }
+    "runtime_validation": "Exact-build Obsidian 1.14.4 desktop smoke and affected main/popout scenarios passed; physical mobile and standard window.h-based test lanes remain unverified. See validation.md."
   },
   "sources": {
     "fork": {
-      "archive": "excalidraw-obsidian-fork-master.zip",
-      "archive_root": "excalidraw-master/",
-      "zip_comment": "c36b852a0acacf556277f71e850f22462a4454a6",
-      "archive_sha256": "ec0f4c3d296e8be103254ff30327cf48b0bf28a69f21d90b5c9fa77a6c02aee1",
+      "kind": "resolved Git working tree",
+      "parent_commit": "3494e26aed12bcd38c8d007925ea95e1ed224389",
+      "incoming_commit": "53973c3a423fbd75a4ce68107786b4fcb90e4968",
       "package": "@zsviczian/excalidraw",
       "version": "0.18.140"
     },
     "upstream": {
-      "archive": "excalidraw-upstream-master.zip",
-      "archive_root": "excalidraw-master/",
-      "zip_comment": "5a406e51875157bece389b9bc92d41ff241d5f3d",
-      "archive_sha256": "76d4d6bccc865b93eeda37b21e289649d504ef65bf7a4bb396884c94e81fe136",
+      "kind": "local Git commit",
+      "commit": "53973c3a423fbd75a4ce68107786b4fcb90e4968",
+      "tree": "c071e339e75654f69ee3787cfa47ab22812120ac",
       "package": "@excalidraw/excalidraw",
       "version": "0.18.0"
     },
     "plugin": {
-      "archive": "obsidian-excalidraw-plugin-master.zip",
-      "archive_root": "obsidian-excalidraw-plugin-master/",
-      "zip_comment": "bd40308a83c1c278fcdc13afa35ac779c24d90d5",
-      "archive_sha256": "78f503dcd308122acf15fc8100cc49122cb6f7d3df859fb34b537dd7804776a7",
-      "version": "2.2.5",
+      "kind": "local Git commit",
+      "commit": "f30b4c5d3dcb66ac76ced8f05d9e95409ee94c79",
+      "version": "2.28.1",
       "fork_dependency": "0.18.140"
     }
   },
   "comparison": {
     "fork": {
-      "files": 1296,
-      "sha256": "449b72a36153aa1b9834aa8e377c0b8f566006bc17582c997b8d775616dd3700"
+      "files": 1300,
+      "sha256": "7f2653ffcb16b0ec1c581523903fca888f7ca47277c046c80ec66b19c74b7f7b"
     },
     "upstream": {
-      "files": 1307,
-      "sha256": "9cef5d303407f073822162e36cb57187f4b33bfaa30347a30cffd5eb6cfef530"
+      "files": 1310,
+      "sha256": "063392dd6b8d47a05e5dea40ef3cfde592b23d3e2cf10e573665c357dfb33a53"
     }
   },
   "customizations": [
@@ -1350,10 +1336,21 @@
       "kind": "behavior"
     },
     {
+      "path": "packages/excalidraw/components/App.selectionTool.ts",
+      "status": "modified",
+      "fork_sha256": "5655bf2d5dae484bf92274b7bc32a8d1c4e871c7248d36a856e1a8cb57ceba20",
+      "upstream_sha256": "4815b628b53c51f1d88ec092cac3b3178f5adf2ee8849a4f01a7e9a04f668cde",
+      "ids": [
+        "OBS-029"
+      ],
+      "note": "PR #458: migrate unlocked-hit precedence from App.handleSelectionOnPointerDown into upstream AppSelectionTool; preserve upstream Alt-click cycling and transform ownership.",
+      "kind": "behavior"
+    },
+    {
       "path": "packages/excalidraw/components/App.text.ts",
       "status": "modified",
-      "fork_sha256": "f866bc1cb64c9da0c48c9039ccb39e8adfa1dc017f370892739e457369e5e559",
-      "upstream_sha256": "255b83d3859bd2304191047edf824db86a3fd9653eedff38976d66f45be3343a",
+      "fork_sha256": "c963534650cd076416264b9f8523deed79767263a3f08489a45b67df885704db",
+      "upstream_sha256": "5235d73e60ff36d60ff7c18bd494d1ff58ab30a3db239a9c744790ce2af8a276",
       "ids": [
         "OBS-009",
         "OBS-026"
@@ -1364,8 +1361,8 @@
     {
       "path": "packages/excalidraw/components/App.tsx",
       "status": "modified",
-      "fork_sha256": "8ba677b0907141a77d4b2fe2f3fcbac66d9ac191f122f8edd8b233fc0614cde3",
-      "upstream_sha256": "c40f37e4a77fc5fba335b0dd790cec6dc9c60e83e647eb80fd5d8e229cdb30c3",
+      "fork_sha256": "b3820d092e652bc7aaef06555cee8ddb5193ee6ef2d5da921eba2f929c4eebaf",
+      "upstream_sha256": "771c931df43190f495fbd12c756d568a059c42b68e941dc7b4b702a269e63c5f",
       "ids": [
         "OBS-007",
         "OBS-008",
@@ -1388,7 +1385,7 @@
         "OBS-032",
         "OBS-037"
       ],
-      "note": "Main cross-cutting integration: public adapters, early state, scaled webviews, highlighter layer, frame/link UI, image lifecycle, teardown/test-hook suppression, menus/input ordering, host layout, and selection/geometry wrappers. See catalog and API contract table.",
+      "note": "Main cross-cutting integration: public adapters, early state, scaled webviews, highlighter layer, frame/link UI, image lifecycle, teardown/test-hook suppression, menus/input ordering, host layout, and selection/geometry wrappers. See catalog and API contract table. PR #458: setSelection retained byte-for-byte; selection and transform handlers follow the upstream extraction, with unlocked-hit override now in App.selectionTool.ts.",
       "kind": "integration"
     },
     {
@@ -2492,8 +2489,8 @@
     {
       "path": "packages/excalidraw/locales/en.json",
       "status": "modified",
-      "fork_sha256": "07a55036173abfe050ea69d5d6421b24601ea7250a6bc5a606dca890f3a9b58d",
-      "upstream_sha256": "73e039ab83a178519bfad9dd4dcfea38cc3d4e7add10d1ad609f1b2932e7f287",
+      "fork_sha256": "87ea18ae31523a75ef5209b1f2e473aeff4dc9b834895992b0485e498279f741",
+      "upstream_sha256": "1167d15e859dade257505291eccfa8f1410d4b2c4a49d054b113fdb5f9918369",
       "ids": [
         "OBS-015",
         "OBS-026"
@@ -2870,13 +2867,25 @@
     {
       "path": "packages/excalidraw/tests/helpers/api.ts",
       "status": "modified",
-      "fork_sha256": "d47889c3cfe5904eb645aaa97dd25308e912bc3e2a56bbc5b4cef16e7da30b11",
-      "upstream_sha256": "1908f9b06bc7fba980d669f7e2326c147c7e67268e61d1a0c04def69d4b6d3d7",
+      "fork_sha256": "bb152f8ab3bddd8d7b0ef170316f2fe3db1eaf3c2294a1c0dae3cdbcec5f1844",
+      "upstream_sha256": "abf9fe687f518eff372c022a9711619c8672adc7e9fd7fb29557b7fa082c6c0e",
       "ids": [
         "OBS-009",
         "OBS-033"
       ],
       "note": "Initialize text rawText in test helper.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/tests/obsidianSelection.test.tsx",
+      "status": "fork-only",
+      "fork_sha256": "8908f8a5e27b69fba060c64b46deddcfc9c6b379038d5b42949c0b5af1f493dd",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-029",
+        "OBS-033"
+      ],
+      "note": "PR #458: mounted-editor public-API regressions for locked overlap, isolated locked hits, Alt-click cycling and host-selected groups; runs without window.h.",
       "kind": "test"
     },
     {
@@ -2905,8 +2914,8 @@
     {
       "path": "packages/excalidraw/types.ts",
       "status": "modified",
-      "fork_sha256": "fa2d507d9c3e8fe1bf8beabf630c9cea9849cd961b43f737060fd2789b8228e9",
-      "upstream_sha256": "e3bba34d12ba1894bf3cdc2a0723ce9711ffb8bb14bf4f3dfadb5d9595d5eac9",
+      "fork_sha256": "23763261a7fd972486d3a6d2f888d052afe0eb1b4923a586bbb4307f7061e1dc",
+      "upstream_sha256": "aa28a89a5aa18ec06c2f19e545d9923018e3776e32afc54a29e9c0910d208c8e",
       "ids": [
         "OBS-007",
         "OBS-008",
@@ -2927,8 +2936,8 @@
     {
       "path": "packages/excalidraw/wysiwyg/textWysiwyg.test.tsx",
       "status": "modified",
-      "fork_sha256": "99c1ea1ec75c819426e16a9b3f8ea905857d54911b4036dea7978f4fa520e234",
-      "upstream_sha256": "8cb079a9a8cc896193b863467b34e56b2c67100b333936ecd7b597d4a3f1cead",
+      "fork_sha256": "0a885dc3d7c2f322b83eaaf9483208b0b48eb38fb7f1db309e59b99b2fa22a1d",
+      "upstream_sha256": "2586e48c7ab1e360f1d9569f78d1a71d93efff087dfcb9a52f3ab3d90184dfc6",
       "ids": [
         "OBS-009",
         "OBS-033"
@@ -2939,8 +2948,8 @@
     {
       "path": "packages/excalidraw/wysiwyg/textWysiwyg.tsx",
       "status": "modified",
-      "fork_sha256": "0305493fe6261eb00e6158e749b476712d18b6cc07908ee656b335d89985a3b0",
-      "upstream_sha256": "bf184f3cbd37cf18e8af402f3325bfcc2a468fbb02c72900ad7aab2d9c06c3b4",
+      "fork_sha256": "91a40ec8b5e1f17d998adf28ca19f3caf79635da40b2184a7e6df34feeeb9f42",
+      "upstream_sha256": "17a79b115586a8f6cb3a1c44d742043f31b5f91a236a450749ec3e5c9252d009",
       "ids": [
         "OBS-009",
         "OBS-010",
@@ -3006,5 +3015,54 @@
       "note": "Resolved dependency/transitive graph churn accompanying manifest overrides; not evidence of isolated Obsidian behavior or verified vulnerability remediation.",
       "kind": "packaging"
     }
-  ]
+  ],
+  "initial_review": {
+    "date": "2026-09-29",
+    "method": "Byte-complete comparison of supplied snapshots plus source/call-site review. Local Git objects now verify both snapshot commit IDs and the upstream merge base; classifications still require behavioral review.",
+    "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
+    "handoff_note": "Original archive provenance below is immutable. The comparison fingerprints reflect this documentation handoff, including root policy edits; production code and dependencies are unchanged.",
+    "original_snapshot_counts": {
+      "fork_files": 1296,
+      "upstream_files": 1307,
+      "modified": 163,
+      "fork_only": 28,
+      "upstream_only": 39,
+      "differing_paths": 230
+    },
+    "runtime_validation": "Basic exact-build Obsidian CLI main-window smoke passed on 2026-09-29; feature-specific and physical-device gates remain open. See validation.md.",
+    "git_verification": {
+      "fork_commit": "c36b852a0acacf556277f71e850f22462a4454a6",
+      "fork_tree": "d9ac1098f143480a9e4266d7baa2156ed3bdbd30",
+      "upstream_commit": "5a406e51875157bece389b9bc92d41ff241d5f3d",
+      "upstream_tree": "e46b0b2d38f591cdb42ed30982ec237cab0c6528",
+      "merge_base": "5a406e51875157bece389b9bc92d41ff241d5f3d",
+      "plugin_commit": "bd40308a83c1c278fcdc13afa35ac779c24d90d5"
+    }
+  },
+  "original_sources": {
+    "fork": {
+      "archive": "excalidraw-obsidian-fork-master.zip",
+      "archive_root": "excalidraw-master/",
+      "zip_comment": "c36b852a0acacf556277f71e850f22462a4454a6",
+      "archive_sha256": "ec0f4c3d296e8be103254ff30327cf48b0bf28a69f21d90b5c9fa77a6c02aee1",
+      "package": "@zsviczian/excalidraw",
+      "version": "0.18.140"
+    },
+    "upstream": {
+      "archive": "excalidraw-upstream-master.zip",
+      "archive_root": "excalidraw-master/",
+      "zip_comment": "5a406e51875157bece389b9bc92d41ff241d5f3d",
+      "archive_sha256": "76d4d6bccc865b93eeda37b21e289649d504ef65bf7a4bb396884c94e81fe136",
+      "package": "@excalidraw/excalidraw",
+      "version": "0.18.0"
+    },
+    "plugin": {
+      "archive": "obsidian-excalidraw-plugin-master.zip",
+      "archive_root": "obsidian-excalidraw-plugin-master/",
+      "zip_comment": "bd40308a83c1c278fcdc13afa35ac779c24d90d5",
+      "archive_sha256": "78f503dcd308122acf15fc8100cc49122cb6f7d3df859fb34b537dd7804776a7",
+      "version": "2.2.5",
+      "fork_dependency": "0.18.140"
+    }
+  }
 }

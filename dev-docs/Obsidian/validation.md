@@ -26,11 +26,17 @@ The dependency-free checker suite now passes 15 tests, including the local Git-r
 
 ## Reproduce the inventory checks
 
+### PR #458 checkpoint (2026-10-06)
+
+The [merge review](pr-458-merge-review.md) records the exact parents, migrated unlocked-hit customization, retained `setSelection`, equivalent crop/resize extraction, auto-merge review, and remaining gates. The current comparison uses incoming upstream `53973c3a423fbd75a4ce68107786b4fcb90e4968`: **232 differing paths** and both complete-tree fingerprints match; 15 checker tests pass. Original September counts and archive evidence above remain historical.
+
+The Obsidian artifact/declaration and plugin production builds passed. Four new mounted-editor public-API selection regressions pass in ordinary Vitest; two fail when the incoming selection module is used without the fork override. Exact-build Obsidian 1.14.4 smoke and affected main/popout input, crop, anchoring, embed-magnification, and teardown probes passed with clean error buffers and verified final cleanup. Plugin `main.js` is 4,994,944 bytes. Standard `window.h`-dependent selection/crop/duplicate suites fail at collection, and the repo-wide typecheck fails in the existing generated/test graph; package declarations and a focused source-graph typecheck rooted at the new regression file pass. Physical mobile and the manual cases in the review remain open.
+
 From the fork monorepo root, with Python 3.10+:
 
 ```bash
 python dev-docs/Obsidian/test_audit.py
-python dev-docs/Obsidian/audit.py --upstream-ref 5a406e51875157bece389b9bc92d41ff241d5f3d
+python dev-docs/Obsidian/audit.py --upstream-ref 53973c3a423fbd75a4ce68107786b4fcb90e4968
 python dev-docs/Obsidian/audit.py --upstream /absolute/path/to/upstream-root
 python dev-docs/Obsidian/audit.py --upstream /absolute/path/to/excalidraw-upstream-master.zip
 python dev-docs/Obsidian/audit.py --render > /tmp/obsidian-file-inventory.md

@@ -213,6 +213,8 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 
 `P: ExcalidrawAutomate.ts`, scene-data utilities, and `ExcalidrawView.ts` consume these methods; the latter calls `getColorAtScenePoint` and `forceFlushSync`. Extra root exports often expose upstream geometry functions directly. Reuse upstream actions/viewport/selection machinery rather than maintaining equivalent algorithms, but preserve capture/undo timing, group semantics, locked elements, and legacy public signatures. The private unused `ElementStore.add` parameter is a separate safe cleanup candidate, not a reason to delete these adapters. **Gate:** V02, V08, V09, V10; D03, D06.
 
+**PR #458 ownership update (2026-10-06):** unlocked-hit precedence moves from `App.handleSelectionOnPointerDown` to [AppSelectionTool.handleSelectionOnPointerDown](../../packages/excalidraw/components/App.selectionTool.ts). Upstream still clears selection beneath a topmost locked overlap when no unlocked hit is selected; it does not replace this fork requirement. `App.setSelection` remains byte-for-byte intact, including group IDs, bound-text exclusion, and previous selection. The mobile context-menu pointer-move guard remains in App. Selection clearing, pointer-up handling, cropping, and resizing use the upstream extracted owner exactly once. The [new public-API tests](../../packages/excalidraw/tests/obsidianSelection.test.tsx) run without `window.h`; locked-overlap tests fail against the unmodified incoming selection tool and all four pass with the migrated override. Live main/popout behavior and validation limits are recorded in the [merge review](pr-458-merge-review.md).
+
 <a id="obs-030"></a>
 ## OBS-030 — Host Mermaid conversion and editable diagram metadata
 
@@ -241,6 +243,8 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 
 `App` also comments out upstream `window.h`/test-hook initialization. Standard component tests access that test hook; until test setup is verified/restored with an Obsidian-runtime-safe guard, tests' presence is not evidence of an executable passing suite. Restore upstream test-only behavior where possible without polluting production or another editor's runtime. No component tests or builds were run in this audit because dependencies/Obsidian were not provisioned. Only the new inventory checker tests and static/document validations are claimed. **Gate:** V02 and all affected focused lanes; F04.
 
+The PR #458 checkpoint adds four mounted-editor selection regressions using `onExcalidrawAPI` and ordinary DOM events, without the disabled hooks. These pass in the standard Vitest configuration. The existing selection/crop/duplicate suites still fail during collection because `createTestHook` is not exported; this passing new lane does not close F04 or imply the older suites passed.
+
 <a id="obs-034"></a>
 ## OBS-034 — Repository export and local workflow artifacts
 
@@ -268,3 +272,5 @@ The added WeakMap enumeration loop is inert (OBS-019). The private `ElementStore
 **Retain persisted geometry semantics.** [resizeElements.ts](../../packages/element/src/resizeElements.ts) prevents ordinary single-element resizing of `customData.isAnchored` images and preserves anchored dimensions during multi-element transforms, while positions can still change. For iframe/embeddable elements, Shift/aspect-ratio resizing adjusts content magnification through the saved scale tuple instead of treating it like a flipped bitmap. The helper exported for `App.updateContainerSize` preserves upstream dimension calculations around these exceptions.
 
 `P: src/utils/excalidrawViewUtils.ts` sets anchoring; `src/utils/utils.ts` reconciles source asset scaling; `ExcalidrawAutomate.ts` creates anchored images. These are active consumers and saved-data behavior, not redundant generic locked-element handling. Upstream locking and aspect-ratio preservation are not the same as “move the anchored item but keep its intrinsic dimensions” or “resize the embed's content scale.” A plugin-side implementation would need an appropriate pre-transform hook and matching undo behavior. **Gate:** V08, V10; test single/multi selection, signed scale, and embedded content sharpness.
+
+PR #458 moves the unchanged resize/crop dispatch from App into `AppSelectionTool`; the customized `resizeElements.ts` remains its transform implementation. Native main/popout probes confirm an anchored image keeps its dimensions, Shift-resizing an embed changes its magnification, and a decoded PNG crops through the extracted handle path. This does not replace multi-selection, signed-scale, export, or physical-device coverage.
