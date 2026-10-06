@@ -106,6 +106,8 @@ The public object is assembled in `App.tsx` and declared in `ExcalidrawImperativ
 
 `P: src/shared/ExcalidrawAutomate.ts`, `src/view/ExcalidrawView.ts`, and plugin view/asset managers are active consumers of these families. Compatibility names can remain even after their implementation becomes a direct upstream delegate.
 
+PR #458 moves input selection/crop/resize implementation into `AppSelectionTool` without changing these host/public contracts or protocol versions. The fork's `AppClassProperties.setSelection` remains on App; it is still not a new method on the returned imperative API. The unlocked-overlap override belongs to the extracted selection tool, while host selection/z-order wrappers stay on App.
+
 ## Extra root-library exports — OBS-007/013/029/030
 
 The following are exposed by the fork's [root entry](../../packages/excalidraw/index.tsx) in addition to upstream's exports. Some merely re-export upstream helpers; public exposure, not a new algorithm, is the fork change.
