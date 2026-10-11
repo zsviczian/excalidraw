@@ -2,7 +2,8 @@
   "schema_version": 1,
   "review": {
     "date": "2026-10-11",
-    "method": "PR #462 three-way source/consumer review of all 22 incoming paths; nine ledger rows reviewed before refresh, including prior PR #459-461 baseline drift. Byte-complete comparison against exact incoming upstream. See pr-462-merge-review.md.",
+    "dependency_precommit_tests": "Required yarn test:update: 54 suites/605 tests pass; 94 suites fail during collection due to existing disabled createTestHook and missing topPicksDnD import. The two unrelated generated snapshot files were restored to their previously clean bytes before commit.",
+    "method": "PR #462 three-way source/consumer review of all 22 incoming paths; nine ledger rows reviewed before refresh, including prior PR #459-461 baseline drift. Byte-complete comparison against exact incoming upstream. See pr-462-merge-review.md. Dependency checkpoint: reviewed the three manifest/lock rows against the same upstream; Sass becomes build-only, source-map-js resolves to 1.2.2. See OBS-002.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
       "fork_parent": "6ec95a327b77df2696e170cb0c9d8a84ac115121",
@@ -11,13 +12,13 @@
       "state": "resolved source review",
       "reference": "https://github.com/zsviczian/excalidraw/pull/462"
     },
-    "runtime_validation": "Exact-build Obsidian 1.14.4/macOS smoke plus affected selection, crop, resize and 16 raw/parsed text-history cases across main/new popout pass; teardown, errors and cleanup pass. Synthetic events; native CDP stalled, ordinary window.h/stale-type lanes and physical-mobile/cold-restart gates remain limited. See pr-462-merge-review.md."
+    "runtime_validation": "Exact-build Obsidian 1.14.4/macOS smoke plus affected selection, crop, resize and 16 raw/parsed text-history cases across main/new popout pass; teardown, errors and cleanup pass. Synthetic events; native CDP stalled, ordinary window.h/stale-type lanes and physical-mobile/cold-restart gates remain limited. See pr-462-merge-review.md.",
+    "dependency_checkpoint": "2026-10-11: Obsidian artifact/declaration and plugin production/library builds pass. Local fork Windows Obsidian 1.14.4 smoke passes. Published 0.18.140 main/direct-popout/moved-popout input/save/cleanup smoke passes. Plugin npm tree/audit confirms no braces and source-map-js 1.2.2. Component full typecheck remains blocked by documented window.h/stale test-type failures. Packed manifest confirms Sass dev-only; no publication/version bump. The 5 MB target is 5 * 1024 * 1024 = 5,242,880 bytes. Plugin main.js: 5,051,865 bytes with published component (191,015 bytes of headroom), 5,057,617 with local fork (185,263 bytes of headroom); both are below the target. No full scanner, macOS or physical-mobile run in this checkpoint."
   },
   "sources": {
     "fork": {
-      "kind": "resolved Git working tree",
-      "parent_commit": "6ec95a327b77df2696e170cb0c9d8a84ac115121",
-      "incoming_commit": "e65eca999e071503efb893d3379a29fb96ff37c4",
+      "kind": "Git working tree",
+      "parent_commit": "ba7f583bedfce4491f20f5430fa306044173bb65",
       "package": "@zsviczian/excalidraw",
       "version": "0.18.140"
     },
@@ -29,8 +30,8 @@
       "version": "0.18.0"
     },
     "plugin": {
-      "kind": "local Git commit",
-      "commit": "bf541ca5d460f5773a5547ba4511eba3ff0f2e5b",
+      "kind": "Git working tree",
+      "commit": "3cef89dcdadf6c80171a23ebb1036f77ea7656c1",
       "version": "2.28.1",
       "fork_dependency": "0.18.140"
     }
@@ -38,7 +39,7 @@
   "comparison": {
     "fork": {
       "files": 1302,
-      "sha256": "2365a493f28ee70b8c1d6f65230913c157771bd32e3477dfad54ed84a4ddf701"
+      "sha256": "08e5e9a9ef9a3494203f3130f96e220ee47f21874b98f2c3edd15956719589d1"
     },
     "upstream": {
       "files": 1312,
@@ -757,13 +758,13 @@
     {
       "path": "package.json",
       "status": "modified",
-      "fork_sha256": "613eb383df818f29000309084822509f27477e584a7d918afcc96d086756cf6d",
+      "fork_sha256": "4f088787173cb94de03db69d9720fd5a63f64b54397f41482e0407d027fdb1a6",
       "upstream_sha256": "7b7a3a1ac12b2a3d15ee280c02abce3fb4beafdd7156a05b4e9c5446aa66bb1c",
       "ids": [
         "OBS-002",
         "OBS-034"
       ],
-      "note": "Fork export/update scripts, dependency resolutions/overrides, and Yarn dependency; do not mistake lockfile churn for product behavior.",
+      "note": "Fork export/update scripts, dependency resolutions/overrides, and Yarn dependency; do not mistake lockfile churn for product behavior. Root source-map-js resolution pins patched 1.2.2 (2026-10-11 dependency review).",
       "kind": "packaging"
     },
     {
@@ -2612,14 +2613,14 @@
     {
       "path": "packages/excalidraw/package.json",
       "status": "modified",
-      "fork_sha256": "cf706472727419d9486aabbaebb7e0f3ebbf29fd522f75b9bd54903888a18409",
+      "fork_sha256": "46bef0c8dc1ba176a98d6963f22bdb5ccf7a80ecd3bc09cef4c148f30cc0f82b",
       "upstream_sha256": "160dabbd052e579a5b7b0e341d653e0739d17d44d68f16be8c1cf893e1e4236d",
       "ids": [
         "OBS-002",
         "OBS-003",
         "OBS-004"
       ],
-      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE.",
+      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version.",
       "kind": "packaging"
     },
     {
@@ -3007,12 +3008,12 @@
     {
       "path": "yarn.lock",
       "status": "modified",
-      "fork_sha256": "f6393cf58cc60c55bbbfa812f93593f222024398f6db15e3b0450b63649a3069",
+      "fork_sha256": "fcbe1f29d7024f9ddfa99a573a6c361cce6ca01aace6c0126879cd3767b8dd20",
       "upstream_sha256": "2fceed8bdb8180b2d14ab0db6010f48b05da0f3a772e218a7024e88ca7a7c76e",
       "ids": [
         "OBS-002"
       ],
-      "note": "Resolved dependency/transitive graph churn accompanying manifest overrides; not evidence of isolated Obsidian behavior or verified vulnerability remediation.",
+      "note": "Resolved dependency/transitive graph churn accompanying manifest overrides; not evidence of isolated Obsidian behavior or verified vulnerability remediation. This checkpoint changes only source-map-js from 1.2.1 to patched 1.2.2; other development advisories remain.",
       "kind": "packaging"
     }
   ],
