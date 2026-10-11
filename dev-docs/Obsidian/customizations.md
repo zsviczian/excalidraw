@@ -140,6 +140,8 @@ Its added `pruneOrphanGroupIds` counts nondeleted group members and removes grou
 
 `P: src/shared/EmbeddedFileLoader.ts`, `src/shared/ImageCache.ts`, PDF utilities, and element custom-data utilities produce or preserve the metadata. A universal dark-mode filter would not match mixed bitmap/vector/PDF assets. Upstream already renders images and SVG; retain only the host-specific transformations around that pipeline. Keep signed scale, cropping, PDF rotation, large-canvas fallback, and dark/light canvas/export results consistent. Actual device limits come from the adapter, not from assuming all current browsers share a limit. **Gate:** V06, V09, V10; no environment-specific limit claim was independently benchmarked.
 
+PR #463 adopts upstream's single-bitmap faded/clip crop rendering while retaining host canvas limits, inversion flags/iOS handling, custom pen/frame rendering and iframe scale semantics. No saved metadata or export contract changes. See the [merge review](pr-463-merge-review.md) for source and main/popout evidence.
+
 <a id="obs-019"></a>
 ## OBS-019 — Teardown and shared-cache cleanup
 
@@ -225,6 +227,8 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 
 **PR #462 ownership update (2026-10-11):** group-selection helpers now live in upstream [App.selection.ts](../../packages/excalidraw/components/App.selection.ts), and drag, box-selection, frame-membership and transform-handle dispatch follow upstream `AppSelectionTool`. The unlocked-hit override remains unchanged. Keep legacy synchronous `selectElements`/highlight/z-order behavior alongside the new upstream selection API; it is not an equivalent replacement for locked search results or host call ordering. Retained rotated-container imports and the owning-window pointer RAF are fingerprinted. Ten independent mounted-API tests cover both API families. See the [merge review](pr-462-merge-review.md) for consumer accounting and runtime/validation limits.
 
+**PR #463 update (2026-10-11):** crop modifiers, side uncropping and transient drag offsets follow upstream verbatim. The existing unlocked-overlap override, owning-window pointer RAF, host callbacks and mobile flag remain. Upstream now exports `getNextSingleWidthAndHeightFromPointer`, so its fork-only export comment is removed; `App.updateContainerSize` retains the helper and rotation behavior. No host API or protocol changes. See the [merge review](pr-463-merge-review.md).
+
 <a id="obs-030"></a>
 ## OBS-030 — Host Mermaid conversion and editable diagram metadata
 
@@ -286,3 +290,5 @@ The added WeakMap enumeration loop is inert (OBS-019). The private `ElementStore
 PR #458 moves the unchanged resize/crop dispatch from App into `AppSelectionTool`; the customized `resizeElements.ts` remains its transform implementation. Native main/popout probes confirm an anchored image keeps its dimensions, Shift-resizing an embed changes its magnification, and a decoded PNG crops through the extracted handle path. This does not replace multi-selection, signed-scale, export, or physical-device coverage.
 
 PR #462 follows the additional upstream crop/drag/transform-handle extraction without changing saved anchoring or embed-scale behavior. The retained host container-resize API still uses its rotation and resized-coordinate helpers. Validation and platform limits are recorded in the [merge review](pr-462-merge-review.md).
+
+PR #463 retains both anchored single/multi resize guards and embed magnification. Only the now-upstream dimension-helper export loses its redundant fork comment. New crop options do not change saved image/PDF metadata or embed scale; main/popout integration evidence and signed/multi-selection limits are recorded in the [merge review](pr-463-merge-review.md).

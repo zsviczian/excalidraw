@@ -2,6 +2,14 @@
 
 This document distinguishes **performed checks** from **required future gates**. It records the initial documentation/checker audit and the subsequent local CLI smoke; it is not a component release sign-off. Gate IDs below are referenced throughout the [catalog](customizations.md) and [retirement backlog](decustomization.md).
 
+## PR #463 crop and text resize (2026-10-11)
+
+The [three-way review](pr-463-merge-review.md) accounts for all ten incoming paths and five customized ledger rows against `2df993fb397dd6d64625908c9c10337727617f6f`. Adopt upstream crop/modifier/uncrop and text corner geometry, retaining host input/mobile controls, anchoring, embed scale, rendering metadata and geometry APIs. The dimension helper's now-upstream export permits retiring its redundant fork comment; no complete OBS ID or host API is retired.
+
+Obsidian artifact/declaration, isolated source typecheck, 16 independent tests, 11 host-runner tests, 15 checker tests and the 232-path complete fingerprint check pass. Production lint warnings and all 256 full typecheck diagnostics are unchanged under the same source/type environment. Required snapshot-update testing passes 54 suites/605 tests with 94 existing collection failures; unrelated snapshot output is restored. Ordinary crop/resize suites remain unavailable because of disabled App hooks, with changed behavior tested through the real mounted editor instead.
+
+Plugin production/development builds and exact-build Obsidian 1.14.4/macOS main/new-popout crop modifiers, dynamic recomputation, handle retention, uncropping/undo/redo, rotated/flipped crop metadata and horizontal text corner resize pass. Existing selection, anchored resize, embed magnification, rotated container sizing and 16 Markdown-history variants across both windows pass; grouped Cmd-click adds 12 assertions per window. Teardown, captured errors and owned cleanup pass. Main.js is 5,057,545 bytes (185,335 bytes under the 5 MiB target). These are synthetic owner-window desktop probes; physical input/mobile, other desktop systems, cold restart/restored popouts and broad PDF/export/signed/multi-resize coverage remain separate. Reports and exact hashes are in the review. The plugin source/dependency remains clean, with no publication.
+
 ## PR #462 selection extraction (2026-10-11)
 
 The [three-way review](pr-462-merge-review.md) accounts for all 22 incoming paths and the nine reviewed ledger updates against upstream `e65eca999e071503efb893d3379a29fb96ff37c4`. Host selection/highlight/z-order signatures, locked-hit precedence, owning-window RAF, rotated container APIs and Markdown callbacks remain; the new upstream selection implementation is unchanged. No customization is retired and no protocol, dependency, version or saved-field changes are made.

@@ -110,6 +110,8 @@ PR #458 moves input selection/crop/resize implementation into `AppSelectionTool`
 
 PR #462 adds the unchanged upstream `selection.select/add/remove/clear` API alongside the legacy host methods. `selectElements(elements, highlightSearchResult?)` remains synchronous, allows locked targets, uses exactly the supplied IDs and skips capture; the new API resolves scene IDs, expands groups unless deep, filters locked targets unless requested, follows editor-session/link state and applies on the next render. Preserve both contracts. Group helpers move to upstream `App.selection.ts`; no host protocol or saved-field changes. See the [merge review](pr-462-merge-review.md).
 
+PR #463 changes only upstream crop internals and text corner sizing. `PointerDownState.drag.lastOffset` is transient and additive; existing plugin `onPointerDown` arguments and grouped-link interception remain unchanged. The dimension helper needed by `updateContainerSize` is now exported by upstream itself. Host protocols, legacy imperative methods, raw Markdown, image/PDF customData and serialized fields remain unchanged. See the [merge review](pr-463-merge-review.md).
+
 ## Extra root-library exports — OBS-007/013/029/030
 
 The following are exposed by the fork's [root entry](../../packages/excalidraw/index.tsx) in addition to upstream's exports. Some merely re-export upstream helpers; public exposure, not a new algorithm, is the fork change.

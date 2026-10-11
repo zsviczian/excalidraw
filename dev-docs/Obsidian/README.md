@@ -18,9 +18,9 @@ Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md]
 
 ## Current merge checkpoint
 
-The 2026-10-11 [PR #462 review](pr-462-merge-review.md) compares the resolved merge with incoming upstream `e65eca999e071503efb893d3379a29fb96ff37c4`. The fork parent is `6ec95a327b77df2696e170cb0c9d8a84ac115121`; their merge base is `4c00f31ddcc20086bac1020428819fe0b9a30bce`. The ledger contains **164 modified, 29 fork-only, and 39 upstream-only paths** (232 total); complete tree counts are 1,302 fork files and 1,312 upstream files.
+The 2026-10-11 [PR #463 review](pr-463-merge-review.md) compares the resolved merge with incoming upstream `2df993fb397dd6d64625908c9c10337727617f6f`. The fork parent is `2e82aa6558a780df81d29c74c6e3b8a2dd8f75ce`; their merge base is `e65eca999e071503efb893d3379a29fb96ff37c4`. The ledger remains **164 modified, 29 fork-only, and 39 upstream-only paths** (232 total); complete tree counts are 1,302 fork files and 1,312 upstream files.
 
-The JSON's `sources`, `review`, and `comparison` describe this checkpoint. `original_sources` and `initial_review` preserve the initial archive evidence below; [PR #458](pr-458-merge-review.md) remains the prior extraction record. All 22 incoming paths and nine changed ledger rows were reviewed, including prior WYSIWYG/pan, Drive-video and text-history baseline drift. No customization was retired. Upstream's new selection module is unchanged; host selection APIs, unlocked-hit precedence, rotated-container imports, raw Markdown and owner-window scheduling remain intact. Source/build and live validation, including limitations, are recorded in the [merge review](pr-462-merge-review.md) and [validation record](validation.md).
+All ten incoming paths and five changed ledger rows were reviewed. Crop geometry/rendering and dominant-axis text corner resizing follow upstream; custom pens, frames, image inversion/limits, anchored resize, embed magnification, host geometry APIs, mobile controls and plugin input hooks remain intact. Upstream now exports the dimension helper used by `App.updateContainerSize`, so its redundant fork export comment is retired without removing the helper or host consumer. No whole OBS ID is retired. The JSON's `sources`, `review`, and `comparison` describe this checkpoint; original archive provenance stays immutable. [PR #462](pr-462-merge-review.md) and [PR #458](pr-458-merge-review.md) preserve previous extraction reviews. Source/build and runtime evidence, including limits, are in the [merge review](pr-463-merge-review.md) and [validation record](validation.md).
 
 ## Initial scope and baseline
 
@@ -58,7 +58,7 @@ Requires Python 3.10+ only. Run from the fork monorepo root. No dependency insta
 
 ```bash
 python dev-docs/Obsidian/test_audit.py
-python dev-docs/Obsidian/audit.py --upstream-ref e65eca999e071503efb893d3379a29fb96ff37c4
+python dev-docs/Obsidian/audit.py --upstream-ref 2df993fb397dd6d64625908c9c10337727617f6f
 ```
 
 `--upstream` can instead name the supplied upstream ZIP. `--fork` defaults to the repository containing this script and can also name a clean directory or ZIP. Comparing the **original** fork ZIP against the handoff ledger should report the two intentional root-policy edits; use the patched checkout for a clean handoff comparison.

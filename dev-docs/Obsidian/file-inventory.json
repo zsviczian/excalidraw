@@ -2,30 +2,30 @@
   "schema_version": 1,
   "review": {
     "date": "2026-10-11",
-    "dependency_precommit_tests": "Required yarn test:update: 54 suites/605 tests pass; 94 suites fail during collection due to existing disabled createTestHook and missing topPicksDnD import. The two unrelated generated snapshot files were restored to their previously clean bytes before commit.",
-    "method": "PR #462 three-way source/consumer review of all 22 incoming paths; nine ledger rows reviewed before refresh, including prior PR #459-461 baseline drift. Byte-complete comparison against exact incoming upstream. See pr-462-merge-review.md. Dependency checkpoint: reviewed the three manifest/lock rows against the same upstream; Sass becomes build-only, source-map-js resolves to 1.2.2. See OBS-002.",
+    "dependency_precommit_tests": "PR #463 required yarn test:update: 54 suites/605 tests pass; 94 suites fail during collection due to existing disabled createTestHook and missing topPicksDnD import. Both unrelated generated snapshot files restored to their previously clean bytes.",
+    "method": "PR #463 three-way source/consumer review of all ten incoming paths, including auto-merges; five ledger rows reviewed before refresh. Byte-complete comparison against exact incoming upstream. See pr-463-merge-review.md. Earlier dependency checkpoint evidence remains below.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
-      "fork_parent": "6ec95a327b77df2696e170cb0c9d8a84ac115121",
-      "upstream_parent": "e65eca999e071503efb893d3379a29fb96ff37c4",
-      "merge_base": "4c00f31ddcc20086bac1020428819fe0b9a30bce",
+      "fork_parent": "2e82aa6558a780df81d29c74c6e3b8a2dd8f75ce",
+      "upstream_parent": "2df993fb397dd6d64625908c9c10337727617f6f",
+      "merge_base": "e65eca999e071503efb893d3379a29fb96ff37c4",
       "state": "resolved source review",
-      "reference": "https://github.com/zsviczian/excalidraw/pull/462"
+      "reference": "https://github.com/zsviczian/excalidraw/pull/463"
     },
-    "runtime_validation": "Exact-build Obsidian 1.14.4/macOS smoke plus affected selection, crop, resize and 16 raw/parsed text-history cases across main/new popout pass; teardown, errors and cleanup pass. Synthetic events; native CDP stalled, ordinary window.h/stale-type lanes and physical-mobile/cold-restart gates remain limited. See pr-462-merge-review.md.",
+    "runtime_validation": "PR #463 exact-build Obsidian 1.14.4/macOS main/new-popout crop modifiers, uncropping, text corner resize, history, retained host workflows and grouped Cmd-click probes pass; teardown, errors and owned cleanup pass. Synthetic input, full-suite/typecheck baseline and physical-device/other-platform limits are recorded in pr-463-merge-review.md.",
     "dependency_checkpoint": "2026-10-11: Obsidian artifact/declaration and plugin production/library builds pass. Local fork Windows Obsidian 1.14.4 smoke passes. Published 0.18.140 main/direct-popout/moved-popout input/save/cleanup smoke passes. Plugin npm tree/audit confirms no braces and source-map-js 1.2.2. Component full typecheck remains blocked by documented window.h/stale test-type failures. Packed manifest confirms Sass dev-only; no publication/version bump. The 5 MB target is 5 * 1024 * 1024 = 5,242,880 bytes. Plugin main.js: 5,051,865 bytes with published component (191,015 bytes of headroom), 5,057,617 with local fork (185,263 bytes of headroom); both are below the target. No full scanner, macOS or physical-mobile run in this checkpoint."
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "ba7f583bedfce4491f20f5430fa306044173bb65",
+      "parent_commit": "2e82aa6558a780df81d29c74c6e3b8a2dd8f75ce",
       "package": "@zsviczian/excalidraw",
       "version": "0.18.140"
     },
     "upstream": {
       "kind": "local Git commit",
-      "commit": "e65eca999e071503efb893d3379a29fb96ff37c4",
-      "tree": "27ebab1219755a46a29421b58c8c3f60fc153362",
+      "commit": "2df993fb397dd6d64625908c9c10337727617f6f",
+      "tree": "e69dcecda257633056bd4cb929eeaea844ad121f",
       "package": "@excalidraw/excalidraw",
       "version": "0.18.0"
     },
@@ -39,11 +39,11 @@
   "comparison": {
     "fork": {
       "files": 1302,
-      "sha256": "08e5e9a9ef9a3494203f3130f96e220ee47f21874b98f2c3edd15956719589d1"
+      "sha256": "87edc3c0ad357c7d3361c0c85998e335d0d445991c8b5b339680061707be791f"
     },
     "upstream": {
       "files": 1312,
-      "sha256": "baed648363e58cf01084a618e8bfd115a97bc6f7faa71541eddc8c31ff7acb81"
+      "sha256": "81565a82ba860c447448efea6d06d6a302047ed5dc0f56820805612a3afa697f"
     }
   },
   "customizations": [
@@ -998,8 +998,8 @@
     {
       "path": "packages/element/src/renderElement.ts",
       "status": "modified",
-      "fork_sha256": "faa0d639fb140a7f6fbd8fb6fa228f8ca71e7186235c08bd62c77930acd4f2c4",
-      "upstream_sha256": "92c12311cef36022d0a6118a5946ee1353a9a0bf6f3a2a3b6f7865773c2be49b",
+      "fork_sha256": "32551ded43623bf157183a61bbe8026e9ba5449694eb3bc1c83b5887c5eb7f6a",
+      "upstream_sha256": "3e2336ab71d128161db8976b992e59176ee598c52cd3297460bab33c5b87f8f2",
       "ids": [
         "OBS-014",
         "OBS-015",
@@ -1007,19 +1007,19 @@
         "OBS-018",
         "OBS-027"
       ],
-      "note": "Custom pen rendering, marker frames/colors, host canvas limits, image inversion/iOS handling, embed border scaling, and selection-width tuning.",
+      "note": "Custom pen rendering, marker frames/colors, host canvas limits, image inversion/iOS handling, embed border scaling, and selection-width tuning. PR #463: crop/text-resize integration reviewed against incoming 2df993fb; see pr-463-merge-review.md.",
       "kind": "behavior"
     },
     {
       "path": "packages/element/src/resizeElements.ts",
       "status": "modified",
-      "fork_sha256": "a0ee2adf0f57431ccabeb9c02f06e8dccc20481bfd021ecaa1507086b75cbb21",
-      "upstream_sha256": "db291eeaa59e817f18612f82226d1e2dfdcf7c38b58c70b450cd9f6d445c71c6",
+      "fork_sha256": "c6bdb7f8ed70d699639b82195a9b7a1004c32ee87da787b767050f5212a743db",
+      "upstream_sha256": "ab1385b240e92a93a133650961fa95196dfac806a593b2c46bf09774f6997e84",
       "ids": [
         "OBS-037",
         "OBS-029"
       ],
-      "note": "Anchored image size protection, Shift embed magnification, and exported next-container-dimension helper.",
+      "note": "Anchored image size protection and Shift embed magnification. PR #463 upstream now exports getNextSingleWidthAndHeightFromPointer; retain the host container consumer and remove only the redundant fork export comment. See pr-463-merge-review.md.",
       "kind": "compatibility"
     },
     {
@@ -1339,12 +1339,12 @@
     {
       "path": "packages/excalidraw/components/App.selectionTool.ts",
       "status": "modified",
-      "fork_sha256": "f8d825889e2250ed62a8fbef951007dc3bfc2a3943c834b1bf4d6634bb5592db",
-      "upstream_sha256": "dafd81592a719bdc10be31d20d56837ff42322f9c5d486a360632ddefadf900a",
+      "fork_sha256": "def8937c4d7b751a1aca89ff269631ca8435c02e1edbcfc99a44c4f3d3339f7e",
+      "upstream_sha256": "a4632dc92bec48a0a2d0ad5f2f90d44984275027e1e74605defeb53ece9dda9e",
       "ids": [
         "OBS-029"
       ],
-      "note": "PR #458: migrate unlocked-hit precedence from App.handleSelectionOnPointerDown into upstream AppSelectionTool; preserve upstream Alt-click cycling and transform ownership. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md.",
+      "note": "PR #458: migrate unlocked-hit precedence from App.handleSelectionOnPointerDown into upstream AppSelectionTool; preserve upstream Alt-click cycling and transform ownership. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #463: crop/text-resize integration reviewed against incoming 2df993fb; see pr-463-merge-review.md.",
       "kind": "behavior"
     },
     {
@@ -1362,8 +1362,8 @@
     {
       "path": "packages/excalidraw/components/App.tsx",
       "status": "modified",
-      "fork_sha256": "1072ff1ccdc757f5457ed66f145c9f307f0ffb17b506099e321e4b4f6eb481c8",
-      "upstream_sha256": "8aaf45ace6e6aa8bedde2b36669aeca42b362ec76755b5de74563fded76da651",
+      "fork_sha256": "cc91c39158f0d92e33d7b3c13060fa4000424e3e55e8a4ef51f552dea749ae9f",
+      "upstream_sha256": "999cdb100f9214fc8d988378fad993d7013caf74021778bd853aafac513d2e80",
       "ids": [
         "OBS-007",
         "OBS-008",
@@ -1386,7 +1386,7 @@
         "OBS-032",
         "OBS-037"
       ],
-      "note": "Main cross-cutting integration: public adapters, early state, scaled webviews, highlighter layer, frame/link UI, image lifecycle, teardown/test-hook suppression, menus/input ordering, host layout, and selection/geometry wrappers. See catalog and API contract table. PR #458: setSelection retained byte-for-byte; selection and transform handlers follow the upstream extraction, with unlocked-hit override now in App.selectionTool.ts. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md.",
+      "note": "Main cross-cutting integration: public adapters, early state, scaled webviews, highlighter layer, frame/link UI, image lifecycle, teardown/test-hook suppression, menus/input ordering, host layout, and selection/geometry wrappers. See catalog and API contract table. PR #458: setSelection retained byte-for-byte; selection and transform handlers follow the upstream extraction, with unlocked-hit override now in App.selectionTool.ts. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #463: crop/text-resize integration reviewed against incoming 2df993fb; see pr-463-merge-review.md.",
       "kind": "integration"
     },
     {
@@ -2915,8 +2915,8 @@
     {
       "path": "packages/excalidraw/types.ts",
       "status": "modified",
-      "fork_sha256": "a12eb58110e9ffd506a1c559363477b34183f2bc4594ae1c4dfae16728a03a69",
-      "upstream_sha256": "72a9c66b3cde194943246509bc82037f945371367a95525480efcf75cf691a29",
+      "fork_sha256": "6cc5a1bf342d9c4569ee6793f54c91e11a6abdb5f80680ea7616ddf1c314d1e3",
+      "upstream_sha256": "ac40747edad09f3cbf9ac5c396e22b71c0a8538191a70370f4a47cea521ec96b",
       "ids": [
         "OBS-007",
         "OBS-008",
@@ -2931,7 +2931,7 @@
         "OBS-029",
         "OBS-030"
       ],
-      "note": "Public/internal extensions for host props, state, renderer fields, image/geometry methods, history, and Mermaid; AppClassProperties.setSelection is not itself an imperative API member. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md.",
+      "note": "Public/internal extensions for host props, state, renderer fields, image/geometry methods, history, and Mermaid; AppClassProperties.setSelection is not itself an imperative API member. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #463: crop/text-resize integration reviewed against incoming 2df993fb; see pr-463-merge-review.md.",
       "kind": "type-compatibility"
     },
     {

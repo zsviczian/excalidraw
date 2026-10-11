@@ -63,6 +63,8 @@ Locate the current upstream owner after an extraction and update the compatibili
 
 **PR #462 evidence:** the new upstream selection API is not a drop-in replacement for legacy `selectElements`: synchronous publication, exact IDs (including locked search matches), highlighting and capture timing differ. Retain the thin legacy method and z-order wrappers; no OBS-029 retirement is approved. The incoming extraction is otherwise adopted verbatim. See [PR #462 review](pr-462-merge-review.md).
 
+**PR #463 partial decustomization:** incoming `2df993fb` exports `getNextSingleWidthAndHeightFromPointer` for upstream cropping. This exactly supplies the export previously added for `App.updateContainerSize`; remove its redundant fork comment and retain the upstream export and host caller. The rotated-container workflow is checked in main/popout. OBS-029/037 remain active because anchoring, embed magnification and host geometry APIs still differ. See [PR #463 review](pr-463-merge-review.md).
+
 <a id="d07"></a>
 ## D07 — Test whether `initState` can retire in favor of upstream initialization
 

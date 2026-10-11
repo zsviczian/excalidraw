@@ -726,8 +726,6 @@ class App extends React.Component<AppProps, AppState> {
   /** current frame pointer cords */
   lastPointerMoveCoords: { x: number; y: number } | null = null;
   private lastCompletedCanvasClicks: { x: number; y: number }[] = [];
-  /** previous frame pointer coords */
-  previousPointerMoveCoords: { x: number; y: number } | null = null;
   allowMobileMode: boolean = true; //zsviczian
 
 
@@ -6769,8 +6767,13 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
     // alt-clicks cycle the selection, so their double-click does nothing
-    // (autoshape doesn't select, alt is its free-text-at-point escape hatch)
-    if (event.altKey && this.state.activeTool.type !== "autoshape") {
+    // (autoshape doesn't select, alt is its free-text-at-point escape hatch;
+    // the crop editor doesn't cycle, alt mirrors the sides it uncrops)
+    if (
+      event.altKey &&
+      this.state.activeTool.type !== "autoshape" &&
+      !this.state.croppingElementId
+    ) {
       return;
     }
     // case: double-clicking with arrow/line tool selected would both create
@@ -6902,7 +6905,16 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     if (selectedElements.length === 1 && isImageElement(selectedElements[0])) {
-      this.startImageCropping(selectedElements[0]);
+      if (
+        !this.selectionTool.maybeUncropSides(
+          selectedElements[0],
+          sceneX,
+          sceneY,
+          event.altKey,
+        )
+      ) {
+        this.startImageCropping(selectedElements[0]);
+      }
       return;
     }
 
@@ -8831,6 +8843,7 @@ class App extends React.Component<AppProps, AppState> {
         hasOccurred: false,
         offset: null,
         origin: { ...origin },
+        lastOffset: { x: 0, y: 0 },
         blockDragging: false,
       },
       eventListeners: {
@@ -9700,10 +9713,6 @@ class App extends React.Component<AppProps, AppState> {
         return;
       }
 
-      const lastPointerCoords =
-        this.previousPointerMoveCoords ?? pointerDownState.origin;
-      this.previousPointerMoveCoords = pointerCoords;
-
       // We need to initialize dragOffsetXY only after we've updated
       // `state.selectedElementIds` on pointerDown. Doing it here in pointerMove
       // event handler should hopefully ensure we're already working with
@@ -9752,9 +9761,6 @@ class App extends React.Component<AppProps, AppState> {
       if (pointerDownState.resize.isResizing) {
         pointerDownState.lastCoords.x = pointerCoords.x;
         pointerDownState.lastCoords.y = pointerCoords.y;
-        if (this.selectionTool.maybeHandleCrop(pointerDownState, event)) {
-          return true;
-        }
         if (this.selectionTool.maybeHandleResize(pointerDownState, event)) {
           return true;
         }
@@ -9920,7 +9926,6 @@ class App extends React.Component<AppProps, AppState> {
           event,
           pointerDownState,
           pointerCoords,
-          lastPointerCoords,
           elementsMap,
         )
       ) {
@@ -10167,7 +10172,6 @@ class App extends React.Component<AppProps, AppState> {
 
       // just in case, tool changes mid drag, always clean up
       this.lassoTrail.endPath();
-      this.previousPointerMoveCoords = null;
 
       SnapCache.setReferenceSnapPoints(null);
       SnapCache.setVisibleGaps(null);
@@ -10767,8 +10771,10 @@ class App extends React.Component<AppProps, AppState> {
         !croppingElementId ||
         // in the cropping mode
         (croppingElementId &&
-          // not cropping and no hit element
-          ((!hitElement && !isCropping) ||
+          // not cropping, nor clicking a crop handle, and no hit element
+          ((!hitElement &&
+            !isCropping &&
+            !pointerDownState.resize.handleType) ||
             // hitting something else
             (hitElement && hitElement.id !== croppingElementId)))
       ) {
