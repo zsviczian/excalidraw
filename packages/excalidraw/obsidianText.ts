@@ -100,3 +100,43 @@ export function getObsidianTextSubmission(
   }
   return { nextOriginalText, rawText, link, hasTextLink };
 }
+
+/**
+ * Discard version-only changes from a raw-to-parsed Markdown round trip.
+ * Author: zsviczian. Reference:
+ * https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/2976
+ * Preparing raw Markdown temporarily changes scene text and dimensions. Even
+ * when submission restores every content property, the new version would make
+ * history record an element delta and erase redo. Restore the pre-edit snapshot
+ * only when all non-metadata properties match; actual edits, link changes and
+ * geometry changes must retain normal history. Standalone editing is untouched.
+ */
+export function restoreObsidianTextAfterEditing(
+  app: App,
+  original: NonDeleted<ExcalidrawTextElement>,
+) {
+  if (!app.props.onBeforeTextEdit) {
+    return;
+  }
+  const current = app.scene.getElement<ExcalidrawTextElement>(original.id);
+  if (!current || !isTextElement(current)) {
+    return;
+  }
+  const keys = new Set([...Object.keys(original), ...Object.keys(current)]);
+  for (const key of keys) {
+    if (key === "version" || key === "versionNonce" || key === "updated") {
+      continue;
+    }
+    if (
+      original[key as keyof ExcalidrawTextElement] !==
+      current[key as keyof ExcalidrawTextElement]
+    ) {
+      return;
+    }
+  }
+  app.scene.replaceAllElements(
+    app.scene
+      .getElementsIncludingDeleted()
+      .map((element) => (element.id === original.id ? original : element)),
+  );
+}

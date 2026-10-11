@@ -2,6 +2,48 @@
 
 This document distinguishes **performed checks** from **required future gates**. It records the initial documentation/checker audit and the subsequent local CLI smoke; it is not a component release sign-off. Gate IDs below are referenced throughout the [catalog](customizations.md) and [retirement backlog](decustomization.md).
 
+## Issue #2976: text-edit history
+
+The paired `fix-2976-text-undo` branches preserve restored scene source when
+reopening text and preserve redo after an unchanged raw/parsed Markdown round
+trip. The component adds only an internal helper and two call-site lines; no
+public API, protocol, dependency, version or persisted-data changes.
+
+The maintainer approved merging these paired source checkpoints before package
+publication. The component package and plugin's exact dependency remain at
+`0.18.140`; the complete fix requires the unpublished component changes. Publish
+the component later with the next batch, update the plugin's dependency/lockfile,
+and verify the published pair before plugin 2.29.0, planned for the end of October
+2026. The maintainer also confirmed that the local solution works.
+
+- Component Obsidian artifact/declaration build passed; all six focused
+  `obsidianText.test.ts` tests and ESLint for the three changed source/test files
+  passed. A focused TypeScript source graph rooted at that test passed. The
+  repository-wide typecheck still fails in the existing `window.h` and test graph.
+- Local component artifacts were copied into the plugin's ignored installed
+  package, then its production build and 11 host-runner tests passed. Windows
+  Obsidian 1.14.0 passed all 16 combinations of raw/parsed mode, keyboard/toolbar
+  history and plain, wikilink, extra-bracket (`[[link]]]`) and aliased source.
+  Reopening after undo/redo, unchanged submission, editing after undo and
+  legacy/empty source checks passed. JavaScript errors and fixture cleanup passed.
+  Cleanup awaits the drawing's empty-view transition before deleting it; a final
+  disk check confirms that close/save did not recreate the fixture.
+  Plugin `main.js`: 4,995,385 bytes. This is an unpublished integration checkpoint.
+- Inventory comparison used upstream
+  `53973c3a423fbd75a4ce68107786b4fcb90e4968`. The three changed file rows were
+  reviewed and refreshed. The same comparison of the starting fork HEAD
+  `b7f9961e184d2bc946340594c3b17beae8b59d4b` already fails for `App.tsx`,
+  `wysiwyg/textWysiwyg.tsx`, `wysiwyg/textWysiwyg.test.tsx`, the unlisted
+  `tests/embeddable.test.tsx` and the full fork-tree fingerprint. Those unrelated
+  merge-checkpoint differences remain unapproved by this patch; the checker
+  retains those five baseline findings.
+
+The highest-risk remaining workflow is parsed text inside a bound container,
+where editing can also resize the container. Check unchanged reopen and real
+edits there, including undo/redo. Repeat on macOS (Command+Z/Shift+Command+Z),
+main window and popout, and a physical phone/tablet using toolbar history.
+Mobile touch and popout behavior were not established by the Windows CDP run.
+
 ## Initial review: what was checked
 
 Review date: 2026-09-29. Inputs and exact archive hashes are in [file-inventory.json](file-inventory.json). The audit read `AGENTS.md` and `CONTRIBUTING.md` in all three supplied repositories, with the fork/plugin policies governing integration and compatibility. Source/consumer review included the fork's `CLAUDE.md`, package/build configuration, plugin runtime/adapters, mount/migration and scripting consumers, and the full path-level upstream-to-fork delta.

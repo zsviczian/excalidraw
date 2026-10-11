@@ -57,6 +57,7 @@ import { getFontSize } from "../actions/actionProperties"; // zsviczian -- retai
 import {
   getObsidianTextSubmission,
   prepareObsidianTextForEditing,
+  restoreObsidianTextAfterEditing,
 } from "../obsidianText"; // zsviczian -- keep Markdown conversion in the Obsidian helper
 import { withBatchedUpdates } from "../reactUtils";
 import { isPointHittingTextAutoResizeHandle } from "../textAutoResizeHandle";
@@ -188,6 +189,7 @@ export class AppText {
     },
   ) {
     const elementsMap = this.app.scene.getElementsMapIncludingDeleted();
+    const originalElement = { ...element }; // zsviczian -- snapshot before raw Markdown preparation, plugin #2976
 
     const updateElement = (
       nextOriginalText: string,
@@ -336,6 +338,7 @@ export class AppText {
           submission.link,
           submission.hasTextLink,
         );
+        restoreObsidianTextAfterEditing(this.app, originalElement); // zsviczian -- unchanged Markdown must preserve redo, plugin #2976
         // zsviczian END
 
         // keyboard-submit keeps focus on the edited object. For bound text, keep
