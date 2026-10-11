@@ -1470,6 +1470,24 @@ export interface ExcalidrawImperativeAPI {
   getColorAtScenePoint: InstanceType<typeof App>["getColorAtScenePoint"]; //zsviczian
   startLineEditor: InstanceType<typeof App>["startLineEditor"]; //zsviczian
   refreshAllArrows: InstanceType<typeof App>["refreshAllArrows"]; //zsviczian
+  /**
+   * Selects elements (or their ids — one or many), adds them to or removes
+   * them from the selection, or clears it — as the editor does: an element is
+   * selected with its group (unless `deep`), a frame and its children aren't
+   * selected at the same time, and locked elements are skipped (unless
+   * `includeLocked`). Text editing and cropping end, and the link popup of a
+   * lone selected element shows. Missing and deleted elements are skipped.
+   *
+   * By default the change is recorded for undo along with the next undoable
+   * change — pass `captureUpdate` as for `updateScene()` otherwise. Like
+   * `updateScene()`, it applies on the next render: read it back through
+   * `onChange()` or `getAppState()` after that. Works in view mode too, where
+   * the selection shows without transform handles.
+   */
+  selection: Pick<
+    InstanceType<typeof App>["selection"],
+    "select" | "add" | "remove" | "clear"
+  >;
   getSceneElements: InstanceType<typeof App>["getSceneElements"];
   getAppState: () => InstanceType<typeof App>["state"];
   getFiles: () => InstanceType<typeof App>["files"];

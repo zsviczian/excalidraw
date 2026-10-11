@@ -61,6 +61,8 @@ The root `registerFontsInCSS` helper and root `getEmbedLink` alias lack an ident
 
 Locate the current upstream owner after an extraction and update the compatibility import/wrapper there. Selection/highlight timing, arrow recalculation, and text-container changes still need tests; an identically named upstream method is not automatically identical behavior. Gate: V02/V08, API/type snapshots and scripted selection, undo, ordering, bindings, and geometry.
 
+**PR #462 evidence:** the new upstream selection API is not a drop-in replacement for legacy `selectElements`: synchronous publication, exact IDs (including locked search matches), highlighting and capture timing differ. Retain the thin legacy method and z-order wrappers; no OBS-029 retirement is approved. The incoming extraction is otherwise adopted verbatim. See [PR #462 review](pr-462-merge-review.md).
+
 <a id="d07"></a>
 ## D07 — Test whether `initState` can retire in favor of upstream initialization
 

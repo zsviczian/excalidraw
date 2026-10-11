@@ -2,6 +2,16 @@
 
 This document distinguishes **performed checks** from **required future gates**. It records the initial documentation/checker audit and the subsequent local CLI smoke; it is not a component release sign-off. Gate IDs below are referenced throughout the [catalog](customizations.md) and [retirement backlog](decustomization.md).
 
+## PR #462 selection extraction (2026-10-11)
+
+The [three-way review](pr-462-merge-review.md) accounts for all 22 incoming paths and the nine reviewed ledger updates against upstream `e65eca999e071503efb893d3379a29fb96ff37c4`. Host selection/highlight/z-order signatures, locked-hit precedence, owning-window RAF, rotated container APIs and Markdown callbacks remain; the new upstream selection implementation is unchanged. No customization is retired and no protocol, dependency, version or saved-field changes are made.
+
+The Obsidian artifact/declaration build, isolated mounted-API source typecheck, 16 focused selection/Markdown tests, 11 offline host-runner tests, 15 inventory-checker tests and the complete 232-path source comparison pass. Touched lint introduces no findings. The full typecheck has 217 existing diagnostics plus 39 incoming assertions against the stale `window.h.app` App type; the ordinary hooked suite is not a passing lane. See the review for the temporary diagnostic-hook restoration, formatting/tooling details and exact limits.
+
+Both plugin production and development builds pass against the four local artifacts; the final production build reproduces the tested SHA-256. Main.js is 4,995,829 bytes (4,171 bytes below a decimal 5 MB limit), 444 bytes above the previous recorded checkpoint. No plugin production source or dependency/lockfile change is part of this merge.
+
+On Obsidian 1.14.4/macOS, exact-build load/reload, main/new-popout selection, drag, duplication, box selection, locked search/highlight, z-order, anchored resize, decoded PNG crop movement, embed scale and rotated-container probes pass. Sixteen raw/parsed text cases across the two windows preserve source, undo and redo after unchanged submission through the new API. Popout teardown leaves the main editor usable; error and disposable-fixture/controller cleanup checks pass. These use bounded synthetic owning-window events and public APIs. Native CDP input stalled and is explicitly not passed; physical mobile, other desktop systems, cold app restart/restored popouts and broad legacy/export/signed/multi-resize coverage remain separate gates. The exact-build report is local at `/tmp/pr462-feature-smoke/report.json`; source and artifact identity are recorded in the review.
+
 ## Issue #2976: text-edit history
 
 The paired `fix-2976-text-undo` branches preserve restored scene source when
