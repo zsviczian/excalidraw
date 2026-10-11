@@ -1349,13 +1349,13 @@
     {
       "path": "packages/excalidraw/components/App.text.ts",
       "status": "modified",
-      "fork_sha256": "c963534650cd076416264b9f8523deed79767263a3f08489a45b67df885704db",
+      "fork_sha256": "c32d3d6297afcebf37ae5dd5db550693b65e97516c4a72ee92f86a2055593d70",
       "upstream_sha256": "5235d73e60ff36d60ff7c18bd494d1ff58ab30a3db239a9c744790ce2af8a276",
       "ids": [
         "OBS-009",
         "OBS-026"
       ],
-      "note": "Delegate before-edit/before-submit Markdown lifecycle to obsidianText; initialize raw text and adjusted font size.",
+      "note": "Upstream text-session owner with narrow Obsidian calls: Markdown preparation/submission, zoom-aware creation, and unchanged-source history restoration for plugin #2976.",
       "kind": "integration"
     },
     {
@@ -2558,25 +2558,25 @@
     {
       "path": "packages/excalidraw/obsidianText.test.ts",
       "status": "fork-only",
-      "fork_sha256": "7540b31e49383ac4480974f3b7fccebe8b6c72c0c33867cdf9d009840068c720",
+      "fork_sha256": "b28222b1db4cfdc430ad82f77c4eabfe178702d189cfb299a15d4bbc46b35091",
       "upstream_sha256": null,
       "ids": [
         "OBS-009",
         "OBS-033"
       ],
-      "note": "Raw Markdown before edit and independent parsed text/link on submission.",
+      "note": "Raw Markdown and submission regressions, including unchanged history deltas and preservation of real source, geometry and link changes for plugin #2976.",
       "kind": "test"
     },
     {
       "path": "packages/excalidraw/obsidianText.ts",
       "status": "fork-only",
-      "fork_sha256": "844b14b90f86f820141bda0dcb6627c1c060688bdadcbb612d3e376f1f13836f",
+      "fork_sha256": "85257605bc42f39ae61b5c840c110ef58eee924914bc534f744e124f9a267452",
       "upstream_sha256": null,
       "ids": [
         "OBS-009",
         "OBS-010"
       ],
-      "note": "Small fork-owned before-edit/submission helpers preserving raw versus displayed text and optional link sync.",
+      "note": "Fork-owned raw/display text and link helpers; restore unchanged pre-edit content to avoid version-only history deltas clearing redo (plugin #2976).",
       "kind": "integration"
     },
     {
