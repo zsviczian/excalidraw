@@ -2,6 +2,18 @@
 
 This document distinguishes **performed checks** from **required future gates**. It records the initial documentation/checker audit and the subsequent local CLI smoke; it is not a component release sign-off. Gate IDs below are referenced throughout the [catalog](customizations.md) and [retirement backlog](decustomization.md).
 
+## W layout follow-up (#12264, 2026-10-12)
+
+Branch `fix/wrap-tray-mode-12264`, parent `bee1292f3` (already version 0.18.142). The action predicate and W key test share a fingerprinted gate using `isFullPanelMode(app)` plus compact/tablet; mobile is excluded. AGENTS has the requested short layout reminder. Inventory has 233 differing paths against the unchanged PR #465 upstream baseline: one new OBS-022/029 action row, plus reviewed policy/test/version fingerprints. No version/dependency/public API or persisted-field changes.
+
+25 focused tests, touched lint (zero warnings), the isolated selection/wrap source typecheck, Obsidian artifacts/declarations and plugin production/development builds pass. Full typecheck remains at 262 existing diagnostics with none in the changed files. Plugin main.js is 5,060,946 bytes (181,934 under 5 MiB), SHA-256 `79376b4e3899409d3fe327ed7b48c5e4a149e29d66f0df92a1caeb9ae7c24983`. Development retains existing published-package type/source-map warnings; plugin source/dependency is unchanged. No package publication or plugin dependency change.
+
+Baseline mounted tests already pass full/tray/compact; the mobile case fails before the new gate and passes afterward. Thus the original reported tray failure is not reproduced, and this checkpoint must not claim its cause was identified. A supplementary exact-build live probe passed full-mode W wrap/unwrap, link ownership and undo/redo, then stopped because the plugin's host UI did not mount the requested command palette. It restored the original test-vault layout and removed its owned drawing/controller. No full live mode-matrix, popout, physical tablet/mobile or native keyboard pass is claimed. Further live probing was stopped at the maintainer's request to finish. Manual follow-up: try W in the original failing tray drawing and on a tablet keyboard.
+
+The precommit snapshot-update run was stopped at the maintainer's explicit request to skip further testing and commit/merge. Unrelated generated snapshots were restored; no full-suite completion is claimed.
+
+The precommit snapshot-update run was stopped at the maintainer's explicit request to skip further testing and commit/merge. Unrelated generated snapshots were restored; no full-suite completion is claimed.
+
 ## PR #465 wrapping and frames (2026-10-12)
 
 The [three-way review](pr-465-merge-review.md) accounts for all 25 incoming paths against `541653c7c9d587d463a47daacff9fb30e45a52e7`. Bound-link behavior moves to extracted helpers; narrow fingerprinted AppWrap transfer points fix the reproduced loss of links when deleting/restoring containers. Marker guards, raw Markdown and host/window contracts remain. Two complete path differences retire with proof: bounds' inert comment and actionFrame's redundant theme/inert factory argument. Ledger remains 232 paths (163 modified, 30 fork-only, 39 upstream-only), with 12 refreshed existing rows and two new classifications.

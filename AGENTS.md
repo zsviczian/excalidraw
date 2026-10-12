@@ -173,6 +173,7 @@ When changing a menu or popover:
 
 ## Coding And Documentation
 
+- For full desktop/tray layout behavior, use `isFullPanelMode(app)` from `obsidianUtils.ts`; a `"full"`-only check excludes the tray. Include compact/tablet explicitly when supported, and test shortcut availability separately in mobile layout.
 - Follow upstream TypeScript, React, Sass, import, and formatting conventions in the touched area.
 - Use TSDoc/high-signal comments for exported APIs, new fork helpers, package-loading logic, and non-obvious compatibility workarounds.
 - Preserve public Excalidraw exports, serialized scene compatibility, and independently consumed host adapter contracts. Apply the coordinated internal-protocol rule above to the paired Obsidian host adapters.
