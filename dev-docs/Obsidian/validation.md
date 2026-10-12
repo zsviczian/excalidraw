@@ -2,6 +2,14 @@
 
 This document distinguishes **performed checks** from **required future gates**. It records the initial documentation/checker audit and the subsequent local CLI smoke; it is not a component release sign-off. Gate IDs below are referenced throughout the [catalog](customizations.md) and [retirement backlog](decustomization.md).
 
+## PR #465 wrapping and frames (2026-10-12)
+
+The [three-way review](pr-465-merge-review.md) accounts for all 25 incoming paths against `541653c7c9d587d463a47daacff9fb30e45a52e7`. Bound-link behavior moves to extracted helpers; narrow fingerprinted AppWrap transfer points fix the reproduced loss of links when deleting/restoring containers. Marker guards, raw Markdown and host/window contracts remain. Two complete path differences retire with proof: bounds' inert comment and actionFrame's redundant theme/inert factory argument. Ledger remains 232 paths (163 modified, 30 fork-only, 39 upstream-only), with 12 refreshed existing rows and two new classifications.
+
+Artifact/declaration and isolated source typechecks, 21 focused tests, 11 runner tests and 15 checker tests pass. Required snapshot-update lane passes 55 suites/610 tests with 95 existing-hook collection failures; unrelated snapshot output is restored. Full typecheck has 256 baseline diagnostics and six additional incoming test assertions using existing canvas-state/action-harness mismatches; no new production/independent-test error. These lanes remain explicitly limited.
+
+Production/development plugin builds and exact-build Obsidian 1.14.4/macOS main/new-popout W/link/rawText/history, linked shape/arrow restoration, marker resize/name, ordinary dark frames, image-frame SVG clipping, Delete/Cut and grouped Cmd-click probes pass, alongside retained crop/resize/selection/Markdown workflows. Teardown/errors/owned cleanup pass. Main.js is 5,059,509 bytes (183,371 below 5 MiB); exact report/hash and physical-device/native clipboard/other-platform limits are in the review. The plugin source/dependency remain clean; no publication.
+
 ## PR #463 crop and text resize (2026-10-11)
 
 The [three-way review](pr-463-merge-review.md) accounts for all ten incoming paths and five customized ledger rows against `2df993fb397dd6d64625908c9c10337727617f6f`. Adopt upstream crop/modifier/uncrop and text corner geometry, retaining host input/mobile controls, anchoring, embed scale, rendering metadata and geometry APIs. The dimension helper's now-upstream export permits retiring its redundant fork comment; no complete OBS ID or host API is retired.

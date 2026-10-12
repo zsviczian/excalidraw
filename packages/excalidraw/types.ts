@@ -1310,6 +1310,7 @@ export type AppClassProperties = {
   toolDrag: App["toolDrag"];
   activeResizeHandle: App["activeResizeHandle"];
   selectionTool: App["selectionTool"];
+  wrap: App["wrap"];
   modifiers: App["modifiers"];
   isToolLocked: App["isToolLocked"];
   getEffectiveGridSize: App["getEffectiveGridSize"];

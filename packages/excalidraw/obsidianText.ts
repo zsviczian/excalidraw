@@ -140,3 +140,20 @@ export function restoreObsidianTextAfterEditing(
       .map((element) => (element.id === original.id ? original : element)),
   );
 }
+
+/**
+ * Merge explicit links when text changes container ownership.
+ * Author: zsviczian. Reference: https://github.com/zsviczian/excalidraw/pull/465
+ * Preserve the existing fork binding rule: distinct links retain container-first
+ * order, equal links have one owner, and nullish fallback keeps empty strings.
+ * The wrap action deletes/restores containers within its own undo transaction,
+ * so the component must move their links along with the surviving text.
+ */
+export function mergeObsidianElementLinks(
+  containerLink: string | null,
+  textLink: string | null,
+): string | null {
+  return textLink && containerLink && containerLink !== textLink
+    ? `${containerLink} ${textLink}`
+    : textLink ?? containerLink ?? null;
+}

@@ -89,6 +89,7 @@ export { actionToggleShowHints } from "./actionToggleShowHints";
 
 export { actionToggleStats } from "./actionToggleStats";
 export { actionUnbindText, actionBindText } from "./actionBoundText";
+export { actionToggleWrap } from "./actionToggleWrap";
 export { actionLink } from "./actionLink";
 export { actionToggleElementLock } from "./actionElementLock";
 export { actionToggleLinearEditor } from "./actionLinearEditor";

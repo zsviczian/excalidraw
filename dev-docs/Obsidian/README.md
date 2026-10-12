@@ -18,9 +18,9 @@ Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md]
 
 ## Current merge checkpoint
 
-The 2026-10-11 [PR #463 review](pr-463-merge-review.md) compares the resolved merge with incoming upstream `2df993fb397dd6d64625908c9c10337727617f6f`. The fork parent is `2e82aa6558a780df81d29c74c6e3b8a2dd8f75ce`; their merge base is `e65eca999e071503efb893d3379a29fb96ff37c4`. The ledger remains **164 modified, 29 fork-only, and 39 upstream-only paths** (232 total); complete tree counts are 1,302 fork files and 1,312 upstream files.
+The 2026-10-12 [PR #465 review](pr-465-merge-review.md) compares the resolved merge with incoming upstream `541653c7c9d587d463a47daacff9fb30e45a52e7`. The fork parent is `52e99975d798fc7c252f2662ba9ba225d09b9ee2`; their merge base is `2df993fb397dd6d64625908c9c10337727617f6f`. The ledger contains **163 modified, 30 fork-only, and 39 upstream-only paths** (232 total); complete tree counts are 1,306 fork files and 1,315 upstream files.
 
-All ten incoming paths and five changed ledger rows were reviewed. Crop geometry/rendering and dominant-axis text corner resizing follow upstream; custom pens, frames, image inversion/limits, anchored resize, embed magnification, host geometry APIs, mobile controls and plugin input hooks remain intact. Upstream now exports the dimension helper used by `App.updateContainerSize`, so its redundant fork export comment is retired without removing the helper or host consumer. No whole OBS ID is retired. The JSON's `sources`, `review`, and `comparison` describe this checkpoint; original archive provenance stays immutable. [PR #462](pr-462-merge-review.md) and [PR #458](pr-458-merge-review.md) preserve previous extraction reviews. Source/build and runtime evidence, including limits, are in the [merge review](pr-463-merge-review.md) and [validation record](validation.md).
+All 25 incoming paths were reviewed. Adopt upstream W wrapping, frame membership/clipping and cut fixes, retaining marker guards, host props/APIs, Markdown and link semantics. Bound-link overrides move to upstream's extracted helpers; narrow fingerprinted AppWrap additions preserve links when deleting/restoring containers. A shared rule stays in the existing fork-owned obsidianText module, with five independent regression tests. Two complete file differences retire: bounds' inert comment and actionFrame's redundant theme echo/inert ordinary-frame factory argument. Their history remains under OBS-015/032/036; no complete OBS ID retires. Twelve existing ledger rows and two new rows are reviewed; the already committed 0.18.141 version is acknowledged without another bump. Current JSON provenance reflects this checkpoint; original ZIP provenance stays immutable. [PR #463](pr-463-merge-review.md), [PR #462](pr-462-merge-review.md) and [PR #458](pr-458-merge-review.md) preserve earlier reviews. Validation and limits are in the [merge review](pr-465-merge-review.md).
 
 ## Initial scope and baseline
 
@@ -58,7 +58,7 @@ Requires Python 3.10+ only. Run from the fork monorepo root. No dependency insta
 
 ```bash
 python dev-docs/Obsidian/test_audit.py
-python dev-docs/Obsidian/audit.py --upstream-ref 2df993fb397dd6d64625908c9c10337727617f6f
+python dev-docs/Obsidian/audit.py --upstream-ref 541653c7c9d587d463a47daacff9fb30e45a52e7
 ```
 
 `--upstream` can instead name the supplied upstream ZIP. `--fork` defaults to the repository containing this script and can also name a clean directory or ZIP. Comparing the **original** fork ZIP against the handoff ledger should report the two intentional root-policy edits; use the patched checkout for a clean handoff comparison.

@@ -26,6 +26,8 @@ The full upstream-to-fork differences in these files are comments/formatting onl
 
 Restore each file byte-for-byte to the reviewed upstream version in a separate cleanup patch, retaining the useful reason/history here rather than as permanent merge noise. This can remove **four entire differing paths** without removing the font, clipboard, or eyedropper features implemented elsewhere. Recheck each full diff against the then-current merge base before applying; do not transplant these old upstream files over future upstream changes. Gate: exact diff/AST-equivalence review plus the ordinary lint/type/test lane (V02/V04/V06/V07 as affected).
 
+**PR #465 completed bounds retirement (2026-10-12):** the touched bounds file now exactly matches incoming `541653c7`; the removed fingerprint annotated an identical return, with no runtime delta. Frame-edge tests and main/popout image framing pass. Three other D01 paths remain separate candidates; OBS-036 retains this history. See [PR #465 review](pr-465-merge-review.md).
+
 <a id="d02"></a>
 ## D02 — Remove the ineffective WeakMap enumeration
 
@@ -99,6 +101,8 @@ Keep only JSX changes necessary for real structure/semantics. CSS cannot substit
 **Priority P2; narrow conditional retirement; OBS-008/032.** The default `exportScale` becomes `1` instead of device pixel ratio in [appState.ts](../../packages/excalidraw/appState.ts); host initialization/export calls may express that policy without changing the global default. Test main/popout displays with differing pixel ratios and all export entry points first.
 
 [actionCanvas.tsx](../../packages/excalidraw/actions/actionCanvas.tsx) changes the `onThemeChange` early-return flow. The supplied plugin root actively passes that callback to `ExcalidrawView.onThemeChange`, which saves the theme, asynchronously reloads themed files, updates the tools panel and schedules dynamic styling. This is not an unused override. To retire it, first migrate the plugin to an explicit controlled-theme update that works with upstream's early return, then verify state publication, asset reload and callback ordering. Preserve the existing behavior until that coordinated migration passes. Do not merge this with locale ownership: avoiding mutation of the host document's `lang`/`dir` remains a separate valid integration requirement. Gate: V02/V03/V07/V10.
+
+**PR #465 completed actionFrame retirement:** upstream wrapInFrame/unwrapFrame spread the full appState, retaining theme. The old factory scene argument could only name marker frames, but this action never passes marker role; it was inert. actionFrame.ts now matches upstream bytes. Keep marker factories/drawing caller and all theme notification adapters; dark W frame/undo and marker naming probes pass. OBS-015/032 remain active. See [PR #465 review](pr-465-merge-review.md).
 
 <a id="d12"></a>
 ## D12 — Narrow embed/URL policy through host rendering and validation

@@ -84,6 +84,8 @@ Issue [plugin #2976](https://github.com/zsviczian/obsidian-excalidraw-plugin/iss
 
 `P: ExcalidrawRoot.ts` supplies `onLinkOpen`, `onLinkHover`, and mobile `insertLinkAction`; `ExcalidrawView.ts` handles Obsidian navigation/hover. Upstream `onLinkOpen` is reused, not a fork invention. Data-HTML acceptance and broad same-origin embedding are capability/security decisions, not safe generic sanitizer improvements; move host-specific resolution behind a typed policy/render callback where equivalence can be proven. `hasTextLink`, raw text, link preview, and container-link behavior must survive any UI migration. **Gate:** V04, V06, V08; D12, F03.
 
+**PR #465 ownership update (2026-10-12):** legacy bind/wrap actions and new W wrapping share upstream extracted helpers, which retain the original link move/merge rule through fork-owned `mergeObsidianElementLinks` in obsidianText.ts. New AppWrap deletes/restores containers; fingerprinted transfer points move explicit links to surviving text and back, within upstream's undo transaction. Two mounted tests fail before this preservation and pass afterward. Raw Markdown, shape/arrow binding and public host hooks remain unchanged. See the [review](pr-465-merge-review.md).
+
 <a id="obs-011"></a>
 ## OBS-011 — Drop and paste interception
 
@@ -117,7 +119,9 @@ Its added `pruneOrphanGroupIds` counts nondeleted group members and removes grou
 
 **Retain, fix a separate export defect.** Factories assign sequential padded frame names and retain `frameRole: "marker" | null`. Marker frames are outlines/regions, not containers: frame membership, hit detection, creation, resize, and `actionToggleFrameRole` keep them from capturing members; converting to marker releases existing members with undo support. Rendering supports independent marker-name/visibility flags, dashed marker outlines, and global/per-frame stroke/fill/name colors. Export explicitly filters marker frames and disables marker rendering, including in embedded exported scene data.
 
-`P: src/shared/Dialogs/InsertPDFModal.ts`, frame/slideshow utilities, and `ExcalidrawAutomate` workflows use marker regions. Standard upstream frames capture/clip content and do not supply this role contract. Do not migrate by treating marker frames as ordinary frames. `actionFrame` also echoes the current theme, a narrowly testable historical workaround. In `staticSvgScene.ts`, frame `stroke-width` incorrectly reads a **fill color** before its numeric fallback; that is F01, not evidence that all frame customization should go. **Gate:** V08, V09, V10; existing role test checks membership and undo, not full export parity.
+`P: src/shared/Dialogs/InsertPDFModal.ts`, frame/slideshow utilities, and `ExcalidrawAutomate` workflows use marker regions. Standard upstream frames capture/clip content and do not supply this role contract. Do not migrate by treating marker frames as ordinary frames. The prior actionFrame theme echo is retired by PR #465 after upstream supplies the complete appState. In `staticSvgScene.ts`, frame `stroke-width` incorrectly reads a **fill color** before its numeric fallback; that is F01, not evidence that all frame customization should go. **Gate:** V08, V09, V10; existing role test checks membership and undo, not full export parity.
+
+**PR #465:** all three marker membership/resize guards remain unchanged while upstream fixes ordinary frame edge inclusion, clipping and cut. actionFrame.ts now matches upstream: its full appState spread retains theme, and the removed scene factory argument was inert because that action creates only ordinary frames. The marker drawing factory/caller and naming behavior remain. Main/popout W, marker resize/name, framed PNG export and Delete/Cut probes pass; see the [review](pr-465-merge-review.md).
 
 <a id="obs-016"></a>
 ## OBS-016 — Webviews, rich embeds, and embed magnification
@@ -246,9 +250,11 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 <a id="obs-032"></a>
 ## OBS-032 — Theme notifications and host locale ownership
 
-**Retain document isolation; reassess notification overrides.** [i18n.ts](../../packages/excalidraw/i18n.ts) lowers translation eligibility from 85 to 66 and stops changing the containing document's `lang`/`dir`, avoiding mutation of the whole Obsidian application. Fork locale additions label extended stroke/font/frame controls. `actionToggleViewMode` calls the host before changing state. `actionToggleTheme` continues its own update even after invoking `onThemeChange`, unlike upstream's early return. `actionFrame` explicitly includes the current theme in its result.
+**Retain document isolation; reassess notification overrides.** [i18n.ts](../../packages/excalidraw/i18n.ts) lowers translation eligibility from 85 to 66 and stops changing the containing document's `lang`/`dir`, avoiding mutation of the whole Obsidian application. Fork locale additions label extended stroke/font/frame controls. `actionToggleViewMode` calls the host before changing state. `actionToggleTheme` continues its own update even after invoking `onThemeChange`, unlike upstream's early return. Upstream actionFrame now includes the complete appState; PR #465 retires its formerly explicit fork theme echo.
 
 `P: src/view/components/ExcalidrawRoot.ts` actively passes `onThemeChange` to `ExcalidrawView.onThemeChange`, which updates saved scene theme, asynchronously reloads themed files, updates the tools panel and schedules dynamic styling. The callback is not unused. Restoring upstream's callback early return requires an explicit plugin-controlled theme update and ordering tests; preserve both notification and component-state behavior until that migration is proven. Also ensure a frame action cannot reset the theme before removing its theme echo. Translation threshold is a product preference that could become host configuration. Do not restore whole-document lang/dir mutation while embedded in Obsidian. **Gate:** V03, V07, V08; D11.
+
+**PR #465 partial retirement:** actionFrame's theme echo is replaced by upstream's full appState spread, verified through dark-theme frame wrap/unwrap. Theme callbacks and other host notification contracts remain. See the [review](pr-465-merge-review.md).
 
 <a id="obs-033"></a>
 ## OBS-033 — Fork regression tests and fixture adaptations
@@ -258,6 +264,8 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 `App` also comments out upstream `window.h`/test-hook initialization. Standard component tests access that test hook; until test setup is verified/restored with an Obsidian-runtime-safe guard, tests' presence is not evidence of an executable passing suite. Restore upstream test-only behavior where possible without polluting production or another editor's runtime. No component tests or builds were run in this audit because dependencies/Obsidian were not provisioned. Only the new inventory checker tests and static/document validations are claimed. **Gate:** V02 and all affected focused lanes; F04.
 
 The PR #458 checkpoint adds four mounted-editor selection regressions using `onExcalidrawAPI` and ordinary DOM events, without the disabled hooks. These pass in the standard Vitest configuration. The existing selection/crop/duplicate suites still fail during collection because `createTestHook` is not exported; this passing new lane does not close F04 or imply the older suites passed.
+
+PR #465 adds [obsidianWrap.test.tsx](../../packages/excalidraw/tests/obsidianWrap.test.tsx), with five standard-lane tests for explicit-link/raw-source/history ownership, original-container restoration, dark frame theme, edge-aligned stroke clipping and marker guards. It does not use disabled window.h hooks. The new incoming wrap suite shares the existing collection/type limitations; desktop owning-window probes supply separate runtime evidence. See the [review](pr-465-merge-review.md).
 
 <a id="obs-034"></a>
 ## OBS-034 — Repository export and local workflow artifacts
@@ -277,6 +285,8 @@ Review the surrounding workspace and dependency history before restoring example
 ## OBS-036 — Comment-only, formatting-only, and inert differences
 
 **Highest-confidence decustomization targets.** Four complete file differences have no functional code delta: `element/bounds.ts` adds a fingerprint to an identical return; `fonts/fonts.css` adds four comments to unchanged source values; `data/filesystem.ts` adds a TODO and changes the final newline; `components/EyeDropper.tsx` only reformats a cursor object. Restoring these files from the supplied upstream can remove four changed paths without removing a host feature. Relocate a still-useful historical note into the relevant catalog entry rather than keeping a code conflict alive for it.
+
+PR #465 restores bounds.ts byte-for-byte to incoming upstream, retiring its inert return-expression comment. The other three comment/format-only paths remain candidates for separate review; no whole OBS-036 retirement is implied.
 
 The added WeakMap enumeration loop is inert (OBS-019). The private `ElementStore.add(originalId?)` parameter is unused (OBS-029). Definition-only exports `PRECEDING_ELEMENT_KEY` and `isLaserPointerActive` need broader public/type-surface checking before removal even though no call sites were found in the supplied repositories. A no-op proof is stronger than “old comment” or “no direct plugin import”; keep that distinction in review. **Gate:** byte/source diff, reference/type scan as applicable, and narrow validation; D01–D05.
 
