@@ -3,7 +3,7 @@
   "review": {
     "date": "2026-10-12",
     "dependency_precommit_tests": "PR #465 required yarn test:update: 55 suites/610 tests pass; 95 suites fail collection through existing disabled createTestHook/missing topPicksDnD, including the new incoming wrap suite. Two unrelated snapshot outputs restored to index bytes, preserving the incoming contextmenu snapshot.",
-    "method": "PR #465 three-way review of all 25 incoming paths and plugin consumers. Retire two differing paths with equivalence/inertness evidence, relocate link behavior, and add narrow AppWrap preservation plus independent coverage. Twelve existing rows refreshed and two new rows classified only after review. See pr-465-merge-review.md.",
+    "method": "PR #465 three-way review of all 25 incoming paths and plugin consumers. Retire two differing paths with equivalence/inertness evidence, relocate link behavior, and add narrow AppWrap preservation plus independent coverage. Twelve existing rows refreshed and two new rows classified only after review. See pr-465-merge-review.md. 2026-10-12 layout follow-up on fix/wrap-tray-mode-12264: reviewed AGENTS reminder, shared actionToggleWrap layout gate, four independent layout cases and previously committed 0.18.142 version; see validation.md.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
       "fork_parent": "52e99975d798fc7c252f2662ba9ba225d09b9ee2",
@@ -13,14 +13,16 @@
       "reference": "https://github.com/zsviczian/excalidraw/pull/465"
     },
     "runtime_validation": "PR #465 exact-build Obsidian 1.14.4/macOS main/new-popout wrap/link/Markdown/history, ordinary/marker frames, image-frame SVG clipping, Delete/Cut and grouped Cmd-click probes pass; teardown, errors and owned cleanup pass. Synthetic input; existing full test/type lane and physical-device/other-platform limits remain documented in pr-465-merge-review.md.",
-    "dependency_checkpoint": "2026-10-11: Obsidian artifact/declaration and plugin production/library builds pass. Local fork Windows Obsidian 1.14.4 smoke passes. Published 0.18.140 main/direct-popout/moved-popout input/save/cleanup smoke passes. Plugin npm tree/audit confirms no braces and source-map-js 1.2.2. Component full typecheck remains blocked by documented window.h/stale test-type failures. Packed manifest confirms Sass dev-only; no publication/version bump. The 5 MB target is 5 * 1024 * 1024 = 5,242,880 bytes. Plugin main.js: 5,051,865 bytes with published component (191,015 bytes of headroom), 5,057,617 with local fork (185,263 bytes of headroom); both are below the target. No full scanner, macOS or physical-mobile run in this checkpoint."
+    "dependency_checkpoint": "2026-10-11: Obsidian artifact/declaration and plugin production/library builds pass. Local fork Windows Obsidian 1.14.4 smoke passes. Published 0.18.140 main/direct-popout/moved-popout input/save/cleanup smoke passes. Plugin npm tree/audit confirms no braces and source-map-js 1.2.2. Component full typecheck remains blocked by documented window.h/stale test-type failures. Packed manifest confirms Sass dev-only; no publication/version bump. The 5 MB target is 5 * 1024 * 1024 = 5,242,880 bytes. Plugin main.js: 5,051,865 bytes with published component (191,015 bytes of headroom), 5,057,617 with local fork (185,263 bytes of headroom); both are below the target. No full scanner, macOS or physical-mobile run in this checkpoint.",
+    "layout_followup": "Validated follow-up: W/menu predicate enabled for full/tray/compact, excluded in mobile. 25 focused tests, isolated source typecheck, declarations/artifacts and plugin production/development builds pass. Full typecheck retains 262 existing diagnostics. Baseline tray/compact keyboard tests already passed; original reported tray failure was not reproduced. Extra live probe passed full-layout keyboard/link/history then stopped on unavailable host command-palette rendering; cleanup restored settings and removed owned drawing/controller. No full live layout-matrix pass claimed.",
+    "layout_precommit": "Precommit snapshot-update run stopped at explicit maintainer request to skip further testing and commit/merge. Unrelated generated snapshots restored. Prior focused tests/builds remain the validation evidence."
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "52e99975d798fc7c252f2662ba9ba225d09b9ee2",
+      "parent_commit": "bee1292f35b9853d96a3b407b8a66b026878f3a9",
       "package": "@zsviczian/excalidraw",
-      "version": "0.18.141"
+      "version": "0.18.142"
     },
     "upstream": {
       "kind": "local Git commit",
@@ -39,7 +41,7 @@
   "comparison": {
     "fork": {
       "files": 1306,
-      "sha256": "221433c7f275bac8b5f4dfec55096b828c473e600bb1be2aa9a507c9c5ac6375"
+      "sha256": "b1af19808690c42ea52e14cf09bc54fb2fe9a445d9fe2034468e3d9770782ed4"
     },
     "upstream": {
       "files": 1315,
@@ -296,12 +298,12 @@
     {
       "path": "AGENTS.md",
       "status": "modified",
-      "fork_sha256": "f3ed7e5e468804724448a2aa5b4c015c19f866092a87d4f7c54095bfaf37073b",
+      "fork_sha256": "f1dd5d9c9ce2176967494662df9026f748b16e8a6c6692752d8fe3ad614fd2d0",
       "upstream_sha256": "83adc6ba0bd860a72db2e260e367ca7832fa1aaea4ce3622cca3ea7529a0f228",
       "ids": [
         "OBS-001"
       ],
-      "note": "Fork execution, merge, host, artifact, and handoff policies; now requires the persisted inventory.",
+      "note": "Fork execution, merge, host, artifact, and handoff policies; now requires the persisted inventory. 2026-10-12: requested reminder to use isFullPanelMode for full/tray and explicitly include compact/tablet where supported.",
       "kind": "governance"
     },
     {
@@ -1173,6 +1175,18 @@
       ],
       "note": "Notify host before toggling view mode.",
       "kind": "integration"
+    },
+    {
+      "path": "packages/excalidraw/actions/actionToggleWrap.ts",
+      "status": "modified",
+      "fork_sha256": "30f38888d376755c6b692f83a51c2eb61c23e4cf35e873068a0ff1ffcdbe8107",
+      "upstream_sha256": "27e4e7ec8bd04f5e299e59a84632822a2a5e1028c9497e43f68dd6b6bd9a4af6",
+      "ids": [
+        "OBS-022",
+        "OBS-029"
+      ],
+      "kind": "behavior",
+      "note": "2026-10-12 upstream #12264 follow-up: shared menu/keyboard layout gate uses isFullPanelMode for full/tray and explicitly includes compact/tablet. Mobile layout is excluded. Selection, modifier and wrap semantics remain upstream."
     },
     {
       "path": "packages/excalidraw/actions/actionTrayMenu.tsx",
@@ -2602,14 +2616,14 @@
     {
       "path": "packages/excalidraw/package.json",
       "status": "modified",
-      "fork_sha256": "93bd542a437efa5d891591469ad1ca61f2f78fee77158feb81eb5dfa86ac8448",
+      "fork_sha256": "9c1e8070718b67b1f2d1029bc10c076ba404e0f218c1a39df5202780e148d8c9",
       "upstream_sha256": "160dabbd052e579a5b7b0e341d653e0739d17d44d68f16be8c1cf893e1e4236d",
       "ids": [
         "OBS-002",
         "OBS-003",
         "OBS-004"
       ],
-      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies.",
+      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies. Baseline bee1292f3 already bumps to 0.18.142; the layout fix does not bump or publish.",
       "kind": "packaging"
     },
     {
@@ -2881,17 +2895,18 @@
     {
       "path": "packages/excalidraw/tests/obsidianWrap.test.tsx",
       "status": "fork-only",
-      "fork_sha256": "44bd08b5cbfaf7fa95d8b37e1266bdbcdee7e2ef309f00685cf01d6a3c9c5e7c",
+      "fork_sha256": "dedb5a77f731ccceec924b81f45e514a00d98ed27440f92fcf64decc5eb9b2d0",
       "upstream_sha256": null,
       "ids": [
         "OBS-009",
         "OBS-010",
         "OBS-015",
+        "OBS-022",
         "OBS-032",
         "OBS-033"
       ],
       "kind": "test",
-      "note": "PR #465: five independent mounted-keyboard/frame tests cover link/rawText/history round trips, original-container restoration, dark theme, frame-edge clipping and marker resize guards; no window.h dependency."
+      "note": "PR #465: five independent mounted-keyboard/frame tests cover link/rawText/history round trips, original-container restoration, dark theme, frame-edge clipping and marker resize guards; no window.h dependency. Four host-layout cases verify W in full/tray/compact with tablet form factor, and block it in mobile layout."
     },
     {
       "path": "packages/excalidraw/tsconfig-types.json",

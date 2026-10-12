@@ -176,6 +176,8 @@ Do not delete the bridge just because upstream offers a portal container: the co
 
 `P: obsidianCommonHostAdapter.ts`, plugin settings, `ExcalidrawView.ts`, and `ExcalidrawRoot.ts` supply UI preferences. Upstream already has responsive full/compact/mobile interfaces and `UIOptions.getFormFactor`; those should stay the structural owner rather than be duplicated. They do **not** implement this tray mode. Move what can be represented by public configuration to the plugin and keep only a narrow tray/preference extension. Test phone/tablet/desktop preferences independently of viewport size and touch capability. **Gate:** V03, V07; D08.
 
+2026-10-12 W layout follow-up (#12264): `actionToggleWrap` uses one predicate/keyboard gate: `isFullPanelMode(app)` for full/tray, plus compact/tablet. Only mobile layout is excluded. Four mounted tests configure the typed common host's actual layout preference, including tablet form factor. Existing wrap/link/history behavior remains. The reported tray failure was not reproduced by baseline tests; this checkpoint makes the requested layout policy explicit and corrects mobile availability. See [validation](validation.md).
+
 <a id="obs-023"></a>
 ## OBS-023 — Host commands and context-menu integration
 

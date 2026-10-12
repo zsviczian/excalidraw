@@ -13,7 +13,12 @@ import {
   waitFor,
 } from "@testing-library/react";
 
-import { arrayToMap } from "@excalidraw/common";
+import {
+  arrayToMap,
+  type EditorInterface,
+  type StylesPanelMode,
+} from "@excalidraw/common";
+import { configureObsidianCommonHost } from "@excalidraw/common/commonObsidianHost";
 import {
   addElementsToFrame,
   getElementsCompletelyInFrame,
@@ -64,11 +69,15 @@ const frameState = () => ({
   offsetTop: 0,
 });
 
-async function mount(elements: ExcalidrawElement[]) {
+async function mount(
+  elements: ExcalidrawElement[],
+  formFactor?: EditorInterface["formFactor"],
+) {
   let api!: ExcalidrawImperativeAPI;
   render(
     <Excalidraw
       handleKeyboardGlobally={true}
+      UIOptions={formFactor ? { getFormFactor: () => formFactor } : undefined}
       onExcalidrawAPI={(value) => {
         if (value) {
           api = value;
@@ -97,6 +106,43 @@ async function mount(elements: ExcalidrawElement[]) {
 }
 
 describe("Obsidian wrap link ownership", () => {
+  it.each(["full", "tray", "compact", "mobile"] as const)(
+    "enables W in %s layout only when the layout is not mobile",
+    async (mode: StylesPanelMode) => {
+      const dispose = configureObsidianCommonHost({
+        protocolVersion: 1,
+        getDeviceInfo: () => null,
+        getDesktopUIMode: () => mode,
+        getPreferredUIMode: () => mode,
+        getCanvasLimits: () => ({
+          areaLimit: 16777216,
+          widthHeightLimit: 32767,
+        }),
+        getHighlightColor: () => "#0076ff",
+      });
+      try {
+        const { api, select, toggle } = await mount(
+          [text()],
+          mode === "compact"
+            ? "tablet"
+            : mode === "mobile"
+            ? "phone"
+            : "desktop",
+        );
+        select(["label"]);
+        await toggle();
+        expect(
+          api
+            .getSceneElements()
+            .some((element) => element.type === "rectangle"),
+        ).toBe(mode !== "mobile");
+      } finally {
+        cleanup();
+        dispose();
+      }
+    },
+  );
+
   it("moves explicit links through wrap, unwrap, rewrap and history without losing raw Markdown", async () => {
     const { api, select, toggle, get } = await mount([text()]);
     select(["label"]);

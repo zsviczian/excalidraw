@@ -9,7 +9,7 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 | [Customization catalog](customizations.md) | 37 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
-| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 232 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
+| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 233 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
 | [Validation and merge playbook](validation.md) | What was actually verified, existing regression tests, missing runtime evidence, and behavior-specific gates. |
 | [Obsidian runtime testing](OBSIDIAN_RUNTIME_TESTING.md) | Guarded CLI test-vault deployment, exact-build desktop smoke, reports, and feature-specific host probes. |
 | [Local audit checker](audit.py) / [checker tests](test_audit.py) | Dependency-free, offline source accounting; detects changed, new, or retired differences and stale tree fingerprints. |
@@ -21,6 +21,10 @@ Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md]
 The 2026-10-12 [PR #465 review](pr-465-merge-review.md) compares the resolved merge with incoming upstream `541653c7c9d587d463a47daacff9fb30e45a52e7`. The fork parent is `52e99975d798fc7c252f2662ba9ba225d09b9ee2`; their merge base is `2df993fb397dd6d64625908c9c10337727617f6f`. The ledger contains **163 modified, 30 fork-only, and 39 upstream-only paths** (232 total); complete tree counts are 1,306 fork files and 1,315 upstream files.
 
 All 25 incoming paths were reviewed. Adopt upstream W wrapping, frame membership/clipping and cut fixes, retaining marker guards, host props/APIs, Markdown and link semantics. Bound-link overrides move to upstream's extracted helpers; narrow fingerprinted AppWrap additions preserve links when deleting/restoring containers. A shared rule stays in the existing fork-owned obsidianText module, with five independent regression tests. Two complete file differences retire: bounds' inert comment and actionFrame's redundant theme echo/inert ordinary-frame factory argument. Their history remains under OBS-015/032/036; no complete OBS ID retires. Twelve existing ledger rows and two new rows are reviewed; the already committed 0.18.141 version is acknowledged without another bump. Current JSON provenance reflects this checkpoint; original ZIP provenance stays immutable. [PR #463](pr-463-merge-review.md), [PR #462](pr-462-merge-review.md) and [PR #458](pr-458-merge-review.md) preserve earlier reviews. Validation and limits are in the [merge review](pr-465-merge-review.md).
+
+### W layout follow-up
+
+The 2026-10-12 `fix/wrap-tray-mode-12264` checkpoint adds a shared non-mobile W/menu gate, four layout cases and the requested AGENTS reminder. Current ledger is **164 modified, 30 fork-only, 39 upstream-only paths** (233); tree counts remain 1,306/1,315. The already committed 0.18.142 version is acknowledged. Prior merge evidence above remains historical; current follow-up validation and reproduction limits are in [validation.md](validation.md).
 
 ## Initial scope and baseline
 
