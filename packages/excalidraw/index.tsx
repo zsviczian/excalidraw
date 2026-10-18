@@ -443,12 +443,21 @@ export {
 
 export { reconcileElements } from "./data/reconcile";
 
+export { exportScene /* , exportToClipboard */ } from "./scene/export"; // zsviczian -- overloaded clipboard adapter below
+// zsviczian START -- preserve public export calls while adopting exportScene, PR #468
 export {
   exportToCanvas,
-  exportToBlob,
   exportToSvg,
+  exportToBlob,
   exportToClipboard,
-} from "@excalidraw/utils/export";
+} from "./obsidianExport";
+// zsviczian END
+
+export type {
+  ExportSceneData,
+  ExportSceneConfig,
+  ExportSceneOptions,
+} from "./scene/export";
 
 export { getCommonBoundingBox } from "@excalidraw/element/bounds"; //zsviczian
 export { getMaximumGroups } from "@excalidraw/element/groups"; //zsviczian

@@ -211,3 +211,8 @@ For follow-on cleanups, the most likely regressions are hidden public/script dep
 ## Handoff checker result
 
 **Original ZIP handoff recorded:** 14 dependency-free checker tests, including Git file selection, binary/empty/unmarked differences, new/retired/content drift, archive handling, classification validation, and exclusive report creation without manifest mutation. Both upstream-directory and upstream-ZIP comparisons passed with 230 reviewed differences and matching complete-tree fingerprints. The Markdown ledger reproduced byte-for-byte; all 759 repository-relative documentation links/anchors and explicit plugin source paths resolved. All three original ZIP checksums/comments matched the recorded provenance. The handoff archive contained exactly 11 added/modified files, with no deletions or other source changes; its member paths, content bytes and ZIP integrity were checked. The subsequent local Git and native smoke results are recorded above; neither the original audit nor the basic smoke closes feature-specific runtime gates.
+
+
+## PR #468 export API checkpoint (2026-10-18)
+
+See [three-way review, export compatibility and validation limits](pr-468-merge-review.md). Public export adapters preserve plugin/script calls. Exact linked/image SVG markup and seeded PNG pixels match before/after fixtures; native plugin link filtering, conversion and export hook pass. Artifact/declaration, plugin production/development and bundle checks pass. Existing full-suite/typecheck failures remain explicit; this is an unpublished local handoff, without plugin source/dependency changes.

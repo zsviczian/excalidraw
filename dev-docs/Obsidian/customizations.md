@@ -57,6 +57,8 @@ Consumers include plugin imports/ambient declarations and normal ESM consumers, 
 <a id="obs-007"></a>
 ## OBS-007 — Public props, imperative methods, and library exports
 
+PR #468 preserves legacy public export signatures in fork-owned obsidianExport.ts and adds upstream exportScene. Root and utility clipboard entry points accept both old flat and new data/config options. Plugin constants, package validation, EA exports and community scripts retain their interface. No host protocol change. See [merge review](pr-468-merge-review.md).
+
 **Preserve public contracts; simplify internals.** [types.ts](../../packages/excalidraw/types.ts), [index.tsx](../../packages/excalidraw/index.tsx), and [App.tsx](../../packages/excalidraw/components/App.tsx) expose the fork's hooks, early state, webview/diagram/menu controls, history operations, view/layout helpers, image readiness, selection/z-order/geometry methods, and additional library exports. The complete extension list and callback semantics are in [contracts](contracts.md#component-extension-surface).
 
 Direct consumers are `P: ExcalidrawRoot.ts`, `ExcalidrawView.ts`, `ExcalidrawAutomate.ts`, `src/constants/constants.ts`, `EmbeddedFileLoader.ts`, and public script/type documentation. Public exports such as `getEmbedLink` and `registerFontsInCSS` have no current direct plugin runtime call found, but do have exposed declarations/documentation; they are not deletion-safe. Many extra exports re-export **unchanged upstream algorithms**, not bespoke algorithms to remove. Upstream already has `setViewport`, `getEditorInterface`, `renderEmbeddable`, and other generic APIs. Prefer making old entry points thin wrappers around them while preserving parameters, timing, selection, and return values. `AppClassProperties.setSelection` is an internal App helper, not an added member of the published imperative object. **Gate:** V02–V05, V08–V10; D05, D06, D09.
@@ -117,6 +119,8 @@ Its added `pruneOrphanGroupIds` counts nondeleted group members and removes grou
 <a id="obs-015"></a>
 ## OBS-015 — Marker frames and frame presentation
 
+PR #468 moves marker exclusion into the shared export preparation used by upstream exportScene, preserving custom label color/rawText and disabled marker decorations. Global frame colors now travel through explicit export config. SVG metadata exclusion remains; legacy PNG metadata is unchanged. See [merge review](pr-468-merge-review.md).
+
 **Retain, fix a separate export defect.** Factories assign sequential padded frame names and retain `frameRole: "marker" | null`. Marker frames are outlines/regions, not containers: frame membership, hit detection, creation, resize, and `actionToggleFrameRole` keep them from capturing members; converting to marker releases existing members with undo support. Rendering supports independent marker-name/visibility flags, dashed marker outlines, and global/per-frame stroke/fill/name colors. Export explicitly filters marker frames and disables marker rendering, including in embedded exported scene data.
 
 `P: src/shared/Dialogs/InsertPDFModal.ts`, frame/slideshow utilities, and `ExcalidrawAutomate` workflows use marker regions. Standard upstream frames capture/clip content and do not supply this role contract. Do not migrate by treating marker frames as ordinary frames. The prior actionFrame theme echo is retired by PR #465 after upstream supplies the complete appState. In `staticSvgScene.ts`, frame `stroke-width` incorrectly reads a **fill color** before its numeric fallback; that is F01, not evidence that all frame customization should go. **Gate:** V08, V09, V10; existing role test checks membership and undo, not full export parity.
@@ -139,6 +143,8 @@ Its added `pruneOrphanGroupIds` counts nondeleted group members and removes grou
 
 <a id="obs-018"></a>
 ## OBS-018 — Image inversion, canvas limits, and export fidelity
+
+PR #468 retains the public legacy export calls through fork-owned obsidianExport.ts adapters and one upstream renderer; root/utility exports retain both clipboard shapes. Independent viewport/scale and native rounding remain compatible through a narrow environment hook. Exact SVG/image-symbol markup and seeded PNG pixels match live before/after fixtures; plugin export-link filtering/rewriting/hook coverage passes. See [merge review](pr-468-merge-review.md).
 
 **Retain saved render metadata.** Element/canvas/SVG renderers use host canvas area/dimension limits, PDF/SVG-with-bitmap metadata, SVG dark-mode opt-out and bitmap inversion flags, and a device-specific iOS workaround rather than only upstream Safari detection. SVG symbol IDs distinguish images with different inversion modes and crops, preventing incompatible render variants from sharing the same symbol. Frame/pen/scale data is forwarded through the corresponding render configs.
 

@@ -348,6 +348,18 @@ const _renderStaticScene = ({
     );
   }
 
+  if (renderConfig.clipToFrame) {
+    const frame = renderConfig.clipToFrame;
+    context.beginPath();
+    context.rect(
+      frame.x + appState.scrollX,
+      frame.y + appState.scrollY,
+      frame.width,
+      frame.height,
+    );
+    context.clip();
+  }
+
   const groupsToBeAddedToFrame = new Set<string>();
 
   visibleElements.forEach((element) => {

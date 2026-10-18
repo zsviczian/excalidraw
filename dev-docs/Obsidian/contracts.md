@@ -114,6 +114,8 @@ PR #463 changes only upstream crop internals and text corner sizing. `PointerDow
 
 ## Extra root-library exports — OBS-007/013/029/030
 
+PR #468 adds upstream `exportScene` while retaining public `exportToCanvas`, `exportToSvg`, `exportToBlob` and the flat `exportToClipboard` form through `obsidianExport.ts`; the clipboard adapter also accepts upstream's new data/config form. Legacy plugin callers and scripting signatures stay unchanged. Frame palette/render settings move to explicit config rather than leaking through sanitized appState. No host protocol version changes. [Review and SVG/link evidence](pr-468-merge-review.md).
+
 The following are exposed by the fork's [root entry](../../packages/excalidraw/index.tsx) in addition to upstream's exports. Some merely re-export upstream helpers; public exposure, not a new algorithm, is the fork change.
 
 | Family | Export names |

@@ -1,28 +1,36 @@
+/**
+ * Public export compatibility adapters for Obsidian and community scripts.
+ * Author: zsviczian
+ * Reference: https://github.com/zsviczian/excalidraw/pull/468
+ * Upstream replaced these flat options with exportScene. Keep the public host
+ * contract while delegating all rendering to that single upstream pipeline.
+ */
 import { MIME_TYPES } from "@excalidraw/common";
-import { getDefaultAppState } from "@excalidraw/excalidraw/appState";
-import {
-  copyBlobToClipboardAsPng,
-  copyTextToSystemClipboard,
-  copyToClipboard,
-} from "@excalidraw/excalidraw/clipboard";
-import { encodePngMetadata } from "@excalidraw/excalidraw/data/image";
+
 import { getNonDeletedElements } from "@excalidraw/element";
-import { serializeAsJSON } from "@excalidraw/excalidraw/data/json";
-import {
-  restoreAppState,
-  restoreElements,
-} from "@excalidraw/excalidraw/data/restore";
-import {
-  exportToCanvas as _exportToCanvas,
-  exportToSvg as _exportToSvg,
-} from "@excalidraw/excalidraw/scene/export";
 
 import type {
   ExcalidrawFrameLikeElement,
   NonDeleted,
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
-import type { AppState, BinaryFiles } from "@excalidraw/excalidraw/types";
+
+import { getDefaultAppState } from "./appState";
+import {
+  copyBlobToClipboardAsPng,
+  copyTextToSystemClipboard,
+  copyToClipboard,
+} from "./clipboard";
+import { encodePngMetadata } from "./data/image";
+import { serializeAsJSON } from "./data/json";
+import { restoreAppState, restoreElements } from "./data/restore";
+import {
+  exportScene,
+  exportToClipboard as exportSceneToClipboard,
+  getExportConfigFromAppState,
+} from "./scene/export";
+
+import type { AppState, BinaryFiles } from "./types";
 
 export { MIME_TYPES };
 
@@ -50,57 +58,44 @@ export const exportToCanvas = ({
 }: ExportOpts & {
   exportPadding?: number;
 }) => {
-  const restoredElements = getNonDeletedElements(
-    restoreElements(elements, null, {
-      deleteInvisibleElements: true,
-    }),
-  );
   const restoredAppState = restoreAppState(appState, null);
-
-  const { exportBackground, viewBackgroundColor } = restoredAppState;
-  return _exportToCanvas(
-    restoredElements,
-    { ...restoredAppState, offsetTop: 0, offsetLeft: 0, width: 0, height: 0 },
-    files || {},
-    { exportBackground, exportPadding, viewBackgroundColor, exportingFrame },
-    (width: number, height: number) => {
-      const canvas = document.createElement("canvas");
-
-      if (maxWidthOrHeight) {
-        if (typeof getDimensions === "function") {
-          console.warn(
-            "`getDimensions()` is ignored when `maxWidthOrHeight` is supplied.",
-          );
-        }
-
-        const max = Math.max(width, height);
-
-        // if content is less then maxWidthOrHeight, fallback on supplied scale
-        const scale =
-          maxWidthOrHeight < max
-            ? maxWidthOrHeight / max
-            : appState?.exportScale ?? 1;
-
-        canvas.width = width * scale;
-        canvas.height = height * scale;
-
-        return {
-          canvas,
-          scale,
-        };
-      }
-
-      const ret = getDimensions?.(width, height) || { width, height };
-
-      canvas.width = ret.width;
-      canvas.height = ret.height;
-
-      return {
-        canvas,
-        scale: ret.scale ?? 1,
-      };
+  return exportScene({
+    type: "canvas",
+    data: { elements, appState, files },
+    config: {
+      ...getExportConfigFromAppState(restoredAppState),
+      padding: exportPadding,
+      exportingFrame,
+      // Legacy raster exports ignore exportScale unless maxWidthOrHeight is set.
+      scale: 1,
+      environment: {
+        configureCanvas(canvas, width, height) {
+          if (maxWidthOrHeight) {
+            if (typeof getDimensions === "function") {
+              console.warn(
+                "`getDimensions()` is ignored when `maxWidthOrHeight` is supplied.",
+              );
+            }
+            const max = Math.max(width, height);
+            const scale =
+              maxWidthOrHeight < max
+                ? maxWidthOrHeight / max
+                : appState?.exportScale ?? 1;
+            canvas.width = width * scale;
+            canvas.height = height * scale;
+            return scale;
+          }
+          const dimensions = getDimensions?.(width, height) ?? {
+            width,
+            height,
+          };
+          canvas.width = dimensions.width;
+          canvas.height = dimensions.height;
+          return dimensions.scale ?? 1;
+        },
+      },
     },
-  );
+  });
 };
 
 export const exportToBlob = async (
@@ -182,33 +177,34 @@ export const exportToSvg = async ({
   skipInliningFonts?: true;
   reuseImages?: boolean;
 }): Promise<SVGSVGElement> => {
-  const restoredElements = getNonDeletedElements(
-    restoreElements(elements, null, {
-      deleteInvisibleElements: true,
-    }),
-  );
   const restoredAppState = restoreAppState(appState, null);
-
-  const exportAppState = {
-    ...restoredAppState,
-    exportPadding,
-  };
-
-  return _exportToSvg(restoredElements, exportAppState, files, {
-    exportingFrame,
-    renderEmbeddables,
-    skipInliningFonts,
-    reuseImages,
+  return exportScene({
+    type: "svg",
+    data: { elements, appState, files },
+    config: {
+      ...getExportConfigFromAppState(restoredAppState),
+      padding: exportPadding,
+      exportingFrame,
+      renderEmbeddables,
+      skipInliningFonts,
+      reuseImages,
+      embedScene: restoredAppState.exportEmbedScene,
+    },
   });
 };
 
 export const exportToClipboard = async (
-  opts: ExportOpts & {
-    mimeType?: string;
-    quality?: number;
-    type: "png" | "svg" | "json";
-  },
+  opts:
+    | Parameters<typeof exportSceneToClipboard>[0]
+    | (ExportOpts & {
+        mimeType?: string;
+        quality?: number;
+        type: "png" | "svg" | "json";
+      }),
 ) => {
+  if ("data" in opts) {
+    return exportSceneToClipboard(opts);
+  }
   if (opts.type === "svg") {
     const svg = await exportToSvg(opts);
     await copyTextToSystemClipboard(svg.outerHTML);

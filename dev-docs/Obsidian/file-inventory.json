@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "review": {
-    "date": "2026-10-12",
-    "dependency_precommit_tests": "PR #465 required yarn test:update: 55 suites/610 tests pass; 95 suites fail collection through existing disabled createTestHook/missing topPicksDnD, including the new incoming wrap suite. Two unrelated snapshot outputs restored to index bytes, preserving the incoming contextmenu snapshot.",
-    "method": "PR #465 three-way review of all 25 incoming paths and plugin consumers. Retire two differing paths with equivalence/inertness evidence, relocate link behavior, and add narrow AppWrap preservation plus independent coverage. Twelve existing rows refreshed and two new rows classified only after review. See pr-465-merge-review.md. 2026-10-12 layout follow-up on fix/wrap-tray-mode-12264: reviewed AGENTS reminder, shared actionToggleWrap layout gate, four independent layout cases and previously committed 0.18.142 version; see validation.md.",
+    "date": "2026-10-18",
+    "dependency_precommit_tests": "PR #468 required test:update: 55 suites/612 tests pass; 96 suites fail collection through existing window.h/createTestHook or missing topPicksDnD harness. Unrelated randomized transform snapshots restored. Full typecheck: 262 existing test/stale-declaration diagnostics, including incoming touched tests; none in the adapter/export pipeline/new compatibility tests.",
+    "method": "PR #468: three-way review of all 31 incoming paths and plugin SVG/link/export consumers. Fourteen changed/new ledger rows reviewed; no complete customization retired. Shared upstream export preparation replaces duplicate marker filters; fork-owned adapters preserve public calls. See pr-468-merge-review.md.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
-      "fork_parent": "52e99975d798fc7c252f2662ba9ba225d09b9ee2",
-      "upstream_parent": "541653c7c9d587d463a47daacff9fb30e45a52e7",
-      "merge_base": "2df993fb397dd6d64625908c9c10337727617f6f",
-      "state": "resolved source review",
-      "reference": "https://github.com/zsviczian/excalidraw/pull/465"
+      "fork_parent": "efcd36513651c4dcab56dfd788677dc4dc2a474e",
+      "upstream_parent": "e1b7aacb356a492aa1e0fc6eb57b8896124027f0",
+      "merge_base": "4c37956ba5f04ec342a9d9d5891a38f22c5b7b4e",
+      "state": "resolved and runtime-validated source review",
+      "reference": "https://github.com/zsviczian/excalidraw/pull/468"
     },
-    "runtime_validation": "PR #465 exact-build Obsidian 1.14.4/macOS main/new-popout wrap/link/Markdown/history, ordinary/marker frames, image-frame SVG clipping, Delete/Cut and grouped Cmd-click probes pass; teardown, errors and owned cleanup pass. Synthetic input; existing full test/type lane and physical-device/other-platform limits remain documented in pr-465-merge-review.md.",
+    "runtime_validation": "PR #468 exact-build Obsidian 1.14.4/macOS: standard linked and mixed-inversion SVG markup byte-identical to baseline; seeded PNG pixels, dimensions, markers/frame palette/fonts/EA exports, internal-link filtering and actual export-link hook pass. Main/new/reopened popout exports/selection/teardown and cleanup pass. Production/development/declaration/bundle checks pass; main.js 4,956,690 bytes. See pr-468-merge-review.md for native CLI workaround and platform/restart/offline limits.",
     "dependency_checkpoint": "2026-10-11: Obsidian artifact/declaration and plugin production/library builds pass. Local fork Windows Obsidian 1.14.4 smoke passes. Published 0.18.140 main/direct-popout/moved-popout input/save/cleanup smoke passes. Plugin npm tree/audit confirms no braces and source-map-js 1.2.2. Component full typecheck remains blocked by documented window.h/stale test-type failures. Packed manifest confirms Sass dev-only; no publication/version bump. The 5 MB target is 5 * 1024 * 1024 = 5,242,880 bytes. Plugin main.js: 5,051,865 bytes with published component (191,015 bytes of headroom), 5,057,617 with local fork (185,263 bytes of headroom); both are below the target. No full scanner, macOS or physical-mobile run in this checkpoint.",
     "layout_followup": "Validated follow-up: W/menu predicate enabled for full/tray/compact, excluded in mobile. 25 focused tests, isolated source typecheck, declarations/artifacts and plugin production/development builds pass. Full typecheck retains 262 existing diagnostics. Baseline tray/compact keyboard tests already passed; original reported tray failure was not reproduced. Extra live probe passed full-layout keyboard/link/history then stopped on unavailable host command-palette rendering; cleanup restored settings and removed owned drawing/controller. No full live layout-matrix pass claimed.",
     "layout_precommit": "Precommit snapshot-update run stopped at explicit maintainer request to skip further testing and commit/merge. Unrelated generated snapshots restored. Prior focused tests/builds remain the validation evidence."
@@ -20,32 +20,32 @@
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "bee1292f35b9853d96a3b407b8a66b026878f3a9",
+      "parent_commit": "efcd36513651c4dcab56dfd788677dc4dc2a474e",
       "package": "@zsviczian/excalidraw",
-      "version": "0.18.142"
+      "version": "0.18.143"
     },
     "upstream": {
       "kind": "local Git commit",
-      "commit": "541653c7c9d587d463a47daacff9fb30e45a52e7",
-      "tree": "a8ea3e9705538c0ea7893d051ad961efb664f9ba",
+      "commit": "e1b7aacb356a492aa1e0fc6eb57b8896124027f0",
+      "tree": "9e12003cd91f5081f0a3bb17309723500d7052fd",
       "package": "@excalidraw/excalidraw",
       "version": "0.18.0"
     },
     "plugin": {
       "kind": "Git working tree",
-      "commit": "0ba2608a4a510d998905dca12794362d6f3b7cf3",
-      "version": "2.28.1",
-      "fork_dependency": "0.18.140"
+      "commit": "3746c5903a08fb551b6777e0a4236315554e3eda",
+      "version": "2.29.0",
+      "fork_dependency": "0.18.143"
     }
   },
   "comparison": {
     "fork": {
       "files": 1306,
-      "sha256": "b1af19808690c42ea52e14cf09bc54fb2fe9a445d9fe2034468e3d9770782ed4"
+      "sha256": "ca7c5142ec70d05cd5ea6aa40671c34140d27a6273a4b6778dfe8c2fb530623d"
     },
     "upstream": {
-      "files": 1315,
-      "sha256": "6d4756bf6a3308d817184a79dfbd940997cf46622b858adbd3737ea1240eb3a7"
+      "files": 1313,
+      "sha256": "d15fbd32d89b10965b6034fa54c2eb7c9cf82a04f5c759bd538cec378e28cfed"
     }
   },
   "customizations": [
@@ -585,7 +585,7 @@
       "path": "examples/with-script-in-browser/components/ExampleApp.tsx",
       "status": "upstream-only",
       "fork_sha256": null,
-      "upstream_sha256": "344f04fa5be3c8a4f29009e5d3e8190880c0d0ccfea5e39bf3a23255a8310ca6",
+      "upstream_sha256": "e047bc2a9b0c8f34cbc6e36008d11db80fb3bd84a64450473a5e7c1a4cd60e98",
       "ids": [
         "OBS-035"
       ],
@@ -1077,8 +1077,8 @@
     {
       "path": "packages/excalidraw/CHANGELOG.md",
       "status": "modified",
-      "fork_sha256": "d5bd1a2fbedff77913c227512d78a061b49d33eb77fab800b5c07bb0edc0d369",
-      "upstream_sha256": "7a406aad909cf2f41a292b400bcf72753727d934d31e84dd59aa4780014d83d4",
+      "fork_sha256": "1b730171967025ef621b04bce46f028033a18996de3b97c583e46367abc6f881",
+      "upstream_sha256": "7ead2afbdca014e41fcaf166ccffcd4e192f78315184014261dbd43c1da36c65",
       "ids": [
         "OBS-001",
         "OBS-007",
@@ -1353,8 +1353,8 @@
     {
       "path": "packages/excalidraw/components/App.tsx",
       "status": "modified",
-      "fork_sha256": "625a0790112bc212013d794eaa9e974a050ed4889978b373271e30a9b88f2254",
-      "upstream_sha256": "5898611a994aec7f21631a6e25e0a450c13b188b268d677ee698e03054d6162a",
+      "fork_sha256": "2a10b91b516973f5833564b65541109f0e5afd8c90f988521711d72a2cfc49f1",
+      "upstream_sha256": "28f92de749063f4b07db0d0ef11f5ca31609db5596b1ef1408fd537b31018a29",
       "ids": [
         "OBS-007",
         "OBS-008",
@@ -2042,8 +2042,8 @@
     {
       "path": "packages/excalidraw/components/TTDDialog/common.ts",
       "status": "modified",
-      "fork_sha256": "9c98adcb9680cba6a30d3ebc9cf0313cf854ab7558aa103667baf797246dd250",
-      "upstream_sha256": "4ced1857522c2e92f72031077a24c55938683263219264ac57ab3d6249146af3",
+      "fork_sha256": "edee5f8a8e5eb794c687bb56bc80b20a6bfb2a43f92b4b43510ec78fbf09714d",
+      "upstream_sha256": "6dd77c3ec626cf8702a321b69efb2515849c052fcd5e82a5354a806d618822ac",
       "ids": [
         "OBS-030"
       ],
@@ -2379,8 +2379,8 @@
     {
       "path": "packages/excalidraw/data/restore.ts",
       "status": "modified",
-      "fork_sha256": "f4a6a80a0fc00d5020d3ad1ad3e6003e7347391d999e813a92c88a8ddeea6114",
-      "upstream_sha256": "0da843833ddafc18962a5ef2c1c18801a296a8818f2b4753cc9c7ce63caa0808",
+      "fork_sha256": "e0a4743370692cb0b9d7226788757574c5cb521013e1a5b8477c9f3f359e4d49",
+      "upstream_sha256": "12b5d84fbc0e2e0d29a879bf8052443453f2941a18687eabca56e39c5ac38d9e",
       "ids": [
         "OBS-009",
         "OBS-010",
@@ -2452,8 +2452,8 @@
     {
       "path": "packages/excalidraw/index-node.ts",
       "status": "modified",
-      "fork_sha256": "d0340d9e6a53b56482fe3b60cfa4f94f5449381b7f94d58cc551a0f676f5d00f",
-      "upstream_sha256": "833d9ce4abbb0f02d666fcbcddb87e2af02fc407eef802a52b62fce0e26c3533",
+      "fork_sha256": "4afb016ccc59a85663051777acc498696f348d2c71186d0c33d9d4495054fba2",
+      "upstream_sha256": "e6d7d1fc3434a50bd1b88bb0bd1a33753df56cf4b5002d6447294bb3e77d1085",
       "ids": [
         "OBS-009",
         "OBS-004"
@@ -2464,8 +2464,8 @@
     {
       "path": "packages/excalidraw/index.tsx",
       "status": "modified",
-      "fork_sha256": "f1f90ea2c874f0ecf7696633c9001c517f694741bf20bc31aeafaabb31a85ceb",
-      "upstream_sha256": "b021fd1c3e3dc7fdca1d8a719eeac7694ab097b4c12dde27dffc9ee6a6b766c9",
+      "fork_sha256": "13bc4092f905f93e228a219edd04bb63c356767030d9a76a243d8c035e61141a",
+      "upstream_sha256": "721b79a0d542a8a5933e5e241e4b2d08a71a6ac591c1811597623fd88e1fa813",
       "ids": [
         "OBS-005",
         "OBS-006",
@@ -2475,7 +2475,7 @@
         "OBS-013",
         "OBS-030"
       ],
-      "note": "Forward fork props and expose host registries, conversion/font/text/geometry helpers, and compatibility library exports.",
+      "note": "Forward fork props and expose host registries, conversion/font/text/geometry helpers, and compatibility library exports. PR #468 retains legacy export/clipboard signatures beside new exportScene.",
       "kind": "integration"
     },
     {
@@ -2560,6 +2560,18 @@
       "kind": "integration"
     },
     {
+      "path": "packages/excalidraw/obsidianExport.ts",
+      "status": "fork-only",
+      "fork_sha256": "50c21456e6a1b3c2bcea19d55121d46448ef36d7fd0298c7c6f0726f80086704",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-007",
+        "OBS-018"
+      ],
+      "kind": "compatibility",
+      "note": "PR #468: fork-owned legacy export option/encoding adapters delegate to upstream exportScene; preserve independent raster viewport/scale, metadata and clipboard call forms for plugin/scripts."
+    },
+    {
       "path": "packages/excalidraw/obsidianText.test.ts",
       "status": "fork-only",
       "fork_sha256": "b28222b1db4cfdc430ad82f77c4eabfe178702d189cfb299a15d4bbc46b35091",
@@ -2616,7 +2628,7 @@
     {
       "path": "packages/excalidraw/package.json",
       "status": "modified",
-      "fork_sha256": "9c1e8070718b67b1f2d1029bc10c076ba404e0f218c1a39df5202780e148d8c9",
+      "fork_sha256": "f951cd74957f91b5c5e5a5b6c8d690d6d561ddb91d82cf5cf0f43f39245a84e3",
       "upstream_sha256": "160dabbd052e579a5b7b0e341d653e0739d17d44d68f16be8c1cf893e1e4236d",
       "ids": [
         "OBS-002",
@@ -2699,8 +2711,8 @@
     {
       "path": "packages/excalidraw/renderer/staticScene.ts",
       "status": "modified",
-      "fork_sha256": "3b83c4f1b61840a6c8e867301e046b3a767aaf69132c37b276fa7548b77169f1",
-      "upstream_sha256": "711213e3422e48cf41f6aaff2c4d81b7202fdf0ebb78819f99e4a7ea33f128b2",
+      "fork_sha256": "88ecdfb4453692100a50e09cdd9406c90400de0fb65f3ecd09100d2e970a0a11",
+      "upstream_sha256": "8d858d1a208ecaf8bf5e64c8c2069f67910703fad6f77e0394dcb33e76f17d3e",
       "ids": [
         "OBS-014",
         "OBS-018",
@@ -2726,14 +2738,15 @@
     {
       "path": "packages/excalidraw/scene/export.ts",
       "status": "modified",
-      "fork_sha256": "cc09c1f98ca7709c976225b8c230f1034279713699bed9d0f0bf912517960cac",
-      "upstream_sha256": "b0a1e6200370627478f2f370dd31cab071b7293275c6e12bfd2a0c2d2dd614c0",
+      "fork_sha256": "b90bd7cd281d00f25d1208fa3af02ae9d6b8d970a0640b9f91cb594abebfa331",
+      "upstream_sha256": "76eabf29da776131f71554db2bac4a78f11c44852dee244603b69c48fe26f55f",
       "ids": [
+        "OBS-007",
         "OBS-009",
         "OBS-015",
         "OBS-018"
       ],
-      "note": "Custom frame-name color/raw text, exclude marker frames from export and embedded scene data, and pass frame colors to SVG renderer.",
+      "note": "PR #468: consolidate PDF marker exclusion before shared upstream export preparation; preserve custom labels/rawText and explicit host frame colors; narrow canvas environment hook supports legacy independent viewport/scale.",
       "kind": "compatibility"
     },
     {
@@ -2761,8 +2774,8 @@
     {
       "path": "packages/excalidraw/scene/types.ts",
       "status": "modified",
-      "fork_sha256": "ac7440e254ee2cbd00c48124f44361924c5e06f5ae4031892acc8787f4167598",
-      "upstream_sha256": "ae0eb07ceb272918e18e3be8ea17d58d85bbd912ead24c35355bc09aa40c0778",
+      "fork_sha256": "6fbb4a24cfe8e777b2c2ac04cccffffd812d773e5233563e3e802e8748df4f6d",
+      "upstream_sha256": "96380dca797c9d3a5bd3e89a6183366c10c729b7792867e466a640ad20c0b4b6",
       "ids": [
         "OBS-014",
         "OBS-015"
@@ -2879,6 +2892,20 @@
       ],
       "note": "Initialize text rawText in test helper. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md.",
       "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/tests/obsidianExport.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "aab4672fb19d4a10a7326397e072890337c2e29184272d9d7d3fdb84b77587b4",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-007",
+        "OBS-009",
+        "OBS-015",
+        "OBS-018"
+      ],
+      "kind": "regression-test",
+      "note": "PR #468: ten independent real-pipeline tests cover legacy/root/utility exports, dimensions, colors, markers, SVG metadata/links, frame clipping, JPEG and clipboard."
     },
     {
       "path": "packages/excalidraw/tests/obsidianSelection.test.tsx",
@@ -3000,6 +3027,18 @@
       ],
       "note": "Add global test/generated/example exclusions for TypeScript projects.",
       "kind": "packaging"
+    },
+    {
+      "path": "packages/utils/src/index.ts",
+      "status": "modified",
+      "fork_sha256": "3447b199ece2fae1f32cba8f835ea8c14b0fc2b6ab3ea3d6811eed2ac2b87dee",
+      "upstream_sha256": "2bf0879113bbccd1641736b8b07b03fa086b373ef65a84ff0bda8da946f3989c",
+      "ids": [
+        "OBS-007",
+        "OBS-018"
+      ],
+      "kind": "compatibility",
+      "note": "PR #468: retain legacy export aliases through fork-owned adapters alongside upstream exportScene and its types."
     },
     {
       "path": "scripts/buildObsidianPackage.js",

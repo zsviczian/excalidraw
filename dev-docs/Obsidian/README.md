@@ -9,7 +9,7 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 | [Customization catalog](customizations.md) | 37 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
-| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 233 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
+| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 236 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
 | [Validation and merge playbook](validation.md) | What was actually verified, existing regression tests, missing runtime evidence, and behavior-specific gates. |
 | [Obsidian runtime testing](OBSIDIAN_RUNTIME_TESTING.md) | Guarded CLI test-vault deployment, exact-build desktop smoke, reports, and feature-specific host probes. |
 | [Local audit checker](audit.py) / [checker tests](test_audit.py) | Dependency-free, offline source accounting; detects changed, new, or retired differences and stale tree fingerprints. |
@@ -25,6 +25,10 @@ All 25 incoming paths were reviewed. Adopt upstream W wrapping, frame membership
 ### W layout follow-up
 
 The 2026-10-12 `fix/wrap-tray-mode-12264` checkpoint adds a shared non-mobile W/menu gate, four layout cases and the requested AGENTS reminder. Current ledger is **164 modified, 30 fork-only, 39 upstream-only paths** (233); tree counts remain 1,306/1,315. The already committed 0.18.142 version is acknowledged. Prior merge evidence above remains historical; current follow-up validation and reproduction limits are in [validation.md](validation.md).
+
+### PR #468 export API merge
+
+The 2026-10-18 [PR #468 review](pr-468-merge-review.md) uses incoming upstream `e1b7aacb356a492aa1e0fc6eb57b8896124027f0`. All 31 incoming paths are accounted for. Legacy export adapters preserve the unchanged plugin interface and community scripts while using the new upstream renderer. Marker filtering is consolidated; frame colors/raw text and image/link semantics remain. Ledger: **165 modified, 32 fork-only, 39 upstream-only paths** (236); complete trees: 1,306 fork / 1,313 upstream files. Prior version 0.18.143 and PR #467 restore changes are acknowledged. No version/publication or plugin source/dependency update. See the review for runtime evidence and remaining validation limits.
 
 ## Initial scope and baseline
 

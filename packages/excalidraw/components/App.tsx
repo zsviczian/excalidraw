@@ -2890,9 +2890,7 @@ class App extends React.Component<AppProps, AppState> {
       this.state,
       this.files,
       {
-        exportBackground: this.state.exportBackground,
         name: this.getName(),
-        viewBackgroundColor: this.state.viewBackgroundColor,
         exportingFrame: opts.exportingFrame,
       },
     )
