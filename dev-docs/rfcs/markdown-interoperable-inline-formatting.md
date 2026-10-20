@@ -6,11 +6,29 @@
 
 ## Summary
 
-Introduce a small, explicit inline-formatting vocabulary to Excalidraw text elements, with a familiar WYSIWYG editor and a **lossless, documented Markdown-compatible source representation**. The initial vocabulary is emphasis (bold/italic), strike-through, optional underline, and foreground color. The element still owns one font family, size, line height, and overall layout. Arbitrary HTML, nested blocks, and per-character font changes are out of scope.
+Introduce a small, explicit inline-formatting vocabulary to Excalidraw text elements, with a familiar WYSIWYG editor and a **documented Markdown-compatible interchange representation**. The initial vocabulary is emphasis (bold/italic), strike-through, optional underline, and foreground color. The element still owns one font family, size, line height, and overall layout. Arbitrary HTML, nested blocks, and per-character font changes are out of scope.
 
 This is not a proposal to expose Markdown syntax as the default editing experience or to make Obsidian-specific constructs part of Excalidraw. A user can select text and click Bold or Color. The editor manipulates a structured intermediate representation, and the serializer emits a deliberately constrained source format that Markdown-based applications, CLI tools, and agents can inspect and edit.
 
-**Core compatibility contract:** Existing scenes and callers expecting plain text must continue to work. The proposal must specify exactly which field is authoritative and how edits through either the rich UI or the host's Markdown representation round-trip. Two independently mutable copies of the same text are not acceptable.
+**Core compatibility contract:** Existing scenes and callers expecting plain text must continue to work. The preferred option uses existing plain-text fields plus optional formatting marks and a Markdown codec; alternative storage designs remain open for discussion. Repeated interchange must preserve formatting meaning within the supported subset, without independently mutable duplicate text sources.
+
+## Position for upstream discussion
+
+**The proposal is a Markdown interoperability contract, not a mandate to store Markdown in a text field or adopt a particular rich-text editor.** Excalidraw should continue to expose **one text element type**, including text inside rectangles, arrows, and sticky notes, with optional inline marks. The same element works without formatting. The editor is a UI detail; consumers should not need an editor-specific serialized document to exchange text.
+
+**Preferred starting point for evaluation:** preserve the established plain-text semantics of `originalText` (unwrapped) and `text` (wrapped/display), represent optional styling as compact marks/runs, and expose a **versioned, documented Markdown import/export codec** for the supported subset. This avoids a third stored text string, retains existing layout and binding expectations, and allows Markdown tools, Obsidian, and agents to exchange formatted text. It is not yet proven that a marks representation can preserve *exact Markdown source bytes*; the baseline guarantee is **semantic round-trip** for supported syntax, with exact-source preservation an explicit separate requirement for hosts that need it.
+
+**Alternative for consideration:** Markdown as the canonical source (either in a separate source field or, with a breaking migration, in `originalText`). It is compelling for source fidelity but carries more compatibility and synchronization risks. Both belong in the design discussion; **neither is a prerequisite for Markdown interoperability**.
+
+For Obsidian specifically, the existing host-only `rawText` stores link-bearing Markdown; aligning that workflow with the upstream codec is future integration work. Upstream need not add `rawText`, Obsidian wikilink syntax, or a second text-element type.
+
+### Non-negotiable outcomes, flexible implementation
+
+- WYSIWYG inline formatting remains easy to use; no Markdown source editing required for ordinary users.
+- The same element can participate in existing bindings, containers, wrapping, and exports.
+- Existing unformatted scenes and plain-text APIs remain compatible.
+- Import/export of the documented Markdown/limited HTML subset preserves text and *formatting meaning* through repeated conversions, including CLI/agent edits.
+- The specific editor widget, scene metadata shape, and source-of-truth policy are subject to maintainer review and validation.
 
 ## Motivation
 
@@ -127,7 +145,7 @@ Prefer omitting `inlineSource` for legacy plain elements. On the first formattin
 
 Markdown import parses into `originalText` + `inlineMarks`; export serializes the same to Markdown. This can be easier for cursor indices, text measurement, and existing renderers. It may also avoid duplicate authoritative fields. **However**, lossless *source* round-tripping is not guaranteed: distinct spellings (`_` versus `*`, HTML style casing, literal escaping) can normalize on export. Obsidian editing must preserve the host's intended semantics and metadata, and ideally avoid gratuitous rewrites. Mark offsets need explicit Unicode semantics (UTF-16, code points, or grapheme clusters), and transformations must update them on every insertion/deletion/wrap.
 
-**Suggested decision:** Prototype B and A against the same acceptance tests before committing to the format. If preserving exact user-authored markup is a requirement, A (or B plus original-source preservation) is the safer starting point. If semantic Markdown round-tripping is enough, B may fit Excalidraw's architecture with less disruption. Do not promise byte-for-byte equality and zero migration cost simultaneously.
+**Suggested decision:** Start by evaluating B (plain text + optional marks, Markdown codec) as the compatibility-first default, and benchmark A where preservation of user-authored Markdown syntax requires it. Prototype both against the same acceptance tests before committing to the format. If preserving exact user-authored markup is a requirement, A (or an explicitly designed preservation mechanism alongside B) warrants separate evaluation. If semantic Markdown round-tripping is enough, B may fit Excalidraw's architecture with less disruption. Do not promise byte-for-byte equality and zero migration cost simultaneously.
 
 ## Editing architecture
 
