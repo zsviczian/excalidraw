@@ -95,6 +95,11 @@ Issue [plugin #2976](https://github.com/zsviczian/obsidian-excalidraw-plugin/iss
 <a id="obs-011"></a>
 ## OBS-011 — Drop and paste interception
 
+**PR #471:** Upstream's separate loader-script filtering is adopted verbatim;
+file-aware host interception, cancellation and raw Markdown remain unchanged.
+Native Instagram embed-code paste is checked independently of the older failing
+React clipboard harness. See the [merge review](pr-471-merge-review.md).
+
 **Retain.** [App.clipboard.ts](../../packages/excalidraw/components/App.clipboard.ts) passes parsed files as a **third** `onPaste` argument before native insertion. `App` invokes/awaits `onDrop` and stops the upstream path only when it returns `false`; thrown errors are caught/logged. [data/blob.ts](../../packages/excalidraw/data/blob.ts) tolerates a missing `DataTransferItem`, which occurs for host tab drags. Text paste also retains raw text and adjusts font sizing.
 
 `P: src/view/managers/DropManager.ts` and `ExcalidrawView.ts` handle vault files, host draggables, and the public EA `onDropHook`; `ExcalidrawRoot.ts` wires these callbacks. The supplied upstream onPaste contract lacks the file list and there is no equivalent onDrop prop. A plugin DOM listener is not automatically equivalent because payload availability, await/cancel behavior, and insertion ordering matter. The difference in `data/filesystem.ts` is only a TODO/newline, **not** an alternative file-open implementation. **Gate:** V04, V06; D01 for that unrelated comment.
@@ -108,6 +113,12 @@ Its added `pruneOrphanGroupIds` counts nondeleted group members and removes grou
 
 <a id="obs-013"></a>
 ## OBS-013 — Local fonts and host font loading
+
+**PR #471 (2026-10-20):** Adopt upstream worker FontFaceSet loading while retaining
+host Local Font registration/loading exclusions, Helvetica guard and unrelated-font
+filtering. The public loader accepts both its existing Document argument and the
+new FontFaceSet form. No font identity/protocol change or retirement. Focused
+ownership/compatibility tests and validation limits are in the [review](pr-471-merge-review.md).
 
 **PR #469 (2026-10-20):** Upstream now prewarms the actual current item font through each editor document, superseding the empty-scene-only Excalifont preload. Local Font identity/replacement, host-font filtering and public font helpers remain. [Merge review](pr-469-merge-review.md).
 
@@ -137,6 +148,11 @@ PR #468 moves marker exclusion into the shared export preparation used by upstre
 
 <a id="obs-016"></a>
 ## OBS-016 — Webviews, rich embeds, and embed magnification
+
+**PR #471:** Adopt upstream Instagram post/reel normalization and portrait bounds.
+Existing HTML-data, YouTube routing, webview, magnification and same-origin
+customizations remain; this provider addition does not supply their replacement.
+See the [merge review](pr-471-merge-review.md) for coverage and platform limits.
 
 **Retain with explicit boundary/security review.** [element/embeddable.ts](../../packages/element/src/embeddable.ts) adds data-HTML embedding, Obsidian YouTube wrapper routing on desktop/iOS, and unconditional same-origin allowance where upstream is selective. `App` tries the host `renderEmbeddable` path, then chooses webview or iframe with special handling for srcdoc/generated and Vimeo cases. It exposes embed-node lookup, forced rendering of offscreen embeds, and an active-embed menu. Embedded element scale changes DOM content resolution/magnification independently of its scene bounds; canvas border/SVG dimensions and radius/padding accommodate it.
 

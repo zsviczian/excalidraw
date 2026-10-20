@@ -132,6 +132,14 @@ The registration interfaces/disposer types are exported by their defining host m
 
 ## Persisted fields and identities — OBS-009/010/012/013/014/015/016/018/026/037
 
+PR #471 adopts upstream worker font sets while preserving the fork's public
+`Fonts.loadFontFaces(families, characters, Document)` call form; its third
+argument also accepts a FontFaceSet. Internal document callers pass their own
+font set, and the plugin retains control of replacing Local Font faces. The
+Instagram provider addition and clipboard loader-script filtering do not
+change host callback arguments, Local Font ID 4 or any persisted field.
+See the [merge review](pr-471-merge-review.md).
+
 Canonical shapes: [element/types.ts](../../packages/element/src/types.ts), [obsidianTypes.ts](../../packages/excalidraw/obsidianTypes.ts), [types.ts](../../packages/excalidraw/types.ts), defaults in [newElement.ts](../../packages/element/src/newElement.ts), restoration in [restore.ts](../../packages/excalidraw/data/restore.ts), and export in [scene/export.ts](../../packages/excalidraw/scene/export.ts). Some `customData` keys are intentionally not rigidly typed in the base element definition.
 
 | Data/identity | Meaning and retirement constraint |

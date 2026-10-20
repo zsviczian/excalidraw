@@ -9,7 +9,7 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 | [Customization catalog](customizations.md) | 37 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
-| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 233 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
+| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 234 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
 | [Validation and merge playbook](validation.md) | What was actually verified, existing regression tests, missing runtime evidence, and behavior-specific gates. |
 | [Obsidian runtime testing](OBSIDIAN_RUNTIME_TESTING.md) | Guarded CLI test-vault deployment, exact-build desktop smoke, reports, and feature-specific host probes. |
 | [Local audit checker](audit.py) / [checker tests](test_audit.py) | Dependency-free, offline source accounting; detects changed, new, or retired differences and stale tree fingerprints. |
@@ -45,6 +45,19 @@ pass; the broad older suite, three baseline test-type diagnostics and remaining
 platform/heap gates are explicitly documented. No version/publication/dependency
 update or plugin production-source change. Use this incoming commit for the
 current audit; older checkpoint commands below remain historical examples.
+
+### PR #471 Instagram and worker-font merge
+
+The 2026-10-20 [PR #471 review](pr-471-merge-review.md) compares incoming
+`bee01e3a12812c930109aa91242658709480bbf3` with fork parent `22d40c4a8` and
+merge base `d3a9c2a19`. All six incoming paths are reviewed; Fonts.ts is the
+only conflicted file. Adopt upstream Instagram and worker-font support while
+preserving host paste, embed and Local Font contracts, including the existing
+public Document loader argument. No retirement or protocol/version change.
+Ledger: **161 modified, 34 fork-only, 39 upstream-only paths** (234); complete
+trees: **1,313 fork / 1,318 upstream**. Use this incoming commit for the current
+audit; previous checkpoints remain historical evidence. Validation and limits
+are recorded in the review.
 
 ## Initial scope and baseline
 
