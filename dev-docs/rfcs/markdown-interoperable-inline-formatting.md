@@ -37,6 +37,60 @@ Markdown itself does **not** solve cursor mapping, layout metrics, security, ric
 6. **Links:** Maintain existing Excalidraw element link semantics. Treat inline Markdown links as a separate design decision, not an accidental result of a general Markdown parser. Obsidian wikilinks and embeds remain host-specific.
 7. **No layout blocks:** headings, tables, lists, arbitrary HTML elements, per-run font family/size, images, code blocks, and embedded DOM are deferred.
 
+## Decision note: should Markdown replace `originalText`? (2026-10-20)
+
+**Recommendation: no, not directly.** The appealing idea is to put markup in `originalText` and leave `text` as the rendered projection. However, upstream currently treats both properties as *plain text*, with different wrapping semantics. Changing `originalText` to source markup is a breaking semantic change, even if its TypeScript type stays `string`.
+
+### Current upstream contract (verified)
+
+- `ExcalidrawTextElement` declares both `text: string` and `originalText: string`. [Element type](https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/types.ts).
+- The [WYSIWYG editor](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/wysiwyg/textWysiwyg.tsx) explicitly states it deals with `originalText` and derives wrapped `text` from it.
+- The [text geometry helpers](https://github.com/excalidraw/excalidraw/blob/master/packages/element/src/textElement.ts) pass `originalText` directly into `wrapText()` and measure the result. [Auto-resize](https://github.com/excalidraw/excalidraw/blob/master/packages/excalidraw/actions/actionTextAutoResize.ts) also measures `originalText`.
+- Text mutations, search, copy/paste, bindings, sticky-note fit, exports, and APIs have further consumers that must be audited before changing semantics.
+
+**Counterexample:** setting `originalText = "Hello **world**"` while `text = "Hello world"` would make existing wrap/measure/edit paths count six markup delimiters as characters, potentially wrap or size incorrectly, and expose visible markup when editing. A plain-text scene remains entirely valid; a new field cannot be mandatory.
+
+### Proposed backward-compatible contract
+
+For **legacy text elements**, retain all existing semantics:
+
+- `originalText`: authoritative unwrapped plain text.
+- `text`: derived displayed text, with layout-inserted wraps; ordinary line breaks retained.
+- No inline-formatting metadata unless the user opts into rich inline styling.
+
+For **formatted text elements** introduce an optional, versioned field, name illustrative:
+
+```ts
+{
+  type: "text",
+  originalText: "Hello world", // unwrapped, decoded plain text
+  text: "Hello\nworld",        // display text, line wrapping for this geometry
+  inlineSource: "Hello **world**", // authoritative Markdown-compatible source
+  inlineSourceFormat: "excalidraw-inline-md-v1"
+}
+```
+
+The **authoritative source for formatted elements is `inlineSource`**; `originalText` and `text` remain *derived projections* and keep their existing meaning. Parsing returns plain characters, marks, and source-to-plain offset mapping. Layout derives wrapped text and formatted runs from the same result; synthetic wrap breaks never enter the source.
+
+This preserves older consumers' expectations for plain text while making formatting available to opt-in callers. It does **not** guarantee that old applications can preserve formatting after editing a newly formatted element: the read/write contract must define how updates from legacy `originalText`-only APIs are handled. Prefer an explicit `updateTextContent({ source, format })` path; if an older caller changes plain text only, define whether to discard marks, remap them deterministically, or reject a stale-source update. Never silently persist mutually inconsistent fields.
+
+The earlier **Data model** alternatives in this RFC remain explorations; for an upstream compatibility-first design, **this note supersedes treating `originalText` as markup**. A plain-text + formatting-ranges model is still a candidate: `originalText` remains canonical plain text, and a Markdown codec provides interchange. The critical invariant is that `originalText` itself must not quietly change from plain to markup.
+
+### Obsidian consideration, deliberately deferred
+
+Obsidian Excalidraw already maintains a separate `rawText` in its host data model to retain Markdown source—including links and aliases—while `originalText` and `text` represent parsed/display content. This is evidence for the **need to keep source distinct from plain-text projections**, not a proposal that upstream must adopt Obsidian's specific `rawText` field, link grammar, or synchronization code. A future Obsidian adapter can map upstream `inlineSource` and its own `rawText` with documented precedence and lossless host-link handling. Avoid conflating Obsidian wikilinks with upstream rich-text marks.
+
+### Explicit acceptance criteria
+
+1. For unformatted legacy scenes, serialize/load, wrap, search, edit, measure, export, and text-binding behavior remain unchanged.
+2. Formatting `Hello **world**` produces `originalText === "Hello world"` and a plain-text display projection; the glyphs `**` must not contribute to width/height.
+3. Every editor mutation atomically updates authoritative formatted source, unwrapped plain text, wrapped display text, and run layout; invalid source cannot silently desynchronize them.
+4. Width/height changes only alter layout projections, not `inlineSource` or user-authored line breaks.
+5. A plain-text-only API changing `originalText` on a formatted element has a **documented**, tested behavior; no ambiguous last-writer-wins state.
+6. Current scene and clipboard consumers degrade to readable plain text; new saved-scene format versioning and old-client write behavior are explicitly documented.
+7. Canvas and SVG exports render formatting using measured glyph runs and an editor-appropriate render environment, without exposing markup in visible text.
+8. Markdown ↔ formatted element ↔ Markdown passes semantic round-trip tests (and exact source preservation where explicitly promised); Obsidian-specific source/link round-trip is a later host integration test.
+
 ## Data model: choose an authority, not two copies
 
 The hardest decision is the persisted source of truth. Two viable designs:
