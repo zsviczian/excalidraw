@@ -146,6 +146,60 @@ Additional tests: leading/trailing whitespace, CRLF, Unicode combining marks, em
 - **Scope creep:** links, inline fonts, arbitrary styles, lists, headings, and embedded HTML should not accidentally enter v1.
 - **Tooling claim:** Markdown is generally friendlier for CLI/LLM workflows, but concise structured runs can also be agent-friendly; measure sample diff size, token counts, and error rates rather than asserting universal superiority.
 
+
+## Editor implementation options: buy a small engine or build the narrow editor?
+
+**Research checkpoint: 2026-10-20.** This is a candidate evaluation, not a library selection or an installed benchmark. Consider the **complete production integration cost**, including transitive dependencies, Markdown codec, sanitizer, React bindings, UI styling, and IME/accessibility code—not simply an npm package's reported core size.
+
+Excalidraw does **not** need a general-purpose document editor for v1. It needs a single bounded inline text element, a few marks, predictable selection/undo/composition, a host-owned DOM and window, and a renderer independent of the editing widget. Excalidraw's existing textarea has mature positioning, keyboard, and composition behavior. The decision is whether to evolve that mechanism or replace just its *active editing surface*.
+
+| Candidate | Main strengths | Cost / fit risks | Recommendation |
+| --- | --- | --- | --- |
+| **Custom minimal editor (existing textarea + styled overlay)** | Reuses Excalidraw's input, positioning, undo integration, theme; no editor-engine dependency; full visual control | Overlaid marks and selection can diverge; IME, bidi, emoji, composition, mobile text selection, screen readers and highlighting require careful testing; may become a home-grown editor framework | **Prototype only** if a restricted set of marks works without separate styled caret/selection layout |
+| **Custom scoped `contenteditable` + small run model** | Native mixed inline styles, small dependency footprint, CSS can match Excalidraw; custom Markdown codec independent | Browser DOM normalization, paste sanitization, selection mapping, transaction/undo, composition and mobile handling become Excalidraw's responsibility | **Viable minimalist option**, but carry a strong browser/IME regression suite before selecting |
+| **Lexical core + minimal React plugins** | Modular editor engine, transactions and selection handling; only import required features; custom nodes/commands and themes | Markdown extension may not preserve custom colors or source syntax without adapters; integration/runtime size and contenteditable positioning; potential mismatch with Excalidraw undo/model | **First library prototype**; compare build delta against the custom option |
+| **ProseMirror core with minimal schema** | Mature schema + marks, transactions, selection/input handling; controlled subset; Markdown parser/serializer can be customized | Lower-level API, more glue code; renderer/host adapter still required; Markdown conversion may normalize source | **Strong alternative** if a minimal Lexical build is not lean or source mapping is easier in ProseMirror |
+| **Tiptap (ProseMirror wrapper)** | Good ergonomics, extension architecture, menus and selection helpers; styling possible | Default presets/features can expand payload; Markdown support must be validated per mark; may be more editor than a one-element inline use case needs | **Fallback** if development speed outweighs dependency delta |
+| **Milkdown (ProseMirror/remark ecosystem)** | Markdown-oriented conversion is central; useful reference for source↔document design | Broad Markdown-document model, remark/unified and ProseMirror stack; inline color/HTML subset still needs customization; potentially substantial bundle overhead | **Reference / optional prototype**, not default for a tiny text element |
+| **Quill 2** | Mature rich-text input model with Delta operations and formats | Delta is canonical internally, Markdown requires a codec; editor/document styling/DOM lifecycle may not align with canvas text layout | **Lower priority** |
+| **Full editors (CKEditor, TinyMCE, BlockNote)** | Feature-rich polished editing | Too broad for constrained inline styling, significant integration and payload cost | **Out of scope** |
+
+### Size and complexity: evidence and caveats
+
+A September 2026 third-party **end-to-end bundle comparison** reported roughly 105 KB gzip for a Lexical React setup, 123 KB for a Tiptap React setup, and 59 KB for Quill, while excluding CSS and depending on the specific imports. These figures are *not* comparable to a proposed custom minimal editor, not guaranteed reproducible for Excalidraw, and **not** a forecast of the actual Obsidian bundle delta. See [EditorStack benchmark](https://www.editorstack.cc/research/bundle-size-benchmark-2026), which documents its versions and bundling assumptions. Official documentation confirms Lexical's [modular extensions](https://lexicaljs.org/docs/packages/lexical) and Milkdown's [ProseMirror/Markdown stack](https://milkdown.dev/docs/guide/faq). An editor-size assessment should also include CSS, framework bindings, rich formatting plugins, Markdown parsing/serialization, sanitization, and any already-shared dependencies.
+
+A **custom editor is not automatically cheaper** once caret mapping, Unicode/IME, accessibility, paste, and maintenance are counted. Conversely, installing a feature-complete editor for five inline marks may impose unnecessary code size and dependency churn. Avoid choosing on unqualified benchmark numbers.
+
+### Proposed two-track spike
+
+Build *disposable experiments*, not production integrations, against the same fixtures:
+
+**Track 1 — minimal custom editor:** retain the existing textarea editor, first trying a noninteractive styled overlay for formatted display; if selection and styling cannot remain in sync under IME/bidi/mobile, separately test a narrowly controlled contenteditable with run-based transactions. Reuse Excalidraw menus/styles. Do not create a new general-purpose editor framework.
+
+**Track 2 — Lexical minimal setup:** editor core + only essential rich text/history/selection bindings, no generic toolbar or full document plugins; mount within the existing canvas text editor overlay and translate edits into Excalidraw's independent run model. Measure the true dependency delta. If not viable, test bare ProseMirror with a minimal inline schema before adding Tiptap or Milkdown.
+
+Both tracks must consume/emit the **same independent `InlineRuns` model and Markdown codec**, with one authority rule defined by the earlier RFC. This lets the project replace the UI engine without migrating saved scenes. The active editor DOM must be scoped to the mounted Excalidraw container's `ownerDocument`/`ownerWindow`; event listeners, selection APIs, portals, timers and font measurements must work in Obsidian popouts.
+
+### Scorecard / decision gates
+
+Use a reproducible comparison rather than selecting by reputation:
+
+| Dimension | Suggested weight | Test |
+| --- | ---: | --- |
+| Input correctness and accessibility | **30%** | desktop/mobile IME, dead keys, emoji/graphemes, bidi, paste, keyboard commands, pointer selection, undo/redo, screen readers |
+| Text/Markdown semantics | **25%** | nested marks, color spans, escaping, source↔plain offsets, external Markdown edits, round-trip stability |
+| Excalidraw canvas integration | **20%** | rotated/scaled text overlay, wrapping, bindings, clipboard, selected toolbar state, font metrics, cross-document popouts |
+| Runtime footprint | **15%** | actual incremental min+gzip and uncompressed Obsidian artifact, startup/render costs, externalized React, lazy-loading feasibility |
+| Maintenance and theming | **10%** | CSS isolation, theme parity, API stability, dependency security/update load, test effort |
+
+**Go/no-go thresholds are proposals, not measured outcomes:** no loss of plain text or styling in the defined subset; no known IME/accessibility or popout regression; measurable bundle/startup overhead documented on production build; HTML never trusted as raw DOM; identical scene formatting across canvas and SVG. Prefer the simpler solution only after correctness gates pass. A large library that meets correctness can still be rejected on footprint; a small custom editor that fails composition must be rejected despite its size.
+
+### Initial recommendation
+
+Keep the codec + model independent of editor choice. **Prototype a minimal custom route against a minimal Lexical route**, measure both *in this monorepo* with the existing Obsidian build constraints, then select. Bare ProseMirror is the next candidate if Lexical's source mapping or dependencies prove awkward. Avoid initially adopting a complete Markdown document editor simply because it already supports Markdown; in this use case Markdown is primarily the interchange/storage contract, not a requirement for a document-editing UI.
+
+**Important:** This comparison does not recommend bypassing Excalidraw's own canvas/SVG text renderer. An editing widget's HTML appearance does not automatically make exported drawings render correctly or deterministically.
+
 ## Suggested upstream discussion
 
 Could Excalidraw implement inline formatting with a deliberately small, documented Markdown-compatible interchange format behind a simple WYSIWYG editor? The goal is not to require users to edit Markdown or to add general HTML rendering, but to retain interoperability with plain-text/Markdown consumers and with CLI/agent workflows. In particular, Obsidian Excalidraw's editable Markdown Text Elements section needs a lossless path for externally edited text, while legacy Excalidraw scene consumers must still receive stable plain text.
