@@ -1,5 +1,6 @@
 import {
   FONT_FAMILY,
+  DEFAULT_FONT_FAMILY,
   FONT_FAMILY_FALLBACKS,
   CJK_HAND_DRAWN_FALLBACK_FONT,
   WINDOWS_EMOJI_FALLBACK_FONT,
@@ -44,8 +45,6 @@ import { VirgilFontFaces } from "./Virgil";
 import { XiaolaiFontFaces } from "./Xiaolai";
 
 export class Fonts {
-  // it's ok to track fonts across multiple instances only once, so let's use
-  // a static member to reduce memory footprint
   public static readonly loadedFontsCache = new Set<string>();
 
   private static _registered:
@@ -82,6 +81,7 @@ export class Fonts {
 
   private readonly scene: Scene;
   private readonly ownerDocument: Document;
+  private readonly loadedFonts = new Set<string>();
 
   constructor(scene: Scene, ownerDocument: Document = document) {
     this.scene = scene;
@@ -104,9 +104,9 @@ export class Fonts {
    * of the supplied fontFaces has not already been processed.
    */
   public onLoaded = (fontFaces: readonly FontFace[]): void => {
-    // bail if all fonts with have been processed. We're checking just a
-    // subset of the font properties (though it should be enough), so it
-    // can technically bail on a false positive.
+    // bail if all fonts with have been processed by THIS instance. We're
+    // checking just a subset of the font properties (though it should be
+    // enough), so it can technically bail on a false positive.
     let shouldBail = true;
 
     //zsviczian - Obsidian adds Excalidraw irrelevant fonts
@@ -124,8 +124,10 @@ export class Fonts {
       const sig = `${fontFace.family}-${fontFace.style}-${fontFace.weight}-${fontFace.unicodeRange}`;
 
       // make sure to update our cache with all the loaded font faces
-      if (!Fonts.loadedFontsCache.has(sig)) {
-        Fonts.loadedFontsCache.add(sig);
+      Fonts.loadedFontsCache.add(sig);
+
+      if (!this.loadedFonts.has(sig)) {
+        this.loadedFonts.add(sig);
         shouldBail = false;
       }
     }
@@ -161,17 +163,19 @@ export class Fonts {
   /**
    * Load font faces for a given scene and trigger scene update.
    */
-  public loadSceneFonts = async (): Promise<FontFace[]> => {
-    const sceneFamilies = this.getSceneFamilies();
+  public loadSceneFonts = async (
+    defaultFontFamily: ExcalidrawTextElement["fontFamily"] = DEFAULT_FONT_FAMILY,
+  ): Promise<FontFace[]> => {
     const elements = this.scene.getNonDeletedElements();
+    const sceneFamilies = Fonts.getUniqueFamilies(elements);
     const charsPerFamily = Fonts.getCharsPerFamily(elements);
 
-    // zsviczian START -- load the empty-scene Welcome UI font in the editor document
-    if (!elements.length) {
-      sceneFamilies.push(FONT_FAMILY.Excalifont);
-      charsPerFamily[FONT_FAMILY.Excalifont] = new Set("Excalidraw");
+    // prewarm the default font so that the first text element is not
+    // rendered with a fallback font
+    if (!sceneFamilies.includes(defaultFontFamily)) {
+      sceneFamilies.push(defaultFontFamily);
+      charsPerFamily[defaultFontFamily] = new Set("Excalidraw");
     }
-    // zsviczian END
 
     return Fonts.loadFontFaces(
       sceneFamilies,
@@ -185,12 +189,20 @@ export class Fonts {
    */
   public static loadElementsFonts = async (
     elements: readonly ExcalidrawElement[],
-    ownerDocument: Document = document,
+    ownerDocument?: Document,
   ): Promise<FontFace[]> => {
+    const doc =
+      ownerDocument ?? (typeof document !== "undefined" ? document : null);
+
+    // NOTE: headless environments should register fonts prior to rendering
+    if (!doc?.fonts) {
+      return [];
+    }
+
     const fontFamilies = Fonts.getUniqueFamilies(elements);
     const charsPerFamily = Fonts.getCharsPerFamily(elements);
 
-    return Fonts.loadFontFaces(fontFamilies, charsPerFamily, ownerDocument);
+    return Fonts.loadFontFaces(fontFamilies, charsPerFamily, doc);
   };
 
   /**
@@ -493,13 +505,6 @@ export class Fonts {
     return charsPerFamily[family]
       ? Array.from(charsPerFamily[family]).join("")
       : "";
-  }
-
-  /**
-   * Get all registered font families.
-   */
-  private static getAllFamilies() {
-    return Array.from(Fonts.registered.keys());
   }
 }
 

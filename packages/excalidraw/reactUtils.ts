@@ -24,7 +24,7 @@ export const withBatchedUpdatesThrottled = <
   TFunction extends ((event: any) => void) | (() => void),
 >(
   func: Parameters<TFunction>["length"] extends 0 | 1 ? TFunction : never,
-  ownerWindow: Window = window, // zsviczian -- bind throttled cross-document events to the mounted editor window
+  ownerWindow: Window = window,
 ) => {
   return throttleRAF<Parameters<TFunction>>(
     // @ts-ignore
@@ -32,7 +32,7 @@ export const withBatchedUpdatesThrottled = <
       unstable_batchedUpdates(func, event);
     }) as TFunction,
     ownerWindow,
-  ); // zsviczian -- keep popout frames independent of main-window throttling
+  );
 };
 
 export const isRenderThrottlingEnabled = (() => {

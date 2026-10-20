@@ -9,14 +9,14 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 | [Customization catalog](customizations.md) | 37 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
-| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 236 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
+| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 233 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
 | [Validation and merge playbook](validation.md) | What was actually verified, existing regression tests, missing runtime evidence, and behavior-specific gates. |
 | [Obsidian runtime testing](OBSIDIAN_RUNTIME_TESTING.md) | Guarded CLI test-vault deployment, exact-build desktop smoke, reports, and feature-specific host probes. |
 | [Local audit checker](audit.py) / [checker tests](test_audit.py) | Dependency-free, offline source accounting; detects changed, new, or retired differences and stale tree fingerprints. |
 
 Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md](../../CONTRIBUTING.md). This inventory documents existing deviations even when they do not yet comply with those policies; it does not silently approve them.
 
-## Current merge checkpoint
+## Reviewed merge checkpoints
 
 The 2026-10-12 [PR #465 review](pr-465-merge-review.md) compares the resolved merge with incoming upstream `541653c7c9d587d463a47daacff9fb30e45a52e7`. The fork parent is `52e99975d798fc7c252f2662ba9ba225d09b9ee2`; their merge base is `2df993fb397dd6d64625908c9c10337727617f6f`. The ledger contains **163 modified, 30 fork-only, and 39 upstream-only paths** (232 total); complete tree counts are 1,306 fork files and 1,315 upstream files.
 
@@ -29,6 +29,22 @@ The 2026-10-12 `fix/wrap-tray-mode-12264` checkpoint adds a shared non-mobile W/
 ### PR #468 export API merge
 
 The 2026-10-18 [PR #468 review](pr-468-merge-review.md) uses incoming upstream `e1b7aacb356a492aa1e0fc6eb57b8896124027f0`. All 31 incoming paths are accounted for. Legacy export adapters preserve the unchanged plugin interface and community scripts while using the new upstream renderer. Marker filtering is consolidated; frame colors/raw text and image/link semantics remain. Ledger: **165 modified, 32 fork-only, 39 upstream-only paths** (236); complete trees: 1,306 fork / 1,313 upstream files. Prior version 0.18.143 and PR #467 restore changes are acknowledged. No version/publication or plugin source/dependency update. See the review for runtime evidence and remaining validation limits.
+
+### PR #469 cross-document runtime merge
+
+The 2026-10-20 [PR #469 review](pr-469-merge-review.md) compares incoming
+`d3a9c2a195182bf65b526ccb7a19de96f4bdfdb3` with fork parent `b743bd52f` and
+merge base `e1b7aacb3`. All 79 incoming paths and 23 conflicted files are
+accounted for. Upstream AppHost, scoped environments, scheduling and drag
+ownership replace equivalent local patches; five entire file differences
+retire. Generic document-local tooltips, migration cancellation/readiness,
+custom pen/highlighter and saved host behavior remain. Ledger: **161 modified,
+33 fork-only, 39 upstream-only paths** (233); complete trees: 1,312 fork /
+1,318 upstream files. The focused 88-test lane and Windows native integration
+pass; the broad older suite, three baseline test-type diagnostics and remaining
+platform/heap gates are explicitly documented. No version/publication/dependency
+update or plugin production-source change. Use this incoming commit for the
+current audit; older checkpoint commands below remain historical examples.
 
 ## Initial scope and baseline
 

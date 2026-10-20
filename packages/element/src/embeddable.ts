@@ -13,6 +13,7 @@ import { newTextElement } from "./newElement";
 import { wrapText } from "./textWrapping";
 import { isIframeElement } from "./typeChecks";
 
+import type { RenderEnvironment } from "./renderEnvironment";
 import type {
   ExcalidrawIframeLikeElement,
   IframeData,
@@ -421,6 +422,7 @@ export const getEmbedLink = (
 
 export const createPlaceholderEmbeddableLabel = (
   element: ExcalidrawIframeLikeElement,
+  renderEnvironment?: RenderEnvironment,
 ): NonDeletedExcalidrawElement => {
   let text: string;
   if (isIframeElement(element)) {
@@ -449,11 +451,12 @@ export const createPlaceholderEmbeddableLabel = (
     backgroundColor: "transparent",
     fontFamily,
     fontSize,
-    text: wrapText(text, fontString, element.width - 20),
-    rawText: text,
+    text: wrapText(text, fontString, element.width - 20, renderEnvironment),
+    rawText: text, // zsviczian -- preserve placeholder source text
     textAlign: "center",
     verticalAlign: VERTICAL_ALIGN.MIDDLE,
     angle: element.angle ?? 0,
+    renderEnvironment,
   });
 };
 

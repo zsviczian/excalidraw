@@ -7,23 +7,80 @@ import {
 } from "@testing-library/react";
 import { vi } from "vitest";
 
-import { MIME_TYPES } from "@excalidraw/common"; // zsviczian -- construct the migration image fixture
-import { newImageElement } from "@excalidraw/element"; // zsviczian -- construct the migration image fixture
+import { FONT_FAMILY, MIME_TYPES } from "@excalidraw/common"; // zsviczian -- migration fixture MIME
+import { newImageElement } from "@excalidraw/element"; // zsviczian -- migration fixture
 
-import type { FileId } from "@excalidraw/element/types"; // zsviczian -- type the migration image fixture
+import type { FontFamilyValues, FileId } from "@excalidraw/element/types"; // zsviczian -- migration file identity
 
 import { Excalidraw } from "../index";
-import { useTopPicksDnD } from "../components/ColorPicker/topPicksDnD"; // zsviczian -- cover popout top-picks drag ownership, upstream #11997
-import { Tooltip } from "../components/Tooltip"; // zsviczian -- exercise document-local tooltips, upstream #11974 follow-up
+import { useColorTopPicksDnD } from "../components/ColorPicker/colorTopPicksDnD";
+import { Tooltip } from "../components/Tooltip"; // zsviczian -- owner-document regression
 
 import type {
-  BinaryFileData, // zsviczian -- type the migration image fixture
-  DataURL, // zsviczian -- type the migration image fixture
   ExcalidrawImperativeAPI,
-} from "../types";
+  BinaryFileData,
+  DataURL,
+} from "../types"; // zsviczian -- migration fixture
+
+const mountEditorInOwnDocument = (currentItemFontFamily?: FontFamilyValues) => {
+  const iframe = document.createElement("iframe");
+  document.body.append(iframe);
+
+  const ownerDocument = iframe.contentDocument!;
+  const ownerWindow = iframe.contentWindow! as Window & typeof globalThis;
+  const mountNode = ownerDocument.createElement("div");
+  ownerDocument.body.append(mountNode);
+
+  const fonts = {
+    load: vi.fn().mockResolvedValue([]),
+    // pretend nothing is loaded yet, so that the editor actually goes
+    // through `fonts.load()` for its scene & current item fonts
+    check: vi.fn().mockReturnValue(false),
+    has: vi.fn().mockReturnValue(true),
+    add: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  };
+  Object.defineProperty(ownerDocument, "fonts", { value: fonts });
+  Object.defineProperties(ownerWindow, {
+    addEventListener: { value: vi.fn() },
+    removeEventListener: { value: vi.fn() },
+    requestAnimationFrame: {
+      value: window.requestAnimationFrame.bind(window),
+    },
+    ResizeObserver: { value: window.ResizeObserver },
+  });
+  Object.defineProperty(ownerDocument, "defaultView", { value: ownerWindow });
+  Object.defineProperty(ownerWindow.HTMLCanvasElement.prototype, "getContext", {
+    value: window.HTMLCanvasElement.prototype.getContext,
+  });
+
+  let api: ExcalidrawImperativeAPI | null = null;
+  const { container, unmount } = renderReact(
+    <Excalidraw
+      ownerDocument={ownerDocument}
+      initialData={{
+        appState: currentItemFontFamily ? { currentItemFontFamily } : undefined,
+      }}
+      onExcalidrawAPI={(nextApi) => {
+        api = nextApi;
+      }}
+    />,
+    { container: mountNode, baseElement: ownerDocument.body },
+  );
+
+  return {
+    fonts,
+    container,
+    getAPI: () => api,
+    cleanup: () => {
+      unmount();
+      iframe.remove();
+    },
+  };
+};
 
 describe("cross-document rendering", () => {
-  // zsviczian START -- verify top-picks drag stays in its source document, upstream #11997
   it("binds top-picks drag interactions to the source window", () => {
     const iframe = document.createElement("iframe");
     document.body.append(iframe);
@@ -31,22 +88,20 @@ describe("cross-document rendering", () => {
     const ownerWindow = iframe.contentWindow!;
     const mountNode = ownerDocument.createElement("div");
     ownerDocument.body.append(mountNode);
-    const onPicksChange = vi.fn();
     const ownerAddEventListener = vi.fn();
-    const ownerRemoveEventListener = vi.fn();
     Object.defineProperties(ownerWindow, {
       addEventListener: { value: ownerAddEventListener },
-      removeEventListener: { value: ownerRemoveEventListener },
+      removeEventListener: { value: vi.fn() },
     });
     let startPickDrag:
-      | ReturnType<typeof useTopPicksDnD>["startPickDrag"]
+      | ReturnType<typeof useColorTopPicksDnD>["startPickDrag"]
       | null = null;
 
     const Harness = () => {
-      const drag = useTopPicksDnD({
+      const drag = useColorTopPicksDnD({
         enabled: true,
         picks: ["#000000", "#ffffff"],
-        onPicksChange,
+        onPicksChange: vi.fn(),
       });
       startPickDrag = drag.startPickDrag;
       return (
@@ -104,7 +159,6 @@ describe("cross-document rendering", () => {
       iframe.remove();
     }
   });
-  // zsviczian END
 
   it("scopes listeners, fonts, and portals to ownerDocument", async () => {
     const iframe = document.createElement("iframe");
@@ -114,16 +168,10 @@ describe("cross-document rendering", () => {
     const ownerWindow = iframe.contentWindow! as Window & typeof globalThis;
     const mountNode = ownerDocument.createElement("div");
     ownerDocument.body.append(mountNode);
-    const ownerImages: HTMLImageElement[] = []; // zsviczian -- record image construction in the editor realm, upstream #11974 follow-up
-    const OwnerImage = function () {
-      const image = ownerDocument.createElement("img");
-      ownerImages.push(image);
-      return image;
-    } as unknown as typeof Image; // zsviczian -- minimal cross-document Image constructor double, upstream #11974 follow-up
 
     const fonts = {
       load: vi.fn().mockResolvedValue([]),
-      check: vi.fn().mockReturnValue(false), // zsviczian -- force the empty-scene UI font load path
+      check: vi.fn().mockReturnValue(true),
       has: vi.fn().mockReturnValue(true),
       add: vi.fn(),
       addEventListener: vi.fn(),
@@ -138,7 +186,6 @@ describe("cross-document rendering", () => {
         value: window.requestAnimationFrame.bind(window),
       },
       ResizeObserver: { value: window.ResizeObserver },
-      Image: { value: OwnerImage }, // zsviczian -- expose the editor-realm constructor to App, upstream #11974 follow-up
     });
     Object.defineProperty(ownerDocument, "defaultView", {
       value: ownerWindow,
@@ -224,43 +271,6 @@ describe("cross-document rendering", () => {
         { passive: false },
       );
 
-      // zsviczian START -- verify image decoding starts in the editor window
-      const ownerImageFileId = "owner-window-image" as FileId;
-      act(() => {
-        api!.updateScene({
-          elements: [
-            newImageElement({
-              type: "image",
-              x: 0,
-              y: 0,
-              fileId: ownerImageFileId,
-              status: "saved",
-              scale: [1, 1],
-            }),
-          ],
-        });
-        api!.addFiles([
-          {
-            id: ownerImageFileId,
-            dataURL: `data:${MIME_TYPES.png};base64,AA==` as DataURL,
-            mimeType: MIME_TYPES.png,
-            created: Date.now(),
-            lastRetrieved: Date.now(),
-          },
-        ]);
-      });
-      await waitFor(() => expect(ownerImages).toHaveLength(1));
-      expect(ownerImages[0].ownerDocument).toBe(ownerDocument);
-      // zsviczian END
-      // zsviczian START -- verify the empty-scene UI font targets the editor document
-      await waitFor(() =>
-        expect(fonts.load).toHaveBeenCalledWith(
-          expect.stringContaining("Excalifont"),
-          expect.stringContaining("Excalid"),
-        ),
-      );
-      // zsviczian END
-
       ownerDocument.body.classList.add("excalidraw-animations-disabled");
       act(() => {
         api!.updateScene({
@@ -283,6 +293,51 @@ describe("cross-document rendering", () => {
     }
   });
 
+  it("loads each editor's current item font through its own ownerDocument.fonts", async () => {
+    const defaultFontEditor = mountEditorInOwnDocument();
+    const nunitoEditor = mountEditorInOwnDocument(FONT_FAMILY.Nunito);
+
+    try {
+      for (const editor of [defaultFontEditor, nunitoEditor]) {
+        await waitFor(() =>
+          expect(
+            editor.container.querySelector("canvas.interactive"),
+          ).not.toBeNull(),
+        );
+        await waitFor(() =>
+          expect(editor.getAPI()!.getAppState().isLoading).toBe(false),
+        );
+      }
+
+      // each editor prewarms its own current item font (the default one
+      // included) through its own document's font faces
+      await waitFor(() =>
+        expect(defaultFontEditor.fonts.load).toHaveBeenCalledWith(
+          expect.stringContaining("Excalifont"),
+          expect.stringContaining("Excalidr"),
+        ),
+      );
+      await waitFor(() =>
+        expect(nunitoEditor.fonts.load).toHaveBeenCalledWith(
+          expect.stringContaining("Nunito"),
+          expect.stringContaining("Excalidr"),
+        ),
+      );
+
+      // ...and never through the other document's
+      expect(defaultFontEditor.fonts.load).not.toHaveBeenCalledWith(
+        expect.stringContaining("Nunito"),
+        expect.anything(),
+      );
+      expect(nunitoEditor.fonts.load).not.toHaveBeenCalledWith(
+        expect.stringContaining("Excalifont"),
+        expect.anything(),
+      );
+    } finally {
+      nunitoEditor.cleanup();
+      defaultFontEditor.cleanup();
+    }
+  });
   // zsviczian START -- keep tooltip nodes and viewport ownership in the trigger document
   it("renders tooltips in the trigger document", () => {
     const iframe = document.createElement("iframe");
@@ -362,7 +417,11 @@ describe("cross-document rendering", () => {
       };
 
       act(() => api!.addFiles([file]));
-      expect(pendingImages).toHaveLength(1);
+      // zsviczian -- upstream also prewarms link icons; await the scene file, not incidental image factories
+      const sceneImages = pendingImages.filter(
+        (image) => image.src === file.dataURL,
+      );
+      expect(sceneImages).toHaveLength(1);
       let settled = false;
       const waitForImages = api!.awaitImageFiles([fileId]).then(() => {
         settled = true;
@@ -371,7 +430,7 @@ describe("cross-document rendering", () => {
       expect(settled).toBe(false);
 
       await act(async () => {
-        pendingImages[0].onload?.(new Event("load"));
+        sceneImages[0].onload?.(new Event("load"));
         await waitForImages;
       });
       expect(settled).toBe(true);
@@ -379,6 +438,48 @@ describe("cross-document rendering", () => {
     } finally {
       renderResult.unmount();
       vi.unstubAllGlobals();
+    }
+  });
+  // zsviczian END
+  // zsviczian START -- retain document-local tooltip lifetime under a shared runtime, PR #469
+  it("does not hide a popout tooltip when a main-document trigger leaves or unmounts", () => {
+    const iframe = document.createElement("iframe");
+    document.body.append(iframe);
+    const doc = iframe.contentDocument!;
+    const mount = doc.createElement("div");
+    doc.body.append(mount);
+    const main = renderReact(
+      <Tooltip label="Main">
+        <span>Main trigger</span>
+      </Tooltip>,
+    );
+    const popout = renderReact(
+      <Tooltip label="Popout">
+        <span>Popout trigger</span>
+      </Tooltip>,
+      { container: mount, baseElement: doc.body },
+    );
+    try {
+      const mainTrigger = main.getByText("Main trigger").parentElement!;
+      const popoutTrigger = popout.getByText("Popout trigger").parentElement!;
+      fireEvent.pointerEnter(mainTrigger);
+      fireEvent.pointerEnter(popoutTrigger);
+      expect(doc.querySelector(".excalidraw-tooltip")).toHaveClass(
+        "excalidraw-tooltip--visible",
+      );
+      fireEvent.pointerLeave(mainTrigger);
+      main.unmount();
+      expect(doc.querySelector(".excalidraw-tooltip")).toHaveClass(
+        "excalidraw-tooltip--visible",
+      );
+      fireEvent.pointerLeave(popoutTrigger);
+      expect(doc.querySelector(".excalidraw-tooltip")).not.toHaveClass(
+        "excalidraw-tooltip--visible",
+      );
+    } finally {
+      main.unmount();
+      popout.unmount();
+      iframe.remove();
     }
   });
   // zsviczian END

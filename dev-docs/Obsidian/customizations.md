@@ -57,6 +57,8 @@ Consumers include plugin imports/ambient declarations and normal ESM consumers, 
 <a id="obs-007"></a>
 ## OBS-007 — Public props, imperative methods, and library exports
 
+**PR #469 (2026-10-20):** Upstream RenderEnvironment is an additive root/type export. Public legacy exports and imperative host methods remain; the legacy raster viewport hook now supplies its actual scale to both scene and render configuration. [Merge review](pr-469-merge-review.md).
+
 PR #468 preserves legacy public export signatures in fork-owned obsidianExport.ts and adds upstream exportScene. Root and utility clipboard entry points accept both old flat and new data/config options. Plugin constants, package validation, EA exports and community scripts retain their interface. No host protocol change. See [merge review](pr-468-merge-review.md).
 
 **Preserve public contracts; simplify internals.** [types.ts](../../packages/excalidraw/types.ts), [index.tsx](../../packages/excalidraw/index.tsx), and [App.tsx](../../packages/excalidraw/components/App.tsx) expose the fork's hooks, early state, webview/diagram/menu controls, history operations, view/layout helpers, image readiness, selection/z-order/geometry methods, and additional library exports. The complete extension list and callback semantics are in [contracts](contracts.md#component-extension-surface).
@@ -72,6 +74,8 @@ Direct consumers are `P: ExcalidrawRoot.ts`, `ExcalidrawView.ts`, `ExcalidrawAut
 
 <a id="obs-009"></a>
 ## OBS-009 — Raw Markdown text lifecycle
+
+**PR #469 (2026-10-20):** Raw Markdown source remains on measured placeholders, frame labels and transformation-created text. Upstream environments flow through measurement/wrapping without replacing the text/link host callbacks or saved representation. [Merge review](pr-469-merge-review.md).
 
 **Retain saved-data compatibility.** [obsidianText.ts](../../packages/excalidraw/obsidianText.ts) and [App.text.ts](../../packages/excalidraw/components/App.text.ts) separate raw Markdown from parsed display/original text before editing and submission, recalculate dimensions, and coordinate link synchronization. Factories, conversion, clipboard, search placeholder text, embed placeholders, fixtures, and restore preserve `rawText`; `hasTextLink` is independent of an explicit link. Upstream's supplied restore path explicitly deletes legacy rawText, so taking that side loses an active host contract. `legacyTextWrap` in [textElement.ts](../../packages/element/src/textElement.ts) preserves old ellipse/diamond text geometry.
 
@@ -105,12 +109,16 @@ Its added `pruneOrphanGroupIds` counts nondeleted group members and removes grou
 <a id="obs-013"></a>
 ## OBS-013 — Local fonts and host font loading
 
+**PR #469 (2026-10-20):** Upstream now prewarms the actual current item font through each editor document, superseding the empty-scene-only Excalifont preload. Local Font identity/replacement, host-font filtering and public font helpers remain. [Merge review](pr-469-merge-review.md).
+
 **Retain.** Local Font numeric ID **4** is a persistent/public identity, not a spare upstream font slot. [Fonts.ts](../../packages/excalidraw/fonts/Fonts.ts) exposes registration/loading helpers, allows local-font replacement, filters unrelated host font loads, and ensures an empty scene can load the welcome font. It avoids registering/checking the changing local face like ordinary static fonts. [ExcalidrawFontFace.ts](../../packages/excalidraw/fonts/ExcalidrawFontFace.ts) asks the host for vault fonts first, accepts whole-face CSS data, and supplies `getContentLegacy`. `obsidianUtils.ts` exposes metrics, family enumeration, local registration, scene font loading, CSS registration/definitions, and filename-based vault delegation.
 
 `P: src/shared/EmbeddedFileLoader.ts` and `src/core/settings.ts` actively call `getCSSFontDefinition`, which uses `getContentLegacy`; `src/constants/constants.ts` exposes its library binding. Its name is **not** evidence of obsolescence. `registerFontsInCSS` itself is publicly declared/documented even though no current plugin runtime call was found. Required fonts/Assistant are bundled by OBS-003; CJK is the deliberate lazy-path exception. The four added comments in `fonts/fonts.css` do not implement bundling and can be retired independently. Browser-specific checks, global document use in legacy CSS registration, and empty-scene behavior need targeted coverage rather than wholesale reversion. **Gate:** V01, V03, V04, V06; D01, D05.
 
 <a id="obs-014"></a>
 ## OBS-014 — Custom pens and highlighter rendering
+
+**PR #469 (2026-10-20):** Upstream owns the exception-safe canvas structure. Custom pen fills/outlines use its environment path factory; the separate highlighter canvas receives the owning environment and DPI. Persisted pen/highlighter metadata is unchanged. [Merge review](pr-469-merge-review.md).
 
 **Retain saved stroke semantics.** [obsidianTypes.ts](../../packages/excalidraw/obsidianTypes.ts), [freedrawPath.ts](../../packages/element/src/freedrawPath.ts), and [easingFunctions.ts](../../packages/element/src/easingFunctions.ts) implement pressure, easing, cap/taper, outline/background, and custom-pen settings. `App` captures options in element `customData`, handles constant pressure, inserts highlighters behind content, and renders a separate underlay. Static/new-element/SVG renderers preserve matching output and dark-mode colors. Generic freedraw-mode controls are suppressed for custom strokes. `actionFinalize` avoids forcing a freedraw loop closed.
 
@@ -137,12 +145,16 @@ PR #468 moves marker exclusion into the shared export preparation used by upstre
 <a id="obs-017"></a>
 ## OBS-017 — Image loading, replacement, and migration readiness
 
+**PR #469 (2026-10-20):** Upstream supplies the retained editor image factory. Keep cancellation, stable-ID replacement, trusted-SVG call scope, the post-await unmount guard and awaitImageFiles; factory equivalence alone does not supply these migration contracts. [Merge review](pr-469-merge-review.md).
+
 **Retain.** [element/image.ts](../../packages/element/src/image.ts) accepts an image factory so decoding occurs through the editor's owning `Window.Image`; pending promises carry cancellation. `App` handles image-cache cancellation on pending-image replacement/unmount, stops late post-decode mutation after unmount, and adds `awaitImageFiles`. That method waits on the relevant currently pending cache promises using settled results; it is not a promise that every future image decode or final canvas paint has completed. Binary file records retain source `name`, support forced replacement of an existing ID, and accept a call-scoped trusted-SVG normalization bypass.
 
 `P: ExcalidrawView.ts` uses `awaitImageFiles` and `skipSvgNormalization` in migration batches; plugin asset loading depends on refreshed bytes at stable file IDs. The bypass is a `ReadonlySet<FileId>` argument, **not persisted trust metadata**. Upstream addFiles and ownerDocument support do not supply equivalent replacement/readiness behavior in these snapshots. Keep the public array addFiles form compatible. Test cancellation, rejection, existing IDs, SVG treatment, and popout closure mid-load; avoid a global cache flush that harms other mounted roots. **Gate:** V03, V06, V10, V11.
 
 <a id="obs-018"></a>
 ## OBS-018 — Image inversion, canvas limits, and export fidelity
+
+**PR #469 (2026-10-20):** SVG measurement and creation follow upstream config.environment, including its reverted measured frame/embed paths. Preserve host inversion/canvas limits, markers/palettes and legacy export geometry/compositing. See the exact-build comparison and its limits. [Merge review](pr-469-merge-review.md).
 
 PR #468 retains the public legacy export calls through fork-owned obsidianExport.ts adapters and one upstream renderer; root/utility exports retain both clipboard shapes. Independent viewport/scale and native rounding remain compatible through a narrow environment hook. Exact SVG/image-symbol markup and seeded PNG pixels match live before/after fixtures; plugin export-link filtering/rewriting/hook coverage passes. See [merge review](pr-468-merge-review.md).
 
@@ -155,6 +167,8 @@ PR #463 adopts upstream's single-bitmap faded/clip crop rendering while retainin
 <a id="obs-019"></a>
 ## OBS-019 — Teardown and shared-cache cleanup
 
+**PR #469 (2026-10-20):** Adopt upstream AppHost destruction and its ownership-checked interaction cleanup. Keep the existing image cancellation/late-result guard and source-root lifecycle; do not replace plugin migration persistence or source-unmount ordering. [Merge review](pr-469-merge-review.md).
+
 **Review; some code is demonstrably inert.** `App.componentWillUnmount` adds aggressive clearing/nulling of references, canvas/scene-related data, events, and image work, including type-suppressed assignments. Focus/visibility guards and deferred callbacks interact with this teardown. These changes support `P: PackageManager.ts`/view-root migration in a shared runtime, but the amount of manual nulling is not itself proof of effective cleanup. Some guards still query a document-wide `.excalidraw`, not the particular root.
 
 [ShapeCache.destroy](../../packages/element/src/shape.ts) adds `Object.values(elementWithCanvasCache)` followed by deletion. The target is a `WeakMap`, its entries are not enumerable through `Object.values`, and no own properties supplying entries were found. A Node micro-check confirmed the added loop leaves an entry present. Remove that **loop only** in a separate cleanup; resetting a shared cache globally is not an equivalent fix. Upstream keyed deletion already exists. Test teardown through repeated main/popout migration and late callbacks before retiring any non-inert cleanup. Test-hook suppression is a separate validation problem under OBS-033/F04. **Gate:** V03, V11; D02.
@@ -162,12 +176,16 @@ PR #463 adopts upstream's single-bitmap faded/clip crop rendering while retainin
 <a id="obs-020"></a>
 ## OBS-020 — Owner-window animation and scheduling
 
+**PR #469 (2026-10-20):** The complete reactUtils.ts and renderer/animation.ts fork deltas retire: both files now match incoming upstream bytes. Its per-window queues/cancellation and per-instance symbols cover the old owner-scheduler need. Trail offsets and fork-only interaction/highlighter paths remain, so this ID remains active. [Merge review](pr-469-merge-review.md).
+
 **Good upstream candidates, still required here.** [renderer/animation.ts](../../packages/excalidraw/renderer/animation.ts) changes the scheduler from a single global queue into per-window scheduler state; each animation/timer retains its creating scheduler. rAF, timeout, cancellation, idle state, and resets use that ownership. `throttleRAF`, batched throttled React callbacks, pan/scrollbar movement, and animated trails accept/propagate the owner window. InteractiveCanvas uses the supplied owner DPI instead of global `window.devicePixelRatio`. Renderer computed styles are also owner-window based.
 
 `P: PackageManager.ts` can share one evaluated runtime across views in different windows, while `ExcalidrawRoot.ts` mounts a stable ownerDocument per root. The supplied upstream's ownerDocument prop is useful but **does not already include these scheduler changes**. Browser-wide singletons can stall or cross-cancel another window when the main one is backgrounded. Generalize these fixes upstream and retire duplicate fork hunks only when source ownership and cancellation semantics are equivalent. Trail coordinate offsets remain a separate embedded-layout requirement. **Gate:** V03, V11; focused tests assert independent animation progress and schedule/cancel behavior.
 
 <a id="obs-021"></a>
 ## OBS-021 — Owner-document portals, tooltips, and drag ghosts
+
+**PR #469 (2026-10-20):** The complete colorTopPicksDnD.ts, fontTopPicksDnD.ts and TopPicksDnD/topPicksDnD.tsx deltas retire because upstream now owns the same source-window DOM/styles/timers. Hyperlink ownership follows upstream. Generic tooltip timers/observers/warm state remain document-local because upstream still has one process-wide slot; the Radix bridge remains necessary. [Merge review](pr-469-merge-review.md).
 
 **Retain; upstream generic realm fixes where possible.** [ObsidianRadixPortal.tsx](../../packages/excalidraw/components/ObsidianRadixPortal.tsx) portals selected Radix content to the owning body to escape Obsidian's offset containing block. A `display: contents` bridge carries classes and live CSS custom properties/color; a layout effect avoids stale theme values, and an owning ResizeObserver mirrors hidden tabs without unmounting popup content. Tool, property, dropdown, and modal-origin history controls use that bridge and travelling classes/collision boundaries/outside-click rules.
 
@@ -214,6 +232,8 @@ Consumers include `P: ExcalidrawView.ts` theme updates, custom embed renderers, 
 
 <a id="obs-027"></a>
 ## OBS-027 — Grid, selection, and overlay presentation
+
+**PR #469 (2026-10-20):** Retain grid direction/colors, transparent link icons, text-link affordances and opacity. The new bounded environment cache also keys baked icon opacity, preserving prior compositing instead of sharing another editor setting. [Merge review](pr-469-merge-review.md).
 
 **Minimize around upstream renderers.** [staticScene.ts](../../packages/excalidraw/renderer/staticScene.ts) supports independent horizontal/vertical grid lines, regular/bold colors, dark-mode color treatment, link icon opacity and text-link affordances. Interactive rendering adds host-aware contrast highlights, stronger search-result emphasis, and thinner selection/binding outlines/handles. Search emphasis persists until selection changes. Renderer state selectors forward the required host fields; scrollbar gray and frame presentation are additional narrow visual differences. [CanvasGridSize.tsx](../../packages/excalidraw/components/Stats/CanvasGridSize.tsx) adds a grid-size editor beside upstream's **gridStep** editor.
 
@@ -266,6 +286,8 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 
 <a id="obs-033"></a>
 ## OBS-033 — Fork regression tests and fixture adaptations
+
+**PR #469 (2026-10-20):** Restore upstream hook declarations/initialization/mount in isTestEnv only, enabling the incoming ownership tests while retaining production/dev isolation. The final focused set passes 88 tests. The full older UI harness still fails; representative failures reproduce on the parent with the same test-only hook restoration. No broad suite pass is claimed. [Merge review](pr-469-merge-review.md).
 
 **Retain and verify the test lane.** Added tests cover both host registries, raw-text lifecycle, marker role/undo, and body-portal visibility/theme. Existing tests gain owner-window animation, drag/tooltip/image readiness, clipboard file/raw-text, palette, and WYSIWYG assertions; font-count and accessibility selectors change with their UI contracts. Text fixtures and helpers include rawText. The [validation matrix](validation.md) maps exact files to intended assertions and missing end-to-end evidence.
 

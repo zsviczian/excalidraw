@@ -23,9 +23,9 @@ const createColorGhost: CreateTopPicksGhost<string> = ({
   value: color,
   sourceEl,
 }) => {
+  // the source may live in another window's document (e.g. a popout)
   const ownerDocument = sourceEl.ownerDocument;
-  const ownerWindow = ownerDocument.defaultView ?? window; // zsviczian -- create and style color ghosts in the source realm, upstream #11997
-  const swatch = ownerDocument.createElement("div"); // zsviczian -- keep color ghost content in the popout document, upstream #11997
+  const swatch = ownerDocument.createElement("div");
   swatch.className = "excalidraw-color-dnd-ghost-swatch";
   if (isTransparent(color)) {
     swatch.classList.add("is-transparent");
@@ -33,7 +33,9 @@ const createColorGhost: CreateTopPicksGhost<string> = ({
     // swatches render the theme-adjusted color (dark mode remaps colors
     // rather than CSS-filtering them) — sample the rendered color so the
     // ghost matches what the user picked up
-    const rendered = ownerWindow.getComputedStyle(sourceEl).backgroundColor; // zsviczian -- read styles through the source window, upstream #11997
+    const rendered = (ownerDocument.defaultView ?? window).getComputedStyle(
+      sourceEl,
+    ).backgroundColor;
     swatch.style.backgroundColor =
       rendered && rendered !== "rgba(0, 0, 0, 0)" ? rendered : color;
   }

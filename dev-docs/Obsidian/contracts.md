@@ -157,3 +157,17 @@ Canonical shapes: [element/types.ts](../../packages/element/src/types.ts), [obsi
 Most palette, UI-mode, pinned-script, custom-pen selection, gesture, grid, highlight, dynamic-style, and frame-render settings are host-provided AppState, not automatically saved scene schema. The explicit storage configuration in [appState.ts](../../packages/excalidraw/appState.ts) determines which survive browser/server/export persistence. Do not infer persistence merely from a TypeScript property or inadvertently begin exporting host settings. Clear/reset and first-render initialization are part of the contract even for nonpersisted fields.
 
 PR #465 adds upstream W wrap/unwrap via instance-scoped AppWrap; no host adapter or public root/imperative signature changes. Transient original-container caches are not serialized. Preserve explicit link ownership: bind/wrap places the merged link on the container, deletion by W transfers it to surviving text, and rewrap transfers it back. Raw Markdown/hasTextLink fields remain. Regular Unbind leaves its container alive and follows upstream's updated selection/fixed-width behavior. Marker frame membership/naming and legacy theme notifications remain; only the redundant/inert actionFrame file differences retire. Delete frame retains children; Cut includes and deletes them, matching its payload. See [PR #465 review](pr-465-merge-review.md).
+
+
+## PR #469 scoped rendering checkpoint (2026-10-20)
+
+The fork adopts upstream RenderEnvironment (canvas/image/path factories,
+optional document and textMetrics), AppHost and per-call export environment.
+The plugin continues to pass its stable ownerDocument; it does not configure a
+global current window or a process-wide render-environment setter. Both typed
+Obsidian protocols and all persisted/public host contracts remain unchanged.
+Legacy getDimensions may choose an independent viewport and drawing scale;
+that scale must reach both StaticSceneRenderConfig.scale and renderConfig.scale.
+Source image cancellation, awaitImageFiles and the synchronous migration unmount
+remain required. See [the review](pr-469-merge-review.md) for complete preservation
+and partial-retirement evidence.

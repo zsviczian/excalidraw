@@ -710,6 +710,7 @@ export class AppSelectionTool {
         resizeY,
         pointerDownState.resize.center.x,
         pointerDownState.resize.center.y,
+        this.app.renderEnvironment,
       )
     ) {
       const elementsToHighlight = new Set<NonDeletedExcalidrawElement>();

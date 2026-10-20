@@ -105,7 +105,7 @@ export class AnimatedTrail implements Trail {
 
           return null;
         },
-        this.app.ownerWindow, // zsviczian -- animate trails even when the main window is occluded
+        this.app.ownerWindow,
       );
     }
   }

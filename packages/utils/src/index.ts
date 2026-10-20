@@ -22,3 +22,4 @@ export {
   exportToClipboard,
 } from "@excalidraw/excalidraw/obsidianExport";
 // zsviczian END
+export type { RenderEnvironment } from "@excalidraw/element";

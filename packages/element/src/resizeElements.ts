@@ -49,6 +49,7 @@ import {
   getApproxMinLineHeight,
 } from "./textMeasurements";
 import { wrapText } from "./textWrapping";
+
 import {
   isArrowElement,
   isBindingElement,
@@ -69,6 +70,8 @@ import {
   getStickyNoteResizeIntent,
   updateStickyNoteLayout,
 } from "./stickyNote";
+
+import type { RenderEnvironment } from "./renderEnvironment";
 
 import type { Scene } from "./Scene";
 
@@ -104,6 +107,7 @@ export const transformElements = (
   pointerY: number,
   centerX: number,
   centerY: number,
+  renderEnvironment?: RenderEnvironment,
 ): boolean => {
   const elementsMap = scene.getNonDeletedElementsMap();
   if (selectedElements.length === 1) {
@@ -149,6 +153,7 @@ export const transformElements = (
           {
             shouldMaintainAspectRatio,
             shouldResizeFromCenter,
+            renderEnvironment,
           },
         );
       }
@@ -199,6 +204,7 @@ export const transformElements = (
           nextWidth,
           nextHeight,
           originalBoundingBox,
+          renderEnvironment,
         },
       );
 
@@ -323,6 +329,7 @@ export const resizeSingleTextElement = (
   shouldResizeFromCenter: boolean,
   nextWidth: number,
   nextHeight: number,
+  renderEnvironment?: RenderEnvironment,
 ) => {
   const elementsMap = scene.getNonDeletedElementsMap();
 
@@ -374,6 +381,7 @@ export const resizeSingleTextElement = (
         fontFamily: element.fontFamily,
       }),
       element.lineHeight,
+      renderEnvironment,
     );
 
     const newWidth = Math.max(minWidth, nextWidth);
@@ -382,11 +390,13 @@ export const resizeSingleTextElement = (
       element.originalText,
       getFontString(element),
       Math.abs(newWidth),
+      renderEnvironment,
     );
     const metrics = measureText(
       text,
       getFontString(element),
       element.lineHeight,
+      renderEnvironment,
     );
 
     const newHeight = metrics.height;
@@ -748,10 +758,12 @@ export const resizeSingleElement = (
     shouldInformMutation = true,
     shouldMaintainAspectRatio = false,
     shouldResizeFromCenter = false,
+    renderEnvironment,
   }: {
     shouldMaintainAspectRatio?: boolean;
     shouldResizeFromCenter?: boolean;
     shouldInformMutation?: boolean;
+    renderEnvironment?: RenderEnvironment;
   } = {},
 ) => {
   if (latestElement.customData?.isAnchored) {
@@ -766,6 +778,7 @@ export const resizeSingleElement = (
       shouldResizeFromCenter,
       nextWidth,
       nextHeight,
+      renderEnvironment,
     );
   }
 
@@ -793,6 +806,7 @@ export const resizeSingleElement = (
       width: getApproxMinLineWidth(
         getFontString(boundTextElement),
         boundTextElement.lineHeight,
+        renderEnvironment,
       ),
       height: getApproxMinLineHeight(
         boundTextElement.fontSize,
@@ -989,6 +1003,7 @@ export const resizeSingleElement = (
         ),
         // the arrow pass below is this function's — keep it single
         bindings: false,
+        renderEnvironment,
       });
     } else {
       if (boundTextElement && boundTextFont != null) {
@@ -1003,6 +1018,7 @@ export const resizeSingleElement = (
         shouldMaintainAspectRatio,
         shouldResizeFromCenter,
         flipFactorY < 0,
+        renderEnvironment,
       );
     }
 
@@ -1245,6 +1261,7 @@ export const resizeMultipleElements = (
     nextHeight,
     nextWidth,
     originalBoundingBox,
+    renderEnvironment,
   }: {
     nextWidth?: number;
     nextHeight?: number;
@@ -1254,6 +1271,7 @@ export const resizeMultipleElements = (
     flipByY?: boolean;
     // added to improve performance
     originalBoundingBox?: BoundingBox;
+    renderEnvironment?: RenderEnvironment;
   } = {},
 ) => {
   // in the case of just flipping, there is no need to specify the next width and height
@@ -1587,6 +1605,7 @@ export const resizeMultipleElements = (
             },
           ),
           bindings: { simultaneouslyUpdated: elementsToUpdate },
+          renderEnvironment,
         });
       } else {
         updateBoundElements(element, scene, {
@@ -1624,6 +1643,7 @@ export const resizeMultipleElements = (
           true,
           shouldResizeFromCenter,
           flipByY,
+          renderEnvironment,
         );
       }
     }

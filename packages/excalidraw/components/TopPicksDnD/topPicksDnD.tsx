@@ -41,7 +41,7 @@ export type TopPicksDragState<T> = {
 } | null;
 
 export type TopPicksGhost = {
-  /** the ghost's visual. Rendered into `document.body` — outside the
+  /** the ghost's visual. Rendered into the source's `document.body` — outside the
    * editor's CSS scope, so theme-dependent styling must be resolved from the
    * rendered DOM (computed styles) rather than CSS variables */
   content: HTMLElement;
@@ -60,8 +60,8 @@ export type CreateTopPicksGhost<T> = (args: {
 }) => TopPicksGhost;
 
 type DragSession<T> = {
-  ownerDocument: Document; // zsviczian -- bind top-picks drag to its source document, upstream #11997
-  ownerWindow: Window & typeof globalThis; // zsviczian -- bind top-picks drag to its source window, upstream #11997
+  ownerDocument: Document;
+  ownerWindow: Window;
   pointerId: number;
   startX: number;
   startY: number;
@@ -252,13 +252,13 @@ export const useTopPicksDnD = <T,>({
         ownerWindow,
         ghostContent,
         homeRect: rect,
-      } = session; // zsviczian -- create and style the generic drag ghost in its source realm, upstream #11997
+      } = session;
 
-      const ghost = ownerDocument.createElement("div"); // zsviczian -- keep the ghost in the popout document, upstream #11997
+      const ghost = ownerDocument.createElement("div");
       ghost.className = GHOST_CLASS;
       ghostContent.classList.add(`${GHOST_CLASS}__content`);
       ghost.appendChild(ghostContent);
-      ownerDocument.body.appendChild(ghost); // zsviczian -- render the generic ghost beside the source editor, upstream #11997
+      ownerDocument.body.appendChild(ghost);
 
       session.ghost = ghost;
       session.ghostW = rect.width;
@@ -273,9 +273,9 @@ export const useTopPicksDnD = <T,>({
         if (session?.ghost === ghost) {
           ghost.classList.add(`${GHOST_CLASS}--lifted`);
         }
-      }); // zsviczian -- schedule the ghost animation in the source window, upstream #11997
+      });
 
-      ownerDocument.body.classList.add(BODY_CLASS); // zsviczian -- scope drag styling to the source document, upstream #11997
+      ownerDocument.body.classList.add(BODY_CLASS);
       session.activated = true;
       publish();
     };
@@ -349,7 +349,7 @@ export const useTopPicksDnD = <T,>({
       if (!session?.ghost) {
         return;
       }
-      const { ghost } = session;
+      const { ghost, ownerWindow } = session;
       session.ghost = null;
       ghost.classList.add(`${GHOST_CLASS}--dropping`);
       const rect = target.rect;
@@ -358,12 +358,12 @@ export const useTopPicksDnD = <T,>({
         ghost.style.height = `${rect.height}px`;
         ghost.style.transform = `translate(${rect.left}px, ${rect.top}px)`;
       }
-      session.ownerWindow.setTimeout(() => {
+      ownerWindow.setTimeout(() => {
         ghost.classList.add(`${GHOST_CLASS}--fade`);
       }, 160);
-      session.ownerWindow.setTimeout(() => {
+      ownerWindow.setTimeout(() => {
         ghost.remove();
-      }, 340); // zsviczian -- keep release timers in the source window, upstream #11997
+      }, 340);
     };
 
     // kill any in-flight (or retargetable) reorder-preview transitions before
@@ -398,7 +398,7 @@ export const useTopPicksDnD = <T,>({
       if (!session) {
         return;
       }
-      const { ownerWindow } = session; // zsviczian -- suppress the click in the source window, upstream #11997
+      const { ownerWindow } = session;
       const suppress = (event: MouseEvent) => {
         event.preventDefault();
         event.stopPropagation();
@@ -424,14 +424,14 @@ export const useTopPicksDnD = <T,>({
         onPointerCancel,
         true,
       );
-      session?.ownerWindow.removeEventListener("keydown", onKeyDown, true); // zsviczian -- remove listeners from the same source window, upstream #11997
+      session?.ownerWindow.removeEventListener("keydown", onKeyDown, true);
     };
 
     const dispose = () => {
       removeListeners();
-      session?.ownerDocument.body.classList.remove(BODY_CLASS); // zsviczian -- clear drag styling from the source document, upstream #11997
+      session?.ownerDocument.body.classList.remove(BODY_CLASS);
       if (session?.activationTimer != null) {
-        session.ownerWindow.clearTimeout(session.activationTimer); // zsviczian -- clear the source-window activation timer, upstream #11997
+        session.ownerWindow.clearTimeout(session.activationTimer);
       }
       session = null;
       setDragState(null);
@@ -482,13 +482,13 @@ export const useTopPicksDnD = <T,>({
           // while we were beyond it no longer applies (wiggle-and-return
           // must stay a click)
           if (session.activationTimer !== null) {
-            session.ownerWindow.clearTimeout(session.activationTimer); // zsviczian -- clear the source-window activation timer, upstream #11997
+            session.ownerWindow.clearTimeout(session.activationTimer);
             session.activationTimer = null;
           }
           return;
         }
         const elapsed =
-          session.ownerWindow.performance.now() - session.startTime; // zsviczian -- measure drag timing in the source window, upstream #11997
+          session.ownerWindow.performance.now() - session.startTime;
         if (elapsed < DRAG_TIME_THRESHOLD_MS) {
           // spatial threshold crossed, temporal not yet — likely a fast
           // sloppy click. Wait out the rest of the grace period; the timeout
@@ -589,8 +589,10 @@ export const useTopPicksDnD = <T,>({
       }
       const sourceEl = event.currentTarget as HTMLElement;
       const ownerDocument = sourceEl.ownerDocument;
-      const ownerWindow = (ownerDocument.defaultView ?? window) as Window &
-        typeof globalThis; // zsviczian -- derive the complete drag realm from the source element, upstream #11997
+      const ownerWindow = ownerDocument.defaultView;
+      if (!ownerWindow) {
+        return;
+      }
       const stripEl = stripRef.current;
       if (!stripEl) {
         return;
@@ -603,16 +605,16 @@ export const useTopPicksDnD = <T,>({
       const { content: ghostContent, rect: homeRect } =
         latestRef.current.createGhost({
           value,
-          sourceEl: event.currentTarget as HTMLElement,
+          sourceEl,
           stripEl,
         });
       session = {
-        ownerDocument, // zsviczian -- retain one stable document for the drag lifetime, upstream #11997
-        ownerWindow, // zsviczian -- retain one stable window for the drag lifetime, upstream #11997
+        ownerDocument,
+        ownerWindow,
         pointerId: event.pointerId,
         startX: event.clientX,
         startY: event.clientY,
-        startTime: ownerWindow.performance.now(), // zsviczian -- start timing in the source window, upstream #11997
+        startTime: ownerWindow.performance.now(),
         lastX: event.clientX,
         lastY: event.clientY,
         activationTimer: null,
@@ -633,7 +635,7 @@ export const useTopPicksDnD = <T,>({
       ownerWindow.addEventListener("pointermove", onPointerMove, true);
       ownerWindow.addEventListener("pointerup", onPointerUp, true);
       ownerWindow.addEventListener("pointercancel", onPointerCancel, true);
-      ownerWindow.addEventListener("keydown", onKeyDown, true); // zsviczian -- observe the pointer and keyboard in the source window, upstream #11997
+      ownerWindow.addEventListener("keydown", onKeyDown, true);
     };
 
     return {

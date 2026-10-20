@@ -72,6 +72,7 @@ it("preserves independent getDimensions viewport and drawing scale", async () =>
   expect(getDimensions).toHaveBeenCalledWith(120, 70);
   expect([canvas.width, canvas.height]).toEqual([333, 77]);
   expect(render.mock.lastCall![0].scale).toBe(2);
+  expect(render.mock.lastCall![0].renderConfig.scale).toBe(2); // zsviczian -- PR #469 canvas and render environment must agree
   expect(render.mock.lastCall![0].appState.scrollX).toBe(-10);
 });
 

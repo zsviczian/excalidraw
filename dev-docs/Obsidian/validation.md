@@ -216,3 +216,19 @@ For follow-on cleanups, the most likely regressions are hidden public/script dep
 ## PR #468 export API checkpoint (2026-10-18)
 
 See [three-way review, export compatibility and validation limits](pr-468-merge-review.md). Public export adapters preserve plugin/script calls. Exact linked/image SVG markup and seeded PNG pixels match before/after fixtures; native plugin link filtering, conversion and export hook pass. Artifact/declaration, plugin production/development and bundle checks pass. Existing full-suite/typecheck failures remain explicit; this is an unpublished local handoff, without plugin source/dependency changes.
+
+
+## PR #469 validation checkpoint ? 2026-10-20
+
+[The merge review](pr-469-merge-review.md) records all incoming paths, the
+parent/candidate distinction, native artifact hashes, partial decustomization
+and complete limits. Fourteen focused/maintained suites pass all 88 tests.
+Source/declaration and plugin production/development builds pass; broad tests
+and TypeScript are not reported as clean. Parent reproduction establishes the
+three untouched type errors and representative older UI-harness failures.
+Windows native scenarios cover two concurrent roots, fonts/images/tooltips,
+exports, dirty bidirectional migration, a deliberately pending image decode,
+late callbacks, durable reopen and alias teardown. Do not substitute this for
+macOS, restored/cold/offline/physical-mobile, mixed-DPI/maximized pointer/laser
+or forced-GC checks. The source migration persistence/unmount boundary is
+unchanged. See the review for exact-build comparison and remaining gates.

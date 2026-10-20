@@ -179,3 +179,16 @@ Remaining runtime-global assumptions also exist in RTL queries in layer/tray UI,
 Raw Markdown and legacy wrap restoration, saved custom pen/highlighter semantics, Local Font identity and active CSS-export loading, selective Markdown element IDs, marker-frame behavior, anchored/embed scale data, PDF/inversion metadata, awaited migration image work, awaited drop/file-aware paste hooks, private-runtime IIFE delivery, required offline fonts/lazy Extras, and typed host registries all have active consumer or persisted compatibility evidence. Owner-window scheduling/portal fixes remain necessary even though upstream already has an `ownerDocument` prop.
 
 For these groups, the preferred path is a narrower adapter or a tested upstream contribution, not deletion. A future upstream implementation counts as a replacement only after checking the **same** saved representation, API shape, ownership/lifecycle, error behavior, and plugin tests. The goal is a small, understandable compatibility layer—not an artificially low diff count purchased by regressions.
+
+
+## PR #469 owner-runtime adoption (2026-10-20)
+
+Five complete differences retire under OBS-020/021: both scheduling helpers and
+all three top-picks drag helpers now match incoming upstream `d3a9c2a19`.
+Current-item-font prewarming and hyperlink lifecycle also use upstream owners.
+Keep the stable IDs active for trail offsets, generic document-local tooltip
+state, host portals and other remaining behavior. Generic tooltip state is not
+safe to decustomize to upstream's single timer/observer. Persisted pen/image/
+rawText and the plugin's migration unmount/persistence boundaries remain.
+See [PR #469 review](pr-469-merge-review.md) for replacement evidence, preserved
+consumers, exact file accounting, tests and platform limits.

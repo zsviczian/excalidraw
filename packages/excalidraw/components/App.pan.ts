@@ -196,7 +196,7 @@ export class AppPan {
          * - empty clipboard
          */
         const enableNextPaste = () => {
-          setTimeout(() => {
+          app.ownerWindow.setTimeout(() => {
             app.ownerDocument.body.removeEventListener(
               EVENT.PASTE,
               preventNextPaste,
@@ -219,7 +219,7 @@ export class AppPan {
         scrollX: state.scrollX - deltaX / state.zoom.value,
         scrollY: state.scrollY - deltaY / state.zoom.value,
       }));
-    }, app.ownerWindow); // zsviczian -- pan on the mounted editor's frame scheduler
+    }, app.ownerWindow);
     this.pendingMoveFlush = onPointerMove.flush;
     const teardown = withBatchedUpdates(
       (upEvent?: PointerEvent | FocusEvent) => {

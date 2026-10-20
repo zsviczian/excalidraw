@@ -3,6 +3,9 @@ import React from "react";
 
 import "./Tooltip.scss";
 
+export const TOOLTIP_CLASS = "excalidraw-tooltip";
+export const TOOLTIP_VISIBLE_CLASS = "excalidraw-tooltip--visible";
+
 export const getTooltipDiv = (
   ownerDocument: Document, // zsviczian -- keep tooltip singletons document-local, upstream #11974 follow-up
 ) => {
@@ -16,6 +19,16 @@ export const getTooltipDiv = (
   ownerDocument.body.appendChild(div); // zsviczian -- portal beside the mounted editor, upstream #11974 follow-up
   div.classList.add("excalidraw-tooltip");
   return div;
+};
+
+/**
+ * Hides `ownerDocument`'s tooltip, for tooltips not shown through
+ * `showTooltip` (see `hideTooltip`).
+ */
+export const hideDocumentTooltip = (ownerDocument: Document) => {
+  ownerDocument
+    .querySelector(`.${TOOLTIP_CLASS}`)
+    ?.classList.remove(TOOLTIP_VISIBLE_CLASS);
 };
 
 export const updateTooltipPosition = (
@@ -69,7 +82,7 @@ export const updateTooltipPosition = (
 };
 
 /** ms before a `delay`ed tooltip shows */
-const TOOLTIP_DELAY = 500;
+export const TOOLTIP_DELAY = 500;
 /**
  * ms after a tooltip hides during which a `delay`ed tooltip shows right away
  * (e.g. when moving across adjacent buttons)
@@ -185,6 +198,7 @@ export const showTooltip = (
   }
   const state = getTooltipRuntimeState(ownerDocument);
   const show = () => {
+    state.showTooltipTimer = 0; // zsviczian -- release a completed document-local timer
     // item may have been unmounted while the delayed tooltip was pending
     if (item.isConnected) {
       updateTooltip(item, getTooltipDiv(ownerDocument), label, long, position);
