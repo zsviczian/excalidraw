@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "review": {
-    "date": "2026-10-20",
-    "dependency_precommit_tests": "PR #471: 41 focused tests pass; full test:update 77 passing/79 failing suites (1168 pass/1457 fail), three reported errors; unrelated snapshots restored. Exact parent reproduces older clipboard and embedded-scene snapshot failures. Full tsc retains three baseline diagnostics. See pr-471-merge-review.md.",
-    "method": "PR #471: review all six incoming paths, two font-loader conflict hunks, both parents and plugin font/paste/embed consumers; no retirement. See pr-471-merge-review.md.",
+    "date": "2026-10-21",
+    "dependency_precommit_tests": "PR #472: 15 focused tests and touched-source lint pass; artifact/declaration build passes. Full typecheck retains three documented baseline test diagnostics. Required test:update: 79 suites pass/79 fail; 1174 tests pass/1458 fail, 47 skipped/one todo, three errors; generated snapshots restored. No full-suite pass claimed.",
+    "method": "PR #472: review all 21 incoming paths, all three conflicts against base/fork/upstream, auto-merges and plugin consumers; retire redundant useTextGeneration host lookup because upstream now consumes the host-supplied dialog API. See pr-472-merge-review.md.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
-      "fork_parent": "22d40c4a8b605dd19469c6fba1be492c547f4ed2",
-      "upstream_parent": "bee01e3a12812c930109aa91242658709480bbf3",
-      "merge_base": "d3a9c2a195182bf65b526ccb7a19de96f4bdfdb3",
-      "state": "resolved; Windows paste/font/export/teardown lane passed; baseline migration timeout and platform gaps recorded",
-      "reference": "https://github.com/zsviczian/excalidraw/pull/471"
+      "fork_parent": "dc5c28baa52884d576db4c4470907e192123b527",
+      "upstream_parent": "1d4dc2c0e6e476911d0760e9c3cf3694f2d43384",
+      "merge_base": "bee01e3a12812c930109aa91242658709480bbf3",
+      "state": "resolved; native image and offline Mermaid main/popout gates pass; baseline suite/type failures documented",
+      "reference": "https://github.com/zsviczian/excalidraw/pull/472"
     },
-    "runtime_validation": "PR #471: Windows Obsidian 1.14.4 final main/popout Instagram paste, font readiness, exports, tooltips and alias cleanup pass with no captured errors. Seeded SVG/PNG pixels match exact parent. Broader manual popout-return timeout reproduces on exact parent; later migration steps not reached. Main.js 4,961,338 bytes, 281,542 bytes headroom. Local artifacts only; physical mobile/macOS/Linux/provider/offline/replacement-font gates remain. See pr-471-merge-review.md.",
+    "runtime_validation": "PR #472: Windows Obsidian 1.14.4 native CLI image/save/reopen/export matrix and offline real-Extras Mermaid main/popout selected-source preview and durable reopen pass. No captured native errors. Main.js 4,985,148 bytes. Local artifacts only; no dependency/version/publication change. See pr-472-merge-review.md.",
     "dependency_checkpoint": "2026-10-11: Obsidian artifact/declaration and plugin production/library builds pass. Local fork Windows Obsidian 1.14.4 smoke passes. Published 0.18.140 main/direct-popout/moved-popout input/save/cleanup smoke passes. Plugin npm tree/audit confirms no braces and source-map-js 1.2.2. Component full typecheck remains blocked by documented window.h/stale test-type failures. Packed manifest confirms Sass dev-only; no publication/version bump. The 5 MB target is 5 * 1024 * 1024 = 5,242,880 bytes. Plugin main.js: 5,051,865 bytes with published component (191,015 bytes of headroom), 5,057,617 with local fork (185,263 bytes of headroom); both are below the target. No full scanner, macOS or physical-mobile run in this checkpoint.",
     "layout_followup": "Validated follow-up: W/menu predicate enabled for full/tray/compact, excluded in mobile. 25 focused tests, isolated source typecheck, declarations/artifacts and plugin production/development builds pass. Full typecheck retains 262 existing diagnostics. Baseline tray/compact keyboard tests already passed; original reported tray failure was not reproduced. Extra live probe passed full-layout keyboard/link/history then stopped on unavailable host command-palette rendering; cleanup restored settings and removed owned drawing/controller. No full live layout-matrix pass claimed.",
     "layout_precommit": "Precommit snapshot-update run stopped at explicit maintainer request to skip further testing and commit/merge. Unrelated generated snapshots restored. Prior focused tests/builds remain the validation evidence.",
@@ -23,37 +23,40 @@
       "packages/excalidraw/reactUtils.ts",
       "packages/excalidraw/renderer/animation.ts"
     ],
-    "pr469_validation": "Completed source/inventory and Windows local-artifact integration checkpoint; release/platform validation remains partial. See pr-469-merge-review.md."
+    "pr469_validation": "Completed source/inventory and Windows local-artifact integration checkpoint; release/platform validation remains partial. See pr-469-merge-review.md.",
+    "pr472_retired_files": [
+      "packages/excalidraw/components/TTDDialog/hooks/useTextGeneration.ts"
+    ]
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "22d40c4a8b605dd19469c6fba1be492c547f4ed2",
+      "parent_commit": "dc5c28baa52884d576db4c4470907e192123b527",
       "package": "@zsviczian/excalidraw",
       "version": "0.18.143"
     },
     "upstream": {
       "kind": "local Git commit",
-      "commit": "bee01e3a12812c930109aa91242658709480bbf3",
-      "tree": "8f488daa0cb927b1db0c6df9fc9124d61b738799",
+      "commit": "1d4dc2c0e6e476911d0760e9c3cf3694f2d43384",
+      "tree": "4ce8da3feb2d5025c6c394590b7a45c4a90896d9",
       "package": "@excalidraw/excalidraw",
       "version": "0.18.0"
     },
     "plugin": {
       "kind": "Git working tree",
-      "commit": "60af5d5cb80bc43cdf3773ff5f168bae4b8a0202",
+      "commit": "a1da1bbe738df4a6a640b7c1c7fdab0a1c5da8b5",
       "version": "2.29.0",
       "fork_dependency": "0.18.143"
     }
   },
   "comparison": {
     "fork": {
-      "files": 1313,
-      "sha256": "3a80a345459e4c00ae91e66c864b9d19157ab5a27df49cfa2e0b0ab375c86808"
+      "files": 1316,
+      "sha256": "20b99d2b041420371872815dbafe895938bf4c7f608595780ee882edb2e0e6e1"
     },
     "upstream": {
-      "files": 1318,
-      "sha256": "e559d43f04156ebb8587b619ce44c266f9a7e0cfc694228d479d6f68c17230cf"
+      "files": 1320,
+      "sha256": "c1a85d1813942444a73d1012f1e24d834d781bf5d67cb574f551814220409cf8"
     }
   },
   "customizations": [
@@ -1312,15 +1315,15 @@
     {
       "path": "packages/excalidraw/components/App.clipboard.ts",
       "status": "modified",
-      "fork_sha256": "62fa4b8e38eca220631eac799283db32e1fd8eacf59be6aaf486682f10d6bdcc",
-      "upstream_sha256": "591848ff08c65bdb85a9b29b6fad8d913bb7b7a6614383cf95fa2eadac69b91b",
+      "fork_sha256": "cdf2ea7ac1b242112bb1815202966a006fe21c3bb3d5cd942d52a41560e55e6c",
+      "upstream_sha256": "75c6fd03b8b2cba62b4246f78db65de5c0777ed5d5e0ab9949478f3ce75e2a60",
       "ids": [
         "OBS-009",
         "OBS-011",
         "OBS-026",
         "OBS-030"
       ],
-      "note": "PR #471: adopt upstream loader-script filtering, preserving host files/cancellation, Mermaid, rawText and zoom sizing. See pr-471-merge-review.md.",
+      "note": "PR #471: adopt upstream loader-script filtering, preserving host files/cancellation, Mermaid, rawText and zoom sizing. See pr-471-merge-review.md. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md.",
       "kind": "integration"
     },
     {
@@ -1970,24 +1973,35 @@
     {
       "path": "packages/excalidraw/components/TTDDialog/MermaidToExcalidraw.tsx",
       "status": "modified",
-      "fork_sha256": "41232376fd87a9c800abadca765e6aaffddb4ad78758fe7a15fd399773d5a5a7",
-      "upstream_sha256": "184f196b9670b3ac97f872d81a11f4f00050f25deb21749a849e0e9d1047043f",
+      "fork_sha256": "20092a4bb0326fde486abb6af509c601a989164117356f1158242a0215c33291",
+      "upstream_sha256": "a3acca234f7feddf680e71e88e827dfc284d0de7700080ffa66b5424d9130d7e",
       "ids": [
         "OBS-030",
         "OBS-031"
       ],
-      "note": "Seed diagram input from selected image customData.mermaidText and replace default sample with plugin-support message.",
+      "note": "Seed diagram input from selected image customData.mermaidText and replace default sample with plugin-support message. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md.",
       "kind": "behavior"
     },
     {
-      "path": "packages/excalidraw/components/TTDDialog/MermaidToExcalidrawLib.ts",
+      "path": "packages/excalidraw/components/TTDDialog/MermaidToExcalidrawLib.test.ts",
       "status": "fork-only",
-      "fork_sha256": "21294bf3a02ca51cb0ce9b1327c485c833881f8921d816c6eb6737327f472adc",
+      "fork_sha256": "68f8f9ce9fc50db9cd6a3bc5f1b560afb4de06e4291e5586aa86f4c0ee55f80f",
       "upstream_sha256": null,
       "ids": [
         "OBS-030"
       ],
-      "note": "Cache only ready host Mermaid instances, expose queued conversion, and retain editable source in image customData.",
+      "note": "PR #472: five focused regressions preserve loaded/api host compatibility, activation retry, rejected-module cache recovery, parser/config forwarding and exact-API chunk error attribution.",
+      "kind": "test"
+    },
+    {
+      "path": "packages/excalidraw/components/TTDDialog/MermaidToExcalidrawLib.ts",
+      "status": "fork-only",
+      "fork_sha256": "33db1e16e3431ae890b66a13fc4ac95100247a96bc7c43dcc994a6418042320b",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-030"
+      ],
+      "note": "Cache only ready host Mermaid instances, expose queued conversion, and retain editable source in image customData. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md.",
       "kind": "integration"
     },
     {
@@ -2006,23 +2020,23 @@
     {
       "path": "packages/excalidraw/components/TTDDialog/TTDDialog.tsx",
       "status": "modified",
-      "fork_sha256": "4f6a4ec9761f1eef25907834b9cc450ccda5cc06f231060022a63bec10fb4876",
-      "upstream_sha256": "ba447051c15d7f7bb95d020d2c051224671db47924ed293893be1d42dd0ab76e",
+      "fork_sha256": "8d8f9c430d92fc51072e08649817bb0b753a95db3bac2fcbb4fdba0ca0be4e3d",
+      "upstream_sha256": "bffb76544f2b0d1e196574a2016a7b4740a8a0507dc82dd723d816280c163d96",
       "ids": [
         "OBS-030"
       ],
-      "note": "Replace package dynamic import with host lazy loader, mount/cancellation guard, and selected elements for diagram editing.",
+      "note": "Replace package dynamic import with host lazy loader, mount/cancellation guard, and selected elements for diagram editing. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md.",
       "kind": "integration"
     },
     {
       "path": "packages/excalidraw/components/TTDDialog/TextToDiagram.tsx",
       "status": "modified",
-      "fork_sha256": "e99153d6a5c221aefb00fc2f943e79b48a4079bbfb43ef4e94647c500072cc39",
-      "upstream_sha256": "224d066a54e9aca798a51a6474867055543edb74b6396e067ab0368c1dfdfd1b",
+      "fork_sha256": "437ce83028e9292d8d1e8f86498a337ade05b9d0a6262d002e4c29e17aadaa34",
+      "upstream_sha256": "44567af397861aac721b0ad4a1d038ca748425c49aff9a4e0cd3dcfca08250ba",
       "ids": [
         "OBS-030"
       ],
-      "note": "Always show diagram preview as keyboard/layout workaround.",
+      "note": "Always show diagram preview as keyboard/layout workaround. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md.",
       "kind": "behavior"
     },
     {
@@ -2039,24 +2053,13 @@
     {
       "path": "packages/excalidraw/components/TTDDialog/hooks/useMermaidRenderer.ts",
       "status": "modified",
-      "fork_sha256": "86406147940df700b638b024889e8fa91aa33c7663d3cdb84f78ba243c5cd0f2",
-      "upstream_sha256": "bc1139805a2b49baab8f8750feea2110f852beb28c11cabc9f29304828762036",
+      "fork_sha256": "1cf117d9652899bd92960971784642e5cd4fa51d60c3af07fbc463384a8b8c6d",
+      "upstream_sha256": "2fca3af6e9822fee2d44f0415f4eeb43e86c264c213ea5e672db8a3358f9455a",
       "ids": [
         "OBS-030"
       ],
-      "note": "Queue latest content while rendering and rerender after the host library becomes ready.",
+      "note": "Queue latest content while rendering and rerender after the host library becomes ready. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md.",
       "kind": "behavior"
-    },
-    {
-      "path": "packages/excalidraw/components/TTDDialog/hooks/useTextGeneration.ts",
-      "status": "modified",
-      "fork_sha256": "069263e51ba51501a32e3c38d755776625dfa0fea5a28f49f6361d893002cbe8",
-      "upstream_sha256": "041305d6c557e15672b5743de92ddedf4e071df84c6de8987ac6c585a8493608",
-      "ids": [
-        "OBS-030"
-      ],
-      "note": "Validate generated Mermaid through the shared host API rather than bundled package import.",
-      "kind": "integration"
     },
     {
       "path": "packages/excalidraw/components/ToolPopover.tsx",
@@ -2468,13 +2471,13 @@
     {
       "path": "packages/excalidraw/locales/en.json",
       "status": "modified",
-      "fork_sha256": "e0e89128ed0d963cc811e1d1430bd7e90a8de3f0d6686cff6ebbc7b38aa0959a",
-      "upstream_sha256": "8b392a833ad25c5e6bcebd88b2bde59e627fc01b43a4e6de830d0a2e034e0cb6",
+      "fork_sha256": "f09b052edc0e26348c58294b62895f7e375e2f87871fc1c8f063e934b8ae5b57",
+      "upstream_sha256": "07a8de221b3bcc8fa3c7f2241ecc7acec0a95fec27f2599c776a2b83c6c06296",
       "ids": [
         "OBS-015",
         "OBS-026"
       ],
-      "note": "Add frame-role, extra-small, extra-thin, and extra-bold labels. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md.",
+      "note": "Add frame-role, extra-small, extra-thin, and extra-bold labels. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md.",
       "kind": "presentation"
     },
     {
@@ -2526,12 +2529,12 @@
     {
       "path": "packages/excalidraw/obsidianExcalidrawHost.ts",
       "status": "fork-only",
-      "fork_sha256": "14126e49eb697afa1bd5a99c2036271485b9ae714e5fb675e942f237a5d94486",
+      "fork_sha256": "dbcc8bbe6b084268726896e3e15425bd9f7a42140783dced5a719a237e87edc3",
       "upstream_sha256": null,
       "ids": [
         "OBS-006"
       ],
-      "note": "Version-2 typed service boundary for settings, fonts, Mermaid, commands, labels, and inline suggestions.",
+      "note": "Version-2 typed service boundary for settings, fonts, Mermaid, commands, labels, and inline suggestions. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md.",
       "kind": "integration"
     },
     {
@@ -2585,7 +2588,7 @@
     {
       "path": "packages/excalidraw/obsidianUtils.ts",
       "status": "fork-only",
-      "fork_sha256": "d6082dca2124f3acb824f887642c04049386fe870c141d10d9e03b2bb4fe5ef2",
+      "fork_sha256": "97c59c736eed05f3bafcdc2d65d1e502a541640edcb725b4e3b0923be77f9c98",
       "upstream_sha256": null,
       "ids": [
         "OBS-006",
@@ -2597,7 +2600,7 @@
         "OBS-029",
         "OBS-030"
       ],
-      "note": "Host setting/service delegates, local-font/CSS helpers, pen/touch and zoom helpers, Mermaid wrappers, arrow refresh, and geometry compatibility APIs.",
+      "note": "Host setting/service delegates, local-font/CSS helpers, pen/touch and zoom helpers, Mermaid wrappers, arrow refresh, and geometry compatibility APIs. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md.",
       "kind": "integration"
     },
     {

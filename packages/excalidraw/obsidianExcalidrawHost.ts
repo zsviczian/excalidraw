@@ -23,6 +23,15 @@ export interface ObsidianKeyBlocker {
   close(): void;
 }
 
+/**
+ * Stable host-provided Mermaid service, independent of the dialog's load state.
+ * zsviczian -- PR #472 retains protocol 2's existing { loaded, api } shape.
+ */
+export interface ObsidianMermaidService {
+  loaded: boolean;
+  api: MermaidToExcalidrawLibProps["api"];
+}
+
 /** Plugin-wide capabilities consumed by the Excalidraw package. */
 export interface ObsidianExcalidrawHostAdapter {
   readonly protocolVersion: typeof OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION;
@@ -39,7 +48,7 @@ export interface ObsidianExcalidrawHostAdapter {
   shouldSyncElementLinkWithText(): boolean;
 
   loadFontFromFile(filename: string): Promise<ArrayBuffer | undefined>;
-  getMermaid(): Promise<MermaidToExcalidrawLibProps>;
+  getMermaid(): Promise<ObsidianMermaidService>;
   runAction(action: "anyFile" | "LaTeX" | "card"): void;
   getLabel(key: string): string;
   attachInlineLinkSuggester(

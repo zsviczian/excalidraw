@@ -42,8 +42,10 @@ import { Fonts } from "./fonts";
 import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
 import { getObsidianExcalidrawHost } from "./obsidianExcalidrawHost";
 
-import type { ObsidianKeyBlocker } from "./obsidianExcalidrawHost";
-import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/types";
+import type {
+  ObsidianKeyBlocker,
+  ObsidianMermaidService,
+} from "./obsidianExcalidrawHost";
 
 import type { AppClassProperties, AppState } from "./types";
 
@@ -241,7 +243,7 @@ export function isTouchInPenMode(
   );
 }
 
-export async function getSharedMermaidInstance(): Promise<MermaidToExcalidrawLibProps> {
+export async function getSharedMermaidInstance(): Promise<ObsidianMermaidService> {
   const host = getObsidianExcalidrawHost();
   if (!host) {
     throw new Error("Obsidian Excalidraw host is not configured");
@@ -249,7 +251,7 @@ export async function getSharedMermaidInstance(): Promise<MermaidToExcalidrawLib
   return await host.getMermaid();
 }
 
-export async function loadMermaid(): Promise<MermaidToExcalidrawLibProps> {
+export async function loadMermaid(): Promise<ObsidianMermaidService> {
   return await loadMermaidLib();
 }
 

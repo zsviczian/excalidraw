@@ -114,6 +114,15 @@ Prefer explicit host capabilities for the exceptional URL paths instead of widen
 <a id="d13"></a>
 ## D13 — Consolidate Mermaid loading and isolate generic preview fixes
 
+**PR #472 checkpoint (2026-10-21):** Upstream generated-text validation now
+accepts the dialog API; the redundant direct host lookup is retired with the
+same host-provided converter. Stable public loaded/api helpers and queued
+conversion remain. The dialog uses a private status adapter, and pending-content
+preview fixes remain active. This is partial upstream parity, not authorization
+to consolidate the remaining public loaders. Offline real-Extras main/popout
+preview/save-reopen and five focused loader regressions pass; see the
+[merge review](pr-472-merge-review.md).
+
 **Priority P2; implementation cleanup, active feature retained; OBS-030.** Host lazy conversion, shared engine ownership, and `customData.mermaidText` are active. [mermaid.ts](../../packages/excalidraw/mermaid.ts) and [obsidianUtils.ts](../../packages/excalidraw/obsidianUtils.ts) expose related loading helpers. `loadMermaidLib` is called by the wrapper and is **not** an unused helper.
 
 Consolidate duplicate caching/loading responsibility behind the versioned service while preserving public exports and retry/error behavior. Evaluate generic preview/event fixes separately for upstream parity, rather than retaining an old preview component after upstream moves it. Do not reintroduce eager Mermaid or separate engine instances to match package dependencies cosmetically. Gate: V01/V02/V06, lazy Extras, failure/retry, offline operation, export and editable source metadata.

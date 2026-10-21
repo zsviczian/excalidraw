@@ -208,12 +208,13 @@ export class AppClipboard {
 
     // ------------------- Successful Mermaid -------------------
     if (!isPlainPaste && isMaybeMermaidDefinition(data.text)) {
-      // zsviczian START -- Mermaid is supplied lazily by the Obsidian host, not bundled here
-      // const api = await import("@excalidraw/mermaid-to-excalidraw");
-      const sharedMermaid = await getSharedMermaidInstance();
-      const api = await sharedMermaid.api;
-      // zsviczian END
       try {
+        // if this fails to load (e.g. offline), fall through and paste as text
+        // zsviczian START -- keep host loading inside upstream's paste fallback, PR #472
+        // const api = await import("@excalidraw/mermaid-to-excalidraw");
+        const sharedMermaid = await getSharedMermaidInstance();
+        const api = await sharedMermaid.api;
+        // zsviczian END
         const { elements: skeletonElements, files = {} } =
           await api.parseMermaidToExcalidraw(data.text);
 

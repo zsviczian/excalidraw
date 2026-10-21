@@ -56,10 +56,16 @@ Canonical definition: [obsidianExcalidrawHost.ts](../../packages/excalidraw/obsi
 | `getZoomToFitMaxLevel()`, `getZoomStep()`, `getZoomMin()`, `getZoomMax()` | Zoom preferences and limits. |
 | `isContextMenuDisabled()`, `shouldSyncElementLinkWithText()` | Host interaction/link policy. |
 | `loadFontFromFile(filename)` | Promise of vault font bytes or `undefined`; not a view or file-system object. |
-| `getMermaid()` | Promise of the host converter service, loaded lazily. |
+| `getMermaid()` | Promise of `ObsidianMermaidService`: existing `{loaded: boolean, api: Promise<converter>}` shape, loaded lazily through the plugin. |
 | `runAction("anyFile" \| "LaTeX" \| "card")` | Narrow host commands rather than discovery of a plugin instance. |
 | `getLabel(key)` | Host-owned labels. |
 | `attachInlineLinkSuggester(inputEl, widthWrapper?, container?, suppressPlaceholder?)` | Returns `ObsidianKeyBlocker`, with `isBlockingKeys()` and `close()`; caller owns closing it. |
+
+PR #472 keeps that service and public `loadMermaid()` result unchanged. The
+upstream dialog's `status`/`reloadRequired` fields are internal UI state,
+adapted in `MermaidToExcalidrawLib.ts`; they do not change protocol 2. Mermaid
+code remains Extras-provided. Web-app service-worker precaching is independent
+of Obsidian vault images and scene loading.
 
 [obsidianUtils.ts](../../packages/excalidraw/obsidianUtils.ts) delegates service/settings calls. Optional standalone paths use documented defaults; host-required operations must fail explicitly rather than silently invent a plugin. The residual global laser-settings lookup is **not** part of this typed contract and remains F03 debt.
 

@@ -50,6 +50,10 @@ Consumers include plugin imports/ambient declarations and normal ESM consumers, 
 <a id="obs-006"></a>
 ## OBS-006 — Excalidraw host service registry (protocol 2)
 
+**PR #472 (2026-10-21):** `ObsidianMermaidService` explicitly retains the existing
+`{loaded, api}` host/public-loader contract while upstream dialog state uses
+`status`. No protocol or consumer change. See the [merge review](pr-472-merge-review.md).
+
 **Retain.** [obsidianExcalidrawHost.ts](../../packages/excalidraw/obsidianExcalidrawHost.ts) is the analogous version-2 boundary for settings, vault font loading, shared Mermaid, semantic commands, translations, and inline link suggestions. [obsidianUtils.ts](../../packages/excalidraw/obsidianUtils.ts) turns settings into focused accessors. Services that need a host fail explicitly; settings have defined standalone defaults. Registration does not import Obsidian or the plugin.
 
 `P: src/core/managers/obsidianExcalidrawHostAdapter.ts` reads settings at call time, translates `anyFile`/`LaTeX`/`card` into plugin actions, and attaches the plugin's suggester. Keep synchronous settings live after registration; avoid snapshotting them or passing the whole plugin object. The remaining laser-pointer global is **not** covered by this registry and is separately recorded under OBS-028/F03. Generic typed callbacks are a useful upstream direction; simply removing the adapter would break text input and host services. **Gate:** V02, V03, V04, V06.
@@ -279,6 +283,16 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 
 <a id="obs-030"></a>
 ## OBS-030 — Host Mermaid conversion and editable diagram metadata
+
+**PR #472:** Preserve host loading in the existing fork helper and adapt it to
+upstream's retry/status API; failed API loads release the cache, and activation
+failure yields to the plugin prompt. Clipboard host loading stays inside
+upstream's text-fallback handler. `useTextGeneration.ts` now matches upstream:
+its new dialog API argument is already host-provided, replacing the redundant
+local host lookup. Pending-preview refresh, selected-image source, queue/public
+aliases and image metadata remain. Five focused loader tests and real-Extras
+offline main/popout preview/save-reopen checks pass; no bundled Mermaid or new
+scene-file loader. See the [review](pr-472-merge-review.md).
 
 **Retain the host boundary; upstream general rendering fixes.** [MermaidToExcalidrawLib.ts](../../packages/excalidraw/components/TTDDialog/MermaidToExcalidrawLib.ts) obtains the host's lazy Extras-backed library, caches only a ready instance, permits retry after enablement, queues conversions, and returns converted elements/files or an error. Generated image elements retain `customData.mermaidText`; the dialog seeds text from a selected Mermaid image. TTDDialog replaces the package dynamic import, guards late results after unmount, and closes when the host library is unavailable. Paste and generated-text validation use the shared host API. App accepts a Mermaid tool/render option and preserves selection where required.
 

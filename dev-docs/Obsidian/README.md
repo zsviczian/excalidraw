@@ -59,6 +59,22 @@ trees: **1,313 fork / 1,318 upstream**. Use this incoming commit for the current
 audit; previous checkpoints remain historical evidence. Validation and limits
 are recorded in the review.
 
+### PR #472 lazy-module merge
+
+The 2026-10-21 [PR #472 review](pr-472-merge-review.md) compares incoming
+`1d4dc2c0e6e476911d0760e9c3cf3694f2d43384` with fork parent `dc5c28baa`
+and merge base `bee01e3a1`. All 21 incoming paths and three conflicts are
+accounted for. Mermaid remains supplied by the plugin/Extras through the
+unchanged protocol-2 `{loaded, api}` service. Upstream dialog status/retry is
+adapted privately; generated-text validation now uses that same supplied API,
+retiring its redundant local host lookup. Web-app PWA precaching/Firebase
+changes do not alter Obsidian's vault/scene loader. Ledger: **160 modified,
+35 fork-only, 39 upstream-only paths** (234); complete trees: **1,316 fork /
+1,320 upstream**. Use this incoming commit for the current audit. Fifteen
+focused tests, local-artifact builds and Windows native image/offline Mermaid
+main/popout checks pass; broad suite/type failures remain explicit. No version,
+publication or plugin dependency change.
+
 ## Initial scope and baseline
 
 Initial source audit: **2026-09-29**, using the three supplied ZIP snapshots. The archive roots and full SHA-256 checksums are recorded under `original_sources` in [file-inventory.json](file-inventory.json). The ZIP comments were subsequently verified against local Git commit objects; the September 29 fork working tree and the recorded upstream commit reproduced the initial ledger's 230 paths and both complete-tree fingerprints exactly.

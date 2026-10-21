@@ -232,3 +232,20 @@ late callbacks, durable reopen and alias teardown. Do not substitute this for
 macOS, restored/cold/offline/physical-mobile, mixed-DPI/maximized pointer/laser
 or forced-GC checks. The source migration persistence/unmount boundary is
 unchanged. See the review for exact-build comparison and remaining gates.
+
+
+## PR #472 validation checkpoint (2026-10-21)
+
+[The merge review](pr-472-merge-review.md) accounts for all 21 incoming paths,
+three conflicts and the redundant generated-text host-lookup retirement.
+Fifteen focused tests, touched-source lint, Obsidian artifacts/declarations,
+plugin production/development builds and bundle checks pass. Full typecheck
+retains the three documented baseline test diagnostics. Required `test:update`
+is **not green**: 79 passed/79 failed suites; 1174 passed/1458 failed tests,
+47 skipped/one todo, three errors. Its unrelated snapshot writes are restored.
+Windows Obsidian 1.14.4 native CLI image/export/save-reopen and genuine offline
+Extras Mermaid main/popout selected-source previews and durable reopen pass,
+with no captured errors. The prior sequence/vector and SVG-selector probe
+assumptions were corrected; no production fix was made for them. Source and
+package versions remain unchanged; no publication/dependency handoff. Physical
+mobile, macOS/Linux and web-app Firebase/PWA deployment are not claimed tested.
