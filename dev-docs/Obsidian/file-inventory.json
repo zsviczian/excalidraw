@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "review": {
-    "date": "2026-10-21",
+    "date": "2026-10-23",
     "dependency_precommit_tests": "PR #472: 15 focused tests and touched-source lint pass; artifact/declaration build passes. Full typecheck retains three documented baseline test diagnostics. Required test:update: 79 suites pass/79 fail; 1174 tests pass/1458 fail, 47 skipped/one todo, three errors; generated snapshots restored. No full-suite pass claimed.",
     "method": "PR #472: review all 21 incoming paths, all three conflicts against base/fork/upstream, auto-merges and plugin consumers; retire redundant useTextGeneration host lookup because upstream now consumes the host-supplied dialog API. See pr-472-merge-review.md.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
@@ -26,14 +26,15 @@
     "pr469_validation": "Completed source/inventory and Windows local-artifact integration checkpoint; release/platform validation remains partial. See pr-469-merge-review.md.",
     "pr472_retired_files": [
       "packages/excalidraw/components/TTDDialog/hooks/useTextGeneration.ts"
-    ]
+    ],
+    "published_declaration_correction": "Plugin a1da1bbe plus local changes: derive package-host/loader ambient declarations from installed published 0.18.144; contract test fails before and passes after, runs as prebuild. All 621 installed declarations/artifacts match the lockfile-verified npm tarball. Production/library, 14 fork tests, 15 bundle/harness tests and Windows real-Extras offline main/popout/source/retry/cleanup checks pass. Development keeps five baseline TS7006 diagnostics. No fork runtime/Extras code, protocol, version or dependency changes in repair. Acknowledge existing release commit 9d1e20b60. See pr-472-merge-review.md correction."
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "dc5c28baa52884d576db4c4470907e192123b527",
+      "parent_commit": "9d1e20b60edb27bf183f723cbd207bd261959a40",
       "package": "@zsviczian/excalidraw",
-      "version": "0.18.143"
+      "version": "0.18.144"
     },
     "upstream": {
       "kind": "local Git commit",
@@ -46,13 +47,13 @@
       "kind": "Git working tree",
       "commit": "a1da1bbe738df4a6a640b7c1c7fdab0a1c5da8b5",
       "version": "2.29.0",
-      "fork_dependency": "0.18.143"
+      "fork_dependency": "0.18.144"
     }
   },
   "comparison": {
     "fork": {
       "files": 1316,
-      "sha256": "20b99d2b041420371872815dbafe895938bf4c7f608595780ee882edb2e0e6e1"
+      "sha256": "679f9f797bbcac04e8c6cb0cb06453280fd14f326263c8ec261c89f4e1dc1e06"
     },
     "upstream": {
       "files": 1320,
@@ -2606,14 +2607,14 @@
     {
       "path": "packages/excalidraw/package.json",
       "status": "modified",
-      "fork_sha256": "6cef9d50bd848deab195c50b81749191a083351a9d3281ee8d68fe9cbc0d6880",
+      "fork_sha256": "a06a1486b58de3121ea9626b6b6b915aae79922772c6c939334659ca0843277c",
       "upstream_sha256": "c8f9ca6533ad696ff12ffcd235572bb7ddc2db5dc936044188923ca87f458c97",
       "ids": [
         "OBS-002",
         "OBS-003",
         "OBS-004"
       ],
-      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies. Baseline bee1292f3 already bumps to 0.18.142; the layout fix does not bump or publish. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md.",
+      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies. Baseline bee1292f3 already bumps to 0.18.142; the layout fix does not bump or publish. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. 2026-10-23: acknowledge the existing manifest-only 0.18.144 release commit 9d1e20b60 while correcting consumer declarations; no version change in this repair.",
       "kind": "packaging"
     },
     {

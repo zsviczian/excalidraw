@@ -54,6 +54,13 @@ Consumers include plugin imports/ambient declarations and normal ESM consumers, 
 `{loaded, api}` host/public-loader contract while upstream dialog state uses
 `status`. No protocol or consumer change. See the [merge review](pr-472-merge-review.md).
 
+**2026-10-23 integration correction:** The plugin's duplicated ambient adapter
+and loader type incorrectly followed the upstream UI type after publication.
+They now derive from the published fork declarations; a consumer prebuild
+contract test catches that drift. The host/dialog separation remains required,
+with no fork runtime or protocol change. Published 0.18.144 type/build and
+Windows real-Extras main/popout evidence is in the review's correction section.
+
 **Retain.** [obsidianExcalidrawHost.ts](../../packages/excalidraw/obsidianExcalidrawHost.ts) is the analogous version-2 boundary for settings, vault font loading, shared Mermaid, semantic commands, translations, and inline link suggestions. [obsidianUtils.ts](../../packages/excalidraw/obsidianUtils.ts) turns settings into focused accessors. Services that need a host fail explicitly; settings have defined standalone defaults. Registration does not import Obsidian or the plugin.
 
 `P: src/core/managers/obsidianExcalidrawHostAdapter.ts` reads settings at call time, translates `anyFile`/`LaTeX`/`card` into plugin actions, and attaches the plugin's suggester. Keep synchronous settings live after registration; avoid snapshotting them or passing the whole plugin object. The remaining laser-pointer global is **not** covered by this registry and is separately recorded under OBS-028/F03. Generic typed callbacks are a useful upstream direction; simply removing the adapter would break text input and host services. **Gate:** V02, V03, V04, V06.

@@ -1,5 +1,72 @@
 # PR #472 merge review — lazy web dependencies, preserved Obsidian loading
 
+## Published-declaration correction — 2026-10-23
+
+The original integration lane below copied four runtime artifacts into an
+installed **0.18.143** package. It did not validate the new declarations after
+publication of **0.18.144**. On plugin master `a1da1bbe`, with the maintainer's
+existing dependency/lockfile update to 0.18.144 installed, `npm run build`
+reproduces TS2322 in `obsidianExcalidrawHostAdapter.ts:31` while still emitting
+dist. That output is not a successful type integration check.
+
+The fork correctly kept `{loaded, api}` as `ObsidianMermaidService`, but the
+plugin's manually repeated ambient adapter and public `loadMermaid()` return
+type still referenced `TTDDialog`'s now status-based UI type. The repair is in
+`P: src/types/excalidrawLib.d.ts`: derive the adapter, protocol constant,
+registration function and loader directly from the published fork declarations.
+No fork runtime, host protocol, public service shape, Extras implementation,
+scene field or migration behavior changes. No cast, added status property,
+fallback or feature removal is needed. The existing ringfenced host adapter
+and dialog shim remain necessary; no further fork retirement is justified.
+
+`P: scripts/testing/hostContracts.test.mjs` checks the real plugin adapter,
+producer, registration and public loader against the installed canonical types,
+in both directions. It fails on the original declarations and passes after the
+repair. `npm run build` now runs it as a prebuild gate, so this mismatch produces
+a nonzero build result before Rollup can emit misleading output. It checks this
+boundary rather than suppressing or accepting other compiler diagnostics.
+
+Verification uses the **published** 0.18.144 tarball: its SHA-512 matches the
+existing lockfile, and all **621** installed declaration/runtime files match
+the tarball byte-for-byte. No local runtime artifacts or declarations are
+substituted, no dependency/version is changed by this repair, and nothing is
+published or committed. Production and library builds pass without TS2322;
+production has no TypeScript diagnostics. Development retains the existing
+five TS7006 diagnostics in CLI/view files and the sourcemap-option warning.
+The changed declaration has zero ESLint findings; test scripts are excluded
+by the repository ESLint configuration and pass Node syntax/execution checks.
+The new contract test, **14** focused fork Mermaid/host tests and **15** plugin
+bundle/CLI-harness tests pass. The older full-suite failures below are not
+claimed fixed or rerun for this type-only consumer repair.
+
+Windows Obsidian 1.14.4 native checks against the published installed package
+pass plugin reload/mount, a declined Mermaid service and rejected API,
+subsequent real-Extras conversion while the main renderer is offline, editable
+image source metadata, selected-source canvas previews in main and popout,
+public loaded/api shape, one shared host lookup with four parser calls, and
+byte-preserving save/reopen. Final error collection and owned-file/controller
+cleanup pass. Offline emulation and the host observer are restored. Initial
+probe attempts passed the feature checks but failed Windows empty-directory
+cleanup; the final probe uses a UUID-owned drawing file without creating a
+directory. No production code is changed to accommodate those probe failures.
+
+Final main.js: **4,985,148 bytes**, **257,732 bytes** headroom; SHA-256
+`e86ac09851cec8f2f45a33fa64d3bfcd91a1e8d0fefb0f4942191e694afacd6e`.
+Local evidence: plugin `tmp/pr472-repair-*`, particularly
+`pr472-repair-native/report.json`, `pr472-repair-package/provenance.json`,
+before/after contract/build logs and development/library logs. The report
+identifies plugin `a1da1bbe` plus local changes and published component 0.18.144.
+Source inventory additionally acknowledges the already committed
+`9d1e20b60` manifest-only version bump; it changes no further source hash.
+
+Remaining manual gates: cold application startup, restored popouts,
+macOS/Linux and physical mobile. Highest-probability checks are declining then
+enabling Extras, lazy conversion/retry, selected-source preview and saving the
+source in main/popout editors. No whole-product zero-regression claim follows
+from these bounded checks.
+
+## Original merge checkpoint (2026-10-21)
+
 2026-10-21. [PR #472](https://github.com/zsviczian/excalidraw/pull/472).
 Fork parent: `dc5c28baa52884d576db4c4470907e192123b527`.
 Incoming upstream: `1d4dc2c0e6e476911d0760e9c3cf3694f2d43384`.

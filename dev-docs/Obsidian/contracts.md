@@ -67,6 +67,12 @@ adapted in `MermaidToExcalidrawLib.ts`; they do not change protocol 2. Mermaid
 code remains Extras-provided. Web-app service-worker precaching is independent
 of Obsidian vault images and scene loading.
 
+The 2026-10-23 consumer correction derives the plugin's ambient package-host
+adapter, protocol/registration declarations and public loadMermaid function
+from these published types. Do not substitute TTDDialog's UI type for the host
+service. Its prebuild regression test checks the actual plugin producer and
+bridge against installed declarations. See the [correction record](pr-472-merge-review.md).
+
 [obsidianUtils.ts](../../packages/excalidraw/obsidianUtils.ts) delegates service/settings calls. Optional standalone paths use documented defaults; host-required operations must fail explicitly rather than silently invent a plugin. The residual global laser-settings lookup is **not** part of this typed contract and remains F03 debt.
 
 <a id="component-extension-surface"></a>

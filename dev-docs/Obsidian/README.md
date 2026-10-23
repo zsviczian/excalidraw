@@ -75,6 +75,15 @@ focused tests, local-artifact builds and Windows native image/offline Mermaid
 main/popout checks pass; broad suite/type failures remain explicit. No version,
 publication or plugin dependency change.
 
+**2026-10-23 published-package correction:** The plugin's duplicated ambient
+Mermaid types drifted when 0.18.144 was installed; copying only runtime artifacts
+into 0.18.143 had not tested that declaration handoff. The consumer now derives
+its host/loader declarations from the installed package and checks them before
+production builds. Published-package byte verification and Windows real-Extras
+main/popout checks pass. The [review correction](pr-472-merge-review.md) records
+scope, evidence and remaining gates. The ledger acknowledges the already
+committed 0.18.144 version bump; no new fork production change or retirement.
+
 ## Initial scope and baseline
 
 Initial source audit: **2026-09-29**, using the three supplied ZIP snapshots. The archive roots and full SHA-256 checksums are recorded under `original_sources` in [file-inventory.json](file-inventory.json). The ZIP comments were subsequently verified against local Git commit objects; the September 29 fork working tree and the recorded upstream commit reproduced the initial ledger's 230 paths and both complete-tree fingerprints exactly.
