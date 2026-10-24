@@ -60,6 +60,10 @@ import { headingForPointIsHorizontal } from "./heading";
 
 import { canChangeRoundness } from "./comparisons";
 import {
+  CARDINALITY_INNER_BAR_OFFSET,
+  CARDINALITY_ONE_OR_MANY_BAR_OFFSET,
+  CARDINALITY_ZERO_CIRCLE_OFFSET,
+  CARDINALITY_ZERO_CIRCLE_SCALE,
   elementCenterPoint,
   getArrowheadPoints,
   getDiamondPoints,
@@ -363,15 +367,41 @@ const generateArrowheadOutlineCircle = (
   const [x, y, diameter] = arrowheadPoints;
   const circleOptions = {
     ...options,
-    fill,
-    fillStyle: "solid" as const,
     stroke: strokeColor,
     roughness: Math.min(0.5, options.roughness || 0),
+    // a second stroke would stray from the fill
+    disableMultiStroke: true,
   };
 
   delete circleOptions.strokeLineDash;
 
-  return [generator.circle(x, y, diameter * diameterScale, circleOptions)];
+  return [
+    fillArrowheadOutline(
+      generator.circle(x, y, diameter * diameterScale, circleOptions),
+      fill,
+    ),
+  ];
+};
+
+/**
+ * Fills an arrowhead's outline (a polygon or circle drawn as a single rough
+ * stroke) along that stroke. rough.js' own solid fill is jittered separately
+ * from the outline, by up to 2px, which shows on shapes as small as
+ * arrowheads.
+ */
+const fillArrowheadOutline = (outline: Drawable, fill: string): Drawable => {
+  // polygons are drawn edge by edge, each starting with a move
+  const ops = outline.sets
+    .flatMap((set) => set.ops)
+    .map((op, index) =>
+      index > 0 && op.op === "move" ? { ...op, op: "lineTo" as const } : op,
+    );
+
+  return {
+    ...outline,
+    options: { ...outline.options, fill },
+    sets: [{ type: "fillPath", ops }, ...outline.sets],
+  };
 };
 
 const getArrowheadShapes = (
@@ -393,9 +423,6 @@ const getArrowheadShapes = (
     canvasBackgroundColor,
     isDarkMode,
   );
-  const cardinalityOneOrManyOffset = -0.25;
-  const cardinalityZeroCircleScale = 0.8;
-
   switch (arrowhead) {
     case "circle":
     case "circle_outline": {
@@ -423,24 +450,27 @@ const getArrowheadShapes = (
       const [x, y, x2, y2, x3, y3] = arrowheadPoints;
       const triangleOptions = {
         ...options,
-        fill:
-          arrowhead === "triangle_outline" ? backgroundFillColor : strokeColor,
-        fillStyle: "solid" as const,
         roughness: Math.min(1, options.roughness || 0),
+        // a second stroke would stray from the fill
+        disableMultiStroke: true,
+        // keep the corners of the small polygon in place, only bow the edges
+        preserveVertices: true,
       };
 
       // always use solid stroke for arrowhead
       delete triangleOptions.strokeLineDash;
 
       return [
-        generator.polygon(
-          [
-            [x, y],
-            [x2, y2],
-            [x3, y3],
-            [x, y],
-          ],
-          triangleOptions,
+        fillArrowheadOutline(
+          generator.polygon(
+            [
+              [x, y],
+              [x2, y2],
+              [x3, y3],
+            ],
+            triangleOptions,
+          ),
+          arrowhead === "triangle_outline" ? backgroundFillColor : strokeColor,
         ),
       ];
     }
@@ -460,25 +490,28 @@ const getArrowheadShapes = (
       const [x, y, x2, y2, x3, y3, x4, y4] = arrowheadPoints;
       const diamondOptions = {
         ...options,
-        fill:
-          arrowhead === "diamond_outline" ? backgroundFillColor : strokeColor,
-        fillStyle: "solid" as const,
         roughness: Math.min(1, options.roughness || 0),
+        // a second stroke would stray from the fill
+        disableMultiStroke: true,
+        // keep the corners of the small polygon in place, only bow the edges
+        preserveVertices: true,
       };
 
       // always use solid stroke for arrowhead
       delete diamondOptions.strokeLineDash;
 
       return [
-        generator.polygon(
-          [
-            [x, y],
-            [x2, y2],
-            [x3, y3],
-            [x4, y4],
-            [x, y],
-          ],
-          diamondOptions,
+        fillArrowheadOutline(
+          generator.polygon(
+            [
+              [x, y],
+              [x2, y2],
+              [x3, y3],
+              [x4, y4],
+            ],
+            diamondOptions,
+          ),
+          arrowhead === "diamond_outline" ? backgroundFillColor : strokeColor,
         ),
       ];
     }
@@ -510,7 +543,7 @@ const getArrowheadShapes = (
             shape,
             position,
             "cardinality_one",
-            cardinalityOneOrManyOffset,
+            CARDINALITY_ONE_OR_MANY_BAR_OFFSET,
           ),
           lineOptions,
         ),
@@ -522,7 +555,13 @@ const getArrowheadShapes = (
       return [
         ...generateArrowheadCardinalityOne(
           generator,
-          getArrowheadPoints(element, shape, position, "cardinality_one", -0.5),
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "cardinality_one",
+            CARDINALITY_INNER_BAR_OFFSET,
+          ),
           lineOptions,
         ),
         ...generateArrowheadCardinalityOne(
@@ -540,13 +579,25 @@ const getArrowheadShapes = (
           generator,
           options,
           strokeColor,
-          getArrowheadPoints(element, shape, position, "circle_outline", 1.5),
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "circle_outline",
+            CARDINALITY_ZERO_CIRCLE_OFFSET,
+          ),
           backgroundFillColor,
-          cardinalityZeroCircleScale,
+          CARDINALITY_ZERO_CIRCLE_SCALE,
         ),
         ...generateArrowheadCardinalityOne(
           generator,
-          getArrowheadPoints(element, shape, position, "cardinality_one", -0.5),
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "cardinality_one",
+            CARDINALITY_INNER_BAR_OFFSET,
+          ),
           lineOptions,
         ),
       ];
@@ -564,9 +615,15 @@ const getArrowheadShapes = (
           generator,
           options,
           strokeColor,
-          getArrowheadPoints(element, shape, position, "circle_outline", 1.5),
+          getArrowheadPoints(
+            element,
+            shape,
+            position,
+            "circle_outline",
+            CARDINALITY_ZERO_CIRCLE_OFFSET,
+          ),
           backgroundFillColor,
-          cardinalityZeroCircleScale,
+          CARDINALITY_ZERO_CIRCLE_SCALE,
         ),
       ];
     }
@@ -651,8 +708,10 @@ export const generateLinearCollisionShape = (
         : [pointFrom<LocalPoint>(0, 0)];
 
       if (isElbowArrow(element)) {
-        return generator.path(generateElbowArrowShape(points, 16), options)
-          .sets[0].ops;
+        return generator.path(
+          generateElbowArrowShape(points, ELBOW_ARROW_CORNER_RADIUS),
+          options,
+        ).sets[0].ops;
       } else if (!element.roundness) {
         return points.map((point, idx) => {
           const p = pointRotateRads(
@@ -920,7 +979,7 @@ const _generateElementShape = (
         } else {
           shape = [
             generator.path(
-              generateElbowArrowShape(points, 16),
+              generateElbowArrowShape(points, ELBOW_ARROW_CORNER_RADIUS),
               generateRoughOptions(element, true, isDarkMode),
             ),
           ];
@@ -1020,6 +1079,8 @@ const _generateElementShape = (
     }
   }
 };
+
+export const ELBOW_ARROW_CORNER_RADIUS = 16;
 
 const generateElbowArrowShape = (
   points: readonly LocalPoint[],
