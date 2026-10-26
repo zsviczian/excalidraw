@@ -5,8 +5,8 @@
 
 import {
   arrayToMap,
-  MAX_ZOOM,
-  MIN_ZOOM,
+  // MAX_ZOOM, // zsviczian -- host maximum replaces constant, plugin #3008
+  // MIN_ZOOM, // zsviczian -- host minimum replaces constant, plugin #3008
   viewportCoordsToSceneCoords,
   ZOOM_STEP,
 } from "@excalidraw/common";
@@ -25,6 +25,7 @@ import type { Bounds } from "@excalidraw/common";
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 
 import { getNormalizedZoom } from "./scene";
+import { getZoomMin, getZoomMax } from "./obsidianUtils"; // zsviczian -- host zoom limits, plugin #3008
 
 import type {
   AppState,
@@ -157,9 +158,9 @@ export const constrainScrollState = (
 
   const minZoom = scrollConstraints.lockZoom
     ? scrollConstraints.zoom
-    : MIN_ZOOM;
+    : /* MIN_ZOOM */ getZoomMin(); // zsviczian -- unlocked scroll bounds must honor host zoom, plugin #3008
   const zoomValue = getNormalizedZoom(
-    clamp(state.zoom.value, minZoom, MAX_ZOOM),
+    clamp(state.zoom.value, minZoom, /* MAX_ZOOM */ getZoomMax()), // zsviczian -- honor host maximum with scroll constraints, plugin #3008
   );
 
   if (!scrollConstraints.lockScroll) {

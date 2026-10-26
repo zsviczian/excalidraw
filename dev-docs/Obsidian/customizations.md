@@ -269,6 +269,19 @@ Consumers include `P: ExcalidrawView.ts` theme updates, custom embed renderers, 
 <a id="obs-028"></a>
 ## OBS-028 — Zoom, pen/touch gestures, and navigation
 
+Final combined macOS validation passed all feature scenarios, the JavaScript
+error gate and cleanup. Earlier intermittent ResizeObserver failures below
+remain historical evidence; this change does not fix that separate issue.
+
+The 2026-10-26 plugin #3008 correction makes `App.wheel.ts` read `getZoomMin()`
+before normalization, and `viewport.ts` read both live host limits when scroll
+constraints are present. A locked viewport still retains its explicit zoom
+floor. The plugin's `zoomMin`/`zoomMax` settings remain the source of truth;
+there is no protocol or persisted-data change. Seven focused controller tests
+cover 1% minimum, no 10% snap-back, defaults, live settings, locked/unlocked
+constraints and a maximum above/below 3000%. Native macOS main/popout assertions
+pass; the overall error gate retains known ResizeObserver teardown errors.
+
 **Minimize, preserving input ordering.** Zoom step/min/max and fit ceiling come from host settings; the fork default step is smaller. `zoomToFitElements` already delegates to upstream `zoomToFitBounds` with a legacy margin conversion, ceiling, and no step snapping. Wheel handling uses composedPath and an optional reversed modifier policy. Touch changes include pen-mode single-finger panning, double-tap eraser, configurable pinch behavior, active-PDF gesture suppression, and disable-double-click-text **creation** without blocking editing existing text. Pen cursor behavior, view-mode double-click forwarding, context-menu suppression during movement, and keyboard handling are additional deltas.
 
 `App` moves pan startup after cursor/pointer bookkeeping so the plugin can observe pointer-down events during panning; upstream's earlier pan check has different collaboration/pointer semantics. Right-button pan itself is already upstream. `P: host settings adapters` and `ExcalidrawView.ts` consume these differences. [laserTrails.ts](../../packages/excalidraw/laserTrails.ts) still discovers `window.ExcalidrawAutomate.LASERPOINTER`, which `P: ExcalidrawAutomate.ts` exposes as live laser settings. Move that internal read through the typed boundary while preserving the public EA getter; absence of a direct import is not proof of no consumer. **Gate:** V03, V09, V11; D09, F03.
