@@ -9,7 +9,7 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 | [Customization catalog](customizations.md) | 37 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
-| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 234 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
+| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 236 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
 | [Validation and merge playbook](validation.md) | What was actually verified, existing regression tests, missing runtime evidence, and behavior-specific gates. |
 | [Obsidian runtime testing](OBSIDIAN_RUNTIME_TESTING.md) | Guarded CLI test-vault deployment, exact-build desktop smoke, reports, and feature-specific host probes. |
 | [Local audit checker](audit.py) / [checker tests](test_audit.py) | Dependency-free, offline source accounting; detects changed, new, or retired differences and stale tree fingerprints. |
@@ -17,6 +17,24 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md](../../CONTRIBUTING.md). This inventory documents existing deviations even when they do not yet comply with those policies; it does not silently approve them.
 
 ## Reviewed merge checkpoints
+
+### Plugin #3008 wheel zoom limits — 2026-10-26
+
+Wheel input and constrained viewports now honor the plugin's live minimum and
+maximum zoom. The comparison baseline is `b7de45e88111f5680ae4bb3c3f3541c7d3b279fe`,
+the upstream parent already merged by inherited master PR #473. Its arrowhead
+work is unchanged here; `shape.ts` still differs only by the previously recorded
+inert WeakMap cleanup. The ledger adds the constrained-viewport override and
+focused wheel tests, and updates the wheel controller. No release/protocol bump.
+
+Seven focused tests, artifacts/declarations and plugin production integration
+pass. Main/popout native wheel and image-bound assertions pass with cleanup;
+the overall runner retains known ResizeObserver teardown errors. Full typecheck
+has the same three baseline test diagnostics. Required `test:update`: 81 suites
+and 1,192 tests pass; 79 suites and 1,458 tests fail, with three errors, 47 skipped
+and one todo. Its generated snapshots were restored. Physical mobile and other
+desktop platforms remain separate gates. Local artifact deployment does not
+publish the next component release or change the plugin's 0.18.144 dependency.
 
 The 2026-10-12 [PR #465 review](pr-465-merge-review.md) compares the resolved merge with incoming upstream `541653c7c9d587d463a47daacff9fb30e45a52e7`. The fork parent is `52e99975d798fc7c252f2662ba9ba225d09b9ee2`; their merge base is `2df993fb397dd6d64625908c9c10337727617f6f`. The ledger contains **163 modified, 30 fork-only, and 39 upstream-only paths** (232 total); complete tree counts are 1,306 fork files and 1,315 upstream files.
 

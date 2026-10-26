@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "review": {
-    "date": "2026-10-23",
+    "date": "2026-10-26",
     "dependency_precommit_tests": "PR #472: 15 focused tests and touched-source lint pass; artifact/declaration build passes. Full typecheck retains three documented baseline test diagnostics. Required test:update: 79 suites pass/79 fail; 1174 tests pass/1458 fail, 47 skipped/one todo, three errors; generated snapshots restored. No full-suite pass claimed.",
     "method": "PR #472: review all 21 incoming paths, all three conflicts against base/fork/upstream, auto-merges and plugin consumers; retire redundant useTextGeneration host lookup because upstream now consumes the host-supplied dialog API. See pr-472-merge-review.md.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
@@ -27,19 +27,20 @@
     "pr472_retired_files": [
       "packages/excalidraw/components/TTDDialog/hooks/useTextGeneration.ts"
     ],
-    "published_declaration_correction": "Plugin a1da1bbe plus local changes: derive package-host/loader ambient declarations from installed published 0.18.144; contract test fails before and passes after, runs as prebuild. All 621 installed declarations/artifacts match the lockfile-verified npm tarball. Production/library, 14 fork tests, 15 bundle/harness tests and Windows real-Extras offline main/popout/source/retry/cleanup checks pass. Development keeps five baseline TS7006 diagnostics. No fork runtime/Extras code, protocol, version or dependency changes in repair. Acknowledge existing release commit 9d1e20b60. See pr-472-merge-review.md correction."
+    "published_declaration_correction": "Plugin a1da1bbe plus local changes: derive package-host/loader ambient declarations from installed published 0.18.144; contract test fails before and passes after, runs as prebuild. All 621 installed declarations/artifacts match the lockfile-verified npm tarball. Production/library, 14 fork tests, 15 bundle/harness tests and Windows real-Extras offline main/popout/source/retry/cleanup checks pass. Development keeps five baseline TS7006 diagnostics. No fork runtime/Extras code, protocol, version or dependency changes in repair. Acknowledge existing release commit 9d1e20b60. See pr-472-merge-review.md correction.",
+    "zoom_3008": "Host wheel floor and constrained viewport min/max use existing live host getters. Seven focused tests pass; artifact/declaration and consumer production builds pass. Native macOS main/popout live settings and formula bounds/reopen assertions pass; overall clean-error gate fails on known ResizeObserver popout teardown notifications, cleanup passes. Broad test:update retains 79 failed suites/1458 failed tests and three errors (81 suites/1192 tests pass); generated snapshot edits restored. Full typecheck retains the same three baseline test diagnostics. No version, protocol, dependency or publication change. Upstream parent b7de45e of inherited master PR #473 is the comparison baseline; shape delta remains only the prior inert cleanup."
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "9d1e20b60edb27bf183f723cbd207bd261959a40",
+      "parent_commit": "dc7cf6d5c547d9b9a66f66408ab3d9681d65c9c0",
       "package": "@zsviczian/excalidraw",
       "version": "0.18.144"
     },
     "upstream": {
       "kind": "local Git commit",
-      "commit": "1d4dc2c0e6e476911d0760e9c3cf3694f2d43384",
-      "tree": "4ce8da3feb2d5025c6c394590b7a45c4a90896d9",
+      "commit": "b7de45e88111f5680ae4bb3c3f3541c7d3b279fe",
+      "tree": "4c750f3ebe278e01b445acaf2eceee8c382b37de",
       "package": "@excalidraw/excalidraw",
       "version": "0.18.0"
     },
@@ -52,12 +53,12 @@
   },
   "comparison": {
     "fork": {
-      "files": 1316,
-      "sha256": "679f9f797bbcac04e8c6cb0cb06453280fd14f326263c8ec261c89f4e1dc1e06"
+      "files": 1318,
+      "sha256": "574c9a51cfd1b67a094d7ce944b4b1aa74699c4cb4b19e7f8418610044de601d"
     },
     "upstream": {
-      "files": 1320,
-      "sha256": "c1a85d1813942444a73d1012f1e24d834d781bf5d67cb574f551814220409cf8"
+      "files": 1321,
+      "sha256": "4f6cca2624b7565f871630291125008617ceb03cc3bbf586bf4d865d0ce7d96d"
     }
   },
   "customizations": [
@@ -1028,13 +1029,13 @@
     {
       "path": "packages/element/src/shape.ts",
       "status": "modified",
-      "fork_sha256": "fcc65d09dd599e085745b91b514b001a39fc4afecf96605c572c54dfe40e7785",
-      "upstream_sha256": "1121578b920a03e74e713bcf5ec454faedd09b46a327a55296948e038cfe97b2",
+      "fork_sha256": "1a03648182aca814c535dc3444be963e12dad524a01422c89ea005385c23092c",
+      "upstream_sha256": "58c274afbbea6b5f5c7e892c33c7f727f8f52b5323aaf7b275b9641fef4dd178",
       "ids": [
         "OBS-019",
         "OBS-036"
       ],
-      "note": "Added Object.values(WeakMap) cleanup in ShapeCache.destroy is inert; ordinary keyed cache deletion is unchanged.",
+      "note": "Added Object.values(WeakMap) cleanup in ShapeCache.destroy is inert; ordinary keyed cache deletion is unchanged. Current hashes acknowledge inherited upstream PR #473 arrowhead changes; against its upstream parent, the existing inert cleanup remains the only fork delta.",
       "kind": "no-functional-delta"
     },
     {
@@ -1393,14 +1394,26 @@
       "kind": "integration"
     },
     {
+      "path": "packages/excalidraw/components/App.wheel.obsidian.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "e75261bfbb8e7ee71d5bbd8805eac00878cb60d29bde57292ee048139723c93a",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-028",
+        "OBS-033"
+      ],
+      "kind": "tests",
+      "note": "Focused real wheel-controller/viewport regression for host minimum, maximum, live changes, standalone defaults and zoom locks; independent of unavailable App DOM test hooks."
+    },
+    {
       "path": "packages/excalidraw/components/App.wheel.ts",
       "status": "modified",
-      "fork_sha256": "94572e781f479dbf9603dfc12e7cedcba7b103dba53b6d2379c71d14f14a4d1b",
+      "fork_sha256": "6d8f52d334eccb0fbd9646902b64143fcf2361a66ea5b3b6e5509ea4c057a560",
       "upstream_sha256": "988f43a2e9e836e7e06335ecfc6928fb2c1203324f92a8d98132af175139c60f",
       "ids": [
         "OBS-028"
       ],
-      "note": "Use composedPath for canvas wheel targeting and invert zoom modifier behavior when allowWheelZoom is enabled.",
+      "note": "Use composedPath for canvas wheel targeting and invert zoom modifier behavior when allowWheelZoom is enabled. Use the live host minimum before normalizing wheel zoom (plugin #3008).",
       "kind": "behavior"
     },
     {
@@ -2974,6 +2987,17 @@
       ],
       "note": "Public/internal extensions for host props, state, renderer fields, image/geometry methods, history, and Mermaid; AppClassProperties.setSelection is not itself an imperative API member. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #463: crop/text-resize integration reviewed against incoming 2df993fb; see pr-463-merge-review.md. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md.",
       "kind": "type-compatibility"
+    },
+    {
+      "path": "packages/excalidraw/viewport.ts",
+      "status": "modified",
+      "fork_sha256": "400628e8f09c9d6b6d7abf0e2e6c35eb0b1c06c58a3dc45ad50332c3e425376f",
+      "upstream_sha256": "7fc95483ae81961873df516cb1e6dc936074b6e193a211e302acbb8743bcad0e",
+      "ids": [
+        "OBS-028"
+      ],
+      "kind": "behavior",
+      "note": "Honor live host minimum/maximum when clamping scroll-constrained viewports; preserve locked zoom floor."
     },
     {
       "path": "packages/excalidraw/wysiwyg/textWysiwyg.test.tsx",

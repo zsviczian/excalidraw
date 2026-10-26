@@ -1,6 +1,7 @@
-import { CLASSES, KEYS, MIN_ZOOM, ZOOM_STEP } from "@excalidraw/common";
+import { CLASSES, KEYS, /* MIN_ZOOM, */ ZOOM_STEP } from "@excalidraw/common"; // zsviczian -- host minimum replaces constant, plugin #3008
 
 import { resolveInputDevice } from "../appState";
+import { getZoomMin } from "../obsidianUtils"; // zsviczian -- host zoom limit, plugin #3008
 import { withBatchedUpdates } from "../reactUtils";
 import { getNormalizedZoom } from "../scene";
 import { getViewportForZoomWithScrollConstraints } from "../viewport";
@@ -168,7 +169,7 @@ export class AppWheel {
 
         const minZoom = state.scrollConstraints?.lockZoom
           ? state.scrollConstraints.zoom
-          : MIN_ZOOM;
+          : /* MIN_ZOOM */ getZoomMin(); // zsviczian -- honor live host minimum, plugin #3008
         const nextZoom = getNormalizedZoom(Math.max(newZoom, minZoom));
         if (nextZoom === state.zoom.value) {
           // at a zoom limit there is nothing to do; flipping the bitmap-cache
