@@ -20,6 +20,10 @@ Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md]
 
 ### Plugin #3008 wheel zoom limits — 2026-10-26
 
+Final combined macOS validation passed all feature scenarios, the JavaScript
+error gate and cleanup. Earlier intermittent ResizeObserver failures below
+remain historical evidence; this change does not fix that separate issue.
+
 Wheel input and constrained viewports now honor the plugin's live minimum and
 maximum zoom. The comparison baseline is `b7de45e88111f5680ae4bb3c3f3541c7d3b279fe`,
 the upstream parent already merged by inherited master PR #473. Its arrowhead

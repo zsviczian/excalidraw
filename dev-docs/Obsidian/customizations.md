@@ -269,6 +269,10 @@ Consumers include `P: ExcalidrawView.ts` theme updates, custom embed renderers, 
 <a id="obs-028"></a>
 ## OBS-028 — Zoom, pen/touch gestures, and navigation
 
+Final combined macOS validation passed all feature scenarios, the JavaScript
+error gate and cleanup. Earlier intermittent ResizeObserver failures below
+remain historical evidence; this change does not fix that separate issue.
+
 The 2026-10-26 plugin #3008 correction makes `App.wheel.ts` read `getZoomMin()`
 before normalization, and `viewport.ts` read both live host limits when scroll
 constraints are present. A locked viewport still retains its explicit zoom
