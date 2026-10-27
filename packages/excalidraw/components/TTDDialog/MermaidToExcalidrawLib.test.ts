@@ -1,6 +1,8 @@
 /** zsviczian -- PR #472: preserve the host service across upstream lazy loading. */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { FileId } from "@excalidraw/element/types";
+
 import { getSharedMermaidInstance } from "../../obsidianUtils";
 
 vi.mock("../../obsidianUtils", () => ({
@@ -31,6 +33,29 @@ describe("host-provided Mermaid loading", () => {
     expect(await loadMermaidLib()).toBe(service);
     expect(await loadMermaidToExcalidrawLib()).toBe(service);
     expect(getMermaid).toHaveBeenCalledTimes(1);
+  });
+
+  it("preserves editable image source without mutating readonly converter skeletons", async () => {
+    const image = Object.freeze({
+      type: "image" as const,
+      id: "diagram-image",
+      x: 0,
+      y: 0,
+      width: 20,
+      height: 20,
+      fileId: "diagram-asset" as FileId,
+    });
+    getMermaid.mockResolvedValue({
+      loaded: true,
+      api: Promise.resolve({
+        parseMermaidToExcalidraw: async () => ({ elements: [image] }),
+      }),
+    });
+    const { mermaidToExcalidraw } = await import("./MermaidToExcalidrawLib");
+    const source = 'pie\n "Example" : 1';
+    const result = await mermaidToExcalidraw(source, {});
+    expect(result?.elements?.[0].customData?.mermaidText).toBe(source);
+    expect(image).not.toHaveProperty("customData");
   });
 
   it("yields to activation and retries after the host is enabled", async () => {

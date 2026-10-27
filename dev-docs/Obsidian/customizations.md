@@ -16,6 +16,8 @@ This is repository governance, not a runtime customization. Retain the policy di
 <a id="obs-002"></a>
 ## OBS-002 — Package identity and dependency graph
 
+**PR #475 (2026-10-27):** Converter 3.0.0 stays dev-only in the fork; Pele 1.8.0 is supplied through Extras. The merged lock retains fork security resolutions and prunes old Mermaid dependencies. No fork package/release bump. See the [PR #475 review](pr-475-merge-review.md).
+
 **Minimize, with packaging defects to investigate.** [Package manifest](../../packages/excalidraw/package.json), [root manifest](../../package.json), and [lockfile](../../yarn.lock) differ in package scope/version, source/types/files fields, build/publish scripts, overrides/resolutions, and development dependencies. The component removes `@excalidraw/common`, `@excalidraw/element`, and `@excalidraw/math` runtime dependencies, moves Mermaid to development dependencies, and adds Obsidian build tooling. Root tooling adds Yarn and local repository scripts. Override comments cite scanner findings; this audit does not independently certify vulnerability status or the compatibility of forced versions.
 
 `P: package.json` pins `@zsviczian/excalidraw` `0.18.140`; `P: PackageManager.ts` consumes its `dist/obsidian` payload. The IIFE aliases workspace sources, but the **unchanged ESM builder still externalizes common/element/math**. Thus IIFE bundling is not evidence that removing those dependencies is safe for the published ESM package. Audit the packed dependency graph and consumer installs separately. Retain scope and host delivery; remove obsolete pins only after matching resolved upstream dependencies and relevant security/build evidence. Keep unrelated lockfile refreshes out of behavior patches. **Gate:** V01; backlog F02 and D16.
@@ -49,6 +51,8 @@ Consumers include plugin imports/ambient declarations and normal ESM consumers, 
 
 <a id="obs-006"></a>
 ## OBS-006 — Excalidraw host service registry (protocol 2)
+
+**PR #475 (2026-10-27):** Protocol 2 and public loaded/api remain unchanged with Extras Mermaid component 3.0.0. The plugin now validates its real producer/adapter/bridge against generated local declarations before runtime artifact copying, in addition to the installed-package prebuild gate. Both lanes pass; no duplicated status contract. See the [PR #475 review](pr-475-merge-review.md).
 
 **PR #472 (2026-10-21):** `ObsidianMermaidService` explicitly retains the existing
 `{loaded, api}` host/public-loader contract while upstream dialog state uses
@@ -85,6 +89,8 @@ Direct consumers are `P: ExcalidrawRoot.ts`, `ExcalidrawView.ts`, `ExcalidrawAut
 
 <a id="obs-009"></a>
 ## OBS-009 — Raw Markdown text lifecycle
+
+**PR #475 (2026-10-27):** Adopt upstream label/binding metrics and skeleton placement; preserve rawText, legacyTextWrap and Markdown history/link ownership. The mounted host-metrics regression and Windows main/popout text history checks pass. No source-field migration or label customization is retired. See the [PR #475 review](pr-475-merge-review.md).
 
 **PR #469 (2026-10-20):** Raw Markdown source remains on measured placeholders, frame labels and transformation-created text. Upstream environments flow through measurement/wrapping without replacing the text/link host callbacks or saved representation. [Merge review](pr-469-merge-review.md).
 
@@ -304,6 +310,8 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 <a id="obs-030"></a>
 ## OBS-030 — Host Mermaid conversion and editable diagram metadata
 
+**PR #475 (2026-10-27):** Upgrade the external engine to converter 3/Pele via Extras component 3.0.0; the plugin requires that exact version. Copy readonly image skeletons in the dialog and queued converter while retaining `customData.mermaidText`. Seven of twelve tested kinds still produce images, so selected-source metadata remains required. Host/public loaded/api, retry/cache, queue and pending preview remain; adopt upstream source-aware errors and owning-environment metrics. Forty-one Windows offline/main/popout/persistence assertions pass; no Obsidian 1.15 engine or additional retirement. See the [PR #475 review](pr-475-merge-review.md).
+
 **PR #472:** Preserve host loading in the existing fork helper and adapt it to
 upstream's retry/status API; failed API loads release the cache, and activation
 failure yields to the plugin prompt. Clipboard host loading stays inside
@@ -336,6 +344,8 @@ scene-file loader. See the [review](pr-472-merge-review.md).
 
 <a id="obs-033"></a>
 ## OBS-033 — Fork regression tests and fixture adaptations
+
+**PR #475 (2026-10-27):** Add a frozen-image skeleton regression and `tests/obsidianPele.test.tsx`, mounting a real App through public API/context rather than legacy window.h. Host label metrics/rawText/alignment and the transient arrow-refresh option are checked. Seventy-three focused tests and the CPU canvas test pass; full suite remains red. Exact-parent transform snapshots reproduce the eight mismatches; no generated snapshots are accepted. See the [PR #475 review](pr-475-merge-review.md).
 
 **PR #469 (2026-10-20):** Restore upstream hook declarations/initialization/mount in isTestEnv only, enabling the incoming ownership tests while retaining production/dev isolation. The final focused set passes 88 tests. The full older UI harness still fails; representative failures reproduce on the parent with the same test-only hook restoration. No broad suite pass is claimed. [Merge review](pr-469-merge-review.md).
 
@@ -372,6 +382,8 @@ The added WeakMap enumeration loop is inert (OBS-019). The private `ElementStore
 
 <a id="obs-037"></a>
 ## OBS-037 — Anchored images and embed-aware resizing
+
+**PR #475 (2026-10-27):** The auto-merge only forwards host metrics into bound-element updates; anchored size/embed-scale guards remain unchanged. The new binding implementation is upstream-owned. Windows image/export main/popout checks pass; signed/multi-resize and physical mobile remain separate gates. See the [PR #475 review](pr-475-merge-review.md).
 
 **Retain persisted geometry semantics.** [resizeElements.ts](../../packages/element/src/resizeElements.ts) prevents ordinary single-element resizing of `customData.isAnchored` images and preserves anchored dimensions during multi-element transforms, while positions can still change. For iframe/embeddable elements, Shift/aspect-ratio resizing adjusts content magnification through the saved scale tuple instead of treating it like a flipped bitmap. The helper exported for `App.updateContainerSize` preserves upstream dimension calculations around these exceptions.
 

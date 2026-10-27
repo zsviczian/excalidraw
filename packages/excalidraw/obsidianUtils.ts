@@ -394,7 +394,8 @@ export const refreshAllArrows = (scene: Scene, store: Store) => {
         : elementsMap.get(el.endBinding.elementId)
       : null;
 
-    LinearElementEditor.movePoints(el, scene, pointUpdates, {
+    // zsviczian -- #475 moves this transient option out of persisted element updates.
+    LinearElementEditor.movePoints(el, scene, pointUpdates, undefined, {
       moveMidPointsWithElement:
         !!startBindingElement &&
         startBindingElement?.id === endBindingElement?.id,

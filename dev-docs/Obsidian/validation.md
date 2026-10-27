@@ -1,5 +1,11 @@
 # Validation record and upstream-merge playbook
 
+## PR #475 Mermaid 3/Pele - 2026-10-27
+
+The [PR #475 review](pr-475-merge-review.md) records all 72 incoming paths, three conflicts, readonly-image and transient arrow-option adaptations, the paired Extras/plugin handoff, and explicit baseline failures. Obsidian artifacts/declarations, plugin production/development/library and Extras production/API builds complete. Seventy-three focused fork tests, the CPU canvas test, nineteen plugin tests, four Extras tests and both declaration-contract modes pass. Full fork typecheck retains three baseline errors; required test:update has 81 passing/80 failing suites and three errors. Generated snapshots are restored.
+
+Windows Obsidian 1.14.5 `excalidraw-test` passes guarded core authoring/history/wheel/link/image/export checks, an extended main/popout image matrix and forty-one offline Mermaid assertions using real Extras 3.0.0. JavaScript-error and fixture-cleanup gates pass. Main.js is 5,012,218 bytes. Missing TestAssets prevents the separate SVG corpus scenario; macOS/Linux, physical mobile, cold app restart/restored popouts and the complex historical diagram corpus remain manual gates. No release/publish or absolute zero-regression claim.
+
 This document distinguishes **performed checks** from **required future gates**. It records the initial documentation/checker audit and the subsequent local CLI smoke; it is not a component release sign-off. Gate IDs below are referenced throughout the [catalog](customizations.md) and [retirement backlog](decustomization.md).
 
 ## W layout follow-up (#12264, 2026-10-12)

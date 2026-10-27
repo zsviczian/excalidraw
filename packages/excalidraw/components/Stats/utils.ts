@@ -27,7 +27,7 @@ import type {
   NonDeletedExcalidrawElement,
 } from "@excalidraw/element/types";
 
-import type { Scene } from "@excalidraw/element";
+import type { RenderEnvironment, Scene } from "@excalidraw/element";
 
 import type { AppState } from "../../types";
 
@@ -120,6 +120,8 @@ export const moveElement = (
   appState: AppState,
   originalElementsMap: ElementsMap,
   shouldInformMutation = true,
+  /** measures the labels of the bound arrows the move moves */
+  renderEnvironment?: RenderEnvironment,
 ) => {
   if (
     isBindingElement(originalElement) &&
@@ -168,7 +170,7 @@ export const moveElement = (
     },
     { informMutation: shouldInformMutation, isDragging: false },
   );
-  updateBindings(latestElement, scene, appState);
+  updateBindings(latestElement, scene, appState, { renderEnvironment });
 
   const boundTextElement = getBoundTextElement(
     originalElement,
@@ -228,6 +230,7 @@ export const moveElement = (
       );
       updateBindings(latestChildElement, scene, appState, {
         simultaneouslyUpdated: getNonDeletedElements(originalChildren),
+        renderEnvironment,
       });
     });
   }

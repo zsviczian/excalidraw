@@ -248,7 +248,9 @@ export class AppWrap {
           ({ id }) => !arrows.some((arrow) => arrow.id === id),
         ),
       });
-      updateBoundElements(text, scene);
+      updateBoundElements(text, scene, {
+        renderEnvironment: this.app.renderEnvironment,
+      });
 
       texts.push(text);
     }
@@ -380,8 +382,10 @@ export class AppWrap {
         boundElements: null,
         ...(isArrowContainer ? { angle: 0 as Radians } : null),
       });
-      redrawTextBoundingBox(text, container, scene);
-      updateBoundElements(container, scene);
+      redrawTextBoundingBox(text, container, scene, this.app.renderEnvironment);
+      updateBoundElements(container, scene, {
+        renderEnvironment: this.app.renderEnvironment,
+      });
       // the text may have changed layers since
       nextElements = pushContainerBelowText(nextElements, container, text);
 

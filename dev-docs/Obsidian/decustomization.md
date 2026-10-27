@@ -114,6 +114,8 @@ Prefer explicit host capabilities for the exceptional URL paths instead of widen
 <a id="d13"></a>
 ## D13 — Consolidate Mermaid loading and isolate generic preview fixes
 
+**PR #475 checkpoint (2026-10-27):** Pele still emits image skeletons for seven tested diagram kinds. Keep image-source attachment/selected-source editing, copying readonly skeletons. Existing public loaders and queued/latest preview semantics still have active consumers; no additional upstream-equivalent retirement is established. Exact Extras component 3.0.0 plus installed/local declaration checks and forty-one native offline/main/popout assertions pass. Platform/broad-suite limits remain in the [PR #475 review](pr-475-merge-review.md).
+
 **PR #472 checkpoint (2026-10-21):** Upstream generated-text validation now
 accepts the dialog API; the redundant direct host lookup is retired with the
 same host-provided converter. Stable public loaded/api helpers and queued

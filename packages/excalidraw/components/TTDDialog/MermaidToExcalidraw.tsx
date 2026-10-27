@@ -125,6 +125,7 @@ const MermaidToExcalidraw = ({
           setError,
           mermaidDefinition: deferredText,
           theme,
+          renderEnvironment: app.renderEnvironment,
         });
 
         if (!result.success) {
@@ -142,7 +143,7 @@ const MermaidToExcalidraw = ({
       doRender();
       debouncedSaveMermaidDefinition(deferredText);
     }
-  }, [deferredText, mermaidToExcalidrawLib, isActive, theme]);
+  }, [deferredText, mermaidToExcalidrawLib, isActive, theme, app]);
 
   useEffect(() => {
     const flush = () => debouncedSaveMermaidDefinition.flush();

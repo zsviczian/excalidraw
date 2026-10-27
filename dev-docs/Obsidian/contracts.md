@@ -48,6 +48,8 @@ Canonical definition: [commonObsidianHost.ts](../../packages/common/src/commonOb
 
 ### Excalidraw host, protocol 2
 
+**PR #475:** Converter 3/Pele is provided lazily by Extras Mermaid component `3.0.0`, with an exact plugin gateway check. No Obsidian 1.15 engine is used. The host/public service remains `{loaded, api}`; readonly converter skeletons require immutable image-source attachment, not a protocol bump. Both installed and generated-local declaration checks pass. Saved `customData.mermaidText` remains editable in main/popout. See the [PR #475 review](pr-475-merge-review.md).
+
 Canonical definition: [obsidianExcalidrawHost.ts](../../packages/excalidraw/obsidianExcalidrawHost.ts). Consumer adapter: `P: src/core/managers/obsidianExcalidrawHostAdapter.ts`.
 
 | Capabilities | Meaning |

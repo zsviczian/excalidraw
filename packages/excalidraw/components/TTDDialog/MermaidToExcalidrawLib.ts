@@ -116,12 +116,12 @@ export const mermaidToExcalidraw = async (
 
       return {
         elements: convertToExcalidrawElements(
-          elements.map((el) => {
-            if (el.type === "image") {
-              el.customData = { mermaidText: mermaidDefinition };
-            }
-            return el;
-          }),
+          // zsviczian -- #475: copy readonly converter skeletons, retaining image source.
+          elements.map((el) =>
+            el.type === "image"
+              ? { ...el, customData: { mermaidText: mermaidDefinition } }
+              : el,
+          ),
           {
             regenerateIds: true,
           },
