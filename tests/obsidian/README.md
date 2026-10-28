@@ -58,6 +58,14 @@ pin update remain maintainer-coordinated work.
 
 ## Historical upstream diagnostic review
 
+The follow-up for plugin #3022 adds immutable pairwise saved-image variants in
+`fixtures/image-variants.json` and `unit/imageVariants.test.ts`. These guard shared
+file identity, distinct dimensions/crops, zero opacity, locked state, frames,
+links and unknown host metadata through JSON restore. They establish saved-data
+behavior; the plugin's repository-local native vault establishes actual decoded
+raster/SVG/PDF rendering and source-edit/missing-file recovery. No upstream-owned
+test or runtime file changes are needed for this extension.
+
 `yarn test:obsidian:compatibility` is an optional investigation, not a required
 PR gate. Its separate configuration retains the old helper adapters solely to
 inspect historical failures. The independent regression configuration does not

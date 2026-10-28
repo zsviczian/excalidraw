@@ -361,6 +361,15 @@ scene-file loader. See the [review](pr-472-merge-review.md).
 <a id="obs-033"></a>
 ## OBS-033 — Fork regression tests and fixture adaptations
 
+**PR #477 / plugin #3022 follow-up (2026-10-28):** The independent suite adds
+nine immutable pairwise saved-image cases. Shared file identity, distinct crop
+and display geometry, zero opacity, locked state, frame/group membership, links
+and unknown host data must survive JSON restore without mutating the input.
+These tests live entirely under `tests/obsidian/` and add no upstream-owned
+runtime or test delta. Actual decoded raster/SVG/PDF output, source edits and
+missing-file recovery belong to the plugin's repository-local native matrix;
+their implementation is not a claim that native verification has passed.
+
 **PR #475 (2026-10-27):** Add a frozen-image skeleton regression and `tests/obsidianPele.test.tsx`, mounting a real App through public API/context rather than legacy window.h. Host label metrics/rawText/alignment and the transient arrow-refresh option are checked. Seventy-three focused tests and the CPU canvas test pass; full suite remains red. Exact-parent transform snapshots reproduce the eight mismatches; no generated snapshots are accepted. See the [PR #475 review](pr-475-merge-review.md).
 
 **PR #469 (2026-10-20):** Restore upstream hook declarations/initialization/mount in isTestEnv only, enabling the incoming ownership tests while retaining production/dev isolation. The final focused set passes 88 tests. The full older UI harness still fails; representative failures reproduce on the parent with the same test-only hook restoration. No broad suite pass is claimed. [Merge review](pr-469-merge-review.md).

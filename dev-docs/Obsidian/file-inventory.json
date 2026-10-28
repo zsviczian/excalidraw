@@ -92,8 +92,8 @@
   },
   "comparison": {
     "fork": {
-      "files": 1346,
-      "sha256": "66a410d3d737790c523a6ba79fb417f1dcfe0aa73273149d86e9d0356f87df70"
+      "files": 1348,
+      "sha256": "87eb2d2808567988ab65e25f6eea8d342ab223b2bbc9f0a91f4d0b000235a96c"
     },
     "upstream": {
       "files": 1327,
@@ -3200,7 +3200,7 @@
     {
       "path": "tests/obsidian/README.md",
       "status": "fork-only",
-      "fork_sha256": "88ffe151154bb0d7a3c0a36239a64b7be5123eab75b85a8afee99f80ec3c52d7",
+      "fork_sha256": "5fc59af916b29e7966309dab6c0ea79782d92245468412de45430c275d15f80c",
       "upstream_sha256": null,
       "ids": [
         "OBS-001",
@@ -3285,6 +3285,17 @@
       ],
       "kind": "test-tooling",
       "note": "PR #477 / plugin #3022: independent fixture-backed regression for host text/links/bindings and fork-modified input/tool/library contracts. No upstream test helper transforms."
+    },
+    {
+      "path": "tests/obsidian/fixtures/image-variants.json",
+      "status": "fork-only",
+      "fork_sha256": "ec3ae2699058630e80d53d8de7eb1e67c6c13d7a6d29b3a0ca6a7f3489ed535e",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022 follow-up: immutable pairwise host image metadata/shared-source crop and dimension evidence; source restore only, decoded rendering belongs to native coordinator."
     },
     {
       "path": "tests/obsidian/packageConsumer.mjs",
@@ -3401,6 +3412,17 @@
       ],
       "kind": "regression-test",
       "note": "PR #477: actual common-module breakpoints, desktop exclusion, tablet and live phone preferences; complements real native geometry/touch evidence."
+    },
+    {
+      "path": "tests/obsidian/unit/imageVariants.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "f7f8be1c972b1483258f17a64b485905c39c929f240b6bb5ea48ed0cff9b23e8",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022 follow-up: immutable pairwise host image metadata/shared-source crop and dimension evidence; source restore only, decoded rendering belongs to native coordinator."
     },
     {
       "path": "tests/obsidian/unit/testIdentities.test.ts",
