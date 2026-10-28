@@ -4,6 +4,8 @@ on:
 
 jobs:
   coverage:
+    # zsviczian #477: historical web-app expectations do not define the fork regression baseline.
+    if: github.repository == 'excalidraw/excalidraw'
     runs-on: ubuntu-latest
     permissions:
       contents: read

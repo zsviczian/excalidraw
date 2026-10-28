@@ -6,10 +6,12 @@ Every path differing between the reviewed snapshots is listed, including unmarke
 
 See [scope and provenance](README.md), [behavior catalog](customizations.md), and [retirement backlog](decustomization.md). Hashes and full-tree fingerprints are in the JSON ledger. Counts exclude this directory.
 
-## Modified in both snapshots (162)
+## Modified in both snapshots (164)
 
 | Path | Inventory IDs | Classification / observed difference |
 | --- | --- | --- |
+| [`.github/workflows/test-coverage-pr.yml`](../../.github/workflows/test-coverage-pr.yml) | [OBS-033](customizations.md#obs-033) | **test-tooling** — zsviczian #477 / plugin #3022: restrict preserved upstream web-app CI to upstream; fork PRs use the independent Obsidian regression workflow and opt-in diagnostic. |
+| [`.github/workflows/test.yml`](../../.github/workflows/test.yml) | [OBS-033](customizations.md#obs-033) | **test-tooling** — zsviczian #477 / plugin #3022: restrict preserved upstream web-app CI to upstream; fork PRs use the independent Obsidian regression workflow and opt-in diagnostic. |
 | [`.gitignore`](../../.gitignore) | [OBS-034](customizations.md#obs-034), [OBS-033](customizations.md#obs-033) | **housekeeping** — Ignore locally generated repository.zip. PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. |
 | [`AGENTS.md`](../../AGENTS.md) | [OBS-001](customizations.md#obs-001), [OBS-033](customizations.md#obs-033), [OBS-034](customizations.md#obs-034) | **governance** — Fork execution, merge, host, artifact, and handoff policies; now requires the persisted inventory. 2026-10-12: requested reminder to use isFullPanelMode for full/tray and explicitly include compact/tablet where supported. PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. |
 | [`CONTRIBUTING.md`](../../CONTRIBUTING.md) | [OBS-001](customizations.md#obs-001), [OBS-033](customizations.md#obs-033), [OBS-034](customizations.md#obs-034) | **governance** — Conservative fork contribution policy and integration gates; now requires inventory maintenance and retirement evidence. PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. |

@@ -55,7 +55,8 @@
         "tests/obsidian/unit/inheritedBootstrap.test.tsx"
       ],
       "correction": "Maintainer rejected failed build/acceptance as a completed handoff. Normal plugin production/library builds and matching type selection repaired; companion independent fixtures and actual browser input protect fork contracts and affected upstream behavior. No fork runtime or version change.",
-      "current_regression": "115 independent source cases and coverage floors pass (44.32% lines, 62.39% branches, 40.78% functions); 18 actual production/development browser cases and both clean packed consumers pass. Plugin complete regression: 685 canonical cases plus source/package gates, including 44 native and 40 device cases, all pass. Browser modifier selection is platform-aware; actual macOS/mobile remain separate environments."
+      "current_regression": "115 independent source cases and coverage floors pass (44.32% lines, 62.39% branches, 40.78% functions); 18 actual production/development browser cases and both clean packed consumers pass. Plugin complete regression: 685 canonical cases plus source/package gates, including 44 native and 40 device cases, all pass. Browser modifier selection is platform-aware; actual macOS/mobile remain separate environments.",
+      "legacy_ci_scope": "Preserved test.yml and test-coverage-pr.yml web-app jobs are restricted to excalidraw/excalidraw. Fork changes use obsidian-tests.yml, without running obsolete upstream expectations as default gates. Upstream Vitest configuration unchanged."
     }
   },
   "sources": {
@@ -92,7 +93,7 @@
   "comparison": {
     "fork": {
       "files": 1346,
-      "sha256": "8d60ded00f00fdf4ff97763923417cf13a1ebc00862db3ac97a70e55f908b5eb"
+      "sha256": "66a410d3d737790c523a6ba79fb417f1dcfe0aa73273149d86e9d0356f87df70"
     },
     "upstream": {
       "files": 1327,
@@ -342,6 +343,28 @@
       ],
       "kind": "ci",
       "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only."
+    },
+    {
+      "path": ".github/workflows/test-coverage-pr.yml",
+      "status": "modified",
+      "fork_sha256": "a63f6b3d9c14bef7a91ef9427c87bd88b876d89fe85ffd468d91f570f5cd9328",
+      "upstream_sha256": "b2fa2206f1cb62eea92125f520344989acac8406f617281327b1a28a08a700bd",
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "zsviczian #477 / plugin #3022: restrict preserved upstream web-app CI to upstream; fork PRs use the independent Obsidian regression workflow and opt-in diagnostic."
+    },
+    {
+      "path": ".github/workflows/test.yml",
+      "status": "modified",
+      "fork_sha256": "ad01f8b0fa020a08f92d9ad6b1560e41327c36d0507da030a4295f14d6311cc5",
+      "upstream_sha256": "aaabcbd0d4376d5ba9d894a4dae8be45e73dfc3d48c3845ec3a81d73bc0aded8",
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "zsviczian #477 / plugin #3022: restrict preserved upstream web-app CI to upstream; fork PRs use the independent Obsidian regression workflow and opt-in diagnostic."
     },
     {
       "path": ".gitignore",
@@ -3177,7 +3200,7 @@
     {
       "path": "tests/obsidian/README.md",
       "status": "fork-only",
-      "fork_sha256": "6b17288736c1ef1afc08c6cba33a44e237e697ac27cbc723443800ee819248af",
+      "fork_sha256": "88ffe151154bb0d7a3c0a36239a64b7be5123eab75b85a8afee99f80ec3c52d7",
       "upstream_sha256": null,
       "ids": [
         "OBS-001",

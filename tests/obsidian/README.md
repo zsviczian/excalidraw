@@ -61,7 +61,9 @@ pin update remain maintainer-coordinated work.
 `yarn test:obsidian:compatibility` is an optional investigation, not a required
 PR gate. Its separate configuration retains the old helper adapters solely to
 inspect historical failures. The independent regression configuration does not
-load them. The original upstream configuration remains unchanged.
+load them. The upstream Vitest configuration remains unchanged. Legacy web-app
+test/coverage CI jobs run only in the upstream repository; fork PRs use the
+independent Obsidian gate and its optional manual compatibility audit.
 
 [Individual assessment of all 380 failed assertions](../../dev-docs/Obsidian/test-deviations-3022.json)
 records the old failure, exact source assertion and disposition. It is not an
