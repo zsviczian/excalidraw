@@ -16,8 +16,8 @@ import { Excalidraw, convertToExcalidrawElements } from "../index";
 import { useApp } from "../components/App";
 import { actionAlignTop } from "../actions/actionAlign";
 
+import type { AppClassProperties, ExcalidrawImperativeAPI } from "../types";
 import type App from "../components/App";
-import type { ExcalidrawImperativeAPI } from "../types";
 
 afterEach(cleanup);
 
@@ -29,7 +29,7 @@ const environment: RenderEnvironment = {
 };
 
 it("retains host label metrics and raw text when aligning bound shapes", async () => {
-  let app!: App;
+  let app!: AppClassProperties;
   let api!: ExcalidrawImperativeAPI;
   const Probe = () => {
     app = useApp();
@@ -70,7 +70,9 @@ it("retains host label metrics and raw text when aligning bound shapes", async (
     api.selectElements(
       api.getSceneElements().filter((e) => e.id === "A" || e.id === "B"),
     );
-    app.actionManager.executeAction(actionAlignTop, "keyboard");
+    // zsviczian -- #477 AppContext supplies the real App; only this internal
+    // action-manager assertion crosses the public hook's narrower type.
+    (app as App).actionManager.executeAction(actionAlignTop, "keyboard");
   });
   await waitFor(() =>
     expect(api.getSceneElements().find((e) => e.id === "B")?.y).toBe(0),

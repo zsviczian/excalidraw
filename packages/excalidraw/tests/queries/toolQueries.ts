@@ -1,11 +1,9 @@
 import { queries, buildQueries } from "@testing-library/react";
 
-import { TOOL_TYPE } from "@excalidraw/common";
-
 import type { ToolType } from "@excalidraw/excalidraw/types";
 
 const _getAllByToolName = (container: HTMLElement, tool: ToolType | "lock") => {
-  const toolTitle = tool === "lock" ? "lock" : TOOL_TYPE[tool];
+  const toolTitle = tool; // zsviczian -- #477 test IDs use semantic tool names, including Mermaid
   return (
     queries
       .getAllByTestId(container, `toolbar-${toolTitle}`)

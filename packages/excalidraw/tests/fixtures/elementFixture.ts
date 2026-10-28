@@ -64,6 +64,7 @@ export const textFixture: ExcalidrawElement = {
   fontFamily: DEFAULT_FONT_FAMILY,
   strokeColor: "#1e1e1e",
   text: "original text",
+  rawText: "original text", // zsviczian -- #477 keeps the fork's source-text fixture contract explicit
   originalText: "original text",
   textAlign: "left",
   verticalAlign: "top",

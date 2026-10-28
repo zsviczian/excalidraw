@@ -1,0 +1,5 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["../../packages", "../../excalidraw-app", "./**/*.ts", "./**/*.tsx"],
+  "exclude": ["../../examples", "../../dist", "../../types", "../../node_modules", "../../.test-work"]
+}

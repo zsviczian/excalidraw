@@ -252,3 +252,8 @@ When uncertain, choose the solution that:
 5. can be built and tested as one small checkpoint; and
 6. will create the least friction during the next upstream merge.
 - When overriding properties of an existing type, prefer `Merge<Base, Overrides>` from `@excalidraw/common/utility-types` over `Omit<Base, keyof Overrides> & Overrides`.
+
+
+## Automated Obsidian fork suite (PR #477)
+
+Use [tests/obsidian/README.md](tests/obsidian/README.md) for independent owned, inherited, coverage, actual-browser and packed-consumer commands. The upstream configuration remains intact. Preserve fingerprint guards, failed inherited diagnostics, exact artifact/source identities and type-only exclusions; no model/AST discovery counts as rendered behavior. Update the OBS ledger and appropriate source/browser/native cases for every boundary change. Native hosts remain owned by the plugin coordinator under its session lock.

@@ -129,7 +129,7 @@ describe("Obsidian Excalidraw host registry", () => {
     expect(await fetchFontFromVault("vault/My%20Font.woff2")).toBe(fontData);
     expect(loadFontFromFile).toHaveBeenCalledWith("My Font.woff2");
     expect(await getSharedMermaidInstance()).toBe(mermaid);
-    expect(getMermaid).toHaveBeenCalledOnce();
+    expect(getMermaid).toHaveBeenCalledTimes(1);
 
     runAction("card");
     expect(hostRunAction).toHaveBeenCalledWith("card");
