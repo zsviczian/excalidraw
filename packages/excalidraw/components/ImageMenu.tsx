@@ -5,12 +5,7 @@ import type { AppClassProperties } from "../types";
 import { runAction, t2 } from "../obsidianUtils";
 
 import DropdownMenu from "./dropdownMenu/DropdownMenu";
-import {
-  Card,
-  ImageIcon,
-  InsertAnyFileIcon,
-  LaTeXIcon,
-} from "./icons";
+import { Card, ImageIcon, InsertAnyFileIcon, LaTeXIcon } from "./icons";
 import { isToolButtonDisabled } from "./Tools";
 
 type ImageMenuItemsProps = {
@@ -42,6 +37,14 @@ export const ImageMenuItems = ({ app }: ImageMenuItemsProps) => {
         data-testid="toolbar-card"
       >
         {t2("INSERT_CARD")}
+      </DropdownMenu.Item>
+      {/* zsviczian -- plugin #3019: one shared entry for every image-menu consumer. */}
+      <DropdownMenu.Item
+        onSelect={() => runAction("lucide", app.id)}
+        icon={ImageIcon}
+        data-testid="toolbar-lucide"
+      >
+        {t2("INSERT_LUCIDE_ICON")}
       </DropdownMenu.Item>
       <DropdownMenu.Item
         onSelect={() => runAction("LaTeX")}
