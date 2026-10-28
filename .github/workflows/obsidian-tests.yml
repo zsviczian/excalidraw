@@ -1,10 +1,15 @@
-# zsviczian -- owned gates and explicitly failed inherited diagnostics.
+# zsviczian -- independent fork regression gates; upstream audit is opt-in.
 name: Obsidian fork tests
 on:
   pull_request:
   push:
     branches: [master]
   workflow_dispatch:
+    inputs:
+      upstream_audit:
+        description: Run the historical upstream compatibility diagnostic
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -39,6 +44,7 @@ jobs:
           path: .test-work/reports
           if-no-files-found: error
   inherited-diagnostic:
+    if: github.event_name == 'workflow_dispatch' && inputs.upstream_audit
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

@@ -1,23 +1,85 @@
-# Obsidian fork validation
+# Independent Obsidian fork regression
 
-This additive suite complements the preserved upstream Vitest configuration. Use Yarn and Node 22.22.3. Run `yarn test:obsidian`, `yarn test:obsidian:coverage`, `yarn test:obsidian:compatibility`, `yarn test:typecheck`, `yarn --cwd packages/excalidraw build:esm`, `yarn --cwd packages/excalidraw build:obsidian`, `yarn test:obsidian:package` and `yarn test:obsidian:browser`. Install the pinned Playwright Chromium once with `yarn playwright install chromium` (Linux CI also needs `--with-deps`). Generated outputs and reports stay in ignored `.test-work`; `EXCALIDRAW_TEST_REPORT_DIR` overrides report output.
+Current fork behavior is the accepted baseline. Protect the intended Obsidian
+contracts and the upstream editing workflows affected by fork changes. Upstream
+merges have their own upstream testing; this suite does not duplicate the full
+web-app suite or adapt its helpers to define fork correctness.
 
-Owned discovery uses the maintained fork-only test ledger plus `tests/obsidian`. The inherited lane discovers current package/app sources separately and excludes owned ledger entries, historical `tmp` checkouts and generated outputs. It remains a failed diagnostic where inherited expectations differ; a passing owned lane never changes that status. Missing reports, zero tests, duplicate case IDs, changed source during a run, unexpected skips and failed coverage gates fail the standard runner. JSON, JUnit and text summarize the same evidence. Coverage classifies erased type-only sources separately, records unexecuted modules and lists executable source files by stable OBS group; this mapping is not execution credit for an entire customization.
+Use Yarn and Node 22.22.3:
 
-Two fingerprint-checked, test-only transforms repair current inherited harness assumptions. Explicit Testing Library runtime exports preserve the actual asynchronous `renderApp` override instead of Vitest's shadowing star export. The real synchronous tool-click helper advances the fork's zero-delay selection task inside React act with a narrowly owned temporary clock. A changed helper fingerprint must stop the suite for review. These adapters do not replace App, state or test hooks, and production scheduling remains unchanged. Browser/native trusted input independently checks actual event ordering. Review remaining inherited timing, snapshot, duplicate tooltip, portal, host Mermaid and changed-feature expectations rather than blindly accepting snapshots or broadening fake clocks.
+```sh
+yarn test:obsidian:coverage
+yarn test:obsidian:types
+yarn --cwd packages/excalidraw build:esm
+yarn --cwd packages/excalidraw build:obsidian
+yarn test:obsidian:package
+yarn playwright install chromium
+yarn test:obsidian:browser
+```
 
-The built-browser lane evaluates all four actual Obsidian JS/CSS outputs with the official private React runtime supplied by the consumer. It checks actual editor mount, trusted pointer drawing and keyboard undo, scene metadata, decoded red PNG/SVG pixels, offline Excalifont/Unicode export, independent iframe document/font ownership, surviving editor and cleanup. All remote requests and browser errors fail. Reports capture exact artifact hashes and Chromium version. JSDOM canvas mocks provide model coverage only.
+Linux CI needs `yarn playwright install --with-deps chromium`. Reports, coverage,
+logs and captured images stay in ignored `.test-work`; set
+`EXCALIDRAW_TEST_REPORT_DIR` for a fresh run. The plugin coordinator's
+`npm run test:regression` runs these independent checks, Extras, plugin
+fixture/source tests and native CLI/EA authoring. Use its portable variant
+without a native session. Native transport and application ownership remain the
+plugin coordinator's responsibility.
 
-The package lane packs a freshly built package with lifecycle scripts disabled, verifies all four Obsidian files and generated declarations, installs the tarball in a clean consumer and checks root/common host contracts plus protocol mismatch rejection. It uses bundler resolution for this browser package and skipLibCheck for transitive library declarations; it does not claim NodeNext support or execute the ordinary split ESM graph under Node. First dependency setup may use npm's registry inside the isolated consumer; the monorepo remains Yarn-managed. Packing never publishes. The consumer exposed and protects a real export-map correction from nonexistent `dist/types` to emitted `types` paths. No source/runtime protocol or package version changes.
+Owned discovery uses fork-only ledger entries and `tests/obsidian`. Source tests
+mount actual components or import whole production modules. They use controlled
+fixtures and boundary fakes; JSDOM canvas mocks do not prove rendered pixels.
+Tool activation waits for its real owning-window task, without forcing the API
+synchronous or transforming upstream test helpers. Missing/zero cases, duplicate
+IDs, unexpected skips, changed source, failed cleanup and coverage ratchets fail.
 
-## Checkpoint, 2026-10-28
+The fixture-backed core cases protect raw/display text, explicit links, arrow
+bindings and extensible metadata across restoration. They also check scheduled
+activation of current tools, toolbar targeting, host-forced tools, library
+updates, UI-disabled pointer input and host pointer-down hooks before panning.
+Existing independent cases cover both host registries, frame-role actions,
+locked overlap selection/cycling, wrap/history/link ownership, host text metrics,
+Mermaid/Pele, fonts, custom export adapters, device preferences and owner-document
+portals. Coverage reports list unexecuted runtime modules and type-only files;
+loading a module does not establish behavioral coverage of its entire OBS group.
 
-93 owned tests pass, including live device preference/breakpoint source cases. Coverage after generated/vendor/type-only exclusions: 43.2% lines, 61.08% branches, 40.52% functions. These are diagnostics over the selected production graph, not comprehensive feature coverage. The common/component host registries and owner-document Radix portal have 100% line/branch/function ratchets; app event bus has its own measured floor. Full typecheck passes after four narrow test-only repairs. Twelve production/development Chromium cases and the clean packed consumer pass.
+The actual production/development browser artifacts must mount, draw all six
+basic tools with trusted input, preserve selection/group/delete/undo/redo,
+operate library search and portal menus, decode expected PNG/SVG pixels, load
+Unicode fonts offline, and keep a second document/editor independent. Every
+browser error or external request fails. Private React is supplied exactly as by
+the plugin consumer; production test hooks/globals must be absent.
 
-The bounded inherited baseline previously had 2,692 cases: 2,264 pass, 380 fail, 47 pending and one todo. Keep the current raw report authoritative and preserve failures. The required unadapted `yarn test:update` diagnostic, excluding ignored historical tmp, has 2,781 cases: 1,255 pass, 1,478 fail, 47 skipped and one todo, plus three errors. All 16 generated snapshot/inline-golden changes were restored. The first restoration stopped on a deleted snapshot and was recovered explicitly; no golden changes were accepted. Failed Windows HTML coverage output for a generated esbuild source name was corrected by bounding coverage to production source and excluding build output. Vitest and its development-only v8 provider now both use 3.0.6.
+The package lane packs generated artifacts and declarations, installs the actual
+tarball in an isolated consumer, accepts supported calls and rejects invalid
+ones. It never publishes. The corrected export map points at generated
+`types`, rather than nonexistent `dist/types`. Package versions and runtime
+protocols are unchanged by this testing PR. Publication and the exact plugin
+pin update remain maintainer-coordinated work.
 
-Native acceptance is coordinated by plugin PR #3022 with immutable producer manifests and a single host lock. Current Windows evidence includes 40 desktop/mobile-emulation cases and genuine gateway/PDF output; those are separate reports owned by that repository. Physical Android/iOS, legacy Obsidian, other desktop OSes and a genuine isolated cold restart remain separate evidence. Keep this companion draft until the coordinator completes feature acceptance.
+## Historical upstream diagnostic review
 
-Every changed fork boundary needs an actual-module regression, applicable built/native oracle, reviewed coverage floor and updated stable OBS ledger/catalog. Do not ship test instrumentation. Run the required root snapshot-update diagnostic before committing; retain and review failures, restore unapproved golden changes and report any cleanup problem. Never auto-accept snapshots as an attempt to make inherited expectations green.
+`yarn test:obsidian:compatibility` is an optional investigation, not a required
+PR gate. Its separate configuration retains the old helper adapters solely to
+inspect historical failures. The independent regression configuration does not
+load them. The original upstream configuration remains unchanged.
 
-The inherited suite has 13 repeated parameterized titles creating 22 extra occurrences. A reviewed exact title/count catalogue supplies occurrence IDs, preserving each assertion and failure. New, changed or obsolete collisions fail discovery; owned titles remain unique. This is an explicit identity adapter, not a skip or passing expectation.
+[Individual assessment of all 380 failed assertions](../../dev-docs/Obsidian/test-deviations-3022.json)
+records the old failure, exact source assertion and disposition. It is not an
+expected-failure list and is not consumed by the passing suite. The review
+separates incidental render counts/snapshots, old timing/selectors, deliberate
+selection/pointer/link contracts and diagnostic-host service mismatches. A
+failure before an operation does not prove that operation is broken. Do not
+update snapshots automatically or silently change product behavior to match an
+old driver. Report an independently reproduced suspected error to the maintainer
+for a bug-versus-intended-behavior decision.
+
+The manual workflow can opt into that diagnostic. The plugin's private-React
+scheduler correction passes all 44 production native cases plus 40 device/layout
+cases without unexpected errors. The development-mode dirty-migration residual
+and unavailable isolated restart are tracked in its `docs/TESTING_FINDINGS_3022.md`.
+Physical Android/iOS, other desktop hosts and real restart remain separate
+environments. Browser shortcuts select Meta on macOS and Control elsewhere;
+native macOS validation is still separate evidence.
+
+Update the OBS ledger/catalog after each changed fork boundary. Preserve exact
+source/artifact identities, covered semantic contracts and coverage floors.

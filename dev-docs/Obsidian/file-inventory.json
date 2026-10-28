@@ -40,7 +40,7 @@
       "precommit": "Required test:update run excluding ignored historical tmp checkout: 81 suites pass/81 fail, 1242 tests pass/1477 fail, 47 skipped/one todo, three errors. Includes one export import timeout under parallel load, checked separately. Changed host suite passes all seven tests. Restored 16 generated snapshot/inline-test files to their pre-run bytes; no generated snapshot edits retained. Full-suite failure is not represented as a pass. Export file: default timeout reproduced in isolation, all ten tests pass with a 30-second timeout (public-root import 5.64 seconds). Full typecheck retains the same four baseline diagnostics; generated paired-fork plugin contract passes."
     },
     "automated_testing_3022": {
-      "scope": "Additive owned/inherited/source/browser/package lanes; see tests/obsidian/README.md. Keep companion draft.",
+      "scope": "Independent current-product source/coverage, built-browser and packed-consumer regression. Historical upstream audit is opt-in; all 380 old failed assertions individually assessed in test-deviations-3022.json. No upstream helper transforms in the regression configuration.",
       "upstream": "14bb42edee3d6fee6be264e3ee78670b3b9cee79",
       "owned": "93 owned tests pass, zero skips; source ratchets pass. 18 erased type-only modules excluded, 18 runtime modules unexecuted. Actual built-browser and packed bundler consumer checks pass.",
       "inherited": "Standard failed lane: 2692 assertions, 2264 pass/380 fail/47 pending/one todo. Reviewed title/count adapter retains all cases with stable occurrence IDs; no skip or failure suppression.",
@@ -48,7 +48,14 @@
       "typecheck": "Full original typecheck and dedicated owned suite typecheck pass. Four preexisting test-only errors and two structurally incorrect host-stub return shapes repaired.",
       "packaging": "Clean consumer exposed nonexistent dist/types export-map paths; existing entries now use emitted types/. Bundler resolution checked; no NodeNext/ordinary ESM runtime claim.",
       "release": "No version/protocol change, publication or plugin dependency update; native integration belongs to plugin #3022.",
-      "focused_lint": "Zero errors and warnings in owned testing tooling/configurations and changed export test after mechanical fixes. Existing default stylish formatter throws an ESM-loading error; explicit JSON formatter succeeds. Original and owned typechecks pass; 93 owned tests/source ratchets and 12 actual-browser cases repeat successfully."
+      "focused_lint": "Zero errors and warnings in owned testing tooling/configurations and changed export test after mechanical fixes. Existing default stylish formatter throws an ESM-loading error; explicit JSON formatter succeeds. Original and owned typechecks pass; 93 owned tests/source ratchets and 12 actual-browser cases repeat successfully.",
+      "retired_test_coupling": [
+        "tests/obsidian/unit/authoring.test.tsx",
+        "tests/obsidian/unit/compatibilityGuards.test.ts",
+        "tests/obsidian/unit/inheritedBootstrap.test.tsx"
+      ],
+      "correction": "Maintainer rejected failed build/acceptance as a completed handoff. Normal plugin production/library builds and matching type selection repaired; companion independent fixtures and actual browser input protect fork contracts and affected upstream behavior. No fork runtime or version change.",
+      "current_regression": "115 independent source cases and coverage floors pass (44.32% lines, 62.39% branches, 40.78% functions); 18 actual production/development browser cases and both clean packed consumers pass. Plugin complete regression: 685 canonical cases plus source/package gates, including 44 native and 40 device cases, all pass. Browser modifier selection is platform-aware; actual macOS/mobile remain separate environments."
     }
   },
   "sources": {
@@ -84,8 +91,8 @@
   },
   "comparison": {
     "fork": {
-      "files": 1347,
-      "sha256": "1cee8487e91e926f52e5fe43f591e6fc7ac577dd2051940233f3119bbe2dc229"
+      "files": 1346,
+      "sha256": "8d60ded00f00fdf4ff97763923417cf13a1ebc00862db3ac97a70e55f908b5eb"
     },
     "upstream": {
       "files": 1327,
@@ -326,7 +333,7 @@
     {
       "path": ".github/workflows/obsidian-tests.yml",
       "status": "fork-only",
-      "fork_sha256": "0484bf13362136dd0e9a7aa0efafb98d90f2c356f6151f5a9e96f3d5bf39a72c",
+      "fork_sha256": "5aff9d2d2a0c9cd1b6d5e12d8a275bd6a0ba969324070404302eb7c5c9e8306d",
       "upstream_sha256": null,
       "ids": [
         "OBS-001",
@@ -334,7 +341,7 @@
         "OBS-034"
       ],
       "kind": "ci",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only."
     },
     {
       "path": ".gitignore",
@@ -362,14 +369,14 @@
     {
       "path": "AGENTS.md",
       "status": "modified",
-      "fork_sha256": "87235a9930e6659dacd4285413c7e044ba51273c871537c6b9aaf457837a222f",
+      "fork_sha256": "e5040b965fabecdd6a90dca8d17b87f6ddf3e47300aab51a9f814636bf23fd23",
       "upstream_sha256": "83adc6ba0bd860a72db2e260e367ca7832fa1aaea4ce3622cca3ea7529a0f228",
       "ids": [
         "OBS-001",
         "OBS-033",
         "OBS-034"
       ],
-      "note": "Fork execution, merge, host, artifact, and handoff policies; now requires the persisted inventory. 2026-10-12: requested reminder to use isFullPanelMode for full/tray and explicitly include compact/tablet where supported. PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped.",
+      "note": "Fork execution, merge, host, artifact, and handoff policies; now requires the persisted inventory. 2026-10-12: requested reminder to use isFullPanelMode for full/tray and explicitly include compact/tablet where supported. PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only.",
       "kind": "governance"
     },
     {
@@ -3170,7 +3177,7 @@
     {
       "path": "tests/obsidian/README.md",
       "status": "fork-only",
-      "fork_sha256": "e4b5f017cfa33445588d389546ad0ae8bc8e402259ed6ca0392218a0d09ee434",
+      "fork_sha256": "6b17288736c1ef1afc08c6cba33a44e237e697ac27cbc723443800ee819248af",
       "upstream_sha256": null,
       "ids": [
         "OBS-001",
@@ -3178,12 +3185,12 @@
         "OBS-034"
       ],
       "kind": "documentation",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477: final formatting/source-contract/typed-owned-suite refinement; source behavior and reviewed assertions preserved."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477: final formatting/source-contract/typed-owned-suite refinement; source behavior and reviewed assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only."
     },
     {
       "path": "tests/obsidian/browser/run.mjs",
       "status": "fork-only",
-      "fork_sha256": "debfa43cbaa7875f90beb6c34a292cfc2455efdcb401bed87eec6ebaf519e286",
+      "fork_sha256": "4802f00baf021dc1471766c9a39bdf641103c7b5fe6967d484cb8eb0ed5ffb09",
       "upstream_sha256": null,
       "ids": [
         "OBS-003",
@@ -3193,7 +3200,7 @@
         "OBS-033"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only."
     },
     {
       "path": "tests/obsidian/compatibility/duplicateTitles.json",
@@ -3244,6 +3251,17 @@
       ],
       "kind": "test-tooling",
       "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped."
+    },
+    {
+      "path": "tests/obsidian/fixtures/host-scene.json",
+      "status": "fork-only",
+      "fork_sha256": "720cf1b50e0893c10c97f44e7393aff6a9c788a4867ea549fbbb3b2ee6fe96a2",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: independent fixture-backed regression for host text/links/bindings and fork-modified input/tool/library contracts. No upstream test helper transforms."
     },
     {
       "path": "tests/obsidian/packageConsumer.mjs",
@@ -3327,37 +3345,26 @@
       "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped."
     },
     {
-      "path": "tests/obsidian/unit/authoring.test.tsx",
-      "status": "fork-only",
-      "fork_sha256": "10c315b5dafc351034eb566b20bf3f43cd0b33f07596270d96b108a9addc478e",
-      "upstream_sha256": null,
-      "ids": [
-        "OBS-033"
-      ],
-      "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped."
-    },
-    {
       "path": "tests/obsidian/unit/bootstrap.test.tsx",
       "status": "fork-only",
-      "fork_sha256": "4cacea5fe40edb8cf50b1af1bd6e88fc620b99414bb57f039c643a0f0d3dc41c",
+      "fork_sha256": "b87451b32cc10b5fe97e72543bd0c2b62be22801135e3321ed5831d44ce0d22b",
       "upstream_sha256": null,
       "ids": [
         "OBS-033"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only."
     },
     {
-      "path": "tests/obsidian/unit/compatibilityGuards.test.ts",
+      "path": "tests/obsidian/unit/coreRegression.test.tsx",
       "status": "fork-only",
-      "fork_sha256": "a2625e3c8cebb8134d4d275fa3a45e801f968078807fc2919412d288ee5de22a",
+      "fork_sha256": "4eb13e063a734666a988d879a1d5e00cedaaff417302b5a2d745006473da5221",
       "upstream_sha256": null,
       "ids": [
         "OBS-033"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+      "note": "PR #477 / plugin #3022: independent fixture-backed regression for host text/links/bindings and fork-modified input/tool/library contracts. No upstream test helper transforms."
     },
     {
       "path": "tests/obsidian/unit/deviceBoundaries.test.ts",
@@ -3371,17 +3378,6 @@
       ],
       "kind": "regression-test",
       "note": "PR #477: actual common-module breakpoints, desktop exclusion, tablet and live phone preferences; complements real native geometry/touch evidence."
-    },
-    {
-      "path": "tests/obsidian/unit/inheritedBootstrap.test.tsx",
-      "status": "fork-only",
-      "fork_sha256": "62b25edc7c880d7de11986cc11ff609d6a81aba2aac64b1000974224ce10c365",
-      "upstream_sha256": null,
-      "ids": [
-        "OBS-033"
-      ],
-      "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped."
     },
     {
       "path": "tests/obsidian/unit/testIdentities.test.ts",
@@ -3408,13 +3404,13 @@
     {
       "path": "vitest.obsidian.config.mts",
       "status": "fork-only",
-      "fork_sha256": "18e1589c8475a9b0e2db61d4ee17762b794b31804e0128fcce56312f3237d384",
+      "fork_sha256": "e37c512b906f5b4a8c1833a0fc1b235fb0f7798a85ce3b8038942b4f8bcda242",
       "upstream_sha256": null,
       "ids": [
         "OBS-033"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only."
     },
     {
       "path": "yarn.lock",

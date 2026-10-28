@@ -12,6 +12,7 @@ import { chromium } from "playwright";
 import { sourceIdentity } from "../provenance.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
+const shortcutModifier = process.platform === "darwin" ? "Meta" : "Control";
 const output = resolve(
   process.env.EXCALIDRAW_TEST_REPORT_DIR ||
     join(root, ".test-work/reports/browser"),
@@ -275,7 +276,7 @@ try {
                 element.height >= 90,
             ),
           );
-          await page.keyboard.press("Control+z");
+          await page.keyboard.press(`${shortcutModifier}+z`);
           await page.waitForFunction(
             () => window.__testAPI.getSceneElements().length === 1,
           );
@@ -303,6 +304,273 @@ try {
             delete window.__trustedListener;
           });
         }
+      },
+      true,
+    );
+    await run(
+      "scheduled-tools-still-author",
+      async () => {
+        const original = await page.evaluate(() =>
+          window.__testAPI.getSceneElements(),
+        );
+        const authored = [];
+        try {
+          for (const type of [
+            "rectangle",
+            "diamond",
+            "ellipse",
+            "arrow",
+            "line",
+            "freedraw",
+          ]) {
+            await page.evaluate((type) => {
+              const api = window.__testAPI;
+              api.updateScene({
+                elements: [],
+                appState: { scrollX: 0, scrollY: 0, zoom: { value: 1 } },
+                captureUpdate: "NEVER",
+                forceFlushSync: true,
+              });
+              api.setActiveTool({ type });
+            }, type);
+            await page.waitForFunction(
+              (type) => window.__testAPI.getAppState().activeTool.type === type,
+              type,
+            );
+            await page.mouse.move(400, 300);
+            await page.mouse.down();
+            await page.mouse.move(560, 400, { steps: 12 });
+            await page.mouse.up();
+            await page.waitForFunction(
+              (type) =>
+                window.__testAPI
+                  .getSceneElements()
+                  .some((element) => element.type === type),
+              type,
+            );
+            const result = await page.evaluate(() =>
+              window.__testAPI.getSceneElements().map((element) => ({
+                type: element.type,
+                width: element.width,
+                height: element.height,
+              })),
+            );
+            assert.equal(
+              result.length,
+              1,
+              `One gesture must create one ${type}`,
+            );
+            assert.ok(
+              result[0].width >= 150 && result[0].height >= 90,
+              `Authored geometry differs for ${type}`,
+            );
+            authored.push(result[0]);
+          }
+        } finally {
+          await page.evaluate((elements) => {
+            window.__testAPI.updateScene({
+              elements,
+              captureUpdate: "NEVER",
+              forceFlushSync: true,
+            });
+            window.__testAPI.setActiveTool({ type: "selection" });
+          }, original);
+          await page.waitForFunction(
+            () =>
+              window.__testAPI.getAppState().activeTool.type === "selection",
+          );
+        }
+        return {
+          assertions: [
+            "each fork-scheduled tool authors through trusted input",
+            "one gesture creates exactly one correctly sized upstream element",
+          ],
+          authored,
+        };
+      },
+      true,
+    );
+    await run(
+      "selection-group-delete-history",
+      async () => {
+        const original = await page.evaluate(() => {
+          const lib = window.__testLibrary;
+          const api = window.__testAPI;
+          const before = api.getSceneElements();
+          const elements = lib.convertToExcalidrawElements([
+            {
+              type: "rectangle",
+              x: 40,
+              y: 40,
+              width: 100,
+              height: 60,
+              customData: { owned: "first" },
+            },
+            {
+              type: "ellipse",
+              x: 240,
+              y: 40,
+              width: 100,
+              height: 60,
+              link: "[[Target]]",
+              customData: { owned: "second" },
+            },
+          ]);
+          window.__historyOriginal = before;
+          api.updateScene({
+            elements,
+            captureUpdate: "IMMEDIATELY",
+            forceFlushSync: true,
+          });
+          return elements.map((element) => element.id).sort();
+        });
+        await page.getByTestId("toolbar-selection").click();
+        await page.waitForFunction(
+          () => window.__testAPI.getAppState().activeTool.type === "selection",
+        );
+        // Use actual keyboard events on the editor. No upstream UI helpers,
+        // window.h hooks, replacement history or synthetic timer advancement.
+        await page
+          .locator("canvas.interactive")
+          .click({ position: { x: 700, y: 500 } });
+        await page.keyboard.press(`${shortcutModifier}+a`);
+        await page.waitForFunction(
+          () =>
+            Object.keys(window.__testAPI.getAppState().selectedElementIds)
+              .length === 2,
+        );
+        await page.keyboard.press(`${shortcutModifier}+g`);
+        await page.waitForFunction(() =>
+          window.__testAPI
+            .getSceneElements()
+            .every((element) => element.groupIds.length === 1),
+        );
+        const grouped = await page.evaluate(() =>
+          window.__testAPI
+            .getSceneElements()
+            .map((element) => element.groupIds[0]),
+        );
+        assert.equal(grouped[0], grouped[1], "Group membership differs");
+        await page.keyboard.press("Delete");
+        await page.waitForFunction(
+          () => window.__testAPI.getSceneElements().length === 0,
+        );
+        await page.keyboard.press(`${shortcutModifier}+z`);
+        await page.waitForFunction(
+          () => window.__testAPI.getSceneElements().length === 2,
+        );
+        const restored = await page.evaluate(() =>
+          window.__testAPI.getSceneElements().map((element) => ({
+            id: element.id,
+            data: element.customData,
+            link: element.link,
+            groups: element.groupIds,
+          })),
+        );
+        assert.deepEqual(
+          restored.map((element) => element.id).sort(),
+          original,
+        );
+        assert.deepEqual(restored.map((element) => element.data.owned).sort(), [
+          "first",
+          "second",
+        ]);
+        assert.equal(
+          restored.find((element) => element.data.owned === "second").link,
+          "[[Target]]",
+        );
+        assert.ok(
+          restored.every((element) => element.groups[0] === grouped[0]),
+        );
+        await page.keyboard.press(`${shortcutModifier}+Shift+z`);
+        await page.waitForFunction(
+          () => window.__testAPI.getSceneElements().length === 0,
+        );
+        await page.evaluate(() => {
+          window.__testAPI.updateScene({
+            elements: window.__historyOriginal,
+            captureUpdate: "NEVER",
+            forceFlushSync: true,
+          });
+          delete window.__historyOriginal;
+        });
+        return {
+          assertions: [
+            "trusted select-all and grouping",
+            "delete/undo/redo retain IDs, groups, host links and metadata",
+          ],
+          ids: original,
+        };
+      },
+      true,
+    );
+    await run(
+      "library-search-and-portal-menu",
+      async () => {
+        await page.evaluate(async () => {
+          const lib = window.__testLibrary;
+          const api = window.__testAPI;
+          const elements = lib.convertToExcalidrawElements([
+            { type: "rectangle", x: 0, y: 0, width: 100, height: 60 },
+          ]);
+          await api.updateLibrary({
+            libraryItems: ["wall", "door"].map((name) => ({
+              id: name,
+              name,
+              status: "unpublished",
+              created: 1,
+              elements,
+            })),
+          });
+          api.toggleSidebar({ name: "default", tab: "library" });
+        });
+        const search = page.locator(
+          ".library-menu-items-container__search input",
+        );
+        await search.waitFor({ state: "visible" });
+        await search.fill("wall");
+        await page.keyboard.press("Escape");
+        await page.waitForFunction(
+          () =>
+            document.querySelector(
+              ".library-menu-items-container__search input",
+            )?.value === "",
+        );
+        assert.equal(
+          await page.evaluate(
+            () => window.__testAPI.getAppState().openSidebar?.tab,
+          ),
+          "library",
+        );
+        // The dropdown belongs to the owning document's portal, so query the
+        // actual page rather than assuming it is a descendant of the sidebar.
+        await page
+          .locator(
+            ".library-menu-dropdown-container--in-heading [data-testid='dropdown-menu-button']",
+          )
+          .click();
+        await page
+          .getByTestId("lib-dropdown--load")
+          .waitFor({ state: "visible" });
+        await page.keyboard.press("Escape");
+        await page.evaluate(() =>
+          window.__testAPI.toggleSidebar({
+            name: "default",
+            tab: "library",
+            force: false,
+          }),
+        );
+        assert.equal(
+          await page.evaluate(() => window.__testAPI.getSceneElements().length),
+          1,
+        );
+        return {
+          assertions: [
+            "trusted Escape clears library search and retains sidebar",
+            "load control is visible through its real portal",
+            "library changes do not modify scene",
+          ],
+        };
       },
       true,
     );
