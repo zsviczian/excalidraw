@@ -50,7 +50,15 @@ Consumers include plugin imports/ambient declarations and normal ESM consumers, 
 `P: src/core/managers/obsidianCommonHostAdapter.ts` implements this from live plugin/device information and settings; `PackageManager.ts` registers it. Upstream has editor-interface and renderer primitives but no Obsidian capability contract in this snapshot. Keep plugin classes and globals out of common/element internals. Add generic upstream hooks where appropriate, then let this adapter provide host policy. A future protocol change requires coordinated registration/disposal tests and the consumer handoff, not an unversioned assumption that package and plugin always match. **Gate:** V02, V03, V07, V09.
 
 <a id="obs-006"></a>
-## OBS-006 — Excalidraw host service registry (protocol 2)
+## OBS-006 — Excalidraw host service registry (protocol 3)
+
+**Plugin #3019:** protocol 3 adds the `lucide` action with a caller-supplied
+editor ID. Existing actions and Mermaid loaded/api semantics remain unchanged.
+The plugin resolves the exact API identity and guards insertion itself; no view
+or plugin instance is stored in this shared registry. Protocol-2 consumers fail
+fast. The canonical generated declarations and focused structural-host tests
+cover forwarding and rejection; durable integration awaits a matching published
+package and plugin dependency update.
 
 **PR #475 (2026-10-27):** Protocol 2 and public loaded/api remain unchanged with Extras Mermaid component 3.0.0. The plugin now validates its real producer/adapter/bridge against generated local declarations before runtime artifact copying, in addition to the installed-package prebuild gate. Both lanes pass; no duplicated status contract. See the [PR #475 review](pr-475-merge-review.md).
 
@@ -238,6 +246,14 @@ Do not delete the bridge just because upstream offers a portal container: the co
 <a id="obs-023"></a>
 ## OBS-023 — Host commands and context-menu integration
 
+**Plugin #3019:** the same shared image menu now opens the plugin's Lucide
+sidepanel, forwarding the initiating `app.id` through protocol-3 `runAction`.
+The plugin owns catalog access, SVG conversion, session state, target validation
+and grouped insertion. No renderer, resize rule, global plugin lookup or icon
+package is added here. Desktop/tray/mobile consumers retain one menu definition.
+Host tests cover ID forwarding and rejection of protocol 2; physical touch and
+restored/cold-start popouts remain independent gates.
+
 **Retain the semantic integration; reduce UI patch surface.** [ImageMenu.tsx](../../packages/excalidraw/components/ImageMenu.tsx) supplies system-image, vault-file, card, and LaTeX items through host `runAction`/`getLabel`; desktop, tray, mobile, and mobile-overflow menus reuse it. `ContextMenu` inserts host JSX with the current elements/appState/onClose. `App` respects host/global and per-state context-menu suppression, with the navigation-only `M` shortcut deliberately opening the canvas menu at the latest pointer coordinates even when ordinary touch context/pan paths would block it. Upstream element-link actions are hidden in Obsidian.
 
 `P: obsidianExcalidrawHostAdapter.ts` and `ExcalidrawView.ts` own the commands/menu content; `ExcalidrawRoot.ts` wires the renderer. Preserve mobile overflow ordering, cancellation of selection, key event realm, and menu close semantics. `renderTopRightUI` and composition slots are existing upstream capabilities worth using for future UI additions, but they are not a direct replacement for pre-action context menu injection or image-tool overflow integration. **Gate:** V04, V07, V09.
@@ -394,3 +410,31 @@ PR #458 moves the unchanged resize/crop dispatch from App into `AppSelectionTool
 PR #462 follows the additional upstream crop/drag/transform-handle extraction without changing saved anchoring or embed-scale behavior. The retained host container-resize API still uses its rotation and resized-coordinate helpers. Validation and platform limits are recorded in the [merge review](pr-462-merge-review.md).
 
 PR #463 retains both anchored single/multi resize guards and embed magnification. Only the now-upstream dimension-helper export loses its redundant fork comment. New crop options do not change saved image/PDF metadata or embed scale; main/popout integration evidence and signed/multi-selection limits are recorded in the [merge review](pr-463-merge-review.md).
+
+<a id="obs-038"></a>
+## OBS-038 - Scoped native Lucide insertion action
+
+**Plugin PR #3019 (2026-10-27): retain the narrow host entry.** The shared
+[ImageMenu](../../packages/excalidraw/components/ImageMenu.tsx) adds a localized
+Lucide action for its existing desktop/tray/mobile consumers. It forwards
+`app.id` through [runAction](../../packages/excalidraw/obsidianUtils.ts) and the
+protocol-3 [host contract](../../packages/excalidraw/obsidianExcalidrawHost.ts).
+The existing host registry (OBS-006) retains its lifecycle; menu composition
+(OBS-023) remains shared. No active view, Obsidian icon catalog, converter,
+picker state, special renderer or resize behavior enters the component.
+
+`P: src/core/main.ts`, `src/core/managers/obsidianExcalidrawHostAdapter.ts` and
+`src/view/sidepanel/LucideIconPicker.ts` resolve the initiating editor exactly.
+The plugin owns native conversion, EA/CLI insertion, target guards and saving.
+Upstream's image action does not provide this installed Obsidian icon workflow.
+Move the entry into plugin composition only if all shared image-menu consumers
+can expose an equivalent localized command with the initiating editor identity.
+Never replace this boundary with global plugin discovery or active-view fallback.
+
+Seven current host tests and the artifact/declaration build pass. Windows
+Obsidian 1.14.5 verifies actual menu dispatch, fresh-popout insertion, history,
+stale-target refusal and cleanup; exact local artifact evidence is recorded in
+`P: docs/LUCIDE_ICON_VALIDATION.md` (report excalidraw-obsidian-uvQpEQ).
+This is an unpublished paired protocol change. Publish/install matching exact
+package bytes before release; restored-popout/cold-start, physical mobile,
+macOS/Linux and hosted CodeScanner gates remain. **Gate:** V01, V03, V08, V10.

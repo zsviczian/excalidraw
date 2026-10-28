@@ -6,7 +6,7 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 
 | Document | Purpose |
 | --- | --- |
-| [Customization catalog](customizations.md) | 37 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
+| [Customization catalog](customizations.md) | 38 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
 | [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 237 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |

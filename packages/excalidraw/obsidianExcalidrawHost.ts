@@ -15,7 +15,7 @@
 import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/types";
 
 /** Runtime protocol understood by this version of the Excalidraw package. */
-export const OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION = 2 as const;
+export const OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION = 3 as const; // zsviczian -- plugin #3019 adds scoped Lucide actions
 
 /** Keyboard-blocking lifecycle returned by the host's inline suggester. */
 export interface ObsidianKeyBlocker {
@@ -49,7 +49,11 @@ export interface ObsidianExcalidrawHostAdapter {
 
   loadFontFromFile(filename: string): Promise<ArrayBuffer | undefined>;
   getMermaid(): Promise<ObsidianMermaidService>;
-  runAction(action: "anyFile" | "LaTeX" | "card"): void;
+  /** Lucide requires the initiating editor's ID; no active-view state is retained here. */
+  runAction(
+    action: "anyFile" | "LaTeX" | "card" | "lucide",
+    editorId?: string,
+  ): void;
   getLabel(key: string): string;
   attachInlineLinkSuggester(
     inputEl: HTMLInputElement | HTMLTextAreaElement,

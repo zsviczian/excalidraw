@@ -43,6 +43,7 @@ import { loadMermaidLib } from "./components/TTDDialog/MermaidToExcalidrawLib";
 import { getObsidianExcalidrawHost } from "./obsidianExcalidrawHost";
 
 import type {
+  ObsidianExcalidrawHostAdapter, // zsviczian -- plugin #3019 derives named action types from the host
   ObsidianKeyBlocker,
   ObsidianMermaidService,
 } from "./obsidianExcalidrawHost";
@@ -294,8 +295,16 @@ export const getZoomMax = () => {
   return getObsidianExcalidrawHost()?.getZoomMax() ?? MAX_ZOOM;
 };
 
-export const runAction = (action: "anyFile" | "LaTeX" | "card"): void => {
-  getObsidianExcalidrawHost()?.runAction(action);
+// zsviczian -- plugin #3019 scopes picker opening to its initiating editor.
+export const runAction = (
+  action: Parameters<ObsidianExcalidrawHostAdapter["runAction"]>[0],
+  editorId?: string,
+): void => {
+  if (editorId === undefined) {
+    getObsidianExcalidrawHost()?.runAction(action);
+  } else {
+    getObsidianExcalidrawHost()?.runAction(action, editorId);
+  }
 };
 
 export const t2 = (key: string): string => {

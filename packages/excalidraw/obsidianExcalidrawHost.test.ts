@@ -133,6 +133,8 @@ describe("Obsidian Excalidraw host registry", () => {
 
     runAction("card");
     expect(hostRunAction).toHaveBeenCalledWith("card");
+    runAction("lucide", "initiating-editor"); // zsviczian -- plugin #3019 never guesses the active drawing
+    expect(hostRunAction).toHaveBeenCalledWith("lucide", "initiating-editor");
     expect(t2("COMP_FRAME")).toBe("translated:COMP_FRAME");
     expect(getLabel).toHaveBeenCalledWith("COMP_FRAME");
 
@@ -177,11 +179,11 @@ describe("Obsidian Excalidraw host registry", () => {
   it("rejects an unsupported runtime protocol", () => {
     const incompatibleHost = {
       ...createFakeHost(),
-      protocolVersion: 3,
+      protocolVersion: 2, // zsviczian -- plugin #3019 rejects the previous internal protocol
     } as unknown as ObsidianExcalidrawHostAdapter;
 
     expect(() => configureObsidianExcalidrawHost(incompatibleHost)).toThrow(
-      "Unsupported Obsidian Excalidraw host protocol: 3",
+      "Unsupported Obsidian Excalidraw host protocol: 2",
     );
     expect(getObsidianExcalidrawHost()).toBeNull();
   });

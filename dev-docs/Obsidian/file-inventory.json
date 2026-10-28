@@ -28,14 +28,24 @@
       "packages/excalidraw/components/TTDDialog/hooks/useTextGeneration.ts"
     ],
     "published_declaration_correction": "Plugin a1da1bbe plus local changes: derive package-host/loader ambient declarations from installed published 0.18.144; contract test fails before and passes after, runs as prebuild. All 621 installed declarations/artifacts match the lockfile-verified npm tarball. Production/library, 14 fork tests, 15 bundle/harness tests and Windows real-Extras offline main/popout/source/retry/cleanup checks pass. Development keeps five baseline TS7006 diagnostics. No fork runtime/Extras code, protocol, version or dependency changes in repair. Acknowledge existing release commit 9d1e20b60. See pr-472-merge-review.md correction.",
-    "zoom_3008": "Host wheel floor and constrained viewport min/max use existing live host getters. Seven focused tests pass; artifact/declaration and consumer production builds pass. Native macOS main/popout live settings and formula bounds/reopen assertions pass; overall clean-error gate fails on known ResizeObserver popout teardown notifications, cleanup passes. Broad test:update retains 79 failed suites/1458 failed tests and three errors (81 suites/1192 tests pass); generated snapshot edits restored. Full typecheck retains the same three baseline test diagnostics. No version, protocol, dependency or publication change. Upstream parent b7de45e of inherited master PR #473 is the comparison baseline; shape delta remains only the prior inert cleanup. Final combined native macOS rerun passes all wheel, web-drop, formula-bound and actual Markdown-sidepanel cases, JavaScript error gate and cleanup. Combined development main.js is 4,988,084 bytes (254,796 bytes headroom). Earlier intermittent ResizeObserver failures are retained as historical evidence; no unrelated teardown fix is claimed."
+    "zoom_3008": "Host wheel floor and constrained viewport min/max use existing live host getters. Seven focused tests pass; artifact/declaration and consumer production builds pass. Native macOS main/popout live settings and formula bounds/reopen assertions pass; overall clean-error gate fails on known ResizeObserver popout teardown notifications, cleanup passes. Broad test:update retains 79 failed suites/1458 failed tests and three errors (81 suites/1192 tests pass); generated snapshot edits restored. Full typecheck retains the same three baseline test diagnostics. No version, protocol, dependency or publication change. Upstream parent b7de45e of inherited master PR #473 is the comparison baseline; shape delta remains only the prior inert cleanup. Final combined native macOS rerun passes all wheel, web-drop, formula-bound and actual Markdown-sidepanel cases, JavaScript error gate and cleanup. Combined development main.js is 4,988,084 bytes (254,796 bytes headroom). Earlier intermittent ResizeObserver failures are retained as historical evidence; no unrelated teardown fix is claimed.",
+    "lucide3019": {
+      "date": "2026-10-27",
+      "baseline": "02d5b607525da43eadaad72954d4fc644f3c157a",
+      "upstream": "14bb42edee3d6fee6be264e3ee78670b3b9cee79",
+      "scope": "OBS-038, coordinated with OBS-006/023: shared image-menu Lucide entry and initiating editor ID through protocol 3; no converter, icon package, resize, global plugin lookup or saved format changes.",
+      "validation": "Obsidian artifacts/generated declarations build; seven current host tests pass (the filter also ran seven preserved baseline tests). Full typecheck retains four exact baseline test errors. Focused ESLint JSON reports zero errors and one inherited ImageMenu import-order warning. Local paired runtime verification is recorded in the plugin Lucide validation report; no release-readiness or published-byte claim.",
+      "runtime_validation": "Windows Obsidian 1.14.5 in excalidraw-test: final combined Lucide/SVG/native-CLI run excalidraw-obsidian-uvQpEQ passes, including actual menu, scoped fresh-popout insertion, history, stale-target refusal, reload, JavaScript-error gate and cleanup. All 1935 names x three presets attempted: 5802 success; installed save-off rejected for viewport geometry at each size. main.js 5028698 bytes, SHA-256 34a0b15cd98d4c7875ca24bf0215934ac4691ad77b51a1defd2833e292d459c5. Source and four component artifact hashes in plugin docs/LUCIDE_ICON_VALIDATION.md. Unpublished protocol-3 local handoff; cold/restored popouts, other platforms, physical mobile and hosted CodeScanner remain separate gates.",
+      "merge_authorization": "2026-10-28: maintainer explicitly authorized commit/push/merge of fork and plugin source as a paired intermediate checkpoint, deferring fork version/publication and plugin exact dependency/lockfile update until other changes accumulate. Protocol 3 remains required; no release-readiness claim.",
+      "precommit": "Required test:update run excluding ignored historical tmp checkout: 81 suites pass/81 fail, 1242 tests pass/1477 fail, 47 skipped/one todo, three errors. Includes one export import timeout under parallel load, checked separately. Changed host suite passes all seven tests. Restored 16 generated snapshot/inline-test files to their pre-run bytes; no generated snapshot edits retained. Full-suite failure is not represented as a pass. Export file: default timeout reproduced in isolation, all ten tests pass with a 30-second timeout (public-root import 5.64 seconds). Full typecheck retains the same four baseline diagnostics; generated paired-fork plugin contract passes."
+    }
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "404912c08166f553ed22c97f246d274fbcd74e11",
+      "parent_commit": "02d5b607525da43eadaad72954d4fc644f3c157a",
       "package": "@zsviczian/excalidraw",
-      "version": "0.18.144"
+      "version": "0.18.145"
     },
     "upstream": {
       "kind": "local Git commit",
@@ -46,10 +56,10 @@
     },
     "plugin": {
       "kind": "Git working tree",
-      "commit": "5156e39aceac2ba769f811b15d65a016696719ca",
+      "commit": "19e9a116fcfff75c3429840b42cfbca787590feb",
       "version": "2.29.0",
-      "fork_dependency": "0.18.144",
-      "working_tree_changes": "PR #475: exact Extras Mermaid 3.0.0 gate, release note and generated-local declaration preflight; dependency remains 0.18.144."
+      "fork_dependency": "0.18.145",
+      "working_tree_changes": "PR #3019: local shared Lucide constructor/EA, picker, native CLI and protocol-3 adapter; pre-existing #3018 follow-up fixes retained. Unpublished paired artifacts and generated declaration checks; no dependency update."
     },
     "extras": {
       "kind": "Git working tree",
@@ -64,7 +74,7 @@
   "comparison": {
     "fork": {
       "files": 1325,
-      "sha256": "c8d8c36432e90c733e9f1f63a6f91ab662618e2900a1a8bf06356f58688bb819"
+      "sha256": "e4446f1d8c2bdbdfe7ec0afc380a60ee4935cfb2ac4328d05fa359e664ce40d5"
     },
     "upstream": {
       "files": 1327,
@@ -293,6 +303,12 @@
       "title": "Anchored images and embed-aware resizing",
       "review_state": "retain-compatibility",
       "owner": "Element and plugin asset maintainers"
+    },
+    {
+      "id": "OBS-038",
+      "title": "Scoped native Lucide insertion action",
+      "review_state": "retain-integration",
+      "owner": "Component host boundary and plugin picker maintainers"
     }
   ],
   "files": [
@@ -1713,12 +1729,13 @@
     {
       "path": "packages/excalidraw/components/ImageMenu.tsx",
       "status": "fork-only",
-      "fork_sha256": "5cec08d3b1090cf4bd1a27d55f63c4d714bd55a3911faff3823a6e4166eda87c",
+      "fork_sha256": "1fa219ba699d3de531feb154ef647461db7394409bd425d6a254b263ea560fb4",
       "upstream_sha256": null,
       "ids": [
-        "OBS-023"
+        "OBS-023",
+        "OBS-038"
       ],
-      "note": "Shared image/system-file, vault-file, card, and LaTeX command menu through typed host services.",
+      "note": "Shared image/system-file, vault-file, card, and LaTeX command menu through typed host services. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned.",
       "kind": "integration"
     },
     {
@@ -2541,24 +2558,26 @@
     {
       "path": "packages/excalidraw/obsidianExcalidrawHost.test.ts",
       "status": "fork-only",
-      "fork_sha256": "3f64739d11765956d82aa42963402da160ade95e6e43e9672573af7d7f6b22ab",
+      "fork_sha256": "b59414dc534f871bf9332b09c78aada22a1e4d956e57a4f1a3ad879bdbab7777",
       "upstream_sha256": null,
       "ids": [
         "OBS-006",
-        "OBS-033"
+        "OBS-033",
+        "OBS-038"
       ],
-      "note": "Fake-host services, defaults/errors, live settings, pen panning, protocol rejection, and stale-disposer tests.",
+      "note": "Fake-host services, defaults/errors, live settings, pen panning, protocol rejection, and stale-disposer tests. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned.",
       "kind": "test"
     },
     {
       "path": "packages/excalidraw/obsidianExcalidrawHost.ts",
       "status": "fork-only",
-      "fork_sha256": "dbcc8bbe6b084268726896e3e15425bd9f7a42140783dced5a719a237e87edc3",
+      "fork_sha256": "20c2665fdeb96f83734c908ca7df8411de82cd4dfceddaa3aeb1477c39860237",
       "upstream_sha256": null,
       "ids": [
-        "OBS-006"
+        "OBS-006",
+        "OBS-038"
       ],
-      "note": "Version-2 typed service boundary for settings, fonts, Mermaid, commands, labels, and inline suggestions. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md.",
+      "note": "Version-3 typed service boundary for settings, fonts, Mermaid, commands, labels, and inline suggestions. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned.",
       "kind": "integration"
     },
     {
@@ -2612,7 +2631,7 @@
     {
       "path": "packages/excalidraw/obsidianUtils.ts",
       "status": "fork-only",
-      "fork_sha256": "021ba9e14f7eb6e8e2aa21e857527902e902c35e1c5b77b51ea29254b522e9cc",
+      "fork_sha256": "54ec86ecabc23b5c128b9085a417396a602285e97e95ad88ad4092d439382d7c",
       "upstream_sha256": null,
       "ids": [
         "OBS-006",
@@ -2622,22 +2641,23 @@
         "OBS-022",
         "OBS-028",
         "OBS-029",
-        "OBS-030"
+        "OBS-030",
+        "OBS-038"
       ],
-      "note": "Host setting/service delegates, local-font/CSS helpers, pen/touch and zoom helpers, Mermaid wrappers, arrow refresh, and geometry compatibility APIs. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #475: refreshAllArrows passes its self-binding midpoint flag as transient fifth-argument options; no leaked persisted property. See pr-475-merge-review.md.",
+      "note": "Host setting/service delegates, local-font/CSS helpers, pen/touch and zoom helpers, Mermaid wrappers, arrow refresh, and geometry compatibility APIs. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #475: refreshAllArrows passes its self-binding midpoint flag as transient fifth-argument options; no leaked persisted property. See pr-475-merge-review.md. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned.",
       "kind": "integration"
     },
     {
       "path": "packages/excalidraw/package.json",
       "status": "modified",
-      "fork_sha256": "33b348baab1b5c45dde6586576b33e5f4a2839de0421cf63a6712d06134aa727",
+      "fork_sha256": "537c51f7f3aa421944d2f301dd6a12e6116e6496dc8299cd28da9e353136e33b",
       "upstream_sha256": "77ac97314a8bba124b635a37626b0f7bc950b92dd86edd0c4f0dec9d796df2e9",
       "ids": [
         "OBS-002",
         "OBS-003",
         "OBS-004"
       ],
-      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies. Baseline bee1292f3 already bumps to 0.18.142; the layout fix does not bump or publish. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. 2026-10-23: acknowledge the existing manifest-only 0.18.144 release commit 9d1e20b60 while correcting consumer declarations; no version change in this repair. PR #475: Converter 3.0.0 remains dev-only; preserve fork exports, external runtime and existing 0.18.144 version. See pr-475-merge-review.md.",
+      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies. Baseline bee1292f3 already bumps to 0.18.142; the layout fix does not bump or publish. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. 2026-10-23: acknowledge the existing manifest-only 0.18.144 release commit 9d1e20b60 while correcting consumer declarations; no version change in this repair. PR #475: Converter 3.0.0 remains dev-only; preserve fork exports, external runtime and existing 0.18.144 version. See pr-475-merge-review.md. #3019 accounting acknowledges the already committed 0.18.145 version; this feature does not bump it.",
       "kind": "packaging"
     },
     {
