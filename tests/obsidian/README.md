@@ -99,6 +99,6 @@ source/artifact identities, covered semantic contracts and coverage floors.
 The maintainer approved fixing the empty-source Helvetica fetch found by native
 Markdown-image coverage. `getCSSFontDefinition` now returns an empty definition
 for registry entries marked local, matching CSS font registration. The independent
-source suite passes 126 cases, including local-font no-fetch and bundled-font CSS
+source suite passes 127 cases, including local-font no-fetch and bundled-font CSS
 regressions. Native checks use the current workspace fork and Helvetica frontmatter;
 the expanded coordinated acceptance remains in progress. No upstream tests changed.

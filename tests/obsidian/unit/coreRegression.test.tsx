@@ -75,6 +75,33 @@ it("bundled font CSS still embeds the registered font content", async () => {
   }
 });
 
+it("vault-provided Local Font content remains embedded", async () => {
+  const registered = new Map(Fonts.registered);
+  const data = "data:font/woff2;base64,bG9jYWw=";
+  Fonts.register.call(
+    { registered },
+    "Local Font",
+    {
+      metrics: Fonts.registered.get(FONT_FAMILY.Excalifont)!.metadata.metrics,
+    },
+    { uri: data },
+  );
+  const face = registered.get(FONT_FAMILY["Local Font"])!.fontFaces[0];
+  const content = vi.spyOn(face, "getContentLegacy").mockResolvedValue(data);
+  const registry = vi
+    .spyOn(Fonts, "registered", "get")
+    .mockReturnValue(registered);
+  try {
+    expect(await getCSSFontDefinition(FONT_FAMILY["Local Font"])).toBe(
+      `@font-face {font-family: Local Font; src: url(${data});}`,
+    );
+    expect(content).toHaveBeenCalledOnce();
+  } finally {
+    registry.mockRestore();
+    content.mockRestore();
+  }
+});
+
 async function mount(
   elements: readonly ExcalidrawElement[] = [],
   props: ExcalidrawProps = {},
