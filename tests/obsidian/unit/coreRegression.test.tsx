@@ -14,7 +14,7 @@ import {
   convertToExcalidrawElements,
   restoreElements,
 } from "@excalidraw/excalidraw";
-import { DEFAULT_SIDEBAR } from "@excalidraw/common";
+import { DEFAULT_SIDEBAR, FONT_FAMILY } from "@excalidraw/common";
 import {
   isArrowElement,
   isTextElement,
@@ -28,6 +28,8 @@ import type {
 import type { ExcalidrawElement } from "@excalidraw/element/types";
 import type { ExcalidrawElementSkeleton } from "@excalidraw/element/transform";
 
+import { Fonts } from "../../../packages/excalidraw/fonts/Fonts";
+import { getCSSFontDefinition } from "../../../packages/excalidraw/obsidianUtils";
 import fixtureData from "../fixtures/host-scene.json";
 
 const fixture = fixtureData as {
@@ -43,6 +45,35 @@ const fixture = fixtureData as {
 };
 
 afterEach(cleanup);
+
+it("system font CSS uses the local fallback without fetching nonexistent font content", async () => {
+  const face = Fonts.registered.get(FONT_FAMILY.Helvetica)!.fontFaces[0];
+  const content = vi.spyOn(face, "getContentLegacy");
+  const error = vi.spyOn(console, "error");
+  try {
+    expect(await getCSSFontDefinition(FONT_FAMILY.Helvetica)).toBe("");
+    expect(content).not.toHaveBeenCalled();
+    expect(error).not.toHaveBeenCalled();
+  } finally {
+    content.mockRestore();
+    error.mockRestore();
+  }
+});
+
+it("bundled font CSS still embeds the registered font content", async () => {
+  const face = Fonts.registered.get(FONT_FAMILY.Excalifont)!.fontFaces[0];
+  const data = "data:font/woff2;base64,d29mMg==";
+  const content = vi.spyOn(face, "getContentLegacy").mockResolvedValue(data);
+  try {
+    expect(await getCSSFontDefinition(FONT_FAMILY.Excalifont)).toBe(
+      `@font-face {font-family: ${face.fontFace.family}; src: url(${data});}`,
+    );
+    expect(content).toHaveBeenCalledOnce();
+    expect(await getCSSFontDefinition(-1)).toBe("");
+  } finally {
+    content.mockRestore();
+  }
+});
 
 async function mount(
   elements: readonly ExcalidrawElement[] = [],

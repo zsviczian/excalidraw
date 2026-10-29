@@ -186,7 +186,12 @@ export async function registerFontsInCSS() {
 export async function getCSSFontDefinition(
   fontFamily: number,
 ): Promise<string> {
-  const fontFaces = Fonts.registered.get(fontFamily)?.fontFaces;
+  const registered = Fonts.registered.get(fontFamily);
+  // zsviczian -- #477: system fonts have no font-file content to embed.
+  if (registered?.metadata.local) {
+    return "";
+  }
+  const fontFaces = registered?.fontFaces;
   if (!fontFaces) {
     return "";
   }

@@ -93,7 +93,7 @@
   "comparison": {
     "fork": {
       "files": 1348,
-      "sha256": "87eb2d2808567988ab65e25f6eea8d342ab223b2bbc9f0a91f4d0b000235a96c"
+      "sha256": "bd2826cf3ba5e3f52c8934e138175a3484de79124e6c5a62f24adf682da22394"
     },
     "upstream": {
       "files": 1327,
@@ -2691,7 +2691,7 @@
     {
       "path": "packages/excalidraw/obsidianUtils.ts",
       "status": "fork-only",
-      "fork_sha256": "54ec86ecabc23b5c128b9085a417396a602285e97e95ad88ad4092d439382d7c",
+      "fork_sha256": "6bee7d96834785622b7ba395072784521e63647f9f88a36c0afd5d765e6d9d0e",
       "upstream_sha256": null,
       "ids": [
         "OBS-006",
@@ -2704,7 +2704,7 @@
         "OBS-030",
         "OBS-038"
       ],
-      "note": "Host setting/service delegates, local-font/CSS helpers, pen/touch and zoom helpers, Mermaid wrappers, arrow refresh, and geometry compatibility APIs. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #475: refreshAllArrows passes its self-binding midpoint flag as transient fifth-argument options; no leaked persisted property. See pr-475-merge-review.md. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned.",
+      "note": "Host setting/service delegates, local-font/CSS helpers, pen/touch and zoom helpers, Mermaid wrappers, arrow refresh, and geometry compatibility APIs. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #475: refreshAllArrows passes its self-binding midpoint flag as transient fifth-argument options; no leaked persisted property. See pr-475-merge-review.md. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned. PR #477 follow-up: maintainer-approved local/system-font CSS no-fetch fix and its independent bundled/local-font regressions; 126 source cases pass.",
       "kind": "integration"
     },
     {
@@ -3200,7 +3200,7 @@
     {
       "path": "tests/obsidian/README.md",
       "status": "fork-only",
-      "fork_sha256": "5fc59af916b29e7966309dab6c0ea79782d92245468412de45430c275d15f80c",
+      "fork_sha256": "950f3fde24cabb2e6c092fcf7ea29762d1bb1f24c5b93fdd078be4c2f97faf07",
       "upstream_sha256": null,
       "ids": [
         "OBS-001",
@@ -3208,7 +3208,7 @@
         "OBS-034"
       ],
       "kind": "documentation",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477: final formatting/source-contract/typed-owned-suite refinement; source behavior and reviewed assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477: final formatting/source-contract/typed-owned-suite refinement; source behavior and reviewed assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. PR #477 follow-up: maintainer-approved local/system-font CSS no-fetch fix and its independent bundled/local-font regressions; 126 source cases pass."
     },
     {
       "path": "tests/obsidian/browser/run.mjs",
@@ -3392,13 +3392,14 @@
     {
       "path": "tests/obsidian/unit/coreRegression.test.tsx",
       "status": "fork-only",
-      "fork_sha256": "4eb13e063a734666a988d879a1d5e00cedaaff417302b5a2d745006473da5221",
+      "fork_sha256": "6e3800591e30ddde8e9298f05a8adb60c4440fe97ff31187a999e78609313921",
       "upstream_sha256": null,
       "ids": [
-        "OBS-033"
+        "OBS-033",
+        "OBS-013"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: independent fixture-backed regression for host text/links/bindings and fork-modified input/tool/library contracts. No upstream test helper transforms."
+      "note": "PR #477 / plugin #3022: independent fixture-backed regression for host text/links/bindings and fork-modified input/tool/library contracts. No upstream test helper transforms. PR #477 follow-up: maintainer-approved local/system-font CSS no-fetch fix and its independent bundled/local-font regressions; 126 source cases pass."
     },
     {
       "path": "tests/obsidian/unit/deviceBoundaries.test.ts",

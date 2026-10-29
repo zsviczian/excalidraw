@@ -93,3 +93,12 @@ native macOS validation is still separate evidence.
 
 Update the OBS ledger/catalog after each changed fork boundary. Preserve exact
 source/artifact identities, covered semantic contracts and coverage floors.
+
+## 2026-10-29 approved font correction
+
+The maintainer approved fixing the empty-source Helvetica fetch found by native
+Markdown-image coverage. `getCSSFontDefinition` now returns an empty definition
+for registry entries marked local, matching CSS font registration. The independent
+source suite passes 126 cases, including local-font no-fetch and bundled-font CSS
+regressions. Native checks use the current workspace fork and Helvetica frontmatter;
+the expanded coordinated acceptance remains in progress. No upstream tests changed.
