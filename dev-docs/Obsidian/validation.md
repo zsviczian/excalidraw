@@ -1,5 +1,35 @@
 # Validation record and upstream-merge playbook
 
+## PR #477 / plugin #3022 coordinated regression checkpoint - 2026-10-30
+
+Tested fork `053a3b9f9e77917c457fce8ca9453d38b92a303b`, plugin
+`fd32ac682e2aadc0f982fa23d36da482011117f9` and Extras
+`1cdcb7c425a9b80afdc7b39c88861143b4b85e58` pass two complete matching-build
+Windows native runs: **357/357 cases each**, including 258 behavioral obligations,
+40 device/layout profiles, cleanup/restoration and both native error/layout
+negative controls. Both use the plugin's sole repository-local working vault,
+`.test-work/vaults/excalidraw-auto-test/`, with automatic workspace builds,
+deployment/configuration, explicit CLI targeting and artifact hash verification.
+
+Final portable validation passes 666 canonical cases. This fork contributes
+**127 owned source cases (12 new / 115 reused)** and **18 reused built-browser
+cases**, plus declaration, artifact and clean package-consumer gates. No claim is
+made that the historical upstream web-app suite or whole-repository typecheck
+backlog passed. Upstream-owned tests remain unchanged.
+
+Run `npm.cmd run test:native` twice from the sibling plugin checkout with fixed
+revisions and fresh report directories, then `npm.cmd run test:regression:portable`
+and `node scripts/testing/review3022ProductionDiff.mjs`. These completion changes
+are documentation only; no version, protocol, publishing or runtime change.
+[Complete case evidence, exact hashes and repeatable commands](https://github.com/zsviczian/obsidian-excalidraw-plugin/blob/2026-10-28-automated-test-coverage/docs/testing-evidence/3022/README.md)
+are maintained with the coordinator.
+
+The historical sustained ResizeObserver cause remains unidentified; it did not
+recur in the final pair, and the strict storm gate is unchanged. Physical mobile,
+real OS drag/clipboard, native macOS/Linux and isolated whole-app cold start
+remain separate environments. Earlier checkpoints below retain their original
+hosts, failures and limitations.
+
 ## PR #475 Mermaid 3/Pele - 2026-10-27
 
 The [PR #475 review](pr-475-merge-review.md) records all 72 incoming paths, three conflicts, readonly-image and transient arrow-option adaptations, the paired Extras/plugin handoff, and explicit baseline failures. Obsidian artifacts/declarations, plugin production/development/library and Extras production/API builds complete. Seventy-three focused fork tests, the CPU canvas test, nineteen plugin tests, four Extras tests and both declaration-contract modes pass. Full fork typecheck retains three baseline errors; required test:update has 81 passing/80 failing suites and three errors. Generated snapshots are restored.
