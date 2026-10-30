@@ -304,3 +304,8 @@ I am extremely conservative when accepting changes to this fork.
 The primary goal is to remain as close as possible to upstream Excalidraw while supporting the specific needs of the Obsidian plugin.
 
 When in doubt, choose the solution that creates the smallest possible difference from upstream.
+
+
+## Automated Obsidian fork suite (PR #477)
+
+Use [tests/obsidian/README.md](tests/obsidian/README.md) for independent owned, inherited, coverage, actual-browser and packed-consumer commands. The upstream configuration remains intact. Preserve fingerprint guards, failed inherited diagnostics, exact artifact/source identities and type-only exclusions; no model/AST discovery counts as rendered behavior. Update the OBS ledger and appropriate source/browser/native cases for every boundary change. Native hosts remain owned by the plugin coordinator under its session lock.

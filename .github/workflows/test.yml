@@ -6,6 +6,8 @@ on:
 
 jobs:
   test:
+    # zsviczian #477: retain upstream web-app CI for upstream; fork gates live in obsidian-tests.yml.
+    if: github.repository == 'excalidraw/excalidraw'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4

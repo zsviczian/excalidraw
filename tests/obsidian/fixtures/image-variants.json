@@ -1,0 +1,60 @@
+{
+  "license": "CC0-1.0",
+  "description": "Synthetic saved image metadata. Source kind is host metadata; decoded format behavior is verified by the native coordinator, not these restore tests.",
+  "cases": [
+    {
+      "sourceKind": "raster",
+      "opacity": 0,
+      "locked": false,
+      "cropped": false
+    },
+    {
+      "sourceKind": "raster",
+      "opacity": 50,
+      "locked": true,
+      "cropped": true
+    },
+    {
+      "sourceKind": "svg",
+      "opacity": 100,
+      "locked": false,
+      "cropped": true
+    },
+    {
+      "sourceKind": "pdf-page",
+      "opacity": 100,
+      "locked": true,
+      "cropped": false
+    },
+    {
+      "sourceKind": "svg",
+      "opacity": 0,
+      "locked": true,
+      "cropped": false
+    },
+    {
+      "sourceKind": "pdf-page",
+      "opacity": 0,
+      "locked": false,
+      "cropped": true
+    },
+    {
+      "sourceKind": "svg",
+      "opacity": 50,
+      "locked": false,
+      "cropped": false
+    },
+    {
+      "sourceKind": "raster",
+      "opacity": 100,
+      "locked": false,
+      "cropped": false
+    },
+    {
+      "sourceKind": "pdf-page",
+      "opacity": 50,
+      "locked": false,
+      "cropped": false
+    }
+  ]
+}

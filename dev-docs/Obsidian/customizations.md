@@ -149,6 +149,8 @@ ownership/compatibility tests and validation limits are in the [review](pr-471-m
 
 **Retain.** Local Font numeric ID **4** is a persistent/public identity, not a spare upstream font slot. [Fonts.ts](../../packages/excalidraw/fonts/Fonts.ts) exposes registration/loading helpers, allows local-font replacement, filters unrelated host font loads, and ensures an empty scene can load the welcome font. It avoids registering/checking the changing local face like ordinary static fonts. [ExcalidrawFontFace.ts](../../packages/excalidraw/fonts/ExcalidrawFontFace.ts) asks the host for vault fonts first, accepts whole-face CSS data, and supplies `getContentLegacy`. `obsidianUtils.ts` exposes metrics, family enumeration, local registration, scene font loading, CSS registration/definitions, and filename-based vault delegation.
 
+PR #477 / plugin #3022: `getCSSFontDefinition` respects `metadata.local`, returning no font-file CSS for system fonts such as Helvetica. The maintainer authorized this fix after the native Markdown-image test reproduced an empty-source fetch diagnostic. Independent source cases protect both the system-font path and unchanged bundled-font embedding; native validation uses Helvetica frontmatter.
+
 `P: src/shared/EmbeddedFileLoader.ts` and `src/core/settings.ts` actively call `getCSSFontDefinition`, which uses `getContentLegacy`; `src/constants/constants.ts` exposes its library binding. Its name is **not** evidence of obsolescence. `registerFontsInCSS` itself is publicly declared/documented even though no current plugin runtime call was found. Required fonts/Assistant are bundled by OBS-003; CJK is the deliberate lazy-path exception. The four added comments in `fonts/fonts.css` do not implement bundling and can be retired independently. Browser-specific checks, global document use in legacy CSS registration, and empty-scene behavior need targeted coverage rather than wholesale reversion. **Gate:** V01, V03, V04, V06; D01, D05.
 
 <a id="obs-014"></a>
@@ -361,6 +363,23 @@ scene-file loader. See the [review](pr-472-merge-review.md).
 <a id="obs-033"></a>
 ## OBS-033 — Fork regression tests and fixture adaptations
 
+**PR #477 follow-up (2026-10-30):** The built-browser grouping/history fixture
+must not pointer-click an already active Selection button: that deliberately
+activates Lasso (`components/Tools.tsx`). Passive failure evidence confirms this
+caused the selection readiness timeout. Check the active tool before the setup
+click; preserve every selection/group/delete/undo assertion. All 18 normal
+production/development browser cases pass after this test-only correction.
+No upstream-owned test or production source changes.
+
+**PR #477 / plugin #3022 follow-up (2026-10-28):** The independent suite adds
+nine immutable pairwise saved-image cases. Shared file identity, distinct crop
+and display geometry, zero opacity, locked state, frame/group membership, links
+and unknown host data must survive JSON restore without mutating the input.
+These tests live entirely under `tests/obsidian/` and add no upstream-owned
+runtime or test delta. Actual decoded raster/SVG/PDF output, source edits and
+missing-file recovery belong to the plugin's repository-local native matrix;
+their implementation is not a claim that native verification has passed.
+
 **PR #475 (2026-10-27):** Add a frozen-image skeleton regression and `tests/obsidianPele.test.tsx`, mounting a real App through public API/context rather than legacy window.h. Host label metrics/rawText/alignment and the transient arrow-refresh option are checked. Seventy-three focused tests and the CPU canvas test pass; full suite remains red. Exact-parent transform snapshots reproduce the eight mismatches; no generated snapshots are accepted. See the [PR #475 review](pr-475-merge-review.md).
 
 **PR #469 (2026-10-20):** Restore upstream hook declarations/initialization/mount in isTestEnv only, enabling the incoming ownership tests while retaining production/dev isolation. The final focused set passes 88 tests. The full older UI harness still fails; representative failures reproduce on the parent with the same test-only hook restoration. No broad suite pass is claimed. [Merge review](pr-469-merge-review.md).
@@ -374,6 +393,8 @@ The PR #458 checkpoint adds four mounted-editor selection regressions using `onE
 PR #465 adds [obsidianWrap.test.tsx](../../packages/excalidraw/tests/obsidianWrap.test.tsx), with five standard-lane tests for explicit-link/raw-source/history ownership, original-container restoration, dark frame theme, edge-aligned stroke clipping and marker guards. It does not use disabled window.h hooks. The new incoming wrap suite shares the existing collection/type limitations; desktop owning-window probes supply separate runtime evidence. See the [review](pr-465-merge-review.md).
 
 <a id="obs-034"></a>
+PR #477 adds independent owned/inherited configurations and standard source/browser/package reports under [tests/obsidian](../../tests/obsidian/README.md). Fingerprint-checked test-only render/tool-clock adapters preserve actual editor bootstrap and scheduling; trusted built/native input remains separate evidence. Source coverage excludes generated/vendor/type-only files, lists unexecuted modules by OBS group, and ratchets the actual host/portal/event-bus boundaries. Four narrow existing test-type errors are repaired; dedicated owned types include real host return signatures. The clean packed bundler consumer protects emitted declaration export paths (OBS-002/004). No fork runtime algorithm, protocol, version or persisted scene change. Inherited/root-update failures and restored golden changes remain explicit diagnostics; no blanket timeout or auto-accepted snapshot remedy. CI runs on ordinary hosted PR runners; native host ownership stays in the plugin coordinator.
+
 ## OBS-034 — Repository export and local workflow artifacts
 
 **Cleanup candidates, not product behavior.** Root scripts add `repo:export` and a machine-specific `repo:update` rsync from `~/Downloads/update/`. [generate-repository-zip.sh](../../scripts/generate-repository-zip.sh) creates a filtered, text-focused archive excluding images/fonts/binaries and many directories. `.gitignore`, package `.gitignore`, and `.nvmrc` support local export/deploy/Node setup. The fork also contains a non-UTF-8 `dirtree-mine.txt` tree dump and an empty `packages/excalidraw/npm` file.

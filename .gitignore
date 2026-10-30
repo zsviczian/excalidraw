@@ -29,3 +29,4 @@ meta*.json
 .claude
 
 repository.zip
+.test-work/

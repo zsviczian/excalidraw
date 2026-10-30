@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "review": {
-    "date": "2026-10-27",
+    "date": "2026-10-28",
     "dependency_precommit_tests": "PR #475: 73 focused component tests, one CPU export test, 19 plugin tests, four Extras tests and installed/local-generated type contracts pass. Artifacts/declarations and companion builds complete. Full typecheck retains three baseline test errors; test:update: 81 passing/80 failing suites, 1242 passing/1476 failing tests, 47 skipped/one todo, three errors. Snapshots restored; eight transform mismatches reproduce on exact parent.",
     "method": "PR #475: review all 72 incoming paths, three conflicts against base/fork/upstream, auto-merges and companion consumers; preserve editable image source with readonly v3 skeletons and adapt transient arrow options. No additional retirement. See pr-475-merge-review.md.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
@@ -38,6 +38,25 @@
       "runtime_validation": "Windows Obsidian 1.14.5 in excalidraw-test: final combined Lucide/SVG/native-CLI run excalidraw-obsidian-uvQpEQ passes, including actual menu, scoped fresh-popout insertion, history, stale-target refusal, reload, JavaScript-error gate and cleanup. All 1935 names x three presets attempted: 5802 success; installed save-off rejected for viewport geometry at each size. main.js 5028698 bytes, SHA-256 34a0b15cd98d4c7875ca24bf0215934ac4691ad77b51a1defd2833e292d459c5. Source and four component artifact hashes in plugin docs/LUCIDE_ICON_VALIDATION.md. Unpublished protocol-3 local handoff; cold/restored popouts, other platforms, physical mobile and hosted CodeScanner remain separate gates.",
       "merge_authorization": "2026-10-28: maintainer explicitly authorized commit/push/merge of fork and plugin source as a paired intermediate checkpoint, deferring fork version/publication and plugin exact dependency/lockfile update until other changes accumulate. Protocol 3 remains required; no release-readiness claim.",
       "precommit": "Required test:update run excluding ignored historical tmp checkout: 81 suites pass/81 fail, 1242 tests pass/1477 fail, 47 skipped/one todo, three errors. Includes one export import timeout under parallel load, checked separately. Changed host suite passes all seven tests. Restored 16 generated snapshot/inline-test files to their pre-run bytes; no generated snapshot edits retained. Full-suite failure is not represented as a pass. Export file: default timeout reproduced in isolation, all ten tests pass with a 30-second timeout (public-root import 5.64 seconds). Full typecheck retains the same four baseline diagnostics; generated paired-fork plugin contract passes."
+    },
+    "automated_testing_3022": {
+      "scope": "Independent current-product source/coverage, built-browser and packed-consumer regression. Historical upstream audit is opt-in; all 380 old failed assertions individually assessed in test-deviations-3022.json. No upstream helper transforms in the regression configuration.",
+      "upstream": "14bb42edee3d6fee6be264e3ee78670b3b9cee79",
+      "owned": "93 owned tests pass, zero skips; source ratchets pass. 18 erased type-only modules excluded, 18 runtime modules unexecuted. Actual built-browser and packed bundler consumer checks pass.",
+      "inherited": "Standard failed lane: 2692 assertions, 2264 pass/380 fail/47 pending/one todo. Reviewed title/count adapter retains all cases with stable occurrence IDs; no skip or failure suppression.",
+      "root_update": "1255 pass/1478 fail/47 skipped/one todo/three errors. Restored 16 generated snapshot/inline-golden paths; first cleanup stopped on deleted snapshot and was recovered.",
+      "typecheck": "Full original typecheck and dedicated owned suite typecheck pass. Four preexisting test-only errors and two structurally incorrect host-stub return shapes repaired.",
+      "packaging": "Clean consumer exposed nonexistent dist/types export-map paths; existing entries now use emitted types/. Bundler resolution checked; no NodeNext/ordinary ESM runtime claim.",
+      "release": "No version/protocol change, publication or plugin dependency update; native integration belongs to plugin #3022.",
+      "focused_lint": "Zero errors and warnings in owned testing tooling/configurations and changed export test after mechanical fixes. Existing default stylish formatter throws an ESM-loading error; explicit JSON formatter succeeds. Original and owned typechecks pass; 93 owned tests/source ratchets and 12 actual-browser cases repeat successfully.",
+      "retired_test_coupling": [
+        "tests/obsidian/unit/authoring.test.tsx",
+        "tests/obsidian/unit/compatibilityGuards.test.ts",
+        "tests/obsidian/unit/inheritedBootstrap.test.tsx"
+      ],
+      "correction": "Maintainer rejected failed build/acceptance as a completed handoff. Normal plugin production/library builds and matching type selection repaired; companion independent fixtures and actual browser input protect fork contracts and affected upstream behavior. No fork runtime or version change.",
+      "current_regression": "115 independent source cases and coverage floors pass (44.32% lines, 62.39% branches, 40.78% functions); 18 actual production/development browser cases and both clean packed consumers pass. Plugin complete regression: 685 canonical cases plus source/package gates, including 44 native and 40 device cases, all pass. Browser modifier selection is platform-aware; actual macOS/mobile remain separate environments.",
+      "legacy_ci_scope": "Preserved test.yml and test-coverage-pr.yml web-app jobs are restricted to excalidraw/excalidraw. Fork changes use obsidian-tests.yml, without running obsolete upstream expectations as default gates. Upstream Vitest configuration unchanged."
     }
   },
   "sources": {
@@ -73,8 +92,8 @@
   },
   "comparison": {
     "fork": {
-      "files": 1325,
-      "sha256": "e4446f1d8c2bdbdfe7ec0afc380a60ee4935cfb2ac4328d05fa359e664ce40d5"
+      "files": 1348,
+      "sha256": "93f53be5f6875095d8e5d0e80981fa5207df732514a8d2c2479ac4139aa63cb1"
     },
     "upstream": {
       "files": 1327,
@@ -114,7 +133,7 @@
     },
     {
       "id": "OBS-006",
-      "title": "Excalidraw host service registry (protocol 2)",
+      "title": "Excalidraw host service registry (protocol 3)",
       "review_state": "retain",
       "owner": "Component host and plugin adapter maintainers"
     },
@@ -313,14 +332,50 @@
   ],
   "files": [
     {
-      "path": ".gitignore",
-      "status": "modified",
-      "fork_sha256": "166667b06ab483c0f5166468c7ba867dd28fb43ca54bcd9b4dd9cd5cc0a94e7c",
-      "upstream_sha256": "0da6e894cbff9b19d6af59dcdd3e11e5ae63d1253b3cb462744b843b1fc0ae3b",
+      "path": ".github/workflows/obsidian-tests.yml",
+      "status": "fork-only",
+      "fork_sha256": "5aff9d2d2a0c9cd1b6d5e12d8a275bd6a0ba969324070404302eb7c5c9e8306d",
+      "upstream_sha256": null,
       "ids": [
+        "OBS-001",
+        "OBS-033",
         "OBS-034"
       ],
-      "note": "Ignore locally generated repository.zip.",
+      "kind": "ci",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only."
+    },
+    {
+      "path": ".github/workflows/test-coverage-pr.yml",
+      "status": "modified",
+      "fork_sha256": "a63f6b3d9c14bef7a91ef9427c87bd88b876d89fe85ffd468d91f570f5cd9328",
+      "upstream_sha256": "b2fa2206f1cb62eea92125f520344989acac8406f617281327b1a28a08a700bd",
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "zsviczian #477 / plugin #3022: restrict preserved upstream web-app CI to upstream; fork PRs use the independent Obsidian regression workflow and opt-in diagnostic."
+    },
+    {
+      "path": ".github/workflows/test.yml",
+      "status": "modified",
+      "fork_sha256": "ad01f8b0fa020a08f92d9ad6b1560e41327c36d0507da030a4295f14d6311cc5",
+      "upstream_sha256": "aaabcbd0d4376d5ba9d894a4dae8be45e73dfc3d48c3845ec3a81d73bc0aded8",
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "zsviczian #477 / plugin #3022: restrict preserved upstream web-app CI to upstream; fork PRs use the independent Obsidian regression workflow and opt-in diagnostic."
+    },
+    {
+      "path": ".gitignore",
+      "status": "modified",
+      "fork_sha256": "e56ca7650ef54d243269892b37d706a702ee542cb82f965821ab301eb3b918c7",
+      "upstream_sha256": "0da6e894cbff9b19d6af59dcdd3e11e5ae63d1253b3cb462744b843b1fc0ae3b",
+      "ids": [
+        "OBS-034",
+        "OBS-033"
+      ],
+      "note": "Ignore locally generated repository.zip. PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped.",
       "kind": "housekeeping"
     },
     {
@@ -337,23 +392,27 @@
     {
       "path": "AGENTS.md",
       "status": "modified",
-      "fork_sha256": "f1dd5d9c9ce2176967494662df9026f748b16e8a6c6692752d8fe3ad614fd2d0",
+      "fork_sha256": "2faa3c0f6dd97564a7f5f0831f6c17f45828e0824ff151a9215a934953cbfb8c",
       "upstream_sha256": "83adc6ba0bd860a72db2e260e367ca7832fa1aaea4ce3622cca3ea7529a0f228",
       "ids": [
-        "OBS-001"
+        "OBS-001",
+        "OBS-033",
+        "OBS-034"
       ],
-      "note": "Fork execution, merge, host, artifact, and handoff policies; now requires the persisted inventory. 2026-10-12: requested reminder to use isFullPanelMode for full/tray and explicitly include compact/tablet where supported.",
+      "note": "Fork execution, merge, host, artifact, and handoff policies; now requires the persisted inventory. 2026-10-12: requested reminder to use isFullPanelMode for full/tray and explicitly include compact/tablet where supported. PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: require behavioral regression authoring for feature/fix/refactor changes, focused checkpoint checks, explicit PR-ready portable/native gates, and release/upstream/Obsidian-alpha validation; document CI versus manual native execution and documentation-only exceptions.",
       "kind": "governance"
     },
     {
       "path": "CONTRIBUTING.md",
       "status": "modified",
-      "fork_sha256": "00a4ad9cc35513340efa1e45f43a832f070c9fa9a7c97256cfd1b7618f3d430f",
+      "fork_sha256": "67621ca63104fe6f29e86ae16bcc4f1009f097ea70b5b6b4c630824b76b427b4",
       "upstream_sha256": "7a1025044e70371afa9f9037f5b1c14c7ab356dadf9331d4a26d2d735e8cca67",
       "ids": [
-        "OBS-001"
+        "OBS-001",
+        "OBS-033",
+        "OBS-034"
       ],
-      "note": "Conservative fork contribution policy and integration gates; now requires inventory maintenance and retirement evidence.",
+      "note": "Conservative fork contribution policy and integration gates; now requires inventory maintenance and retirement evidence. PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped.",
       "kind": "governance"
     },
     {
@@ -799,13 +858,14 @@
     {
       "path": "package.json",
       "status": "modified",
-      "fork_sha256": "3f0ac5fb34e475ca4f5d21595664a064cc0006cf476870ce2a39917e4d496b64",
+      "fork_sha256": "b5469acf34040cc05da9e75a06c2bd85232896551e14019f3e9c6b79b08b546a",
       "upstream_sha256": "d910edc970f966a0b1793bfe93c078552ba610c886b197b03d0767dab0eb2ac5",
       "ids": [
         "OBS-002",
-        "OBS-034"
+        "OBS-034",
+        "OBS-033"
       ],
-      "note": "Fork export/update scripts, dependency resolutions/overrides, and Yarn dependency; do not mistake lockfile churn for product behavior. Root source-map-js resolution pins patched 1.2.2 (2026-10-11 dependency review). PR #475: Adopt upstream stats scripts and Playwright; preserve fork scripts/security resolutions. See pr-475-merge-review.md.",
+      "note": "Fork export/update scripts, dependency resolutions/overrides, and Yarn dependency; do not mistake lockfile churn for product behavior. Root source-map-js resolution pins patched 1.2.2 (2026-10-11 dependency review). PR #475: Adopt upstream stats scripts and Playwright; preserve fork scripts/security resolutions. See pr-475-merge-review.md. PR #477: additive owned/source/browser/package test commands; align development-only @vitest/coverage-v8 with Vitest 3.0.6. Runtime dependencies unchanged.",
       "kind": "packaging"
     },
     {
@@ -2558,14 +2618,14 @@
     {
       "path": "packages/excalidraw/obsidianExcalidrawHost.test.ts",
       "status": "fork-only",
-      "fork_sha256": "b59414dc534f871bf9332b09c78aada22a1e4d956e57a4f1a3ad879bdbab7777",
+      "fork_sha256": "d43d23bc1931fa668a524f769e67ebb057ba74a737b6316f9cef66ca95626e36",
       "upstream_sha256": null,
       "ids": [
         "OBS-006",
         "OBS-033",
         "OBS-038"
       ],
-      "note": "Fake-host services, defaults/errors, live settings, pen panning, protocol rejection, and stale-disposer tests. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned.",
+      "note": "Fake-host services, defaults/errors, live settings, pen panning, protocol rejection, and stale-disposer tests. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned. PR #477: use supported called-times assertion; no adapter behavior or protocol change.",
       "kind": "test"
     },
     {
@@ -2631,7 +2691,7 @@
     {
       "path": "packages/excalidraw/obsidianUtils.ts",
       "status": "fork-only",
-      "fork_sha256": "54ec86ecabc23b5c128b9085a417396a602285e97e95ad88ad4092d439382d7c",
+      "fork_sha256": "6bee7d96834785622b7ba395072784521e63647f9f88a36c0afd5d765e6d9d0e",
       "upstream_sha256": null,
       "ids": [
         "OBS-006",
@@ -2644,20 +2704,20 @@
         "OBS-030",
         "OBS-038"
       ],
-      "note": "Host setting/service delegates, local-font/CSS helpers, pen/touch and zoom helpers, Mermaid wrappers, arrow refresh, and geometry compatibility APIs. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #475: refreshAllArrows passes its self-binding midpoint flag as transient fifth-argument options; no leaked persisted property. See pr-475-merge-review.md. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned.",
+      "note": "Host setting/service delegates, local-font/CSS helpers, pen/touch and zoom helpers, Mermaid wrappers, arrow refresh, and geometry compatibility APIs. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #475: refreshAllArrows passes its self-binding midpoint flag as transient fifth-argument options; no leaked persisted property. See pr-475-merge-review.md. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned. PR #477 follow-up: maintainer-approved local/system-font CSS no-fetch fix and its independent bundled/local-font regressions; 127 source cases pass, including custom Local Font preservation.",
       "kind": "integration"
     },
     {
       "path": "packages/excalidraw/package.json",
       "status": "modified",
-      "fork_sha256": "537c51f7f3aa421944d2f301dd6a12e6116e6496dc8299cd28da9e353136e33b",
+      "fork_sha256": "0e2a5943e646505c011535ab78498ebf77107d524f2e5f9c2bb9fc59a3ebc424",
       "upstream_sha256": "77ac97314a8bba124b635a37626b0f7bc950b92dd86edd0c4f0dec9d796df2e9",
       "ids": [
         "OBS-002",
         "OBS-003",
         "OBS-004"
       ],
-      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies. Baseline bee1292f3 already bumps to 0.18.142; the layout fix does not bump or publish. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. 2026-10-23: acknowledge the existing manifest-only 0.18.144 release commit 9d1e20b60 while correcting consumer declarations; no version change in this repair. PR #475: Converter 3.0.0 remains dev-only; preserve fork exports, external runtime and existing 0.18.144 version. See pr-475-merge-review.md. #3019 accounting acknowledges the already committed 0.18.145 version; this feature does not bump it.",
+      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies. Baseline bee1292f3 already bumps to 0.18.142; the layout fix does not bump or publish. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. 2026-10-23: acknowledge the existing manifest-only 0.18.144 release commit 9d1e20b60 while correcting consumer declarations; no version change in this repair. PR #475: Converter 3.0.0 remains dev-only; preserve fork exports, external runtime and existing 0.18.144 version. See pr-475-merge-review.md. #3019 accounting acknowledges the already committed 0.18.145 version; this feature does not bump it. PR #477: clean packed bundler consumer failed on nonexistent dist/types export-map paths; point existing type exports to actual generated types/. No runtime/version/API-signature change.",
       "kind": "packaging"
     },
     {
@@ -2860,13 +2920,13 @@
     {
       "path": "packages/excalidraw/tests/fixtures/elementFixture.ts",
       "status": "modified",
-      "fork_sha256": "5fa1f16232f8509e0b92027d6d48cbd3b8ae5195eb8e5d4d23a1b8d2f53cfd82",
+      "fork_sha256": "54133027c82c50cc6b9d53a7719e95ee1dbb12f964eb0b4acd73b1e36f7a3a80",
       "upstream_sha256": "fa3a50ed780c64e7f2e19bf50258d2259a67951e294d5f4cc578565ce0d2c42b",
       "ids": [
         "OBS-009",
         "OBS-033"
       ],
-      "note": "Add rawText fixture field.",
+      "note": "Add rawText fixture field. PR #477: required rawText fixture field repairs fork test source contract; persisted scene behavior unchanged.",
       "kind": "test"
     },
     {
@@ -2908,16 +2968,17 @@
     {
       "path": "packages/excalidraw/tests/obsidianExport.test.ts",
       "status": "fork-only",
-      "fork_sha256": "e7979212be5a05ec15b0821909aff98f1c7321550da4fea4e949b48ca1563164",
+      "fork_sha256": "ef8de4cf7310e94148ec14f2ad53d047ba31b6186668c05e6f6b95188c103151",
       "upstream_sha256": null,
       "ids": [
         "OBS-007",
         "OBS-009",
         "OBS-015",
-        "OBS-018"
+        "OBS-018",
+        "OBS-033"
       ],
       "kind": "regression-test",
-      "note": "PR #468: ten independent real-pipeline tests cover legacy/root/utility exports, dimensions, colors, markers, SVG metadata/links, frame clipping, JPEG and clipboard. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md."
+      "note": "PR #468: ten independent real-pipeline tests cover legacy/root/utility exports, dimensions, colors, markers, SVG metadata/links, frame clipping, JPEG and clipboard. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #477: hoist actual root/utility imports out of individual five-second cold-import assertions; all ten real export checks preserved, no blanket timeout increase. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
     },
     {
       "path": "packages/excalidraw/tests/obsidianFonts.test.ts",
@@ -2934,7 +2995,7 @@
     {
       "path": "packages/excalidraw/tests/obsidianPele.test.tsx",
       "status": "fork-only",
-      "fork_sha256": "c0577e8f9c738b3b6c727639ee7877b60e5d0bb5a34e02d835480abe4eb86200",
+      "fork_sha256": "d5ef8d9da4874365dc9880112e8d400d3134f1d2a1db9623789cae316b8687c0",
       "upstream_sha256": null,
       "ids": [
         "OBS-009",
@@ -2942,7 +3003,7 @@
         "OBS-033"
       ],
       "kind": "test",
-      "note": "PR #475: real mounted host label metrics/rawText/alignment and public arrow refresh use the upstream binding graph without the legacy window.h harness. See pr-475-merge-review.md."
+      "note": "PR #475: real mounted host label metrics/rawText/alignment and public arrow refresh use the upstream binding graph without the legacy window.h harness. See pr-475-merge-review.md. PR #477: AppContext is typed as AppClassProperties; limit internal actionManager cast to actual App context object. Test-only type repair."
     },
     {
       "path": "packages/excalidraw/tests/obsidianRenderEnvironment.test.ts",
@@ -2985,6 +3046,17 @@
       ],
       "kind": "test",
       "note": "PR #465: five independent mounted-keyboard/frame tests cover link/rawText/history round trips, original-container restoration, dark theme, frame-edge clipping and marker resize guards; no window.h dependency. Four host-layout cases verify W in full/tray/compact with tablet form factor, and block it in mobile layout."
+    },
+    {
+      "path": "packages/excalidraw/tests/queries/toolQueries.ts",
+      "status": "modified",
+      "fork_sha256": "7bf4fd5ce8d8802607f6ef051f068882a10a793a25391afb853f854ab960e507",
+      "upstream_sha256": "54fa76d2ab3f9a252e1a8737c59329e0db498baffd9ed436e0a68dd94370f0bb",
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "regression-test",
+      "note": "PR #477: semantic toolbar test IDs accept current ToolType values including Mermaid; remove stale TOOL_TYPE indexing. Test-only type repair."
     },
     {
       "path": "packages/excalidraw/tsconfig-types.json",
@@ -3126,14 +3198,276 @@
       "kind": "housekeeping"
     },
     {
+      "path": "tests/obsidian/README.md",
+      "status": "fork-only",
+      "fork_sha256": "b033a939d1cfd6b715ee69fb310292ef2b949d99245c5249b6512c4b46eb3e42",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-001",
+        "OBS-033",
+        "OBS-034"
+      ],
+      "kind": "documentation",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477: final formatting/source-contract/typed-owned-suite refinement; source behavior and reviewed assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. PR #477 follow-up: maintainer-approved local/system-font CSS no-fetch fix and its independent bundled/local-font regressions; 127 source cases pass, including custom Local Font preservation."
+    },
+    {
+      "path": "tests/obsidian/browser/run.mjs",
+      "status": "fork-only",
+      "fork_sha256": "52c30e1ee5a3074516fdf92c2e17a159bc794fd5f00816eccd2d4a2494d75170",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-003",
+        "OBS-013",
+        "OBS-019",
+        "OBS-021",
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change."
+    },
+    {
+      "path": "tests/obsidian/compatibility/duplicateTitles.json",
+      "status": "fork-only",
+      "fork_sha256": "1098b61ac117eb5d5fcac4a04c0894e7370e27d482dd2192b84fd33806fee141",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477: reviewed exact 13 inherited repeated titles/counts, creating 22 extra occurrences. Identity adapter preserves every assertion; unreviewed/changed/obsolete collisions fail."
+    },
+    {
+      "path": "tests/obsidian/compatibility/ownedTests.mjs",
+      "status": "fork-only",
+      "fork_sha256": "eff81bfedf8a5974ecca90a68247b2995ee5991ce61e66af42b98156d67a5f98",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-005",
+        "OBS-006",
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+    },
+    {
+      "path": "tests/obsidian/compatibility/renderExports.mjs",
+      "status": "fork-only",
+      "fork_sha256": "436f4b4ac31125fbdacc621bd7c696aaed0d75bbce2f47281e724c24533f000e",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-005",
+        "OBS-006",
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+    },
+    {
+      "path": "tests/obsidian/compatibility/setup.ts",
+      "status": "fork-only",
+      "fork_sha256": "db85f02d93c6cc1848b62219d7cdfe10e00910f7d9c4888f063cb0326bc945d2",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-005",
+        "OBS-006",
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped."
+    },
+    {
+      "path": "tests/obsidian/fixtures/host-scene.json",
+      "status": "fork-only",
+      "fork_sha256": "720cf1b50e0893c10c97f44e7393aff6a9c788a4867ea549fbbb3b2ee6fe96a2",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: independent fixture-backed regression for host text/links/bindings and fork-modified input/tool/library contracts. No upstream test helper transforms."
+    },
+    {
+      "path": "tests/obsidian/fixtures/image-variants.json",
+      "status": "fork-only",
+      "fork_sha256": "ec3ae2699058630e80d53d8de7eb1e67c6c13d7a6d29b3a0ca6a7f3489ed535e",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022 follow-up: immutable pairwise host image metadata/shared-source crop and dimension evidence; source restore only, decoded rendering belongs to native coordinator."
+    },
+    {
+      "path": "tests/obsidian/packageConsumer.mjs",
+      "status": "fork-only",
+      "fork_sha256": "d88f13563af50264ba2ec27423d71d188fad661538ba1e68a9e76f969d6589b4",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-002",
+        "OBS-004",
+        "OBS-005",
+        "OBS-006",
+        "OBS-007"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477: clean tarball consumer checks four runtime outputs, generated host declarations and protocol rejection using bundler resolution; no package publication. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+    },
+    {
+      "path": "tests/obsidian/provenance.mjs",
+      "status": "fork-only",
+      "fork_sha256": "6cdc3e98b4a26cb2fb6444eb080a6aa73d0ff1c86ed36dbd04d412e6e295d03d",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+    },
+    {
+      "path": "tests/obsidian/reportFiles.mjs",
+      "status": "fork-only",
+      "fork_sha256": "df9b10bba13a37fa73335575d20c6d5fab8ec57dba7b19e1805dbcdd2ab2cd5a",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+    },
+    {
+      "path": "tests/obsidian/run.mjs",
+      "status": "fork-only",
+      "fork_sha256": "04130ddb3311e649d0b02c60aadd4ddf738ca13aad083f41fba29f57cd50f23b",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477: final formatting/source-contract/typed-owned-suite refinement; source behavior and reviewed assertions preserved. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+    },
+    {
+      "path": "tests/obsidian/sourceInventory.mjs",
+      "status": "fork-only",
+      "fork_sha256": "8394590f4a8852d9c25201dff570309006e2bbc979d1826ecf313ab0d1c78993",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+    },
+    {
+      "path": "tests/obsidian/testIdentities.mjs",
+      "status": "fork-only",
+      "fork_sha256": "6243da10f3cc508cd7c3da310212ea8af0a9e9240735b94b39b17abfe1ecd492",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477: stable occurrence IDs only for reviewed upstream collisions; deterministic catalogue comparison, no status changes or dropped assertions. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+    },
+    {
+      "path": "tests/obsidian/tsconfig.json",
+      "status": "fork-only",
+      "fork_sha256": "fa1cdd1f44acf0a6741855f7933a1ff343eca603b4d06249d7bfb573e96b7835",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped."
+    },
+    {
+      "path": "tests/obsidian/unit/bootstrap.test.tsx",
+      "status": "fork-only",
+      "fork_sha256": "b87451b32cc10b5fe97e72543bd0c2b62be22801135e3321ed5831d44ce0d22b",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only."
+    },
+    {
+      "path": "tests/obsidian/unit/coreRegression.test.tsx",
+      "status": "fork-only",
+      "fork_sha256": "6a99762c5e57b9706318cebc818c20eb456290e1932c99f9fb01cf0db711d85f",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033",
+        "OBS-013"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: independent fixture-backed regression for host text/links/bindings and fork-modified input/tool/library contracts. No upstream test helper transforms. PR #477 follow-up: maintainer-approved local/system-font CSS no-fetch fix and its independent bundled/local-font regressions; 127 source cases pass, including custom Local Font preservation."
+    },
+    {
+      "path": "tests/obsidian/unit/deviceBoundaries.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "74688c7c67aa6af25afd38dd79ccf5fd317f7d25b4473ba8fa1198e585c80b8f",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-022",
+        "OBS-028",
+        "OBS-033"
+      ],
+      "kind": "regression-test",
+      "note": "PR #477: actual common-module breakpoints, desktop exclusion, tablet and live phone preferences; complements real native geometry/touch evidence."
+    },
+    {
+      "path": "tests/obsidian/unit/imageVariants.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "f7f8be1c972b1483258f17a64b485905c39c929f240b6bb5ea48ed0cff9b23e8",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022 follow-up: immutable pairwise host image metadata/shared-source crop and dimension evidence; source restore only, decoded rendering belongs to native coordinator."
+    },
+    {
+      "path": "tests/obsidian/unit/testIdentities.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "d58e86dca3355df02c8bc67a490ca35ff3b3fc2df4b78f748080f1a7d796b511",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477: negative controls reject new, changed or obsolete title collisions and preserve failure status/each occurrence independently. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+    },
+    {
+      "path": "vitest.obsidian-compat.config.mts",
+      "status": "fork-only",
+      "fork_sha256": "e14ed17d42270597d93943e671adb1825b8892c30a3d39029842e5215e43681e",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+    },
+    {
+      "path": "vitest.obsidian.config.mts",
+      "status": "fork-only",
+      "fork_sha256": "e37c512b906f5b4a8c1833a0fc1b235fb0f7798a85ce3b8038942b4f8bcda242",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only."
+    },
+    {
       "path": "yarn.lock",
       "status": "modified",
-      "fork_sha256": "361ee5590c9b9bc933326a75f9d6b57d4b690df20a684888cb59ca5e08d88ff3",
+      "fork_sha256": "5c64a40db44edf20c89888704dd8c2fa073dbc833bdaa5f8a6d0cf162ecaa909",
       "upstream_sha256": "3a40118db6c7a8d9038957d2437a7c0c52e7d882586b79739ce49660d6352196",
       "ids": [
-        "OBS-002"
+        "OBS-002",
+        "OBS-033"
       ],
-      "note": "Resolved dependency/transitive graph churn accompanying manifest overrides; not evidence of isolated Obsidian behavior or verified vulnerability remediation. This checkpoint changes only source-map-js from 1.2.1 to patched 1.2.2; other development advisories remain. PR #475: Resolve merged manifests from the fork lock; preserve security pins, prune Mermaid, add Pele and incoming Playwright. See pr-475-merge-review.md.",
+      "note": "Resolved dependency/transitive graph churn accompanying manifest overrides; not evidence of isolated Obsidian behavior or verified vulnerability remediation. This checkpoint changes only source-map-js from 1.2.1 to patched 1.2.2; other development advisories remain. PR #475: Resolve merged manifests from the fork lock; preserve security pins, prune Mermaid, add Pele and incoming Playwright. See pr-475-merge-review.md. PR #477: additive owned/source/browser/package test commands; align development-only @vitest/coverage-v8 with Vitest 3.0.6. Runtime dependencies unchanged.",
       "kind": "packaging"
     }
   ],

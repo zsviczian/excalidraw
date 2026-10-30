@@ -6,6 +6,10 @@
 import { newElement, newFrameElement } from "@excalidraw/element";
 import { vi } from "vitest";
 
+import * as utilsAPI from "@excalidraw/utils";
+
+import * as rootAPI from "../index";
+
 import { getDefaultAppState } from "../appState";
 import * as clipboard from "../clipboard";
 import { exportScene } from "../scene/export";
@@ -34,10 +38,8 @@ const data = () => ({ elements: [rectangle()], files: {} });
 
 afterEach(() => vi.restoreAllMocks());
 
-it("retains the public root and utility exports", async () => {
-  const root = await import("../index");
-  const utils = await import("@excalidraw/utils");
-  for (const api of [root, utils]) {
+it("retains the public root and utility exports", () => {
+  for (const api of [rootAPI, utilsAPI]) {
     expect(api.exportScene).toBe(exportScene);
     expect(api.exportToCanvas).toBe(exportToCanvas);
     expect(api.exportToSvg).toBe(exportToSvg);

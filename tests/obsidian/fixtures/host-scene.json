@@ -1,0 +1,22 @@
+{
+  "description": "Synthetic host scene; fixed IDs, links and custom data are the evidence oracle, not a captured upstream snapshot.",
+  "license": "CC0-1.0",
+  "skeleton": [
+    { "type": "rectangle", "id": "left", "x": 0, "y": 0, "width": 120, "height": 80, "label": { "text": "Display" }, "link": "[[Target]]", "customData": { "future": { "keep": true } } },
+    { "type": "rectangle", "id": "right", "x": 300, "y": 0, "width": 120, "height": 80 },
+    {
+      "type": "arrow",
+      "id": "edge",
+      "x": 120,
+      "y": 40,
+      "points": [
+        [0, 0],
+        [180, 0]
+      ],
+      "start": { "id": "left" },
+      "end": { "id": "right" }
+    }
+  ],
+  "hostText": { "text": "Display", "rawText": "[[Target|Display]]" },
+  "expected": { "link": "[[Target]]", "customData": { "future": { "keep": true } }, "start": "left", "end": "right", "container": "left" }
+}

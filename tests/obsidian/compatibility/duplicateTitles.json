@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 2,
+  "owner": "zsviczian",
+  "purpose": "Reviewed inherited parameterized titles omit argument values; stable occurrence IDs preserve all assertions. New or changed collisions fail discovery.",
+  "titles": [
+    {
+      "testId": "fork-inherited:packages/element/tests/duplicate.test.tsx::duplication z-order duplication z order with alt+drag for the lowest z-ordered element should be +1 for the clone",
+      "count": 2
+    },
+    {
+      "testId": "fork-inherited:packages/element/tests/fractionalIndex.test.ts::sync invalid indices with array order should sync when fractional index is malformed should sync invalid indices of all elements",
+      "count": 4
+    },
+    {
+      "testId": "fork-inherited:packages/element/tests/fractionalIndex.test.ts::sync invalid indices with array order should sync when fractional indices are duplicated should sync invalid indices of all elements",
+      "count": 2
+    },
+    {
+      "testId": "fork-inherited:packages/element/tests/fractionalIndex.test.ts::sync invalid indices with array order should sync when a fractional index is out of order should sync invalid indices of moved elements or fallback",
+      "count": 2
+    },
+    {
+      "testId": "fork-inherited:packages/element/tests/fractionalIndex.test.ts::sync invalid indices with array order should sync all moved elements regardless of their validity should sync invalid indices of moved elements or fallback",
+      "count": 8
+    },
+    {
+      "testId": "fork-inherited:packages/element/tests/fractionalIndex.test.ts::sync invalid indices with array order should generate fractions for explicitly moved elements should generate fractions given duplicated indices should sync invalid indices of moved elements or fallback",
+      "count": 3
+    },
+    {
+      "testId": "fork-inherited:packages/element/tests/linearElementEditor.test.tsx::Test Linear Elements Inside editor When edges are round should allow dragging lines from midpoints in between segments",
+      "count": 2
+    },
+    {
+      "testId": "fork-inherited:packages/element/tests/linearElementEditor.test.tsx::Test Linear Elements Inside editor When edges are round should hide midpoints in the segment when points moved close",
+      "count": 2
+    },
+    {
+      "testId": "fork-inherited:packages/element/tests/resize.test.tsx::line element resizes",
+      "count": 2
+    },
+    {
+      "testId": "fork-inherited:packages/element/tests/resize.test.tsx::line element flips while resizing",
+      "count": 2
+    },
+    {
+      "testId": "fork-inherited:packages/element/tests/resize.test.tsx::line element resizes with locked aspect ratio",
+      "count": 2
+    },
+    {
+      "testId": "fork-inherited:packages/element/tests/resize.test.tsx::line element resizes from center",
+      "count": 2
+    },
+    {
+      "testId": "fork-inherited:packages/excalidraw/tests/contextmenu.test.tsx::contextMenu element shows context menu for element",
+      "count": 2
+    }
+  ]
+}

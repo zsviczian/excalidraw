@@ -1,0 +1,65 @@
+# zsviczian -- independent fork regression gates; upstream audit is opt-in.
+name: Obsidian fork tests
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      upstream_audit:
+        description: Run the historical upstream compatibility diagnostic
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  owned:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+          cache: yarn
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
+      - run: yarn test:typecheck --noEmit
+      - run: yarn test:obsidian:types
+      - run: yarn eslint --format json --max-warnings=0 tests/obsidian vitest.obsidian.config.mts vitest.obsidian-compat.config.mts
+      - run: yarn test:obsidian:coverage
+      - run: yarn --cwd packages/excalidraw build:esm
+      - run: yarn --cwd packages/excalidraw build:obsidian
+      - run: yarn test:obsidian:package
+      - run: yarn playwright install --with-deps chromium
+      - run: yarn test:obsidian:browser
+      - name: Compare reviewed upstream inventory
+        run: |
+          git fetch --depth=1 https://github.com/excalidraw/excalidraw.git 14bb42edee3d6fee6be264e3ee78670b3b9cee79
+          python dev-docs/Obsidian/audit.py --upstream-ref 14bb42edee3d6fee6be264e3ee78670b3b9cee79
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fork-owned-evidence
+          path: .test-work/reports
+          if-no-files-found: error
+  inherited-diagnostic:
+    if: github.event_name == 'workflow_dispatch' && inputs.upstream_audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+          cache: yarn
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
+      - name: Preserve inherited failures as a failed lane
+        run: yarn test:obsidian:compatibility
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fork-inherited-diagnostic
+          path: .test-work/reports
+          if-no-files-found: error

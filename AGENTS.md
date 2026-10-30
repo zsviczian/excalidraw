@@ -252,3 +252,16 @@ When uncertain, choose the solution that:
 5. can be built and tested as one small checkpoint; and
 6. will create the least friction during the next upstream merge.
 - When overriding properties of an existing type, prefer `Merge<Base, Overrides>` from `@excalidraw/common/utility-types` over `Omit<Base, keyof Overrides> & Overrides`.
+
+
+## Automated Obsidian fork suite (PR #477)
+
+### Required regression coverage and execution
+
+- Every behavior-changing feature, fix or refactor must add or extend fork-owned executable tests for the intended customization and affected upstream workflows. For fixes, retain a failing-before/passing-after reproduction. Preserve existing assertions and assess unexpected deviations individually; do not bless snapshots or rewrite upstream tests to make a fork-specific expectation pass.
+- Run affected focused tests, lint/type checks and the required Obsidian build at each implementation checkpoint. Before declaring a fork code PR ready, run `yarn test:obsidian:coverage`, `yarn test:obsidian:types`, both package builds, `yarn test:obsidian:package` and `yarn test:obsidian:browser` as documented in `tests/obsidian/README.md`. Update the relevant OBS contracts, test mappings and reviewed inventory in the same change.
+- For changes affecting actual Obsidian editing, assets, host adapters, window ownership/lifecycle or packaging, run the affected native scenarios and the complete `npm run test:native` profile from the sibling plugin before readiness. That coordinator builds the current workspace fork/plugin/Extras and verifies artifacts in its repository-local vault. Run the combined portable/native profiles after upstream integration and before a coordinated release; use the same native profile when validating new Obsidian releases or alphas. Required repeat counts belong to the explicit acceptance plan.
+- Fork source/browser/package CI runs on pull requests and pushes to `master`; actual Obsidian native tests are manually invoked or dispatched through the plugin's isolated runner. They do not execute in the shipped component. Record exact tested revisions, commands, artifacts and unavailable environments; a unit/browser pass is not native integration evidence.
+- Documentation-only or demonstrably mechanical edits need relevant inventory/documentation checks, not invented behavior tests. Preserve failed evidence and distinguish discovery from coverage.
+
+Use [tests/obsidian/README.md](tests/obsidian/README.md) for independent source/coverage, actual-browser and packed-consumer regression commands. Current fork behavior is accepted by default; protect intended fork contracts and the upstream workflows touched by them. The independent suite must not depend on upstream test-helper adapters. Historical upstream diagnostics are opt-in investigation, not required PR gates; assess deviations individually before proposing product changes and never auto-accept snapshots. Preserve exact artifact/source identities and type-only exclusions; model/AST discovery is not rendered behavior. Update the OBS ledger and relevant source/browser/native cases for every boundary change. Native hosts remain owned by the plugin coordinator under its session lock.
