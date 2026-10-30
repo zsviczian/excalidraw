@@ -16,6 +16,11 @@ This is repository governance, not a runtime customization. Retain the policy di
 <a id="obs-002"></a>
 ## OBS-002 — Package identity and dependency graph
 
+**PR #478:** Converter 3.1.0 remains dev-only in the fork. Extras bundles its
+Pele lazy modules in one offline payload, retaining the unreleased 3.0.0 service
+handshake. Fork security resolutions and exact dependency locks remain; no
+package/API version bump. See [merge review](pr-478-merge-review.md).
+
 **PR #475 (2026-10-27):** Converter 3.0.0 stays dev-only in the fork; Pele 1.8.0 is supplied through Extras. The merged lock retains fork security resolutions and prunes old Mermaid dependencies. No fork package/release bump. See the [PR #475 review](pr-475-merge-review.md).
 
 **Minimize, with packaging defects to investigate.** [Package manifest](../../packages/excalidraw/package.json), [root manifest](../../package.json), and [lockfile](../../yarn.lock) differ in package scope/version, source/types/files fields, build/publish scripts, overrides/resolutions, and development dependencies. The component removes `@excalidraw/common`, `@excalidraw/element`, and `@excalidraw/math` runtime dependencies, moves Mermaid to development dependencies, and adds Obsidian build tooling. Root tooling adds Yarn and local repository scripts. Override comments cite scanner findings; this audit does not independently certify vulnerability status or the compatibility of forced versions.
@@ -328,6 +333,12 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 <a id="obs-030"></a>
 ## OBS-030 — Host Mermaid conversion and editable diagram metadata
 
+**PR #478:** Per-diagram loading belongs inside the Extras build, not the fork's
+runtime. Keep public loaded/api, lazy host activation, retry/cache, queued latest
+preview and persisted editable-image source. Upstream web-app service-worker
+prefetch is outside Obsidian. Twelve diagram kinds now have offline Extras
+browser/native assertions. No equivalent replacement justifies retirement.
+
 **PR #475 (2026-10-27):** Upgrade the external engine to converter 3/Pele via Extras component 3.0.0; the plugin requires that exact version. Copy readonly image skeletons in the dialog and queued converter while retaining `customData.mermaidText`. Seven of twelve tested kinds still produce images, so selected-source metadata remains required. Host/public loaded/api, retry/cache, queue and pending preview remain; adopt upstream source-aware errors and owning-environment metrics. Forty-one Windows offline/main/popout/persistence assertions pass; no Obsidian 1.15 engine or additional retirement. See the [PR #475 review](pr-475-merge-review.md).
 
 **PR #472:** Preserve host loading in the existing fork helper and adapt it to
@@ -362,6 +373,11 @@ scene-file loader. See the [review](pr-472-merge-review.md).
 
 <a id="obs-033"></a>
 ## OBS-033 — Fork regression tests and fixture adaptations
+
+**PR #478:** Seven fork-owned real-scene placement cases protect incoming
+flowchart centering, obstacle gaps, rounding, bindings and inherited host styles. Upstream implementation
+and tests remain verbatim. First-use diagram modules are exercised in Extras'
+actual built browser bundle and the plugin's native gateway.
 
 **PR #477 follow-up (2026-10-30):** The built-browser grouping/history fixture
 must not pointer-click an already active Selection button: that deliberately

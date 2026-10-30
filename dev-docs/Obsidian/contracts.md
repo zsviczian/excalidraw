@@ -30,6 +30,13 @@ The plugin shares an evaluated runtime across editor roots. Each editor has a st
 
 ## Host registries — OBS-005/006
 
+PR #478 updates the converter implementation to 3.1.0 while preserving the
+unreleased Extras Mermaid service version 3.0.0, by explicit maintainer direction.
+That service version is a paired compatibility contract, not an alias for the
+converter's npm version. Extras inlines the per-diagram imports into its single
+CommonJS payload. No runtime chunks, remote loader or new protocol surface is
+introduced; the plugin's exact-version check stays unchanged.
+
 Both registrations are scoped to the evaluated package module, not to individual views. Both reject a mismatched `protocolVersion` and return an idempotent disposer protected by a unique token: disposing an older registration must not clear a newer one. The adapter implementations read relevant settings at call time rather than permanently capturing their initial values.
 
 ### Common host, protocol 1

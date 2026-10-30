@@ -35,8 +35,8 @@ jobs:
       - run: yarn test:obsidian:browser
       - name: Compare reviewed upstream inventory
         run: |
-          git fetch --depth=1 https://github.com/excalidraw/excalidraw.git 14bb42edee3d6fee6be264e3ee78670b3b9cee79
-          python dev-docs/Obsidian/audit.py --upstream-ref 14bb42edee3d6fee6be264e3ee78670b3b9cee79
+          git fetch --depth=1 https://github.com/excalidraw/excalidraw.git a758e93d6a03e9f995973703cb886850a398a6d3
+          python dev-docs/Obsidian/audit.py --upstream-ref a758e93d6a03e9f995973703cb886850a398a6d3
       - uses: actions/upload-artifact@v4
         if: always()
         with:

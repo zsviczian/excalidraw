@@ -9,7 +9,7 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 | [Customization catalog](customizations.md) | 38 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
-| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 237 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
+| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 264 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
 | [Validation and merge playbook](validation.md) | What was actually verified, existing regression tests, missing runtime evidence, and behavior-specific gates. |
 | [Obsidian runtime testing](OBSIDIAN_RUNTIME_TESTING.md) | Guarded CLI test-vault deployment, exact-build desktop smoke, reports, and feature-specific host probes. |
 | [Local audit checker](audit.py) / [checker tests](test_audit.py) | Dependency-free, offline source accounting; detects changed, new, or retired differences and stale tree fingerprints. |
@@ -17,6 +17,18 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md](../../CONTRIBUTING.md). This inventory documents existing deviations even when they do not yet comply with those policies; it does not silently approve them.
 
 ## Reviewed merge checkpoints
+
+### PR #478 lazy Pele and centered flowcharts - 2026-10-30
+
+The [PR #478 review](pr-478-merge-review.md) accounts for all 13 incoming paths
+against `a758e93d6a03e9f995973703cb886850a398a6d3`, fork parent `b2e798f37`,
+and merge base `14bb42ede`. Converter 3.1 stays dev-only here and bundled
+offline in Extras. Its unreleased service contract stays 3.0.0; no API/package
+version or plugin dependency bump. Preserve the host loader, queued/latest
+preview and editable-image metadata. No additional retirement is justified.
+Ledger: 264 differing paths; complete trees 1350 fork / 1328 upstream.
+Use the incoming commit above for the current comparison; older commands below
+are historical examples. Validation status and limits live in the review.
 
 ### PR #475 Mermaid 3/Pele - 2026-10-27
 
@@ -159,7 +171,7 @@ Requires Python 3.10+ only. Run from the fork monorepo root. No dependency insta
 
 ```bash
 python dev-docs/Obsidian/test_audit.py
-python dev-docs/Obsidian/audit.py --upstream-ref 14bb42edee3d6fee6be264e3ee78670b3b9cee79
+python dev-docs/Obsidian/audit.py --upstream-ref a758e93d6a03e9f995973703cb886850a398a6d3
 ```
 
 `--upstream` can instead name the supplied upstream ZIP. `--fork` defaults to the repository containing this script and can also name a clean directory or ZIP. Comparing the **original** fork ZIP against the handoff ledger should report the two intentional root-policy edits; use the patched checkout for a clean handoff comparison.

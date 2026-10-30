@@ -1,0 +1,53 @@
+/** zsviczian -- guarded PR #478 replay of the reviewed #475 real-Extras dialog workflow. */
+import assert from 'node:assert/strict';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { resolve, join } from 'node:path';
+import { randomUUID } from 'node:crypto';
+import { runObsidianSmoke } from '../scripts/testing/host/runner.mjs';
+import { produceCombination, stageExtras } from '../scripts/testing/host/combination.mjs';
+import { configureLocalVaultEnvironment, prepareLocalVault, restoreLocalVaultBaseline } from '../scripts/testing/localVault.mjs';
+import { acquireHostLock } from '../scripts/testing/host/hostLock.mjs';
+import { obsidianCliExecutable, spawnNativeSync } from '../scripts/testing/host/processTools.mjs';
+const pluginRoot=resolve(import.meta.dirname,'..'), target=configureLocalVaultEnvironment(pluginRoot);
+const userDataPath=join(process.env.APPDATA,'obsidian'), lock=acquireHostLock({userDataPath});
+const reportDir=resolve(process.env.EXCALIDRAW_TEST_REPORT_DIR || join(pluginRoot,'.test-work/reports/pr478-dialog-'+randomUUID()));
+const runCli=(vault,name,...args)=>{
+ const result=spawnNativeSync(obsidianCliExecutable(),[`vault=${vault}`,name,...args],{cwd:pluginRoot,encoding:'utf8',timeout:60000,maxBuffer:4000000});
+ assert.equal(result.status,0,result.error?.message||result.stderr||result.stdout);return result.stdout;
+};
+const cli=(name,...args)=>runCli(target.vaultName,name,...args);
+const parse=output=>JSON.parse(output.trim().replace(/^=>\s*/,''));
+let report;
+try {
+ assert.ok(!existsSync(join(reportDir,'report.json')), 'Choose a fresh report directory');
+ const combination=produceCombination({pluginRoot,forkRoot:resolve(pluginRoot,'../excalidraw'),extrasRoot:resolve(pluginRoot,'../obsidian-excalidraw-extras'),output:join(pluginRoot,'.test-work/frozen/pr478-dialog-'+randomUUID())});
+ const preparation=await prepareLocalVault({projectRoot:pluginRoot,combination,userDataPath,cli});
+ assert.equal(preparation.ready,true);mkdirSync(reportDir,{recursive:true});writeFileSync(join(reportDir,'preparation.json'),JSON.stringify(preparation,null,2));
+ const code=readFileSync(resolve(pluginRoot,'../excalidraw/dev-docs/Obsidian/pr-478-dialog-feature.txt'),'utf8');
+ report=await runObsidianSmoke({projectRoot:pluginRoot,vaultName:target.vaultName,vaultPath:target.vaultPath,configDir:target.configDir,automationRoot:process.env.EXCALIDRAW_TEST_AUTOMATION_ROOT,expectedUserDataPath:userDataPath,reportDir,source:{buildMode:'workspace-frozen-pr478-dialog',...combination.manifests.plugin},ownedDebugger:true,runCli,
+  deployCompanions:context=>stageExtras({combination,...context}),
+  runBuild:()=>({pluginArtifactRoot:join(combination.output,'plugin'),forkArtifacts:Object.fromEntries(combination.manifests.fork.artifacts.filter(a=>['production-js','production-css','development-js','development-css'].includes(a.role)).map(a=>[a.role,a.sha256])),combination}),
+  scenarios:[async({cli})=>{
+   // Failed diagnostics retain their result on disk. Retire only a completed,
+   // fully cleaned controller; never hide pending work or owned files.
+   cli('eval',"code=(()=>{const c=globalThis.__pr478Feature;if(!c)return JSON.stringify({clean:true});if(!c.finished)throw Error('Previous Mermaid diagnostic is unsettled');if([...c.owned].some(path=>app.vault.getFileByPath(path))||app.vault.getFolderByPath(c.prefix))throw Error('Previous Mermaid diagnostic left owned files');delete globalThis.__pr478Feature;return JSON.stringify({retiredCompleted:true})})()");
+   const started=parse(cli('eval','code='+code));assert.equal(started.started,true);
+   let result;
+   const deadline=Date.now()+120000;
+   for(;;){
+    result=parse(cli('eval','code=JSON.stringify((({finished,status,checks,error,cleanupError,emptyOwnedFolder,diagramKinds})=>({finished,status,checks,error,cleanupError,emptyOwnedFolder,diagramKinds}))(globalThis.__pr478Feature))'));
+    if(result.finished)break;
+    if(Date.now()>deadline)throw Error('Dialog diagnostic deadline; preserve live controller for recovery');
+    await new Promise(resolve=>setTimeout(resolve,100));
+   }
+   writeFileSync(join(reportDir,'dialog-results.json'),JSON.stringify(result,null,2));
+   assert.equal(result.status,'passed',JSON.stringify(result));assert.equal(result.cleanupError,undefined);assert.equal(result.emptyOwnedFolder,true);
+   cli('eval',"code=(()=>{const c=globalThis.__pr478Feature;if(!c?.finished)throw Error('Unsettled controller');delete globalThis.__pr478Feature;return 'clean'})()");
+   return{id:'real-extras-mermaid-main-popout-offline',status:'passed',assertions:result.checks};
+  }]
+ });
+ if(report.cleanup==='passed')report.baselineRestoration=await restoreLocalVaultBaseline({projectRoot:pluginRoot,cli});
+ writeFileSync(join(reportDir,'report.json'),JSON.stringify(report,null,2));
+ assert.equal(report.status,'passed',report.error);assert.equal(report.cleanup,'passed');
+ console.log('PR478 real dialog:',report.status,'checks',report.scenarios.find(s=>s.id==='real-extras-mermaid-main-popout-offline')?.assertions.length);
+}finally{lock.release();}

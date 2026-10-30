@@ -114,6 +114,12 @@ Prefer explicit host capabilities for the exceptional URL paths instead of widen
 <a id="d13"></a>
 ## D13 — Consolidate Mermaid loading and isolate generic preview fixes
 
+**PR #478 checkpoint:** No upstream replacement for the host loader, queued/latest
+preview or persisted selected-image source is introduced. New web-app prefetch
+addresses service-worker chunks; Extras instead inlines every diagram module.
+Retain those active differences and public aliases; no unrelated cleanup is
+included. See [merge review](pr-478-merge-review.md).
+
 **PR #475 checkpoint (2026-10-27):** Pele still emits image skeletons for seven tested diagram kinds. Keep image-source attachment/selected-source editing, copying readonly skeletons. Existing public loaders and queued/latest preview semantics still have active consumers; no additional upstream-equivalent retirement is established. Exact Extras component 3.0.0 plus installed/local declaration checks and forty-one native offline/main/popout assertions pass. Platform/broad-suite limits remain in the [PR #475 review](pr-475-merge-review.md).
 
 **PR #472 checkpoint (2026-10-21):** Upstream generated-text validation now

@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "review": {
-    "date": "2026-10-28",
-    "dependency_precommit_tests": "PR #475: 73 focused component tests, one CPU export test, 19 plugin tests, four Extras tests and installed/local-generated type contracts pass. Artifacts/declarations and companion builds complete. Full typecheck retains three baseline test errors; test:update: 81 passing/80 failing suites, 1242 passing/1476 failing tests, 47 skipped/one todo, three errors. Snapshots restored; eight transform mismatches reproduce on exact parent.",
-    "method": "PR #475: review all 72 incoming paths, three conflicts against base/fork/upstream, auto-merges and companion consumers; preserve editable image source with readonly v3 skeletons and adapt transient arrow options. No additional retirement. See pr-475-merge-review.md.",
+    "date": "2026-10-30",
+    "dependency_precommit_tests": "PR #478: 701 combined portable cases pass, including 134 fork source, 18 fork browser, 29 Extras source and 17 Extras browser cases; full/owned types, both package builds, clean consumers and zero-warning owned lint pass. Fifteen audit tests and 264-path fingerprints pass.",
+    "method": "PR #478: three-parent review of all 13 incoming paths, sole manifest conflict, auto-merges and host/Extras consumers. Converter remains dev-only in fork and fully bundled by Extras. No eligible runtime retirement established.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
-      "fork_parent": "404912c08166f553ed22c97f246d274fbcd74e11",
-      "upstream_parent": "14bb42edee3d6fee6be264e3ee78670b3b9cee79",
-      "merge_base": "b7de45e88111f5680ae4bb3c3f3541c7d3b279fe",
-      "state": "resolved; Windows core/native main-popout and real-Extras offline Mermaid gates pass; broad-suite/platform/release limits explicit",
-      "reference": "https://github.com/zsviczian/excalidraw/pull/475"
+      "fork_parent": "b2e798f37aa646bf81c831d664845806bbc671ee",
+      "upstream_parent": "a758e93d6a03e9f995973703cb886850a398a6d3",
+      "merge_base": "14bb42edee3d6fee6be264e3ee78670b3b9cee79",
+      "state": "Resolved and validated: 701 portable cases and 43 real-Extras native dialog assertions pass; full native observer gate remains failed and reproduces on a fresh pre-merge renderer.",
+      "reference": "https://github.com/zsviczian/excalidraw/pull/478"
     },
-    "runtime_validation": "PR #475: Windows Obsidian 1.14.5 guarded core authoring/history/wheel/link/image/export checks, extended main/popout image matrix and 41 offline real-Extras Mermaid assertions pass, including source preview/save-reopen. Error/cleanup gates pass. main.js 5012218 bytes. Unpublished local artifacts; no Obsidian 1.15 dependency. Missing TestAssets SVG corpus, cold app restart/restored popouts, other platforms/physical mobile and broad-suite failures remain. See pr-475-merge-review.md.",
+    "runtime_validation": "PR #478: Windows Obsidian 1.14.5/installer 1.14.5. Candidate full native: 349/357 pass, eight settling failures amid 22507 exact ResizeObserver notifications; all 258 behavioral obligations and 40 profiles pass, cleanup/restoration pass. Fresh pre-merge renderer with original artifact hashes reproduces the same lifecycle-new-popout-survivor storm (460 notifications). Cause unassigned; no exclusion, observer, threshold or production workaround change. Real candidate Mermaid main/popout diagnostic: 43 assertions across 13 kinds pass, zero notifications/errors, cleanup/restoration pass. See pr-478-results.json.",
     "dependency_checkpoint": "2026-10-11: Obsidian artifact/declaration and plugin production/library builds pass. Local fork Windows Obsidian 1.14.4 smoke passes. Published 0.18.140 main/direct-popout/moved-popout input/save/cleanup smoke passes. Plugin npm tree/audit confirms no braces and source-map-js 1.2.2. Component full typecheck remains blocked by documented window.h/stale test-type failures. Packed manifest confirms Sass dev-only; no publication/version bump. The 5 MB target is 5 * 1024 * 1024 = 5,242,880 bytes. Plugin main.js: 5,051,865 bytes with published component (191,015 bytes of headroom), 5,057,617 with local fork (185,263 bytes of headroom); both are below the target. No full scanner, macOS or physical-mobile run in this checkpoint.",
     "layout_followup": "Validated follow-up: W/menu predicate enabled for full/tray/compact, excluded in mobile. 25 focused tests, isolated source typecheck, declarations/artifacts and plugin production/development builds pass. Full typecheck retains 262 existing diagnostics. Baseline tray/compact keyboard tests already passed; original reported tray failure was not reproduced. Extra live probe passed full-layout keyboard/link/history then stopped on unavailable host command-palette rendering; cleanup restored settings and removed owned drawing/controller. No full live layout-matrix pass claimed.",
     "layout_precommit": "Precommit snapshot-update run stopped at explicit maintainer request to skip further testing and commit/merge. Unrelated generated snapshots restored. Prior focused tests/builds remain the validation evidence.",
@@ -57,47 +57,55 @@
       "correction": "Maintainer rejected failed build/acceptance as a completed handoff. Normal plugin production/library builds and matching type selection repaired; companion independent fixtures and actual browser input protect fork contracts and affected upstream behavior. No fork runtime or version change.",
       "current_regression": "115 independent source cases and coverage floors pass (44.32% lines, 62.39% branches, 40.78% functions); 18 actual production/development browser cases and both clean packed consumers pass. Plugin complete regression: 685 canonical cases plus source/package gates, including 44 native and 40 device cases, all pass. Browser modifier selection is platform-aware; actual macOS/mobile remain separate environments.",
       "legacy_ci_scope": "Preserved test.yml and test-coverage-pr.yml web-app jobs are restricted to excalidraw/excalidraw. Fork changes use obsidian-tests.yml, without running obsolete upstream expectations as default gates. Upstream Vitest configuration unchanged."
+    },
+    "pr478": {
+      "reference": "https://github.com/zsviczian/excalidraw/pull/478",
+      "production": "Verbatim incoming flowchart behavior and dev-only converter 3.1 dependency; Extras inlines lazy modules, unreleased component contract remains 3.0.0. Plugin production and PDF source unchanged.",
+      "retirements": [],
+      "nativeAcceptance": "failed-existing-diagnostic",
+      "evidence": "pr-478-results.json"
     }
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "02d5b607525da43eadaad72954d4fc644f3c157a",
+      "parent_commit": "b2e798f37aa646bf81c831d664845806bbc671ee",
       "package": "@zsviczian/excalidraw",
       "version": "0.18.145"
     },
     "upstream": {
       "kind": "local Git commit",
-      "commit": "14bb42edee3d6fee6be264e3ee78670b3b9cee79",
-      "tree": "001e021f4db3e677481ad415f43abead1b533bf5",
+      "commit": "a758e93d6a03e9f995973703cb886850a398a6d3",
+      "tree": "6bd381be885ddd85448467519c062560b07deb0a",
       "package": "@excalidraw/excalidraw",
       "version": "0.18.0"
     },
     "plugin": {
       "kind": "Git working tree",
-      "commit": "19e9a116fcfff75c3429840b42cfbca787590feb",
+      "commit": "8a0e294013093ad14bbaf319c8ffa77b0fcf0009",
       "version": "2.29.0",
       "fork_dependency": "0.18.145",
-      "working_tree_changes": "PR #3019: local shared Lucide constructor/EA, picker, native CLI and protocol-3 adapter; pre-existing #3018 follow-up fixes retained. Unpublished paired artifacts and generated declaration checks; no dependency update."
+      "working_tree_changes": "PR #478 test-only offline twelve-diagram integration; no production/dependency/version change."
     },
     "extras": {
       "kind": "Git working tree",
-      "parent_commit": "71249336740e12fe6c67b57fc53b45f18db1e24e",
+      "parent_commit": "220e91381d6512d0775812fcff48ba4d116dc7d5",
       "mermaid_component": "3.0.0",
-      "converter": "3.0.0",
+      "converter": "3.1.0",
       "package_version": "0.1.1",
       "plugin_version": "0.1.2",
-      "publication": "none"
+      "publication": "none; unreleased service contract unchanged by maintainer instruction",
+      "implementation_commit": "df1f2b5659259c43780c5ef07cd433fa6c3e14fa"
     }
   },
   "comparison": {
     "fork": {
-      "files": 1348,
-      "sha256": "93f53be5f6875095d8e5d0e80981fa5207df732514a8d2c2479ac4139aa63cb1"
+      "files": 1350,
+      "sha256": "cca767d37b981952913db762d514079e1d19033b89a80332dad82234489def6d"
     },
     "upstream": {
-      "files": 1327,
-      "sha256": "44179fb5ff9701b86081d1d7f06429d3badc4856a7af0c327a341f73e4b1a060"
+      "files": 1328,
+      "sha256": "b063a311ce55ad9b2b073bb5ebb501de266d60f12b12e1ca715c1fff6b47cca6"
     }
   },
   "customizations": [
@@ -334,7 +342,7 @@
     {
       "path": ".github/workflows/obsidian-tests.yml",
       "status": "fork-only",
-      "fork_sha256": "5aff9d2d2a0c9cd1b6d5e12d8a275bd6a0ba969324070404302eb7c5c9e8306d",
+      "fork_sha256": "de1e663ae26d13ac55b293117cbf9389d79e148d10413752a8d290736f9ae787",
       "upstream_sha256": null,
       "ids": [
         "OBS-001",
@@ -342,7 +350,7 @@
         "OBS-034"
       ],
       "kind": "ci",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. PR #478: advance the explicit reviewed upstream baseline to a758e93d6."
     },
     {
       "path": ".github/workflows/test-coverage-pr.yml",
@@ -1176,15 +1184,15 @@
     {
       "path": "packages/excalidraw/CHANGELOG.md",
       "status": "modified",
-      "fork_sha256": "54256ae040683e9be9574ea7d62a1d0794c7b2c37aaf80cdb184970b97685846",
-      "upstream_sha256": "ac0972db0682aa533fd76e05239f3fab48844764be42de23f6c3acff1ccb5811",
+      "fork_sha256": "7c5b275033fffaf73dafb4799efa8c64a2a485a593016846303fd44a0e80f0e6",
+      "upstream_sha256": "0a194de2e96110f6c2d4c3cd418332cbdeb3acb82b95e0fd490df9bb11af52e5",
       "ids": [
         "OBS-001",
         "OBS-007",
         "OBS-009",
         "OBS-011"
       ],
-      "note": "Historical additions describe drop/text hooks, but text-hook signatures no longer match current types; catalog is the current contract. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Adopt incoming upstream release notes; existing historical fork notes retained. See pr-475-merge-review.md.",
+      "note": "Historical additions describe drop/text hooks, but text-hook signatures no longer match current types; catalog is the current contract. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Adopt incoming upstream release notes; existing historical fork notes retained. See pr-475-merge-review.md. PR #478: adopt upstream per-diagram-loading release note while preserving fork history.",
       "kind": "documentation"
     },
     {
@@ -2121,12 +2129,12 @@
     {
       "path": "packages/excalidraw/components/TTDDialog/TTDDialog.tsx",
       "status": "modified",
-      "fork_sha256": "8d8f9c430d92fc51072e08649817bb0b753a95db3bac2fcbb4fdba0ca0be4e3d",
-      "upstream_sha256": "bffb76544f2b0d1e196574a2016a7b4740a8a0507dc82dd723d816280c163d96",
+      "fork_sha256": "c25d3f05a045cfa019158854c64162a3c93b2df597e9318796d9024da16ce4be",
+      "upstream_sha256": "954951285afe6e72610dd2137142157bf5b4d300258f6852a356d92d97645a30",
       "ids": [
         "OBS-030"
       ],
-      "note": "Replace package dynamic import with host lazy loader, mount/cancellation guard, and selected elements for diagram editing. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md.",
+      "note": "Replace package dynamic import with host lazy loader, mount/cancellation guard, and selected elements for diagram editing. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #478: upstream comment update inside the retained disabled loader; active host service is unchanged.",
       "kind": "integration"
     },
     {
@@ -2710,14 +2718,14 @@
     {
       "path": "packages/excalidraw/package.json",
       "status": "modified",
-      "fork_sha256": "0e2a5943e646505c011535ab78498ebf77107d524f2e5f9c2bb9fc59a3ebc424",
-      "upstream_sha256": "77ac97314a8bba124b635a37626b0f7bc950b92dd86edd0c4f0dec9d796df2e9",
+      "fork_sha256": "0d6d4c39f1fc799250ce3875c2d8d69f5128eae437dbbd028042244da5e8b0a8",
+      "upstream_sha256": "e42d3478759da7cce02bad6b47a70fa253f3813e1e35f2c6b1533da798db6ea2",
       "ids": [
         "OBS-002",
         "OBS-003",
         "OBS-004"
       ],
-      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies. Baseline bee1292f3 already bumps to 0.18.142; the layout fix does not bump or publish. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. 2026-10-23: acknowledge the existing manifest-only 0.18.144 release commit 9d1e20b60 while correcting consumer declarations; no version change in this repair. PR #475: Converter 3.0.0 remains dev-only; preserve fork exports, external runtime and existing 0.18.144 version. See pr-475-merge-review.md. #3019 accounting acknowledges the already committed 0.18.145 version; this feature does not bump it. PR #477: clean packed bundler consumer failed on nonexistent dist/types export-map paths; point existing type exports to actual generated types/. No runtime/version/API-signature change.",
+      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies. Baseline bee1292f3 already bumps to 0.18.142; the layout fix does not bump or publish. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. 2026-10-23: acknowledge the existing manifest-only 0.18.144 release commit 9d1e20b60 while correcting consumer declarations; no version change in this repair. PR #475: Converter 3.0.0 remains dev-only; preserve fork exports, external runtime and existing 0.18.144 version. See pr-475-merge-review.md. #3019 accounting acknowledges the already committed 0.18.145 version; this feature does not bump it. PR #477: clean packed bundler consumer failed on nonexistent dist/types export-map paths; point existing type exports to actual generated types/. No runtime/version/API-signature change. PR #478: exact converter 3.1.0 remains dev-only; no fork version/export/security-resolution change.",
       "kind": "packaging"
     },
     {
@@ -3415,6 +3423,18 @@
       "note": "PR #477: actual common-module breakpoints, desktop exclusion, tablet and live phone preferences; complements real native geometry/touch evidence."
     },
     {
+      "path": "tests/obsidian/unit/flowchartPlacement.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "f57b3617374c49efceb8a8f7bd2fccba87445a9089bfd0ee1caaf680a8813849",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-033",
+        "OBS-029"
+      ],
+      "kind": "Independent upstream-placement regression",
+      "note": "PR #478: real Scene/addNewNodes integration preserves centered growth in four directions, arrow bindings and host styles; no upstream test-helper adaptation. Seven cases also cover connected-node gaps and fractional rounding; complete AppState and real scene indices/types are checked."
+    },
+    {
       "path": "tests/obsidian/unit/imageVariants.test.ts",
       "status": "fork-only",
       "fork_sha256": "f7f8be1c972b1483258f17a64b485905c39c929f240b6bb5ea48ed0cff9b23e8",
@@ -3461,13 +3481,13 @@
     {
       "path": "yarn.lock",
       "status": "modified",
-      "fork_sha256": "5c64a40db44edf20c89888704dd8c2fa073dbc833bdaa5f8a6d0cf162ecaa909",
-      "upstream_sha256": "3a40118db6c7a8d9038957d2437a7c0c52e7d882586b79739ce49660d6352196",
+      "fork_sha256": "e170c0e3c4feedc65a336746b033423a05e7401845ff51f75ec6a7c71d234bf2",
+      "upstream_sha256": "0559bb94e18745dc49085797a1979879568b3e06d9c2736e9f6c7a48c8703351",
       "ids": [
         "OBS-002",
         "OBS-033"
       ],
-      "note": "Resolved dependency/transitive graph churn accompanying manifest overrides; not evidence of isolated Obsidian behavior or verified vulnerability remediation. This checkpoint changes only source-map-js from 1.2.1 to patched 1.2.2; other development advisories remain. PR #475: Resolve merged manifests from the fork lock; preserve security pins, prune Mermaid, add Pele and incoming Playwright. See pr-475-merge-review.md. PR #477: additive owned/source/browser/package test commands; align development-only @vitest/coverage-v8 with Vitest 3.0.6. Runtime dependencies unchanged.",
+      "note": "Resolved dependency/transitive graph churn accompanying manifest overrides; not evidence of isolated Obsidian behavior or verified vulnerability remediation. This checkpoint changes only source-map-js from 1.2.1 to patched 1.2.2; other development advisories remain. PR #475: Resolve merged manifests from the fork lock; preserve security pins, prune Mermaid, add Pele and incoming Playwright. See pr-475-merge-review.md. PR #477: additive owned/source/browser/package test commands; align development-only @vitest/coverage-v8 with Vitest 3.0.6. Runtime dependencies unchanged. PR #478: update only the converter version, resolved URL and integrity; retain security pins.",
       "kind": "packaging"
     }
   ],

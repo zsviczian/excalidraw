@@ -108,7 +108,7 @@
     "tunnel-rat": "0.1.2"
   },
   "devDependencies": {
-    "@excalidraw/mermaid-to-excalidraw": "3.0.0",
+    "@excalidraw/mermaid-to-excalidraw": "3.1.0",
     "@size-limit/preset-big-lib": "9.0.0",
     "@testing-library/dom": "10.4.0",
     "@testing-library/jest-dom": "6.6.3",

@@ -1,0 +1,84 @@
+// zsviczian -- guarded PR #478 real-Extras diagnostic, adapted from PR #475.
+﻿(async()=>{
+ if(app.vault.getName()!=='excalidraw-auto-test')throw Error('wrong vault');
+ if(globalThis.__pr478Feature)throw Error('controller exists');
+ const p=app.plugins.plugins['obsidian-excalidraw-plugin'],prefix='__excalidraw_cli_smoke_pr478_'+crypto.randomUUID(),path=prefix+'.excalidraw.md';
+ const c={prefix,path,status:'running',checks:[],getMermaid:p.getMermaid,hostCalls:0,parseCalls:0,owned:new Set(),baseline:new Set(app.vault.getFiles().map(f=>f.path))};globalThis.__pr478Feature=c;
+ const check=(name,value,details={})=>{c.checks.push({name,passed:!!value,...details});if(!value)throw Error(name)};
+ const wait=async(fn,label)=>{for(let i=0;i<200;i++){if(fn())return;await new Promise(r=>setTimeout(r,50))}throw Error('timeout: '+label)};
+ const action=async(command,args)=>{const r=await p.executeCLI({apiVersion:1,command,...args});if(!r.ok)throw Error(JSON.stringify(r));return r};
+ const diagram=`pie title PR478 offline local diagram
+  "Alice" : 60
+  "Bob" : 40`;
+ const job=async()=>{let ea,main,pop,debuggerAPI,attached=false;
+ try{
+  c.owned.add(path);
+  await action('create',{requestId:prefix+'-create',path,elements:[]});await action('open',{path});
+  main=app.workspace.getLeavesOfType('excalidraw').find(l=>l.view.file?.path===path).view;
+  const gateway=p.extrasGateway, previouslyIgnored=gateway.ignoredComponents.has('mermaid');
+  try {
+   gateway.ignoredComponents.add('mermaid');
+   const unavailable=await main.packages.excalidrawLib.loadMermaid();
+   check('declined service retains loaded/api contract',unavailable.loaded===false&&typeof unavailable.api?.then==='function'&&!('status' in unavailable));
+   let rejected=false;await unavailable.api.catch(()=>{rejected=true});check('declined service rejects its API',rejected);
+  } finally {if(!previouslyIgnored)gateway.ignoredComponents.delete('mermaid')}
+  p.getMermaid=async function(){c.hostCalls++;const service=await c.getMermaid.call(this);return {...service,api:service.api.then(lib=>({...lib,parseMermaidToExcalidraw:async(...args)=>{c.parseCalls++;return lib.parseMermaidToExcalidraw(...args)}}))}};
+  debuggerAPI=require('@electron/remote').getCurrentWindow().webContents.debugger;
+  if(!debuggerAPI.isAttached()){debuggerAPI.attach('1.3');attached=true;}
+  await debuggerAPI.sendCommand('Network.enable');await debuggerAPI.sendCommand('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0});
+  c.offline=!navigator.onLine;check('offline renderer',c.offline);
+  const extras=p.extrasGateway.getAPI();check('Extras advertises Mermaid v3',extras.versions.mermaid==='3.0.0');
+  check('matching component accepted',p.extrasGateway.checkVersion('mermaid',extras).valid);
+  check('old component rejected',!p.extrasGateway.checkVersion('mermaid',{...extras,versions:{...extras.versions,mermaid:'2.2.2'}}).valid);
+  const actualParser=await(await p.getMermaid()).api;
+  c.diagramKinds=[];
+  for(const [name,definition] of Object.entries({"swimlane":"swimlane-beta TD\n subgraph Team\n A[Start] --> B[Finish]\n end","flowchart": "flowchart LR\n A[Start] --> B[Finish]", "sequence": "sequenceDiagram\n Alice->>Bob: Hello", "class": "classDiagram\n Animal <|-- Duck", "state": "stateDiagram-v2\n [*] --> Idle\n Idle --> [*]", "er": "erDiagram\n CUSTOMER ||--o{ ORDER : places", "pie": "pie title Legacy image\n \"One\" : 60\n \"Two\" : 40", "mindmap": "mindmap\n root((Example))\n  Branch", "gantt": "gantt\n title Example\n dateFormat YYYY-MM-DD\n section Work\n Task :a1, 2026-01-01, 3d", "journey": "journey\n title Example\n section Work\n Task: 5: Alice", "timeline": "timeline\n title Example\n 2026 : Start", "git": "gitGraph\n commit", "quadrant": "quadrantChart\n title Example\n A: [0.3, 0.6]"})) {
+   const result=await actualParser.parseMermaidToExcalidraw(definition);
+   const converted=main.packages.excalidrawLib.convertToExcalidrawElements(result.elements);
+   check('diagram '+name,result.elements.length>0&&converted.length>0&&converted.every(e=>Number.isFinite(e.x)&&Number.isFinite(e.y)&&Number.isFinite(e.width)&&Number.isFinite(e.height)));
+   const native=['flowchart','sequence','class','state','er','swimlane'].includes(name);
+   check('representation '+name,native?result.elements.every(e=>e.type!=='image'):result.elements.some(e=>e.type==='image'));
+   c.diagramKinds.push({name,count:converted.length,types:[...new Set(result.elements.map(e=>e.type))]});
+  }
+  let syntax=false;try{await actualParser.parseMermaidToExcalidraw('flowchart TD\n A[')}catch(e){syntax=true}check('invalid definition rejected',syntax);
+  ea=p.ea.getAPI();ea.setView(main);const ids=await ea.addMermaid(diagram);check('real Extras Mermaid conversion',Array.isArray(ids)&&ids.length>0);
+  check('EA insertion',await ea.addElementsToView(false,true,true));
+  c.elementSummary=main.excalidrawAPI.getSceneElements().map(e=>({type:e.type,customData:e.customData}));const image=main.excalidrawAPI.getSceneElements().find(e=>e.type==='image'&&e.customData?.mermaidText===diagram);check('editable source on generated image',!!image);
+  const collect=()=>{for(const[,asset]of main.excalidrawData.getFileEntries()){if(asset?.file&&!c.baseline.has(asset.file.path))c.owned.add(asset.file.path)}};collect();
+  const preview=async(view,label)=>{
+   view.updateScene({appState:{selectedElementIds:{[image.id]:true},openDialog:{name:'ttd',tab:'mermaid'}}});
+   const d=view.containerEl.ownerDocument;
+   await wait(()=>d.querySelector('.ttd-dialog .ttd-dialog-output-canvas-content canvas'),'preview '+label);
+   const input=d.querySelector('.ttd-dialog .cm-content')||d.querySelector('.ttd-dialog textarea');
+   check(label+' selected source and rendered preview',!!input&&(input.value||input.textContent||'').includes('PR478 offline local diagram'));
+   view.updateScene({appState:{openDialog:null}});await wait(()=>!d.querySelector('.ttd-dialog'),'close '+label);
+  };
+  await preview(main,'main');
+  const popLeaf=app.workspace.openPopoutLeaf();c.popLeaf=popLeaf;await popLeaf.setViewState({type:'excalidraw',state:{file:path},active:true});
+  await wait(()=>popLeaf.view.excalidrawAPI&&popLeaf.view.isLoaded,'popout API');pop=popLeaf.view;
+  await preview(pop,'popout');
+  for(const view of [main,pop]){
+   const a=view.excalidrawAPI,l=view.packages.excalidrawLib;
+   const canvas=await l.exportToCanvas({elements:a.getSceneElements(),files:a.getFiles(),appState:{...a.getAppState(),exportBackground:true,exportScale:1}});
+   check('PNG export '+(view===main?'main':'popout'),canvas.width>0&&canvas.height>0);
+  }
+  await popLeaf.setViewState({type:'empty',state:{}});popLeaf.detach();c.popLeaf=null;
+  const publicService=await main.packages.excalidrawLib.loadMermaid();check('enabled public loader retains loaded/api contract',publicService.loaded===true&&typeof publicService.api?.then==='function'&&!('status' in publicService));
+  check('host interface used and parser shared',c.hostCalls>=1&&c.parseCalls>=3,{hostCalls:c.hostCalls,parseCalls:c.parseCalls});
+  await main.saveWithOutcome();collect();const text=await app.vault.read(main.file);
+  await main.leaf.setViewState({type:'empty',state:{}});await action('open',{path});
+  main=app.workspace.getLeavesOfType('excalidraw').find(l=>l.view.file?.path===path).view;
+  await wait(()=>main.excalidrawAPI.getSceneElements().some(e=>e.type==='image'&&e.customData?.mermaidText===diagram),'reopened Mermaid image');
+  check('local scene save/reopen source preserved',(await app.vault.read(main.file))===text);
+  c.status='passed';
+ }catch(e){c.status='failed';c.error=String(e?.stack||e)}finally{
+  try{if(debuggerAPI){await debuggerAPI.sendCommand('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1});if(attached)debuggerAPI.detach()}}catch(e){c.cleanupError=String(e)}
+  p.getMermaid=c.getMermaid;ea?.destroy();
+  try{if(c.popLeaf){await c.popLeaf.setViewState({type:'empty',state:{}});c.popLeaf.detach()}
+   for(const l of app.workspace.getLeavesOfType('excalidraw').filter(l=>l.view.file?.path===path)){l.view.updateScene({appState:{openDialog:null}});await l.setViewState({type:'empty',state:{}});}
+   for(const owned of c.owned){const f=app.vault.getFileByPath(owned);if(f)await app.vault.delete(f)}
+   c.emptyOwnedFolder=!app.vault.getFolderByPath(prefix);
+  }catch(e){c.cleanupError=String(e?.stack||e)}
+  c.finished=true;
+ }};void job();return JSON.stringify({started:true,prefix});
+})()
