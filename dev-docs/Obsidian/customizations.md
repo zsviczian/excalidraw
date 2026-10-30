@@ -363,6 +363,14 @@ scene-file loader. See the [review](pr-472-merge-review.md).
 <a id="obs-033"></a>
 ## OBS-033 — Fork regression tests and fixture adaptations
 
+**PR #477 follow-up (2026-10-30):** The built-browser grouping/history fixture
+must not pointer-click an already active Selection button: that deliberately
+activates Lasso (`components/Tools.tsx`). Passive failure evidence confirms this
+caused the selection readiness timeout. Check the active tool before the setup
+click; preserve every selection/group/delete/undo assertion. All 18 normal
+production/development browser cases pass after this test-only correction.
+No upstream-owned test or production source changes.
+
 **PR #477 / plugin #3022 follow-up (2026-10-28):** The independent suite adds
 nine immutable pairwise saved-image cases. Shared file identity, distinct crop
 and display geometry, zero opacity, locked state, frame/group membership, links

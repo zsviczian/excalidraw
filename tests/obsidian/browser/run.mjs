@@ -424,7 +424,14 @@ try {
           });
           return elements.map((element) => element.id).sort();
         });
-        await page.getByTestId("toolbar-selection").click();
+        // zsviczian -- clicking an already active Selection intentionally toggles Lasso.
+        if (
+          (await page.evaluate(
+            () => window.__testAPI.getAppState().activeTool.type,
+          )) !== "selection"
+        ) {
+          await page.getByTestId("toolbar-selection").click();
+        }
         await page.waitForFunction(
           () => window.__testAPI.getAppState().activeTool.type === "selection",
         );
