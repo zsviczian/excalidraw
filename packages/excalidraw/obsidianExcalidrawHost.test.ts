@@ -44,6 +44,7 @@ const createFakeHost = (): ObsidianExcalidrawHostAdapter => ({
     api: new Promise<never>(() => {}),
   }),
   runAction: () => {},
+  prepareMermaidSVGInsert: async (_editorId, diagram) => diagram,
   getLabel: (key) => key,
   attachInlineLinkSuggester: () => ({
     isBlockingKeys: () => false,
@@ -179,11 +180,11 @@ describe("Obsidian Excalidraw host registry", () => {
   it("rejects an unsupported runtime protocol", () => {
     const incompatibleHost = {
       ...createFakeHost(),
-      protocolVersion: 2, // zsviczian -- plugin #3019 rejects the previous internal protocol
+      protocolVersion: 3, // zsviczian -- plugin #3027 rejects the previous internal protocol
     } as unknown as ObsidianExcalidrawHostAdapter;
 
     expect(() => configureObsidianExcalidrawHost(incompatibleHost)).toThrow(
-      "Unsupported Obsidian Excalidraw host protocol: 2",
+      "Unsupported Obsidian Excalidraw host protocol: 3",
     );
     expect(getObsidianExcalidrawHost()).toBeNull();
   });

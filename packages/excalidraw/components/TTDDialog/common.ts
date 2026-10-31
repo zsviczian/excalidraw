@@ -13,6 +13,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
+import { prepareMermaidSVGInsert } from "../../obsidianUtils"; // zsviczian -- plugin #3027 owns SVG conversion choice
 
 import type { MermaidToExcalidrawLibProps } from "./types";
 
@@ -158,7 +159,9 @@ export const saveMermaidDataToStorage = (mermaidDefinition: string) => {
   );
 };
 
-export const insertToEditor = ({
+// zsviczian START -- plugin #3027: await the host only for SVG-backed Mermaid insertion
+// export const insertToEditor = ({
+export const insertToEditor = async ({
   app,
   data,
   text,
@@ -172,7 +175,26 @@ export const insertToEditor = ({
   text?: string;
   shouldSaveMermaidDataToStorage?: boolean;
 }) => {
-  const { elements: newElements, files } = data.current;
+  // zsviczian END
+  // zsviczian START -- plugin #3027: yield the dialog to the host prompt before insertion
+  // const { elements: newElements, files } = data.current;
+  let { elements: newElements, files } = data.current;
+  const prepare = prepareMermaidSVGInsert(app, data.current);
+  if (prepare) {
+    app.setOpenDialog(null);
+    if (shouldSaveMermaidDataToStorage && text) {
+      saveMermaidDataToStorage(text);
+    }
+    const prepared = await prepare().catch((error: unknown) => {
+      console.error("Obsidian SVG diagram insertion failed", error);
+      return null;
+    });
+    if (!prepared || app.api.isDestroyed) {
+      return;
+    }
+    ({ elements: newElements, files } = prepared);
+  }
+  // zsviczian END
 
   if (!newElements.length) {
     return;

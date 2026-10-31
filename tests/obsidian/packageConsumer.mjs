@@ -9,7 +9,10 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const work = join(root, ".test-work/consumers", randomUUID());
 mkdirSync(work, { recursive: true });
 const npm = [
-  process.env.npm_execpath,
+  // zsviczian -- Yarn also sets npm_execpath; pack's JSON contract requires npm, not Yarn's event records.
+  process.env.npm_execpath?.endsWith("npm-cli.js")
+    ? process.env.npm_execpath
+    : undefined,
   join(dirname(process.execPath), "node_modules/npm/bin/npm-cli.js"),
   join(dirname(process.execPath), "../lib/node_modules/npm/bin/npm-cli.js"),
 ]
@@ -80,7 +83,7 @@ writeFileSync(
   join(work, "consumer.ts"),
   `import {OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION,configureObsidianExcalidrawHost} from '@zsviczian/excalidraw';
 import type {ObsidianCommonHostAdapter} from '@zsviczian/excalidraw/common/commonObsidianHost';
-const protocol:3=OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION;
+const protocol:4=OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION;
 declare const component:Parameters<typeof configureObsidianExcalidrawHost>[0];
 declare const common:ObsidianCommonHostAdapter;
 const dispose:()=>void=configureObsidianExcalidrawHost(component);

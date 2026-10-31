@@ -55,6 +55,7 @@ describe("Obsidian wheel minimum (#3008)", () => {
         api: new Promise<never>(() => {}),
       }),
       runAction: () => {},
+      prepareMermaidSVGInsert: async (_editorId, diagram) => diagram,
       getLabel: (key) => key,
       attachInlineLinkSuggester: () => ({
         isBlockingKeys: () => false,

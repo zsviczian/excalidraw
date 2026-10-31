@@ -316,6 +316,30 @@ export const t2 = (key: string): string => {
   return getObsidianExcalidrawHost()?.getLabel(key) ?? key;
 };
 
+/**
+ * zsviczian -- plugin #3027: only SVG-backed Mermaid output needs the host's
+ * conversion choice. Native diagrams and standalone insertion remain synchronous.
+ * The host receives an exact editor ID and staged data, never the App instance.
+ * Author: zsviczian. See dev-docs/Obsidian/contracts.md.
+ */
+export const prepareMermaidSVGInsert = (
+  app: AppClassProperties,
+  diagram: Parameters<
+    ObsidianExcalidrawHostAdapter["prepareMermaidSVGInsert"]
+  >[1],
+) => {
+  const host = getObsidianExcalidrawHost();
+  return host &&
+    diagram.elements.some(
+      (element) =>
+        element.type === "image" &&
+        element.customData?.mermaidText &&
+        diagram.files?.[element.fileId!]?.mimeType === "image/svg+xml",
+    )
+    ? () => host.prepareMermaidSVGInsert(app.id, diagram)
+    : null;
+};
+
 export const shouldDisableZoom = (appState: AppState): boolean => {
   if (appState.activeEmbeddable?.state !== "active") {
     return false;

@@ -492,3 +492,33 @@ stale-target refusal and cleanup; exact local artifact evidence is recorded in
 This is an unpublished paired protocol change. Publish/install matching exact
 package bytes before release; restored-popout/cold-start, physical mobile,
 macOS/Linux and hosted CodeScanner gates remain. **Gate:** V01, V03, V08, V10.
+
+<a id="obs-039"></a>
+## OBS-039 — SVG conversion entry points
+
+**Plugin #3027 (2026-10-31): retain the narrow insertion boundary.** Four
+production files participate: the fork-owned `ImageMenu.tsx` adds
+`runAction("importSVG", app.id)`; the fork-owned host contract/utility add
+protocol-4 `prepareMermaidSVGInsert(editorId, diagram)`; the upstream-owned
+`TTDDialog/common.ts` has a fingerprinted pre-insertion block. SVG Mermaid
+output closes TTD before the host prompt, preserving its source in existing
+dialog storage. The host returns staged native elements, the unchanged image,
+or null to cancel. Native diagrams, ordinary SVGs and standalone insertion
+retain their synchronous path. A retired editor cannot accept a late result;
+unexpected preparation errors remain logged and do not insert.
+
+`P: src/shared/svgConversionActions.ts` owns prompting, inert conversion,
+exact editor/file/document guards and the file picker. Scene right-click
+conversion, layer placement, shared SVG bytes, undo and save/reopen are entirely
+plugin-owned. No converter, Obsidian object graph, active-view state, source
+fetching, new renderer or resize behavior enters the fork. Extras service/API
+and release/dependency versions are unchanged. Protocol 3 is rejected by the
+paired plugin/runtime; publish/install matching package bytes before release.
+
+Upstream's TTD insertion has no awaitable host conversion decision. Post-change
+scene observation would also affect loaded diagrams and split undo into two
+operations; DOM interception would couple behavior to dialog internals. Retire
+this hook only when upstream supplies an equivalent scoped pre-insertion
+extension. Existing OBS-006/023/030 behavior is retained, not duplicated.
+Validation and platform limits are recorded in `svg-conversion-entry-points.md`.
+**Gate:** V01, V03, V04, V07, V08, V10.

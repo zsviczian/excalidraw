@@ -28,6 +28,7 @@ export async function verifyTTDClose(page) {
         }),
       }),
       runAction: () => {},
+      prepareMermaidSVGInsert: async (_editorId, diagram) => diagram,
       getLabel: (key) => key,
       attachInlineLinkSuggester: () => ({
         isBlockingKeys: () => false,

@@ -46,6 +46,15 @@ export const ImageMenuItems = ({ app }: ImageMenuItemsProps) => {
       >
         {t2("INSERT_LUCIDE_ICON")}
       </DropdownMenu.Item>
+      {/* zsviczian START -- plugin #3027: SVG-only system picker, scoped to the initiating editor */}
+      <DropdownMenu.Item
+        onSelect={() => runAction("importSVG", app.id)}
+        icon={ImageIcon}
+        data-testid="toolbar-svg-import"
+      >
+        {t2("IMPORT_SVG_AS_ELEMENTS")}
+      </DropdownMenu.Item>
+      {/* zsviczian END */}
       <DropdownMenu.Item
         onSelect={() => runAction("LaTeX")}
         icon={LaTeXIcon}

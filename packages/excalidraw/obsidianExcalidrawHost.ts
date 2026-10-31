@@ -12,10 +12,19 @@
  * @see https://github.com/zsviczian/obsidian-excalidraw-plugin
  */
 
+import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
+
 import type { MermaidToExcalidrawLibProps } from "./components/TTDDialog/types";
+import type { BinaryFiles } from "./types";
 
 /** Runtime protocol understood by this version of the Excalidraw package. */
-export const OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION = 3 as const; // zsviczian -- plugin #3019 adds scoped Lucide actions
+export const OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION = 4 as const; // zsviczian -- plugin #3027 adds guarded SVG diagram insertion
+
+/** zsviczian -- staged diagram data only, never a view or plugin object. */
+export type ObsidianDiagramInsertion = {
+  elements: readonly NonDeletedExcalidrawElement[];
+  files: BinaryFiles | null;
+};
 
 /** Keyboard-blocking lifecycle returned by the host's inline suggester. */
 export interface ObsidianKeyBlocker {
@@ -51,9 +60,14 @@ export interface ObsidianExcalidrawHostAdapter {
   getMermaid(): Promise<ObsidianMermaidService>;
   /** Lucide requires the initiating editor's ID; no active-view state is retained here. */
   runAction(
-    action: "anyFile" | "LaTeX" | "card" | "lucide",
+    action: "anyFile" | "LaTeX" | "card" | "lucide" | "importSVG",
     editorId?: string,
   ): void;
+  /** Offer conversion of SVG-backed Mermaid output; null cancels insertion. */
+  prepareMermaidSVGInsert(
+    editorId: string,
+    diagram: ObsidianDiagramInsertion,
+  ): Promise<ObsidianDiagramInsertion | null>;
   getLabel(key: string): string;
   attachInlineLinkSuggester(
     inputEl: HTMLInputElement | HTMLTextAreaElement,

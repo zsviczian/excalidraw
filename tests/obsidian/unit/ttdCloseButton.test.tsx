@@ -35,7 +35,7 @@ beforeEach(() => {
     value: vi.fn(),
   });
   dispose = configureObsidianExcalidrawHost({
-    protocolVersion: 3,
+    protocolVersion: 4,
     isDoubleTapEraserEnabled: () => false,
     getZoomToFitMaxLevel: () => 2,
     isPenModeCrosshairVisible: () => false,
@@ -48,6 +48,7 @@ beforeEach(() => {
     shouldSyncElementLinkWithText: () => false,
     loadFontFromFile: async () => undefined,
     runAction: () => {},
+    prepareMermaidSVGInsert: async (_editorId, diagram) => diagram,
     getLabel: (key) => key,
     attachInlineLinkSuggester: () => ({
       isBlockingKeys: () => false,
