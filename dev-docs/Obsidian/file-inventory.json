@@ -102,7 +102,7 @@
   "comparison": {
     "fork": {
       "files": 1354,
-      "sha256": "59d3a54ecffeba352ef6080d31caec4917f00745a6c9df75d7c3440025f6a538"
+      "sha256": "6300119c94b6b600c5dc554855a1595271bbbd56f7db92286cf320b5fee370e2"
     },
     "upstream": {
       "files": 1328,
@@ -3491,7 +3491,7 @@
     {
       "path": "tests/obsidian/unit/svgDiagramInsert.test.ts",
       "status": "fork-only",
-      "fork_sha256": "64faaa3cd2c0ef392194e41455c03a00e4a83090ebbec583e207607828b925f3",
+      "fork_sha256": "74b4deaf303e221ed22abe61903d61bf482495092c9ecaea953de837103ae69f",
       "upstream_sha256": null,
       "ids": [
         "OBS-039"
