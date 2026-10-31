@@ -30,6 +30,7 @@ export interface DialogProps {
   title: React.ReactNode | false;
   autofocus?: boolean;
   closeOnClickOutside?: boolean;
+  showCloseButton?: boolean; // zsviczian -- allow titleless TTD dialogs to expose the existing close action on desktop.
 }
 
 function getDialogSize(size: DialogSize): number {
@@ -122,7 +123,9 @@ export const Dialog = (props: DialogProps) => {
             <span className="Dialog__titleContent">{props.title}</span>
           </h2>
         )}
-        {isFullscreen && (
+        {/* zsviczian START -- reuse the same close action/focus cleanup for TTD on all layouts.
+            {isFullscreen && ( */}
+        {(isFullscreen || props.showCloseButton) && (
           <button
             className="Dialog__close"
             onClick={onClose}
@@ -133,6 +136,7 @@ export const Dialog = (props: DialogProps) => {
             {CloseIcon}
           </button>
         )}
+        {/* zsviczian END */}
         <div className="Dialog__content">{props.children}</div>
       </Island>
     </Modal>

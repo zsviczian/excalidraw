@@ -70,6 +70,20 @@ gate; this approval does not declare the currently published package compatible.
 
 **PR #475:** Converter 3/Pele is provided lazily by Extras Mermaid component `3.0.0`, with an exact plugin gateway check. No Obsidian 1.15 engine is used. The host/public service remains `{loaded, api}`; readonly converter skeletons require immutable image-source attachment, not a protocol bump. Both installed and generated-local declaration checks pass. Saved `customData.mermaidText` remains editable in main/popout. See the [PR #475 review](pr-475-merge-review.md).
 
+**Mermaid previews:** The surrounding preview panel must match the exported
+canvas's opaque white background (light theme) or its renderer-filtered
+`#121212` background (dark theme). A host override of `--default-bg-color` must
+not affect it. Reset clears the inline background; export errors retain their
+original error and the matching themed background. The native dialog probe
+checks actual pixels and computed colors in both owning windows.
+
+**TTD close control:** Both Mermaid and text-to-diagram opt into the shared
+Dialog close button on desktop as well as phone layouts. Exactly one named
+button must appear at the top right, clear of the tabs. Pointer activation,
+keyboard activation and Escape use the same existing close/cleanup path;
+closing must not submit or insert a diagram and must preserve the scene.
+Other desktop dialogs retain their existing close-button policy.
+
 Canonical definition: [obsidianExcalidrawHost.ts](../../packages/excalidraw/obsidianExcalidrawHost.ts). Consumer adapter: `P: src/core/managers/obsidianExcalidrawHostAdapter.ts`.
 
 | Capabilities | Meaning |

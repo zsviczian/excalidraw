@@ -218,6 +218,7 @@ const TTDDialogBase = withInternalFallback(
         size={1520}
         title={false}
         {...rest}
+        showCloseButton // zsviczian -- both Mermaid and text-to-diagram need a visible close affordance.
         autofocus={false}
       >
         <TTDDialogTabs dialog="ttd" tab={tab}>

@@ -1,4 +1,6 @@
 import { DEFAULT_EXPORT_PADDING, EDITOR_LS_KEYS } from "@excalidraw/common";
+// zsviczian -- match exportScene's white canvas and dark-mode filter, not host CSS variables.
+import { COLOR_WHITE, applyDarkModeFilter } from "@excalidraw/common";
 
 import { convertToExcalidrawElements } from "@excalidraw/element";
 
@@ -70,6 +72,9 @@ export const convertMermaidToExcalidraw = async ({
     return { success: false };
   }
 
+  // zsviczian -- Obsidian may override --default-bg-color independently of the preview.
+  const previewBackground = applyDarkModeFilter(COLOR_WHITE, theme === "dark");
+
   let ret;
   try {
     const api = await mermaidToExcalidrawLib.api;
@@ -127,11 +132,17 @@ export const convertMermaidToExcalidraw = async ({
       },
     });
 
-    parent.style.background = "var(--default-bg-color)";
+    // zsviczian START -- keep the surrounding preview the same color as its exported canvas.
+    // parent.style.background = "var(--default-bg-color)";
+    parent.style.background = previewBackground;
+    // zsviczian END
     canvasNode.replaceChildren(canvas);
     return { success: true };
   } catch (err: any) {
-    parent.style.background = "var(--default-bg-color)";
+    // zsviczian START -- retain the matching background on export failure too.
+    // parent.style.background = "var(--default-bg-color)";
+    parent.style.background = previewBackground;
+    // zsviczian END
     if (mermaidDefinition) {
       setError(err);
     }

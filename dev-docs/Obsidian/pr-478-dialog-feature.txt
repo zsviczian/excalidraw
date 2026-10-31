@@ -46,16 +46,46 @@
   c.elementSummary=main.excalidrawAPI.getSceneElements().map(e=>({type:e.type,customData:e.customData}));const image=main.excalidrawAPI.getSceneElements().find(e=>e.type==='image'&&e.customData?.mermaidText===diagram);check('editable source on generated image',!!image);
   const collect=()=>{for(const[,asset]of main.excalidrawData.getFileEntries()){if(asset?.file&&!c.baseline.has(asset.file.path))c.owned.add(asset.file.path)}};collect();
   const preview=async(view,label)=>{
-   view.updateScene({appState:{selectedElementIds:{[image.id]:true},openDialog:{name:'ttd',tab:'mermaid'}}});
    const d=view.containerEl.ownerDocument;
-   await wait(()=>d.querySelector('.ttd-dialog .ttd-dialog-output-canvas-content canvas'),'preview '+label);
-   const input=d.querySelector('.ttd-dialog .cm-content')||d.querySelector('.ttd-dialog textarea');
-   check(label+' selected source and rendered preview',!!input&&(input.value||input.textContent||'').includes('PR478 offline local diagram'));
-   view.updateScene({appState:{openDialog:null}});await wait(()=>!d.querySelector('.ttd-dialog'),'close '+label);
+   const originalTheme=view.excalidrawAPI.getAppState().theme;
+   try {for(const theme of ['light','dark']){
+    view.updateScene({appState:{theme,selectedElementIds:{[image.id]:true},openDialog:{name:'ttd',tab:'mermaid'}}});
+    await wait(()=>d.querySelector('.ttd-dialog .ttd-dialog-output-canvas-content canvas'),'preview '+label+' '+theme);
+    const input=d.querySelector('.ttd-dialog .cm-content')||d.querySelector('.ttd-dialog textarea');
+    check(label+' '+theme+' selected source and rendered preview',!!input&&(input.value||input.textContent||'').includes('PR478 offline local diagram'));
+    const canvas=d.querySelector('.ttd-dialog .ttd-dialog-output-canvas-content canvas');
+    const parent=canvas.closest('.ttd-dialog-output-canvas-container');
+    // Deliberately collide with the host variable. Compare actual exported pixels,
+    // not just registration or a mocked renderer; padding guarantees a clear corner.
+    parent.style.setProperty('--default-bg-color','#595850');
+    const pixel=[...canvas.getContext('2d').getImageData(0,0,1,1).data];
+    const background=d.defaultView.getComputedStyle(parent).backgroundColor;
+    const expected=theme==='light'?[255,255,255,255]:[18,18,18,255];
+    check(label+' '+theme+' preview background matches rendered canvas',
+     view.excalidrawAPI.getAppState().theme===theme&&pixel.every((v,i)=>v===expected[i])&&background===`rgb(${pixel.slice(0,3).join(', ')})`,{theme,pixel,background});
+    const close=d.querySelector('.ttd-dialog .Dialog__close');
+    check(label+' '+theme+' close button is visible and unique',
+     d.querySelectorAll('.ttd-dialog .Dialog__close').length===1&&!!close?.getAttribute('aria-label')&&close.getBoundingClientRect().width>0&&close.getBoundingClientRect().height>0);
+    // Synthetic native DOM activation; trusted pointer/keyboard claims are tested
+    // separately by the built-artifact Playwright suite.
+    close.click();await wait(()=>!d.querySelector('.ttd-dialog'),'close '+label+' '+theme);
+    check(label+' '+theme+' close preserves scene',view.excalidrawAPI.getAppState().openDialog===null&&view.excalidrawAPI.getSceneElements().some(e=>e.id===image.id&&e.customData?.mermaidText===diagram),{openDialog:view.excalidrawAPI.getAppState().openDialog,expectedId:image.id,scene:view.excalidrawAPI.getSceneElements().map(e=>({id:e.id,type:e.type,hasExpectedSource:e.customData?.mermaidText===diagram}))});
+   }
+   view.updateScene({appState:{openDialog:{name:'ttd',tab:'text-to-diagram'}}});
+   await wait(()=>d.querySelector('.ttd-dialog .Dialog__close'),'text-to-diagram '+label);
+   const close=d.querySelector('.ttd-dialog .Dialog__close');close.click();
+   await wait(()=>!d.querySelector('.ttd-dialog'),'close text-to-diagram '+label);
+   check(label+' text-to-diagram close preserves scene',view.excalidrawAPI.getAppState().openDialog===null&&view.excalidrawAPI.getSceneElements().some(e=>e.id===image.id));
+   }finally{view.updateScene({appState:{theme:originalTheme,openDialog:null}})}
   };
   await preview(main,'main');
+  // The second view must read a persisted fixture, not race the main view's autosave.
+  const fixtureSave=await main.saveWithOutcome();collect();
+  check('fixture save acknowledged before opening popout',fixtureSave.acknowledgedRevision!==null&&fixtureSave.acknowledgedRevision>=fixtureSave.requestedRevision);
   const popLeaf=app.workspace.openPopoutLeaf();c.popLeaf=popLeaf;await popLeaf.setViewState({type:'excalidraw',state:{file:path},active:true});
   await wait(()=>popLeaf.view.excalidrawAPI&&popLeaf.view.isLoaded,'popout API');pop=popLeaf.view;
+  await wait(()=>pop.excalidrawAPI.getSceneElements().some(e=>e.id===image.id&&e.customData?.mermaidText===diagram),'persisted popout fixture');
+  check('popout starts with persisted fixture',pop.excalidrawAPI.getSceneElements().some(e=>e.id===image.id&&e.customData?.mermaidText===diagram));
   await preview(pop,'popout');
   for(const view of [main,pop]){
    const a=view.excalidrawAPI,l=view.packages.excalidrawLib;

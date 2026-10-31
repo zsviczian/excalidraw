@@ -333,6 +333,23 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 <a id="obs-030"></a>
 ## OBS-030 — Host Mermaid conversion and editable diagram metadata
 
+**TTD close control (2026-10-31):** Both dialog tabs opt into Dialog's existing
+close button on desktop, retaining a single button on phones and the existing
+close/focus-cleanup path. No new styles or dismissal handler. Owned source
+cases cover both tabs/fallback and close/reopen/Escape; built browser cases
+use trusted clicks and keyboard input at desktop/tablet/phone widths, and the
+native real-Extras probe covers main/popout dismissal. See
+[validation](ttd-close-button.md). Shared Dialog presentation is also OBS-024.
+
+**Preview background (2026-10-31):** `TTDDialog/common.ts` uses the same
+white/dark-filtered background as `exportScene`, rather than the host-overridable
+`--default-bg-color`. This keeps the surrounding panel continuous with the
+rendered image without changing Obsidian's theme variables. Fork-owned unit
+tests cover both themes, export errors and reset; the maintained native dialog
+probe compares real canvas corner pixels with computed panel colors under a
+deliberate variable collision in main/popout windows. No host protocol, image
+source, export API or saved-scene change. See [validation](mermaid-preview-background.md).
+
 **PR #478:** Per-diagram loading belongs inside the Extras build, not the fork's
 runtime. Keep public loaded/api, lazy host activation, retry/cache, queued latest
 preview and persisted editable-image source. Upstream web-app service-worker

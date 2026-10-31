@@ -100,8 +100,8 @@
   },
   "comparison": {
     "fork": {
-      "files": 1350,
-      "sha256": "cca767d37b981952913db762d514079e1d19033b89a80332dad82234489def6d"
+      "files": 1353,
+      "sha256": "a2e622968995c4cb8b8b7ebe8275efa61051ea2be3fd8cb7e4bf4606a3927777"
     },
     "upstream": {
       "files": 1328,
@@ -1650,12 +1650,13 @@
     {
       "path": "packages/excalidraw/components/Dialog.tsx",
       "status": "modified",
-      "fork_sha256": "72bdb5e83f5a7c154b66eaa4ac675dc4687b64b242a2947ee39d899a858f1209",
+      "fork_sha256": "132ea756dc019a53605503963addf1557f3f309d32abb037cc5aaa2383a8e734",
       "upstream_sha256": "ef4b3eea3d298e701d019e462cc52bb399faf37dd986bf556654a898300de3d4",
       "ids": [
-        "OBS-024"
+        "OBS-024",
+        "OBS-030"
       ],
-      "note": "Pass live AppState.dynamicStyle into Modal.",
+      "note": "Pass live AppState.dynamicStyle into Modal. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md.",
       "kind": "presentation"
     },
     {
@@ -2129,12 +2130,12 @@
     {
       "path": "packages/excalidraw/components/TTDDialog/TTDDialog.tsx",
       "status": "modified",
-      "fork_sha256": "c25d3f05a045cfa019158854c64162a3c93b2df597e9318796d9024da16ce4be",
+      "fork_sha256": "0ab91b8d397fd4b4baf6be030a8fe98025d66218020d048917f93fc7b3c71ccc",
       "upstream_sha256": "954951285afe6e72610dd2137142157bf5b4d300258f6852a356d92d97645a30",
       "ids": [
         "OBS-030"
       ],
-      "note": "Replace package dynamic import with host lazy loader, mount/cancellation guard, and selected elements for diagram editing. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #478: upstream comment update inside the retained disabled loader; active host service is unchanged.",
+      "note": "Replace package dynamic import with host lazy loader, mount/cancellation guard, and selected elements for diagram editing. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #478: upstream comment update inside the retained disabled loader; active host service is unchanged. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md.",
       "kind": "integration"
     },
     {
@@ -2151,12 +2152,12 @@
     {
       "path": "packages/excalidraw/components/TTDDialog/common.ts",
       "status": "modified",
-      "fork_sha256": "5d832b07eb591c06e06d101ddb6f8e85288a332fef9e6d84a4c3384f2667b8c1",
+      "fork_sha256": "dc5410b0d68587aa2f982543367028ea28ca2ce35c7180223ba4c8ffe467e46b",
       "upstream_sha256": "51c744fff354ced787149c34bca341515514a55fd70477acfb2f4245076118a5",
       "ids": [
         "OBS-030"
       ],
-      "note": "Attach mermaidText to generated image elements before conversion. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Copy readonly image skeletons while retaining editable Mermaid source; adopt host renderEnvironment. See pr-475-merge-review.md.",
+      "note": "Attach mermaidText to generated image elements before conversion. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Copy readonly image skeletons while retaining editable Mermaid source; adopt host renderEnvironment. See pr-475-merge-review.md. 2026-10-31: Match the rendered preview background using the renderer dark-mode filter, independent of host CSS variables; see mermaid-preview-background.md.",
       "kind": "compatibility"
     },
     {
@@ -3221,17 +3222,31 @@
     {
       "path": "tests/obsidian/browser/run.mjs",
       "status": "fork-only",
-      "fork_sha256": "52c30e1ee5a3074516fdf92c2e17a159bc794fd5f00816eccd2d4a2494d75170",
+      "fork_sha256": "0afa7abf561ce30cea0fdda796aa06b5db513fff36556b75a5c62b288e753152",
       "upstream_sha256": null,
       "ids": [
         "OBS-003",
         "OBS-013",
         "OBS-019",
         "OBS-021",
-        "OBS-033"
+        "OBS-033",
+        "OBS-030"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md."
+    },
+    {
+      "path": "tests/obsidian/browser/ttdClose.mjs",
+      "status": "fork-only",
+      "fork_sha256": "823457a7b569b2373198933710c2ef8f8f2558925bb40623e52e8a02353a8648",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-024",
+        "OBS-030",
+        "OBS-033"
+      ],
+      "kind": "Independent TTD close regression",
+      "note": "Named single close control, both tabs/fallback, close/reopen/Escape and preserved scene. Browser checks trusted clicks/keyboard and settled desktop/tablet/phone geometry; see ttd-close-button.md."
     },
     {
       "path": "tests/obsidian/compatibility/duplicateTitles.json",
@@ -3446,6 +3461,18 @@
       "note": "PR #477 / plugin #3022 follow-up: immutable pairwise host image metadata/shared-source crop and dimension evidence; source restore only, decoded rendering belongs to native coordinator."
     },
     {
+      "path": "tests/obsidian/unit/mermaidPreviewBackground.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "bb3718cd84722f0a585d57fc871341cddd2985f05f8fc5b09eab32e83dc9e2b6",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-030",
+        "OBS-033"
+      ],
+      "kind": "Independent Mermaid preview regression",
+      "note": "Light/dark CSS-variable collision, matching export theme, original export errors and reset; real pixels checked separately in the native dialog probe."
+    },
+    {
       "path": "tests/obsidian/unit/testIdentities.test.ts",
       "status": "fork-only",
       "fork_sha256": "d58e86dca3355df02c8bc67a490ca35ff3b3fc2df4b78f748080f1a7d796b511",
@@ -3455,6 +3482,19 @@
       ],
       "kind": "test-tooling",
       "note": "PR #477: negative controls reject new, changed or obsolete title collisions and preserve failure status/each occurrence independently. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+    },
+    {
+      "path": "tests/obsidian/unit/ttdCloseButton.test.tsx",
+      "status": "fork-only",
+      "fork_sha256": "0bba580622b5abc4bc11b230d7f31b7fd6180065c7fea7c40601920bc290ad6c",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-024",
+        "OBS-030",
+        "OBS-033"
+      ],
+      "kind": "Independent TTD close regression",
+      "note": "Named single close control, both tabs/fallback, close/reopen/Escape and preserved scene. Browser checks trusted clicks/keyboard and settled desktop/tablet/phone geometry; see ttd-close-button.md."
     },
     {
       "path": "vitest.obsidian-compat.config.mts",
