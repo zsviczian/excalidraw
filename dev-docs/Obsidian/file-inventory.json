@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "review": {
-    "date": "2026-10-30",
+    "date": "2026-10-31",
     "dependency_precommit_tests": "PR #478: 701 combined portable cases pass, including 134 fork source, 18 fork browser, 29 Extras source and 17 Extras browser cases; full/owned types, both package builds, clean consumers and zero-warning owned lint pass. Fifteen audit tests and 264-path fingerprints pass.",
     "method": "PR #478: three-parent review of all 13 incoming paths, sole manifest conflict, auto-merges and host/Extras consumers. Converter remains dev-only in fork and fully bundled by Extras. No eligible runtime retirement established.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
@@ -64,12 +64,13 @@
       "retirements": [],
       "nativeAcceptance": "failed-existing-diagnostic",
       "evidence": "pr-478-results.json"
-    }
+    },
+    "svg_entry_points": "Four production paths reviewed against a758e93d6a03e9f995973703cb886850a398a6d3. Matching runtime/declaration builds and 146 owned tests pass. Final plugin native sequence: all 20 cases pass, including ten main/popout UI cases, system chooser events and supplied mindmap color/alpha pixels, with zero captured errors/notifications and passing settling/cleanup/baseline restoration. Plugin portable: 549 tests, 105 measured-source subset, 96 focused SVG cases. System selection uses CDP after trusted menu input; cancellation is explicitly synthetic. The system picker and bounded local CSS variables remain plugin-owned; only the ImageMenu comment changed in this follow-up. See svg-conversion-entry-points.md for hashes, prior browser/packed/type validation and remaining limits. Maintainer explicitly requested paired source merges on 2026-10-31 with package publication/dependency update deferred. Owned fixture branded types corrected; full and owned type checks pass."
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "b2e798f37aa646bf81c831d664845806bbc671ee",
+      "parent_commit": "745d62f7071be4da192f595bb75e140a7b741fc0",
       "package": "@zsviczian/excalidraw",
       "version": "0.18.145"
     },
@@ -82,7 +83,7 @@
     },
     "plugin": {
       "kind": "Git working tree",
-      "commit": "8a0e294013093ad14bbaf319c8ffa77b0fcf0009",
+      "commit": "ae661c0ee8fa64df584864c3cc7af3df426e486f",
       "version": "2.29.0",
       "fork_dependency": "0.18.145",
       "working_tree_changes": "PR #478 test-only offline twelve-diagram integration; no production/dependency/version change."
@@ -100,8 +101,8 @@
   },
   "comparison": {
     "fork": {
-      "files": 1350,
-      "sha256": "cca767d37b981952913db762d514079e1d19033b89a80332dad82234489def6d"
+      "files": 1354,
+      "sha256": "6300119c94b6b600c5dc554855a1595271bbbd56f7db92286cf320b5fee370e2"
     },
     "upstream": {
       "files": 1328,
@@ -336,6 +337,12 @@
       "title": "Scoped native Lucide insertion action",
       "review_state": "retain-integration",
       "owner": "Component host boundary and plugin picker maintainers"
+    },
+    {
+      "id": "OBS-039",
+      "title": "SVG conversion entry points",
+      "review_state": "retain-integration",
+      "owner": "Component host boundary and plugin SVG maintainers"
     }
   ],
   "files": [
@@ -1490,14 +1497,15 @@
     {
       "path": "packages/excalidraw/components/App.wheel.obsidian.test.ts",
       "status": "fork-only",
-      "fork_sha256": "e75261bfbb8e7ee71d5bbd8805eac00878cb60d29bde57292ee048139723c93a",
+      "fork_sha256": "c769a662162eaa773e19a9416f052a2b806463470abfe749080ccb98b5416a29",
       "upstream_sha256": null,
       "ids": [
         "OBS-028",
-        "OBS-033"
+        "OBS-033",
+        "OBS-039"
       ],
       "kind": "tests",
-      "note": "Focused real wheel-controller/viewport regression for host minimum, maximum, live changes, standalone defaults and zoom locks; independent of unavailable App DOM test hooks."
+      "note": "Focused real wheel-controller/viewport regression for host minimum, maximum, live changes, standalone defaults and zoom locks; independent of unavailable App DOM test hooks. Plugin #3027: protocol-4 SVG insertion/menu boundary or coordinated fixture; source and consumers reviewed, no unrelated behavior retired. See svg-conversion-entry-points.md."
     },
     {
       "path": "packages/excalidraw/components/App.wheel.ts",
@@ -1650,12 +1658,13 @@
     {
       "path": "packages/excalidraw/components/Dialog.tsx",
       "status": "modified",
-      "fork_sha256": "72bdb5e83f5a7c154b66eaa4ac675dc4687b64b242a2947ee39d899a858f1209",
+      "fork_sha256": "132ea756dc019a53605503963addf1557f3f309d32abb037cc5aaa2383a8e734",
       "upstream_sha256": "ef4b3eea3d298e701d019e462cc52bb399faf37dd986bf556654a898300de3d4",
       "ids": [
-        "OBS-024"
+        "OBS-024",
+        "OBS-030"
       ],
-      "note": "Pass live AppState.dynamicStyle into Modal.",
+      "note": "Pass live AppState.dynamicStyle into Modal. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md.",
       "kind": "presentation"
     },
     {
@@ -1797,13 +1806,14 @@
     {
       "path": "packages/excalidraw/components/ImageMenu.tsx",
       "status": "fork-only",
-      "fork_sha256": "1fa219ba699d3de531feb154ef647461db7394409bd425d6a254b263ea560fb4",
+      "fork_sha256": "2c8249ca858fbb5ae27c2be4c3877897a429c24e4d637aa997764863ce0175e1",
       "upstream_sha256": null,
       "ids": [
         "OBS-023",
-        "OBS-038"
+        "OBS-038",
+        "OBS-039"
       ],
-      "note": "Shared image/system-file, vault-file, card, and LaTeX command menu through typed host services. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned.",
+      "note": "Shared image/system-file, vault-file, card, and LaTeX command menu through typed host services. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned. Plugin #3027: protocol-4 SVG insertion/menu boundary or coordinated fixture; source and consumers reviewed, no unrelated behavior retired. See svg-conversion-entry-points.md. Picker ownership clarified: system SVG selection is plugin-owned; no new fork logic.",
       "kind": "integration"
     },
     {
@@ -2129,12 +2139,12 @@
     {
       "path": "packages/excalidraw/components/TTDDialog/TTDDialog.tsx",
       "status": "modified",
-      "fork_sha256": "c25d3f05a045cfa019158854c64162a3c93b2df597e9318796d9024da16ce4be",
+      "fork_sha256": "0ab91b8d397fd4b4baf6be030a8fe98025d66218020d048917f93fc7b3c71ccc",
       "upstream_sha256": "954951285afe6e72610dd2137142157bf5b4d300258f6852a356d92d97645a30",
       "ids": [
         "OBS-030"
       ],
-      "note": "Replace package dynamic import with host lazy loader, mount/cancellation guard, and selected elements for diagram editing. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #478: upstream comment update inside the retained disabled loader; active host service is unchanged.",
+      "note": "Replace package dynamic import with host lazy loader, mount/cancellation guard, and selected elements for diagram editing. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #478: upstream comment update inside the retained disabled loader; active host service is unchanged. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md.",
       "kind": "integration"
     },
     {
@@ -2151,12 +2161,13 @@
     {
       "path": "packages/excalidraw/components/TTDDialog/common.ts",
       "status": "modified",
-      "fork_sha256": "5d832b07eb591c06e06d101ddb6f8e85288a332fef9e6d84a4c3384f2667b8c1",
+      "fork_sha256": "715299e907073a425902ac25b2dd3a009a6771d3813526e733ed620ce98700f5",
       "upstream_sha256": "51c744fff354ced787149c34bca341515514a55fd70477acfb2f4245076118a5",
       "ids": [
-        "OBS-030"
+        "OBS-030",
+        "OBS-039"
       ],
-      "note": "Attach mermaidText to generated image elements before conversion. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Copy readonly image skeletons while retaining editable Mermaid source; adopt host renderEnvironment. See pr-475-merge-review.md.",
+      "note": "Attach mermaidText to generated image elements before conversion. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Copy readonly image skeletons while retaining editable Mermaid source; adopt host renderEnvironment. See pr-475-merge-review.md. 2026-10-31: Match the rendered preview background using the renderer dark-mode filter, independent of host CSS variables; see mermaid-preview-background.md. Plugin #3027: protocol-4 SVG insertion/menu boundary or coordinated fixture; source and consumers reviewed, no unrelated behavior retired. See svg-conversion-entry-points.md.",
       "kind": "compatibility"
     },
     {
@@ -2626,26 +2637,28 @@
     {
       "path": "packages/excalidraw/obsidianExcalidrawHost.test.ts",
       "status": "fork-only",
-      "fork_sha256": "d43d23bc1931fa668a524f769e67ebb057ba74a737b6316f9cef66ca95626e36",
+      "fork_sha256": "648d0f956b54b274097714efc2c0534afe4a18ce444a455bb13cb0f20b22afe7",
       "upstream_sha256": null,
       "ids": [
         "OBS-006",
         "OBS-033",
-        "OBS-038"
+        "OBS-038",
+        "OBS-039"
       ],
-      "note": "Fake-host services, defaults/errors, live settings, pen panning, protocol rejection, and stale-disposer tests. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned. PR #477: use supported called-times assertion; no adapter behavior or protocol change.",
+      "note": "Fake-host services, defaults/errors, live settings, pen panning, protocol rejection, and stale-disposer tests. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned. PR #477: use supported called-times assertion; no adapter behavior or protocol change. Plugin #3027: protocol-4 SVG insertion/menu boundary or coordinated fixture; source and consumers reviewed, no unrelated behavior retired. See svg-conversion-entry-points.md.",
       "kind": "test"
     },
     {
       "path": "packages/excalidraw/obsidianExcalidrawHost.ts",
       "status": "fork-only",
-      "fork_sha256": "20c2665fdeb96f83734c908ca7df8411de82cd4dfceddaa3aeb1477c39860237",
+      "fork_sha256": "e8c1d513f4971200e42115320695401a2b7ed143927b025d97b8fe9b1769cce6",
       "upstream_sha256": null,
       "ids": [
         "OBS-006",
-        "OBS-038"
+        "OBS-038",
+        "OBS-039"
       ],
-      "note": "Version-3 typed service boundary for settings, fonts, Mermaid, commands, labels, and inline suggestions. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned.",
+      "note": "Version-3 typed service boundary for settings, fonts, Mermaid, commands, labels, and inline suggestions. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned. Plugin #3027: protocol-4 SVG insertion/menu boundary or coordinated fixture; source and consumers reviewed, no unrelated behavior retired. See svg-conversion-entry-points.md.",
       "kind": "integration"
     },
     {
@@ -2699,7 +2712,7 @@
     {
       "path": "packages/excalidraw/obsidianUtils.ts",
       "status": "fork-only",
-      "fork_sha256": "6bee7d96834785622b7ba395072784521e63647f9f88a36c0afd5d765e6d9d0e",
+      "fork_sha256": "a9cf43387e65aeeefdc3c953db58d4434a9d13a657176459f7aad0a195ae965b",
       "upstream_sha256": null,
       "ids": [
         "OBS-006",
@@ -2710,9 +2723,10 @@
         "OBS-028",
         "OBS-029",
         "OBS-030",
-        "OBS-038"
+        "OBS-038",
+        "OBS-039"
       ],
-      "note": "Host setting/service delegates, local-font/CSS helpers, pen/touch and zoom helpers, Mermaid wrappers, arrow refresh, and geometry compatibility APIs. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #475: refreshAllArrows passes its self-binding midpoint flag as transient fifth-argument options; no leaked persisted property. See pr-475-merge-review.md. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned. PR #477 follow-up: maintainer-approved local/system-font CSS no-fetch fix and its independent bundled/local-font regressions; 127 source cases pass, including custom Local Font preservation.",
+      "note": "Host setting/service delegates, local-font/CSS helpers, pen/touch and zoom helpers, Mermaid wrappers, arrow refresh, and geometry compatibility APIs. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #475: refreshAllArrows passes its self-binding midpoint flag as transient fifth-argument options; no leaked persisted property. See pr-475-merge-review.md. Plugin #3019: protocol-3 Lucide action forwards the initiating editor ID; catalog/conversion/target state remain plugin-owned. PR #477 follow-up: maintainer-approved local/system-font CSS no-fetch fix and its independent bundled/local-font regressions; 127 source cases pass, including custom Local Font preservation. Plugin #3027: protocol-4 SVG insertion/menu boundary or coordinated fixture; source and consumers reviewed, no unrelated behavior retired. See svg-conversion-entry-points.md.",
       "kind": "integration"
     },
     {
@@ -3221,17 +3235,32 @@
     {
       "path": "tests/obsidian/browser/run.mjs",
       "status": "fork-only",
-      "fork_sha256": "52c30e1ee5a3074516fdf92c2e17a159bc794fd5f00816eccd2d4a2494d75170",
+      "fork_sha256": "0afa7abf561ce30cea0fdda796aa06b5db513fff36556b75a5c62b288e753152",
       "upstream_sha256": null,
       "ids": [
         "OBS-003",
         "OBS-013",
         "OBS-019",
         "OBS-021",
-        "OBS-033"
+        "OBS-033",
+        "OBS-030"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md."
+    },
+    {
+      "path": "tests/obsidian/browser/ttdClose.mjs",
+      "status": "fork-only",
+      "fork_sha256": "522bf2f1499fe2bec8275a8464e588084468af8408b9c9c9ced2bc4aa99e0ab3",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-024",
+        "OBS-030",
+        "OBS-033",
+        "OBS-039"
+      ],
+      "kind": "Independent TTD close regression",
+      "note": "Named single close control, both tabs/fallback, close/reopen/Escape and preserved scene. Browser checks trusted clicks/keyboard and settled desktop/tablet/phone geometry; see ttd-close-button.md. Plugin #3027: protocol-4 SVG insertion/menu boundary or coordinated fixture; source and consumers reviewed, no unrelated behavior retired. See svg-conversion-entry-points.md."
     },
     {
       "path": "tests/obsidian/compatibility/duplicateTitles.json",
@@ -3273,15 +3302,16 @@
     {
       "path": "tests/obsidian/compatibility/setup.ts",
       "status": "fork-only",
-      "fork_sha256": "db85f02d93c6cc1848b62219d7cdfe10e00910f7d9c4888f063cb0326bc945d2",
+      "fork_sha256": "10d9ebe3dab0cd8f9a20d3b8512b801df6ae1ff45fa6e700b88ef68f977325c7",
       "upstream_sha256": null,
       "ids": [
         "OBS-005",
         "OBS-006",
-        "OBS-033"
+        "OBS-033",
+        "OBS-039"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. Plugin #3027: protocol-4 SVG insertion/menu boundary or coordinated fixture; source and consumers reviewed, no unrelated behavior retired. See svg-conversion-entry-points.md."
     },
     {
       "path": "tests/obsidian/fixtures/host-scene.json",
@@ -3308,17 +3338,18 @@
     {
       "path": "tests/obsidian/packageConsumer.mjs",
       "status": "fork-only",
-      "fork_sha256": "d88f13563af50264ba2ec27423d71d188fad661538ba1e68a9e76f969d6589b4",
+      "fork_sha256": "05a32e25de0f7ea0efa171fd3dbd9f736f364f4b1daf099479f040b381a61c2e",
       "upstream_sha256": null,
       "ids": [
         "OBS-002",
         "OBS-004",
         "OBS-005",
         "OBS-006",
-        "OBS-007"
+        "OBS-007",
+        "OBS-039"
       ],
       "kind": "test-tooling",
-      "note": "PR #477: clean tarball consumer checks four runtime outputs, generated host declarations and protocol rejection using bundler resolution; no package publication. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+      "note": "PR #477: clean tarball consumer checks four runtime outputs, generated host declarations and protocol rejection using bundler resolution; no package publication. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. Plugin #3027: protocol-4 SVG insertion/menu boundary or coordinated fixture; source and consumers reviewed, no unrelated behavior retired. See svg-conversion-entry-points.md. Ignore Yarn npm_execpath when selecting npm for clean-consumer packing; demonstrated Yarn event-JSON mismatch corrected and packed consumer passes."
     },
     {
       "path": "tests/obsidian/provenance.mjs",
@@ -3446,6 +3477,29 @@
       "note": "PR #477 / plugin #3022 follow-up: immutable pairwise host image metadata/shared-source crop and dimension evidence; source restore only, decoded rendering belongs to native coordinator."
     },
     {
+      "path": "tests/obsidian/unit/mermaidPreviewBackground.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "bb3718cd84722f0a585d57fc871341cddd2985f05f8fc5b09eab32e83dc9e2b6",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-030",
+        "OBS-033"
+      ],
+      "kind": "Independent Mermaid preview regression",
+      "note": "Light/dark CSS-variable collision, matching export theme, original export errors and reset; real pixels checked separately in the native dialog probe."
+    },
+    {
+      "path": "tests/obsidian/unit/svgDiagramInsert.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "74b4deaf303e221ed22abe61903d61bf482495092c9ecaea953de837103ae69f",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-039"
+      ],
+      "kind": "test-tooling",
+      "note": "Fork-owned executable TTD insertion choices, synchronous passthrough, error reporting and destroyed-editor guards. Author zsviczian; plugin #3027. Merge validation uses canonical branded FileId/DataURL fixture values; seven behavior assertions unchanged and both type lanes pass."
+    },
+    {
       "path": "tests/obsidian/unit/testIdentities.test.ts",
       "status": "fork-only",
       "fork_sha256": "d58e86dca3355df02c8bc67a490ca35ff3b3fc2df4b78f748080f1a7d796b511",
@@ -3455,6 +3509,20 @@
       ],
       "kind": "test-tooling",
       "note": "PR #477: negative controls reject new, changed or obsolete title collisions and preserve failure status/each occurrence independently. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved."
+    },
+    {
+      "path": "tests/obsidian/unit/ttdCloseButton.test.tsx",
+      "status": "fork-only",
+      "fork_sha256": "ab0967c82d68ce0c1bfcf4aea5ebdb3ff132b4e8b743a6576cca04f32daa8a33",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-024",
+        "OBS-030",
+        "OBS-033",
+        "OBS-039"
+      ],
+      "kind": "Independent TTD close regression",
+      "note": "Named single close control, both tabs/fallback, close/reopen/Escape and preserved scene. Browser checks trusted clicks/keyboard and settled desktop/tablet/phone geometry; see ttd-close-button.md. Plugin #3027: protocol-4 SVG insertion/menu boundary or coordinated fixture; source and consumers reviewed, no unrelated behavior retired. See svg-conversion-entry-points.md."
     },
     {
       "path": "vitest.obsidian-compat.config.mts",

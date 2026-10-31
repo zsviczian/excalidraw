@@ -53,9 +53,12 @@ Canonical definition: [commonObsidianHost.ts](../../packages/common/src/commonOb
 
 [commonObsidianUtils.ts](../../packages/common/src/commonObsidianUtils.ts) is the normalization/default layer. Preserve fake-host tests, standalone calls without a host, live settings, invalid-mode normalization, version rejection, and stale disposal.
 
-### Excalidraw host, protocol 3
+### Excalidraw host, protocol 4
 
-Plugin PR #3019 coordinates protocol 3 across the component and plugin. The
+Plugin PR #3027 advances the paired protocol to 4 for SVG insertion preparation
+and the editor-scoped SVG file action (OBS-039). Protocol 3 is rejected. The
+Mermaid service/Extras API remains unchanged. The original
+plugin PR #3019 coordinated protocol 3 across the component and plugin. Its
 `lucide` image-menu action passes its initiating editor ID to the plugin; the
 registry never retains an active view. The plugin resolves that exact live API
 and rejects protocol 2 during package loading. Other named actions keep their
@@ -67,8 +70,23 @@ On 2026-10-28 the maintainer authorized merging the paired source checkpoint
 before publication, and will advance the fork version and plugin dependency in
 a later release step. Keep the protocol-3 rejection and exact-package release
 gate; this approval does not declare the currently published package compatible.
+The same unpublished-pair release gate applies to protocol 4.
 
 **PR #475:** Converter 3/Pele is provided lazily by Extras Mermaid component `3.0.0`, with an exact plugin gateway check. No Obsidian 1.15 engine is used. The host/public service remains `{loaded, api}`; readonly converter skeletons require immutable image-source attachment, not a protocol bump. Both installed and generated-local declaration checks pass. Saved `customData.mermaidText` remains editable in main/popout. See the [PR #475 review](pr-475-merge-review.md).
+
+**Mermaid previews:** The surrounding preview panel must match the exported
+canvas's opaque white background (light theme) or its renderer-filtered
+`#121212` background (dark theme). A host override of `--default-bg-color` must
+not affect it. Reset clears the inline background; export errors retain their
+original error and the matching themed background. The native dialog probe
+checks actual pixels and computed colors in both owning windows.
+
+**TTD close control:** Both Mermaid and text-to-diagram opt into the shared
+Dialog close button on desktop as well as phone layouts. Exactly one named
+button must appear at the top right, clear of the tabs. Pointer activation,
+keyboard activation and Escape use the same existing close/cleanup path;
+closing must not submit or insert a diagram and must preserve the scene.
+Other desktop dialogs retain their existing close-button policy.
 
 Canonical definition: [obsidianExcalidrawHost.ts](../../packages/excalidraw/obsidianExcalidrawHost.ts). Consumer adapter: `P: src/core/managers/obsidianExcalidrawHostAdapter.ts`.
 
@@ -79,7 +97,8 @@ Canonical definition: [obsidianExcalidrawHost.ts](../../packages/excalidraw/obsi
 | `isContextMenuDisabled()`, `shouldSyncElementLinkWithText()` | Host interaction/link policy. |
 | `loadFontFromFile(filename)` | Promise of vault font bytes or `undefined`; not a view or file-system object. |
 | `getMermaid()` | Promise of `ObsidianMermaidService`: existing `{loaded: boolean, api: Promise<converter>}` shape, loaded lazily through the plugin. |
-| `runAction("anyFile" \| "LaTeX" \| "card" \| "lucide", editorId?)` | Narrow host commands rather than discovery of a plugin instance. Lucide supplies the initiating editor ID; missing/stale IDs cannot choose another drawing. |
+| `runAction("anyFile" \| "LaTeX" \| "card" \| "lucide" \| "importSVG", editorId?)` | Narrow host commands rather than discovery of a plugin instance. Lucide and SVG import supply the initiating editor ID; missing/stale IDs cannot choose another drawing. |
+| `prepareMermaidSVGInsert(editorId, diagram)` (protocol 4) | Host choice before SVG Mermaid insertion: returns staged native data, the original SVG image data, or null to cancel. Exact editor/file/document identity is guarded by the plugin. No host objects cross the boundary. |
 | `getLabel(key)` | Host-owned labels. |
 | `attachInlineLinkSuggester(inputEl, widthWrapper?, container?, suppressPlaceholder?)` | Returns `ObsidianKeyBlocker`, with `isBlockingKeys()` and `close()`; caller owns closing it. |
 

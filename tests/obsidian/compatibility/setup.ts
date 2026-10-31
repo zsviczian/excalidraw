@@ -16,7 +16,7 @@ beforeEach(() => {
     getHighlightColor: () => "rgba(0,118,255,1)",
   });
   disposeComponent = configureObsidianExcalidrawHost({
-    protocolVersion: 3,
+    protocolVersion: 4,
     isDoubleTapEraserEnabled: () => false,
     getZoomToFitMaxLevel: () => 10,
     isPenModeCrosshairVisible: () => false,
@@ -34,6 +34,7 @@ beforeEach(() => {
       );
     },
     runAction: () => {},
+    prepareMermaidSVGInsert: async (_editorId, diagram) => diagram,
     getLabel: (key) => key,
     attachInlineLinkSuggester: () => ({
       isBlockingKeys: () => false,

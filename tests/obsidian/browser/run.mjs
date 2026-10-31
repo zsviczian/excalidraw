@@ -10,6 +10,7 @@ import { build } from "esbuild";
 import { chromium } from "playwright";
 
 import { sourceIdentity } from "../provenance.mjs";
+import { verifyTTDClose } from "./ttdClose.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const shortcutModifier = process.platform === "darwin" ? "Meta" : "Control";
@@ -780,6 +781,7 @@ try {
       }
       return { owningDocument: true, survivingElements: 1 };
     });
+    await run("ttd-close-button", () => verifyTTDClose(page), true);
     await page.screenshot({ path: join(output, `${mode}-editor.png`) });
     await page.evaluate(() => {
       window.__testRoot.unmount();

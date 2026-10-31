@@ -6,10 +6,10 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 
 | Document | Purpose |
 | --- | --- |
-| [Customization catalog](customizations.md) | 38 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
+| [Customization catalog](customizations.md) | 39 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
-| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 264 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
+| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 268 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
 | [Validation and merge playbook](validation.md) | What was actually verified, existing regression tests, missing runtime evidence, and behavior-specific gates. |
 | [Obsidian runtime testing](OBSIDIAN_RUNTIME_TESTING.md) | Guarded CLI test-vault deployment, exact-build desktop smoke, reports, and feature-specific host probes. |
 | [Local audit checker](audit.py) / [checker tests](test_audit.py) | Dependency-free, offline source accounting; detects changed, new, or retired differences and stale tree fingerprints. |

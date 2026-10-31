@@ -1,4 +1,6 @@
 import { DEFAULT_EXPORT_PADDING, EDITOR_LS_KEYS } from "@excalidraw/common";
+// zsviczian -- match exportScene's white canvas and dark-mode filter, not host CSS variables.
+import { COLOR_WHITE, applyDarkModeFilter } from "@excalidraw/common";
 
 import { convertToExcalidrawElements } from "@excalidraw/element";
 
@@ -11,6 +13,7 @@ import type {
 } from "@excalidraw/element/types";
 
 import { EditorLocalStorage } from "../../data/EditorLocalStorage";
+import { prepareMermaidSVGInsert } from "../../obsidianUtils"; // zsviczian -- plugin #3027 owns SVG conversion choice
 
 import type { MermaidToExcalidrawLibProps } from "./types";
 
@@ -70,6 +73,9 @@ export const convertMermaidToExcalidraw = async ({
     return { success: false };
   }
 
+  // zsviczian -- Obsidian may override --default-bg-color independently of the preview.
+  const previewBackground = applyDarkModeFilter(COLOR_WHITE, theme === "dark");
+
   let ret;
   try {
     const api = await mermaidToExcalidrawLib.api;
@@ -127,11 +133,17 @@ export const convertMermaidToExcalidraw = async ({
       },
     });
 
-    parent.style.background = "var(--default-bg-color)";
+    // zsviczian START -- keep the surrounding preview the same color as its exported canvas.
+    // parent.style.background = "var(--default-bg-color)";
+    parent.style.background = previewBackground;
+    // zsviczian END
     canvasNode.replaceChildren(canvas);
     return { success: true };
   } catch (err: any) {
-    parent.style.background = "var(--default-bg-color)";
+    // zsviczian START -- retain the matching background on export failure too.
+    // parent.style.background = "var(--default-bg-color)";
+    parent.style.background = previewBackground;
+    // zsviczian END
     if (mermaidDefinition) {
       setError(err);
     }
@@ -147,7 +159,9 @@ export const saveMermaidDataToStorage = (mermaidDefinition: string) => {
   );
 };
 
-export const insertToEditor = ({
+// zsviczian START -- plugin #3027: await the host only for SVG-backed Mermaid insertion
+// export const insertToEditor = ({
+export const insertToEditor = async ({
   app,
   data,
   text,
@@ -161,7 +175,26 @@ export const insertToEditor = ({
   text?: string;
   shouldSaveMermaidDataToStorage?: boolean;
 }) => {
-  const { elements: newElements, files } = data.current;
+  // zsviczian END
+  // zsviczian START -- plugin #3027: yield the dialog to the host prompt before insertion
+  // const { elements: newElements, files } = data.current;
+  let { elements: newElements, files } = data.current;
+  const prepare = prepareMermaidSVGInsert(app, data.current);
+  if (prepare) {
+    app.setOpenDialog(null);
+    if (shouldSaveMermaidDataToStorage && text) {
+      saveMermaidDataToStorage(text);
+    }
+    const prepared = await prepare().catch((error: unknown) => {
+      console.error("Obsidian SVG diagram insertion failed", error);
+      return null;
+    });
+    if (!prepared || app.api.isDestroyed) {
+      return;
+    }
+    ({ elements: newElements, files } = prepared);
+  }
+  // zsviczian END
 
   if (!newElements.length) {
     return;
