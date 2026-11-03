@@ -104,6 +104,9 @@ import {
   getHoveredElementForBinding,
   isBindingEnabled,
   updateBoundElements,
+  getFrameArrowIdsToReattach,
+  isBoundToElementNotIn,
+  moveFrameArrows,
   LinearElementEditor,
   newElementWith,
   newFrameElement,
@@ -160,8 +163,10 @@ import {
   hasBoundingBox,
   getFrameChildrenInsertionIndex,
   isCursorInFrame,
+  isFrameClippable,
   addElementsToFrame,
   replaceAllElementsInFrame,
+  removeArrowsWithoutEndInFrame,
   removeElementsFromFrame,
   getElementsInResizingFrame,
   getElementsInNewFrame,
@@ -5971,35 +5976,22 @@ class App extends React.Component<AppProps, AppState> {
       }
 
       if (isArrowKey(event.key)) {
-        let selectedElements = this.scene.getSelectedElements({
+        const selectedElements = this.scene.getSelectedElements({
           selectedElementIds: this.state.selectedElementIds,
           includeBoundTextElement: true,
           includeElementsInFrames: true,
         });
-
-        const arrowIdsToRemove = new Set<string>();
-
-        selectedElements
-          .filter((el): el is NonDeleted<ExcalidrawArrowElement> =>
-            isBindingElement(el),
-          )
-          .filter((arrow) => {
-            const startElementNotInSelection =
-              arrow.startBinding &&
-              !selectedElements.some(
-                (el) => el.id === arrow.startBinding?.elementId,
-              );
-            const endElementNotInSelection =
-              arrow.endBinding &&
-              !selectedElements.some(
-                (el) => el.id === arrow.endBinding?.elementId,
-              );
-            return startElementNotInSelection || endElementNotInSelection;
-          })
-          .forEach((arrow) => arrowIdsToRemove.add(arrow.id));
-
-        selectedElements = selectedElements.filter(
-          (el) => !arrowIdsToRemove.has(el.id),
+        const selectedElementIds = new Set(
+          selectedElements.map((element) => element.id),
+        );
+        const frameArrowIds = getFrameArrowIdsToReattach(selectedElements);
+        // arrows bound to unselected elements are moved only by the selected
+        // ones they're bound to (if any), unless their frame moves them
+        const movedElements = selectedElements.filter(
+          (element) =>
+            !isBindingElement(element) ||
+            frameArrowIds.has(element.id) ||
+            !isBoundToElementNotIn(element, selectedElementIds),
         );
 
         const step =
@@ -6024,7 +6016,11 @@ class App extends React.Component<AppProps, AppState> {
           offsetY = step;
         }
 
-        selectedElements.forEach((element) => {
+        movedElements.forEach((element) => {
+          if (frameArrowIds.has(element.id)) {
+            // moved with their frame once the rest has (below)
+            return;
+          }
           this.scene.mutateElement(
             element,
             {
@@ -6035,10 +6031,18 @@ class App extends React.Component<AppProps, AppState> {
           );
 
           updateBoundElements(element, this.scene, {
-            simultaneouslyUpdated: selectedElements,
+            simultaneouslyUpdated: movedElements,
             renderEnvironment: this.renderEnvironment,
           });
         });
+        moveFrameArrows(frameArrowIds, { x: offsetX, y: offsetY }, this.scene, {
+          renderEnvironment: this.renderEnvironment,
+        });
+        // a moved arrow's ends may have left its frame
+        removeArrowsWithoutEndInFrame(
+          movedElements,
+          this.scene.getNonDeletedElementsMap(),
+        );
 
         this.scene.triggerUpdate();
 
@@ -6679,6 +6683,7 @@ class App extends React.Component<AppProps, AppState> {
       // iframe-like elements are rendered as DOM overlays and are not
       // visually clipped by their containing frames
       !isIframeLikeElement(element) &&
+      isFrameClippable(element, elementsMap) &&
       !isCursorInFrame(
         { x, y },
         containingFrame as NonDeleted<ExcalidrawFrameLikeElement>,
