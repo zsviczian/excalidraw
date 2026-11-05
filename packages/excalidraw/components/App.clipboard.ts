@@ -40,7 +40,10 @@ import { tryParseSpreadsheet } from "../charts";
 import { parseClipboard, parseDataTransferEvent } from "../clipboard";
 import { ImageURLToFile, SVGStringToFile } from "../data/blob";
 import { t } from "../i18n";
-import { isMaybeMermaidDefinition } from "../mermaid";
+import {
+  isMaybeMermaidDefinition,
+  MERMAID_TO_EXCALIDRAW_CONFIG,
+} from "../mermaid";
 import { getSharedMermaidInstance } from "../obsidianUtils"; // zsviczian -- reuse the offline host Mermaid runtime
 import { withBatchedUpdates } from "../reactUtils";
 import { getShortcutKey } from "../shortcut";
@@ -216,7 +219,10 @@ export class AppClipboard {
         const api = await sharedMermaid.api;
         // zsviczian END
         const { elements: skeletonElements, files = {} } =
-          await api.parseMermaidToExcalidraw(data.text);
+          await api.parseMermaidToExcalidraw(
+            data.text,
+            MERMAID_TO_EXCALIDRAW_CONFIG,
+          );
 
         const elements = convertToExcalidrawElements(skeletonElements, {
           regenerateIds: true,

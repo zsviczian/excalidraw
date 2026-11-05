@@ -1,12 +1,13 @@
 import { convertToExcalidrawElements } from "@excalidraw/element";
 
 import type { ExcalidrawElement } from "@excalidraw/element/types";
-import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
 
+import { MERMAID_TO_EXCALIDRAW_CONFIG } from "../../mermaid";
 import { getSharedMermaidInstance } from "../../obsidianUtils";
 
 import { isModuleLoadError } from "./utils/mermaidError";
 
+import type { ObsidianMermaidConfig } from "../../obsidianMermaidConfig";
 import type { ObsidianMermaidService } from "../../obsidianExcalidrawHost";
 
 import type { MermaidToExcalidrawLibProps } from "./types";
@@ -77,7 +78,11 @@ export const loadMermaidDialogAPI = (
       throw error;
     }
     return {
-      parseMermaidToExcalidraw: async (definition, config) => {
+      // zsviczian -- mirror upstream dialog defaults through the Extras adapter, PR #482.
+      parseMermaidToExcalidraw: async (
+        definition,
+        config = MERMAID_TO_EXCALIDRAW_CONFIG,
+      ) => {
         try {
           return await lib.parseMermaidToExcalidraw(definition, config);
         } catch (error) {
@@ -96,7 +101,7 @@ export const loadMermaidDialogAPI = (
 //zsviczian
 export const mermaidToExcalidraw = async (
   mermaidDefinition: string,
-  opts: MermaidConfig,
+  opts: ObsidianMermaidConfig,
 ): Promise<
   | {
       elements?: ExcalidrawElement[];

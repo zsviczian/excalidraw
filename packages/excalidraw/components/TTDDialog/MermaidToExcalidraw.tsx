@@ -40,9 +40,13 @@ import "./MermaidToExcalidraw.scss";
 import type { BinaryFiles } from "../../types";
 import type { MermaidToExcalidrawLibProps } from "./types";
 
-//zsviczian
+// zsviczian START -- plugin support example replaces the upstream starter diagram.
+// const MERMAID_EXAMPLE =
+//   "flowchart TD\n A[Christmas] -->|Get money| B(Go shopping)\n B --> C{Let me think}\n C -->|One| D[Laptop]\n C -->|Two| E[iPhone]\n C -->|Three| F[Car]";
 const MERMAID_EXAMPLE =
   "flowchart TD\n  A[The Excalidraw Plugin is Community Supported] --> B{Will YOU support it?}\n  B -- 👍 Yes --> C[Long-term stability + new features]\n  B -- No 👎 --> D[Plugin eventually stops working 😢]\n  C --> E[Support at ❤️ https://ko-fi.com/zsolt]\n  E --> F[📢 Encourage others to support]\n  D --> G[🪦 R.I.P. Excalidraw Plugin]";
+
+// zsviczian END
 
 const debouncedSaveMermaidDefinition = debounce(saveMermaidDataToStorage, 300);
 const AUTO_FIX_DEBOUNCE_MS = 500;
@@ -67,24 +71,38 @@ const getErrorMessage = (error: unknown): string => {
   return "";
 };
 
+/** a link to the Mermaid syntax docs of a diagram type */
+const mermaidSyntaxLink = (page: string) => (el: React.ReactNode) =>
+  (
+    <a
+      href={`https://mermaid.js.org/syntax/${page}.html`}
+      target="_blank"
+      rel="noreferrer"
+    >
+      {el}
+    </a>
+  );
+
 const MermaidToExcalidraw = ({
   mermaidToExcalidrawLib,
   onRetryLoad,
   isActive,
-  selectedElements,
+  selectedElements, // zsviczian -- reopen the selected image's original Mermaid source.
 }: {
   mermaidToExcalidrawLib: MermaidToExcalidrawLibProps;
   onRetryLoad?: () => void;
   isActive?: boolean;
-  selectedElements: readonly NonDeletedExcalidrawElement[]; //zsviczian
+  selectedElements: readonly NonDeletedExcalidrawElement[]; // zsviczian -- host selection for editable image source.
 }) => {
+  // zsviczian START -- preserve source editing for image-backed Mermaid diagrams.
   const selectedMermaidImage = selectedElements.filter(
     (el) => el.type === "image" && el.customData?.mermaidText,
-  )[0]; //zsviczian
-  const selectedMermaidText = selectedMermaidImage?.customData?.mermaidText; //zsviczian
+  )[0];
+  const selectedMermaidText = selectedMermaidImage?.customData?.mermaidText;
+  // zsviczian END
   const [text, setText] = useState(
     () =>
-      selectedMermaidText || //zsviczian
+      selectedMermaidText || // zsviczian -- selected image source precedes the saved draft.
       EditorLocalStorage.get<string>(EDITOR_LS_KEYS.MERMAID_TO_EXCALIDRAW) ||
       MERMAID_EXAMPLE,
   );
@@ -261,42 +279,14 @@ const MermaidToExcalidraw = ({
       <div className="ttd-dialog-desc">
         <Trans
           i18nKey="mermaid.description"
-          flowchartLink={(el) => (
-            <a
-              href="https://mermaid.js.org/syntax/flowchart.html"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {el}
-            </a>
-          )}
-          sequenceLink={(el) => (
-            <a
-              href="https://mermaid.js.org/syntax/sequenceDiagram.html"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {el}
-            </a>
-          )}
-          classLink={(el) => (
-            <a
-              href="https://mermaid.js.org/syntax/classDiagram.html"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {el}
-            </a>
-          )}
-          erdLink={(el) => (
-            <a
-              href="https://mermaid.js.org/syntax/entityRelationshipDiagram.html"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {el}
-            </a>
-          )}
+          flowchartLink={mermaidSyntaxLink("flowchart")}
+          sequenceLink={mermaidSyntaxLink("sequenceDiagram")}
+          classLink={mermaidSyntaxLink("classDiagram")}
+          stateLink={mermaidSyntaxLink("stateDiagram")}
+          erdLink={mermaidSyntaxLink("entityRelationshipDiagram")}
+          ganttLink={mermaidSyntaxLink("gantt")}
+          quadrantLink={mermaidSyntaxLink("quadrantChart")}
+          timelineLink={mermaidSyntaxLink("timeline")}
         />
       </div>
       <TTDDialogPanels>

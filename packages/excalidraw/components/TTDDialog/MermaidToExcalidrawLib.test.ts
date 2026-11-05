@@ -111,6 +111,36 @@ describe("host-provided Mermaid loading", () => {
     expect(getMermaid).toHaveBeenCalledTimes(2);
   });
 
+  it("applies upstream elbow defaults through the host without overriding caller config", async () => {
+    const service = ready();
+    getMermaid.mockResolvedValue(service);
+    const parse = (await service.api).parseMermaidToExcalidraw;
+    const { loadMermaidDialogAPI } = await import("./MermaidToExcalidrawLib");
+    const api = await loadMermaidDialogAPI(vi.fn());
+    await api.parseMermaidToExcalidraw("flowchart TD; A-->B");
+    expect(parse).toHaveBeenLastCalledWith("flowchart TD; A-->B", {
+      elbow: { flowchart: true },
+    });
+    const explicit = { elbow: { flowchart: false } };
+    await api.parseMermaidToExcalidraw("flowchart TD; A-->B", explicit);
+    expect(parse).toHaveBeenLastCalledWith("flowchart TD; A-->B", explicit);
+    expect(getMermaid).toHaveBeenCalledTimes(1);
+  });
+
+  it("forwards legacy EA curve options without changing the Mermaid source", async () => {
+    const service = ready();
+    getMermaid.mockResolvedValue(service);
+    const parse = (await service.api).parseMermaidToExcalidraw;
+    const { mermaidToExcalidraw } = await import("./MermaidToExcalidrawLib");
+    const source = "flowchart TD; A-->B";
+    const config = { flowchart: { curve: "basis" as const } };
+    expect(await mermaidToExcalidraw(source, config)).toEqual({
+      elements: [],
+      files: undefined,
+    });
+    expect(parse).toHaveBeenCalledExactlyOnceWith(source, config);
+  });
+
   it("forwards config and reports only chunk failures against the exact API", async () => {
     const syntax = new Error("Parse error");
     const chunk = new TypeError("Failed to fetch dynamically imported module");

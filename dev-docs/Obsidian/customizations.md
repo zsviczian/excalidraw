@@ -333,6 +333,18 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 <a id="obs-030"></a>
 ## OBS-030 — Host Mermaid conversion and editable diagram metadata
 
+**PR #482 (2026-11-05):** Converter 3.6.0 / Pele 1.13.0 remain Extras-provided
+with the existing service contract 3.0.0. Clipboard and the active host dialog
+adapter apply upstream elbow defaults; explicit caller configuration and
+definition curves retain precedence. Adopt upstream source-line errors and
+editable Gantt, timeline and quadrant charts. Keep host retry/cache, public
+loaded/api, queued previews, image source and selection metadata; no retirement.
+`obsidianMermaidConfig.ts` and Extras preserve the removed `flowchart.curve`
+option for EA/public callers, using the pinned converter's existing Pele input
+without rewriting source. Native and packed-consumer tests cover both option
+generations; ordinary converter calls remain unchanged.
+See [the merge review](pr-482-merge-review.md) for source, consumers and validation.
+
 **TTD close control (2026-10-31):** Both dialog tabs opt into Dialog's existing
 close button on desktop, retaining a single button on phones and the existing
 close/focus-cleanup path. No new styles or dismissal handler. Owned source

@@ -2,7 +2,7 @@ import { useRef } from "react";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import { useAtom, useAtomValue } from "../../editor-jotai";
+import { useAtom /*, useAtomValue */ } from "../../editor-jotai"; // zsviczian -- always-on preview does not read the preview atom.
 import { t } from "../../i18n";
 
 import { useApp, useExcalidrawSetAppState } from "../App";
@@ -14,7 +14,10 @@ import {
   insertToEditor,
   saveMermaidDataToStorage,
 } from "./common";
-import { errorAtom, chatHistoryAtom, showPreviewAtom } from "./TTDContext";
+// zsviczian START -- always-on preview does not read the preview atom.
+// import { errorAtom, chatHistoryAtom, showPreviewAtom } from "./TTDContext";
+import { errorAtom, chatHistoryAtom } from "./TTDContext";
+// zsviczian END
 
 import { useTTDChatStorage } from "./useTTDChatStorage";
 import { useMermaidRenderer } from "./hooks/useMermaidRenderer";
@@ -24,7 +27,6 @@ import { TTDChatPanel } from "./Chat/TTDChatPanel";
 import { TTDPreviewPanel } from "./TTDPreviewPanel";
 
 import { getLastAssistantMessage } from "./utils/chat";
-import { withMermaidSourceLineNumber } from "./utils/mermaidError";
 
 import type { BinaryFiles } from "../../types";
 import type {
@@ -57,7 +59,10 @@ const TextToDiagramContent = ({
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const [error, setError] = useAtom(errorAtom);
   const [chatHistory, setChatHistory] = useAtom(chatHistoryAtom);
-  const showPreview = true; //zsviczian (always show preview, on-screen keyboard issue) useAtomValue(showPreviewAtom);
+  // zsviczian START -- always show preview to avoid the host on-screen keyboard issue.
+  // const showPreview = useAtomValue(showPreviewAtom);
+  const showPreview = true;
+  // zsviczian END
 
   const { savedChats } = useTTDChatStorage({ persistenceAdapter });
 
@@ -152,10 +157,7 @@ const TextToDiagramContent = ({
 
   const handleAiRepairClick = async (message: TChat.ChatMessage) => {
     const mermaidContent = message.content || "";
-    const errorMessage = withMermaidSourceLineNumber(
-      message.error || "",
-      mermaidContent,
-    );
+    const errorMessage = message.error || "";
 
     if (!mermaidContent) {
       return;

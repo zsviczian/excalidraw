@@ -88,6 +88,13 @@ declare const component:Parameters<typeof configureObsidianExcalidrawHost>[0];
 declare const common:ObsidianCommonHostAdapter;
 const dispose:()=>void=configureObsidianExcalidrawHost(component);
 const live = common.getCanvasLimits();
+void component.getMermaid().then(async service => {
+  const converter = await service.api;
+  converter.parseMermaidToExcalidraw('flowchart TD; A-->B', {flowchart:{curve:'basis'}});
+  converter.parseMermaidToExcalidraw('flowchart TD; A-->B', {elbow:{flowchart:true}});
+  // @ts-expect-error unsupported legacy curve must remain rejected
+  converter.parseMermaidToExcalidraw('flowchart TD; A-->B', {flowchart:{curve:'unknown'}});
+});
 // @ts-expect-error protocol mismatch must remain rejected by generated declarations
 const wrong:2=OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION;
 void [protocol,dispose,live];`,

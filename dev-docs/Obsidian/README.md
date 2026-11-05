@@ -9,7 +9,7 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 | [Customization catalog](customizations.md) | 39 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
-| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 268 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
+| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 270 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
 | [Validation and merge playbook](validation.md) | What was actually verified, existing regression tests, missing runtime evidence, and behavior-specific gates. |
 | [Obsidian runtime testing](OBSIDIAN_RUNTIME_TESTING.md) | Guarded CLI test-vault deployment, exact-build desktop smoke, reports, and feature-specific host probes. |
 | [Local audit checker](audit.py) / [checker tests](test_audit.py) | Dependency-free, offline source accounting; detects changed, new, or retired differences and stale tree fingerprints. |
@@ -17,6 +17,20 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md](../../CONTRIBUTING.md). This inventory documents existing deviations even when they do not yet comply with those policies; it does not silently approve them.
 
 ## Reviewed merge checkpoints
+
+### PR #482 converter 3.6 - 2026-11-05
+
+The [merge review](pr-482-merge-review.md) accounts for all 18 incoming paths
+against `701b901a0f1ba3d0b390d9cdf63d112e25abac4b`, fork parent `a46e7001b`
+and merge base `dd2f8fc32`. Keep lazy Extras loading and image source semantics;
+apply upstream defaults in the actual host dialog adapter. Converter 3.6.0 is
+dev-only here and bundled offline by Extras. Service contract 3.0.0, package
+versions and the plugin dependency are unchanged. All 876 portable and 387
+Windows native cases pass, plus 67 real-Extras dialog assertions and 18 SVG
+paint/entry cases. Cleanup/restoration pass. Legacy caller curves are preserved
+through Extras' pinned converter pipeline. Physical mobile, other native OSes
+and isolated whole-app restart remain separate environments.
+Use this incoming commit for the current inventory comparison.
 
 ### PR #478 lazy Pele and centered flowcharts - 2026-10-30
 

@@ -88,6 +88,19 @@ keyboard activation and Escape use the same existing close/cleanup path;
 closing must not submit or insert a diagram and must preserve the scene.
 Other desktop dialogs retain their existing close-button policy.
 
+**PR #482 conversion:** The host supplies converter 3.6.0 / Pele 1.13.0 through
+the unchanged loaded/api service. Dialog and paste use upstream's elbow-flowchart
+default; explicit dialog options are forwarded unchanged, and a definition's
+curve wins. Gantt, timeline and quadrant output is native editable geometry.
+Image-only kinds must still retain editable source and valid files. Errors count
+original source lines; do not remap them a second time. Extras bundles every
+lazy module offline. No host protocol or scene schema change.
+Legacy `flowchart.curve` linear/basis defaults remain accepted by host/EA types
+and the Extras module; definition settings override them. The compatibility
+path uses converter 3.6's internal Pele and conversion stages, preserving
+source/error identity, font size, limits and image/native output. Recheck these
+pinned internal imports on each converter upgrade.
+
 Canonical definition: [obsidianExcalidrawHost.ts](../../packages/excalidraw/obsidianExcalidrawHost.ts). Consumer adapter: `P: src/core/managers/obsidianExcalidrawHostAdapter.ts`.
 
 | Capabilities | Meaning |

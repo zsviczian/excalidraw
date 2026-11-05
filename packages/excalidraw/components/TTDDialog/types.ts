@@ -2,10 +2,11 @@ import type { RequestError } from "@excalidraw/excalidraw/errors";
 
 import type { NonDeletedExcalidrawElement } from "@excalidraw/element/types";
 
-import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw";
+// import type { MermaidConfig } from "@excalidraw/mermaid-to-excalidraw"; // zsviczian -- compatible host type below, PR #482.
 
 import type { MermaidToExcalidrawResult } from "@excalidraw/mermaid-to-excalidraw/dist/interfaces";
 
+import type { ObsidianMermaidConfig as MermaidConfig } from "../../obsidianMermaidConfig"; // zsviczian -- preserve public curve options through Extras, PR #482.
 import type { BinaryFiles } from "../../types";
 
 export type LLMMessage = {
