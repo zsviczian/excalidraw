@@ -14,7 +14,7 @@ import { t } from "../i18n";
 import { getScrollToContentState, isSomeElementSelected } from "../scene";
 import { SCROLLBAR_WIDTH, SCROLLBAR_MARGIN } from "../scene/scrollbars";
 
-import { actionToggleStats } from "../actions";
+import { actionToggleMinimap, actionToggleStats } from "../actions";
 
 import { SelectedShapeActions, ZoomActions } from "./Actions";
 import { FixedSideContainer } from "./FixedSideContainer";
@@ -23,6 +23,10 @@ import { Section } from "./Section";
 import Stack from "./Stack";
 import { Stats } from "./Stats";
 import { Toolbar } from "./Toolbar";
+
+import { Tooltip } from "./Tooltip";
+
+import { Minimap } from "./Minimap/Minimap";
 
 import type { ActionManager } from "../actions/manager";
 import type {
@@ -33,7 +37,6 @@ import type {
   UIAppState,
 } from "../types";
 import type { JSX } from "react";
-import { Tooltip } from "./Tooltip";
 
 type TrayMenuProps = {
   appState: UIAppState;
@@ -77,6 +80,9 @@ export const TrayMenu = ({
     MainMenuTunnel,
     DefaultSidebarTriggerTunnel,
   } = useTunnels();
+  // zsviczian -- the tray owns its footer; use upstream's action gate for
+  // UI opt-out, navigation and minimum editor height. PR #483.
+  const minimapUIEnabled = actionManager.isActionEnabled(actionToggleMinimap);
   const renderToolbar = () => {
     const shouldShowStats = //zsviczian
       appState.stats.open &&
@@ -269,10 +275,13 @@ export const TrayMenu = ({
               )}
           </footer>
         </Island>
-        <Island padding={1} style={{ marginLeft: `4px` }}>
+        <Island padding={1} className="tray-zoom" style={{ marginLeft: `4px` }}>
+          {minimapUIEnabled && appState.minimapEnabled && <Minimap />}
           <ZoomActions
-            renderAction={actionManager.renderAction}
-            trayMode={true}
+            actionManager={actionManager}
+            zoomUIEnabled={app.isUIControlEnabled("zoom")}
+            minimapUIEnabled={minimapUIEnabled}
+            zenModeEnabled={appState.zenModeEnabled}
           />
         </Island>
       </div>

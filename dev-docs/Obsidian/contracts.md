@@ -245,3 +245,7 @@ that scale must reach both StaticSceneRenderConfig.scale and renderConfig.scale.
 Source image cancellation, awaitImageFiles and the synchronous migration unmount
 remain required. See [the review](pr-469-merge-review.md) for complete preservation
 and partial-retirement evidence.
+
+## PR #483 minimap and zoom integration
+
+The upstream minimap is browser-only AppState, omitted from exported scenes. Its host layout gate includes full/tray via isFullPanelMode and compact explicitly; mobile, short, UI-disabled and navigation-disabled editors cannot expose a dead toggle. TrayMenu owns its footer renderer. Zoom menu/wheel limits read existing live host capabilities. Protocols, saved scene fields and plugin dependencies are unchanged. The Obsidian artifact uses upstream main-thread rendering without a worker URL. See [review](pr-483-merge-review.md).

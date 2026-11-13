@@ -209,3 +209,7 @@ safe to decustomize to upstream's single timer/observer. Persisted pen/image/
 rawText and the plugin's migration unmount/persistence boundaries remain.
 See [PR #469 review](pr-469-merge-review.md) for replacement evidence, preserved
 consumers, exact file accounting, tests and platform limits.
+
+## PR #483 partial tray decustomization (2026-11-13)
+
+Retire ZoomActions.trayMode and its customized Stack wrappers (OBS-022/024): upstream now supplies a flex zoom container. The fork-only tray island owns presentation and the minimap; host limits remain narrow fork calls. No complete OBS ID or file difference retires. This does not prove the broader D08 device policy or D09 navigation behavior obsolete. See [review and validation](pr-483-merge-review.md).

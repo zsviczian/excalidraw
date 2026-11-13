@@ -36,6 +36,8 @@ Verification: component Obsidian/declaration build, plugin production/library bu
 <a id="obs-003"></a>
 ## OBS-003 — Single-artifact Obsidian delivery
 
+**PR #483 (2026-11-13):** The new minimap uses upstream's main-thread fallback directly when the evaluated artifact has no import.meta.url. ESM retains worker support; no runtime chunk/network fetch is added. See [review](pr-483-merge-review.md).
+
 **Retain.** [buildObsidianPackage.js](../../scripts/buildObsidianPackage.js) and [obsidianEntry.ts](../../packages/excalidraw/obsidianEntry.ts) create one function-evaluable IIFE plus CSS per environment. The builder aliases workspace sources, externalizes private React/ReactDOM/JSX references, exposes `ExcalidrawLib`, disables runtime `import.meta.url` use, embeds required assets/fonts, resolves lazy CJK paths, and cleans only its own output directory. The entry adds Obsidian-only CSS without making it part of upstream's normal entry. Production/development source-map policies differ intentionally. [subset-main.ts](../../packages/excalidraw/subset/subset-main.ts) disables the external worker path.
 
 `P: PackageManager.ts` evaluates the shared runtime and leases it to views; its assumptions are not satisfied by upstream's chunked ESM output or by a renamed UMD artifact. Required filenames, offline behavior, lexical React bindings, and prepack sequencing are specified in [contracts](contracts.md#artifact-contract). Keep the build isolated. Worker support alone does not make the worker override obsolete: an inline/blob worker would need a new offline/CSP/one-artifact design and validation. **Gate:** V01, V03, V06, V11. No generated output was built or inspected in this audit.
@@ -244,6 +246,8 @@ Do not delete the bridge just because upstream offers a portal container: the co
 <a id="obs-022"></a>
 ## OBS-022 — Tray layout and host device/UI preferences
 
+**PR #483 (2026-11-13):** Upstream flex-based ZoomActions replaces the old trayMode prop/Stack wrappers. TrayMenu now owns the class and right-hand minimap; isFullPanelMode plus compact protects host layout choices. Keep the tray and existing public layout APIs. See [merge review](pr-483-merge-review.md).
+
 **Minimize while retaining the tray.** [common/editorInterface.ts](../../packages/common/src/editorInterface.ts) adds tray styles mode, lets host device/preference override upstream derivation, guards zero-width layouts, permits mobile mode to be disabled, and reduces the sidebar breakpoint. Early returns leave upstream preference derivation/loading bodies unreachable. `App` exposes layout refresh/setter helpers and avoids destructive zero-dimension resize behavior. [TrayMenu.tsx](../../packages/excalidraw/components/TrayMenu.tsx), LayerUI, Actions, MobileMenu, toolbars, dropdowns, and styles implement the top/bottom tray, full shape-action panel, phone preference, stats, pen/library controls, and sidebar offsets. `openMenu: "shape"` and the tray action support it.
 
 `P: obsidianCommonHostAdapter.ts`, plugin settings, `ExcalidrawView.ts`, and `ExcalidrawRoot.ts` supply UI preferences. Upstream already has responsive full/compact/mobile interfaces and `UIOptions.getFormFactor`; those should stay the structural owner rather than be duplicated. They do **not** implement this tray mode. Move what can be represented by public configuration to the plugin and keep only a narrow tray/preference extension. Test phone/tablet/desktop preferences independently of viewport size and touch capability. **Gate:** V03, V07; D08.
@@ -297,6 +301,8 @@ Consumers include `P: ExcalidrawView.ts` theme updates, custom embed renderers, 
 
 <a id="obs-028"></a>
 ## OBS-028 — Zoom, pen/touch gestures, and navigation
+
+**PR #483 (2026-11-13):** Centered minimap wheel zoom reuses upstream AppWheel/AppViewport while preserving live host limits and modifier behavior. The new zoom menu reads the same live limits, including values beyond upstream defaults. See [merge review](pr-483-merge-review.md).
 
 Final combined macOS validation passed all feature scenarios, the JavaScript
 error gate and cleanup. Earlier intermittent ResizeObserver failures below
@@ -402,6 +408,8 @@ scene-file loader. See the [review](pr-472-merge-review.md).
 
 <a id="obs-033"></a>
 ## OBS-033 — Fork regression tests and fixture adaptations
+
+**PR #483 (2026-11-13):** Owned minimapIntegration tests and built-browser minimap driver protect full/compact/tray, opt-outs, live limits, actual pixels/navigation, export omission and scene-destroy cleanup. Native minimap/Zen/device coverage is registered by the plugin coordinator. Execution and remaining native failures are recorded in the [review](pr-483-merge-review.md).
 
 **PR #478:** Seven fork-owned real-scene placement cases protect incoming
 flowchart centering, obstacle gaps, rounding, bindings and inherited host styles. Upstream implementation

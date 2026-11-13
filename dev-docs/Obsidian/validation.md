@@ -285,3 +285,7 @@ with no captured errors. The prior sequence/vector and SVG-selector probe
 assumptions were corrected; no production fix was made for them. Source and
 package versions remain unchanged; no publication/dependency handoff. Physical
 mobile, macOS/Linux and web-app Firebase/PWA deployment are not claimed tested.
+
+## PR #483 minimap/zoom checkpoint (2026-11-13)
+
+See [merge review](pr-483-merge-review.md) for the exact parents, 37-path checklist, retained contracts, partial tray decustomization and current test results. 1004 portable cases and all six focused native minimap variants pass. Full native remains failed on table/phone plugin defects reproduced with the exact pre-merge fork; table controls are tracked in plugin #3049. Physical mobile and other desktop environments remain separate.

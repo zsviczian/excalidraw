@@ -1,0 +1,341 @@
+{
+  "upstream": "82d5847e57dcb6fb5982833ea9ec2137fe0b2bd5",
+  "fork_parent": "9108457500f24844456a3d354eb395976cef3824",
+  "merge_base": "701b901a0f1ba3d0b390d9cdf63d112e25abac4b",
+  "portable": {
+    "status": "passed",
+    "canonical_cases": 1004,
+    "sources": {
+      "plugin": {
+        "commit": "8b6f79efa31b08b9579e21e38a7fcd7a8f9d8043",
+        "dirty": true,
+        "diffHash": "76d27cde295049638e19118f72de4cc36e729be281c5662d0016b1cb29548256",
+        "lockfileHash": "741c0318ef12f5b1661e3d86b9044949aab9f2132db6d23d2b119a3b4740d2b1"
+      },
+      "fork": {
+        "commit": "9108457500f24844456a3d354eb395976cef3824",
+        "dirty": true,
+        "diffHash": "3e8c5ba2891d1f5d996bb07eda95ba4f85ccedacaf139560e5a3cfabcaca4a58",
+        "lockfileHash": "5ff2005c676da0a7250e859ce363fc40c832a64104732e21d40e827b02632d18"
+      },
+      "extras": {
+        "commit": "4bd7af3325a8059a5ca68fc3e88169507b08c773",
+        "dirty": false,
+        "diffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "lockfileHash": "e6419e0a6e01e7292c905ccd51efc54223eff4f80e8d1d9229ce94194eb282f9"
+      }
+    }
+  },
+  "native_full": {
+    "status": "failed",
+    "cleanup": "passed",
+    "complete_acceptance": false,
+    "report": "P: .test-work/reports/pr483-regression-ready/build/",
+    "failed_case_ids": [
+      "native:embed-table:main",
+      "native:upstream-minimap-483",
+      "native:embed-controls:phone:PNG",
+      "native:device:phone-portrait-light"
+    ],
+    "note": "The initial minimap helper failure is superseded only by the focused fresh-DOM rerun; full run remains failed and downstream cases remain unfinished."
+  },
+  "native_minimap": {
+    "status": "passed",
+    "cleanup": "passed",
+    "case": {
+      "testId": "native:upstream-minimap-483",
+      "featureIds": [
+        "P01",
+        "P03",
+        "P08"
+      ],
+      "status": "passed",
+      "assertions": [
+        "actual minimap pixels in full/compact/tray",
+        "main/popout footer and portal ownership",
+        "centered wheel navigation",
+        "live host zoom limits",
+        "zoom menu reset",
+        "toggle cleanup and popout teardown"
+      ],
+      "variants": [
+        {
+          "popout": false,
+          "mode": "full",
+          "painted": true,
+          "ownerDocument": true,
+          "centeredWheel": true,
+          "liveLimit": true,
+          "reset": true
+        },
+        {
+          "popout": false,
+          "mode": "compact",
+          "painted": true,
+          "ownerDocument": true,
+          "centeredWheel": true,
+          "liveLimit": true,
+          "reset": true
+        },
+        {
+          "popout": false,
+          "mode": "tray",
+          "painted": true,
+          "ownerDocument": true,
+          "centeredWheel": true,
+          "liveLimit": true,
+          "reset": true
+        },
+        {
+          "popout": true,
+          "mode": "full",
+          "painted": true,
+          "ownerDocument": true,
+          "centeredWheel": true,
+          "liveLimit": true,
+          "reset": true
+        },
+        {
+          "popout": true,
+          "mode": "compact",
+          "painted": true,
+          "ownerDocument": true,
+          "centeredWheel": true,
+          "liveLimit": true,
+          "reset": true
+        },
+        {
+          "popout": true,
+          "mode": "tray",
+          "painted": true,
+          "ownerDocument": true,
+          "centeredWheel": true,
+          "liveLimit": true,
+          "reset": true
+        }
+      ]
+    },
+    "source": {
+      "commit": "9108457500f24844456a3d354eb395976cef3824",
+      "dirty": true,
+      "diffHash": "3e8c5ba2891d1f5d996bb07eda95ba4f85ccedacaf139560e5a3cfabcaca4a58",
+      "lockfileHash": "5ff2005c676da0a7250e859ce363fc40c832a64104732e21d40e827b02632d18",
+      "buildCommand": "yarn build:esm && yarn build:obsidian",
+      "runtime_artifacts": [
+        {
+          "role": "production-js",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.production.min.js",
+          "sha256": "4590f606e9f6b0c8cc1b3f9fa591e0b395230ee84a61eccd9d84dabf3c46692c",
+          "bytes": 6528127
+        },
+        {
+          "role": "production-css",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.production.min.css",
+          "sha256": "ec335630eb0117a57585053c04ad014cf45471bbde39d5acca909c056899aabf",
+          "bytes": 314075
+        },
+        {
+          "role": "development-js",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.development.js",
+          "sha256": "5f0ba6c1c14131a2234a34e748dd1acbcdc1355a441a87bee42c6f6f4e039522",
+          "bytes": 30175652
+        },
+        {
+          "role": "development-css",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.development.css",
+          "sha256": "4e3777b2799487b0a0aac432ff5db2588a59228d373bdff6c598bc9bff1ada3c",
+          "bytes": 355823
+        }
+      ],
+      "total_verified_artifacts": 635
+    },
+    "plugin_artifacts": {
+      "version": "2.29.2",
+      "sourceHashes": {
+        "main.js": "b08d4d0f6702760755c3fa068fcfec69469d636d61728e72c29707638a74fe7d",
+        "manifest.json": "8e82828fd9125615e8a361d0f15553e548cac2ee7a303e55387378a53b925fd9",
+        "styles.css": "e36267936ece8e50cb8d99f7cd572c745ea1f70d1e800afa65d4dbbd3f92dd3d"
+      },
+      "mainBytes": 5139573,
+      "companions": {
+        "installedHashes": {
+          "main": "387e1c2642e92712bed038142f7e04bff2051456c440d2cd92fd7f15969a3f56",
+          "manifest": "6820958e66d6736ae5114f41349a24ea152495e9055a043f6bde47fde1e6e967",
+          "styles": "3de04a6882b3e43b48f81231962c5f52afbd7146cc986fb0c86631ac5de30eda"
+        },
+        "id": "excalidraw-extras",
+        "source": "4bd7af3325a8059a5ca68fc3e88169507b08c773",
+        "sha256": "387e1c2642e92712bed038142f7e04bff2051456c440d2cd92fd7f15969a3f56",
+        "previouslyLoaded": true,
+        "discovery": "existing"
+      },
+      "installedHashes": {
+        "main.js": "b08d4d0f6702760755c3fa068fcfec69469d636d61728e72c29707638a74fe7d",
+        "manifest.json": "8e82828fd9125615e8a361d0f15553e548cac2ee7a303e55387378a53b925fd9",
+        "styles.css": "e36267936ece8e50cb8d99f7cd572c745ea1f70d1e800afa65d4dbbd3f92dd3d"
+      }
+    },
+    "report": "P: .test-work/reports/pr483-minimap-focused/"
+  },
+  "premerge_baseline": {
+    "fork_source": {
+      "commit": "9108457500f24844456a3d354eb395976cef3824",
+      "dirty": false,
+      "diffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "lockfileHash": "5ff2005c676da0a7250e859ce363fc40c832a64104732e21d40e827b02632d18",
+      "buildCommand": "yarn build:esm && yarn build:obsidian",
+      "runtime_artifacts": [
+        {
+          "role": "production-js",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.production.min.js",
+          "sha256": "12d7568292333686fd6ce3443a7b9cace90da49329f94b48236f365d99d56666",
+          "bytes": 6508987
+        },
+        {
+          "role": "production-css",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.production.min.css",
+          "sha256": "0337e307594435b5125d216c9570aad9b5d4460908f3f0e716baf1daa87ac002",
+          "bytes": 309492
+        },
+        {
+          "role": "development-js",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.development.js",
+          "sha256": "78a275d820d23cb81fe73fb9faaa46dff40f91c320af48d4ff0fe6907bc27288",
+          "bytes": 30055085
+        },
+        {
+          "role": "development-css",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.development.css",
+          "sha256": "192fb4463825f0b870d9f59862f6ae54056e591226546608958fe9e3c937b883",
+          "bytes": 350666
+        }
+      ],
+      "total_verified_artifacts": 621
+    },
+    "core_status": "failed",
+    "cleanup": "passed",
+    "table_failure": "native:embed-table:main: three authoritative table cells and escaped display dimensions",
+    "phone_status": "failed",
+    "phone_cleanup": "passed",
+    "phone_restoration": {
+      "restored": true
+    },
+    "phone_control_bounds": {
+      "x": -107,
+      "y": 794.53125,
+      "width": 44,
+      "height": 44,
+      "top": 794.53125,
+      "right": -63,
+      "bottom": 838.53125,
+      "left": -107
+    },
+    "report": "P: .test-work/reports/pr483-parent-embed-baseline/",
+    "issue": "https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/3049"
+  },
+  "final_candidate_confirmation": {
+    "status": "passed",
+    "cleanup": "passed",
+    "canonical_cases": 11,
+    "scenarios": [
+      {
+        "id": "plugin-load",
+        "status": "passed"
+      },
+      {
+        "id": "drawing-main-window",
+        "status": "passed"
+      },
+      {
+        "id": "lifecycle",
+        "status": "passed"
+      },
+      {
+        "id": "wheel-zoom-3008",
+        "status": "passed"
+      },
+      {
+        "id": "minimap-483",
+        "status": "passed"
+      },
+      {
+        "id": "javascript-errors",
+        "status": "passed"
+      },
+      {
+        "id": "source-stability",
+        "status": "passed"
+      }
+    ],
+    "fork_source": {
+      "commit": "9108457500f24844456a3d354eb395976cef3824",
+      "dirty": true,
+      "diffHash": "f1d7b2963a08df1f52b2fa4555c748836c44d77e6fa897e10718c570724673db",
+      "lockfileHash": "5ff2005c676da0a7250e859ce363fc40c832a64104732e21d40e827b02632d18",
+      "buildCommand": "yarn build:esm && yarn build:obsidian",
+      "runtime_artifacts": [
+        {
+          "role": "production-js",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.production.min.js",
+          "sha256": "4590f606e9f6b0c8cc1b3f9fa591e0b395230ee84a61eccd9d84dabf3c46692c",
+          "bytes": 6528127
+        },
+        {
+          "role": "production-css",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.production.min.css",
+          "sha256": "ec335630eb0117a57585053c04ad014cf45471bbde39d5acca909c056899aabf",
+          "bytes": 314075
+        },
+        {
+          "role": "development-js",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.development.js",
+          "sha256": "5f0ba6c1c14131a2234a34e748dd1acbcdc1355a441a87bee42c6f6f4e039522",
+          "bytes": 30175652
+        },
+        {
+          "role": "development-css",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.development.css",
+          "sha256": "4e3777b2799487b0a0aac432ff5db2588a59228d373bdff6c598bc9bff1ada3c",
+          "bytes": 355823
+        }
+      ],
+      "total_verified_artifacts": 635
+    },
+    "plugin_source": {
+      "commit": "8b6f79efa31b08b9579e21e38a7fcd7a8f9d8043",
+      "dirty": true,
+      "diffHash": "9998b00cc83144ca19793efb8f50f661fd97d9ac4736121a47ffb01ca32f4ba6",
+      "lockfileHash": "741c0318ef12f5b1661e3d86b9044949aab9f2132db6d23d2b119a3b4740d2b1",
+      "buildCommand": "npm run build",
+      "runtime_artifacts": [
+        {
+          "role": "main",
+          "relativePath": "dist/main.js",
+          "sha256": "b08d4d0f6702760755c3fa068fcfec69469d636d61728e72c29707638a74fe7d",
+          "bytes": 5139573
+        },
+        {
+          "role": "manifest",
+          "relativePath": "dist/manifest.json",
+          "sha256": "8e82828fd9125615e8a361d0f15553e548cac2ee7a303e55387378a53b925fd9",
+          "bytes": 470
+        },
+        {
+          "role": "styles",
+          "relativePath": "dist/styles.css",
+          "sha256": "e36267936ece8e50cb8d99f7cd572c745ea1f70d1e800afa65d4dbbd3f92dd3d",
+          "bytes": 368508
+        }
+      ],
+      "total_verified_artifacts": 3
+    },
+    "main_bytes": 5139573,
+    "size_headroom_bytes": 103307,
+    "report": "P: .test-work/reports/pr483-final-candidate/"
+  },
+  "remaining_environments": [
+    "physical Android/iOS",
+    "other native desktop operating systems",
+    "isolated whole-application cold restart"
+  ]
+}

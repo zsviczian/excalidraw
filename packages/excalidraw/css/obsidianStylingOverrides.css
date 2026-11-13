@@ -45,11 +45,28 @@
   --editor-container-padding: var(--size-4-2);
 }
 
-.excalidraw .tray-zoom {
+.excalidraw .tray-zoom .zoom-actions {
   height: var(--default-button-size);
   pointer-events: initial;
   padding-bottom: 0.05rem;
   padding-top: 0.05rem;
+}
+
+/* zsviczian -- anchor the tray minimap above its right-hand zoom island,
+   rather than the full footer's left edge. PR #483. */
+.excalidraw .tray-zoom {
+  position: relative;
+}
+
+.excalidraw .tray-zoom .minimap {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+}
+
+/* zsviczian -- the body-portaled zoom menu leaves the footer's stacking
+   context; keep its actions above the minimap canvas. PR #483. */
+.excalidraw .dropdown-menu.zoom-menu {
+  z-index: var(--zIndex-ui-main-menu);
 }
 
 .excalidraw.excalidraw-container.theme--dark {  /* unused */
