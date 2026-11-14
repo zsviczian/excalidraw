@@ -111,7 +111,11 @@ Plugin #3048 / PR #3052 restores the existing upstream iframe path for desktop
 YouTube videos/playlists with two narrow routing exclusions. This removes those
 providers from the guest-webview override without retiring OBS-016 or changing
 other providers, scale, URL normalization or sandbox policy. Source and built
-browser coverage pass; native validation remains paused by maintainer request.
+browser coverage and native main/popout offline fullscreen/exit pass. The paired
+complete checkpoint passes 1,023 portable and 468 native cases with strict
+error/idle, cleanup and baseline gates. The final plugin-only held-P follow-up
+has separate focused evidence. Real playback, physical Escape/mobile and other
+native OSes remain unverified; see [validation](validation.md).
 
 **Priority P2; security and merge-boundary improvement, not blanket removal; OBS-010/016/037.** Upstream already offers `renderEmbeddable` and `validateEmbeddable`. The fork adds webviews, HTML-data acceptance, HTTPS extraction, same-origin allowance, scale/magnification, and host menus. Some routing/presentation may migrate to the existing callbacks; saved scale and resize behavior still need component support.
 

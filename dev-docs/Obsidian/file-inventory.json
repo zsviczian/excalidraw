@@ -2,7 +2,7 @@
   "schema_version": 1,
   "review": {
     "date": "2026-11-14",
-    "dependency_precommit_tests": "Four real-editor provider cases and 161 owned source coverage cases pass; full/owned typechecks, both Obsidian artifacts and 24 browser cases pass. 15 audit tests pass. Native validation is paused by maintainer instruction; inherited test:update diagnostics are recorded separately.",
+    "dependency_precommit_tests": "Four provider cases, 161 owned source and 24 built-browser cases pass; full/owned types and artifacts pass. Paired complete checkpoint: 1023 portable and 468 required native cases pass, including 160 device cases, strict idle/error/source gates and cleanup/restoration. Final plugin-only pen-repeat guard has separate 789-fast/13-native evidence. Inherited test:update remains failed; see validation.md.",
     "method": "Plugin #3048 / PR #3052: review existing OBS-016 desktop transport, upstream iframe fallback and plugin custom renderer; preserve generic guest webviews, Vimeo, normalized provider URLs, permissions and saved data.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
@@ -71,7 +71,7 @@
       "plugin_baseline": "78674a39ccf046b93b5de4155edcc871d82602cf",
       "fork_baseline": "29b11ad978d0a793f6502dcdc259f3481054c368",
       "scope": "OBS-016/033: two YouTube exclusions in the existing desktop webview predicate; upstream iframe unchanged. No protocol, package version or saved-data change.",
-      "validation": "Four real-editor source cases pass after two baseline failures; production/development browser suite passes including nested cross-origin fullscreen at zoom 0.5 and 2. Full and owned-test typechecks and Obsidian artifacts pass. Native CLI validation explicitly paused at maintainer request while another agent uses Obsidian.",
+      "validation": "Implementation 8260fa44: four real-editor provider cases pass after two baseline failures; both browser artifacts pass nested cross-origin offline fullscreen at zoom 0.5/2. Paired plugin fdca1796 + Extras 4bd7af33: 1023 portable / 468 native pass (160 device cases), including Windows Obsidian 1.15.1 main/popout offline iframe fullscreen/player exit and strict gates. Final plugin 78782221 changes only its pen-repeat guard and passes 789 fast / 13 focused native checks; no complete native rerun after that guard. Real YouTube playback, physical Escape/mobile, other OSes and cold app restart remain unverified. No observer gate waiver; earlier failed reports retained.",
       "inherited_tests": "Raw required yarn test:update failed, including ignored historical source copies. Filtering the retained report to current-tree paths yields 175 files (82 failed), with 1331 passed, 1513 failed assertions and one todo. This is not a clean compatibility result or a parent comparison. All 16 generated snapshot/inline-snapshot primary-tree changes were preserved as a patch then restored; no failed snapshots were accepted. Owned 161-case and 24-case built browser suites pass independently."
     }
   },
@@ -90,11 +90,11 @@
       "version": "0.18.0"
     },
     "plugin": {
-      "kind": "Git working tree",
-      "commit": "78674a39ccf046b93b5de4155edcc871d82602cf",
+      "kind": "Git source checkpoint",
+      "commit": "78782221011caa2e8eb0e5f9655f426d4bb60c01",
       "version": "2.29.2",
       "fork_dependency": "0.18.147",
-      "working_tree_changes": "PR #3052: embed control ownership/mobile positioning, optional empty-tab/ribbon UI, plugin-only pen toggle, unavailable Extras API guards and focused regressions. Fork version and exact dependency remain unchanged; local artifacts only."
+      "working_tree_changes": "Committed PR #3052 implementation: table/phone embed controls, opt-in empty-tab/ribbon preferences, plugin-only pen toggle including held-key repeats, unavailable Extras guards and independent PNG URL/document lifetimes. Complete native/portable checkpoint is fdca1796; the final guard has separate focused evidence. Dependency/version unchanged; unpublished local artifacts only. Later documentation-only commits do not change this runtime checkpoint."
     },
     "extras": {
       "kind": "Git working tree",
