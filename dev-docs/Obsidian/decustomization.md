@@ -107,6 +107,12 @@ Keep only JSX changes necessary for real structure/semantics. CSS cannot substit
 <a id="d12"></a>
 ## D12 — Narrow embed/URL policy through host rendering and validation
 
+Plugin #3048 / PR #3052 restores the existing upstream iframe path for desktop
+YouTube videos/playlists with two narrow routing exclusions. This removes those
+providers from the guest-webview override without retiring OBS-016 or changing
+other providers, scale, URL normalization or sandbox policy. Source and built
+browser coverage pass; native validation remains paused by maintainer request.
+
 **Priority P2; security and merge-boundary improvement, not blanket removal; OBS-010/016/037.** Upstream already offers `renderEmbeddable` and `validateEmbeddable`. The fork adds webviews, HTML-data acceptance, HTTPS extraction, same-origin allowance, scale/magnification, and host menus. Some routing/presentation may migrate to the existing callbacks; saved scale and resize behavior still need component support.
 
 Prefer explicit host capabilities for the exceptional URL paths instead of widening generic sanitizer behavior. Preserve vault embeds, Excalidraw scenes, PDFs, media, Mermaid images, and platform fallbacks. No exploitability claim is made from source inspection alone. Gate: V03/V04/V06/V08/V10 including hostile/malformed links, clipboard/drop, desktop webview versus mobile iframe, and old scenes. Migration must not silently break legitimate existing data-HTML drawings.

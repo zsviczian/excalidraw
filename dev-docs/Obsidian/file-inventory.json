@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "review": {
-    "date": "2026-11-13",
-    "dependency_precommit_tests": "PR #483: 1004 portable canonical cases pass, including 157 owned coverage cases, both browser artifacts, package consumers, declarations and builds. Full fork typecheck, 15 audit tests and focused zero-warning lint pass. Plugin bundle checks pass; main.js 5139573 bytes, 103307 bytes below 5 MiB.",
-    "method": "PR #483: all 37 incoming paths, three-way conflict and clean auto-merges reviewed; narrow tray decustomization and portal fix.",
+    "date": "2026-11-14",
+    "dependency_precommit_tests": "Four real-editor provider cases and 161 owned source coverage cases pass; full/owned typechecks, both Obsidian artifacts and 24 browser cases pass. 15 audit tests pass. Native validation is paused by maintainer instruction; inherited test:update diagnostics are recorded separately.",
+    "method": "Plugin #3048 / PR #3052: review existing OBS-016 desktop transport, upstream iframe fallback and plugin custom renderer; preserve generic guest webviews, Vimeo, normalized provider URLs, permissions and saved data.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
       "fork_parent": "9108457500f24844456a3d354eb395976cef3824",
@@ -66,12 +66,19 @@
       "nativeAcceptance": "failed-existing-diagnostic",
       "evidence": "pr-478-results.json"
     },
-    "svg_entry_points": "Four production paths reviewed against a758e93d6a03e9f995973703cb886850a398a6d3. Matching runtime/declaration builds and 146 owned tests pass. Final plugin native sequence: all 20 cases pass, including ten main/popout UI cases, system chooser events and supplied mindmap color/alpha pixels, with zero captured errors/notifications and passing settling/cleanup/baseline restoration. Plugin portable: 549 tests, 105 measured-source subset, 96 focused SVG cases. System selection uses CDP after trusted menu input; cancellation is explicitly synthetic. The system picker and bounded local CSS variables remain plugin-owned; only the ImageMenu comment changed in this follow-up. See svg-conversion-entry-points.md for hashes, prior browser/packed/type validation and remaining limits. Maintainer explicitly requested paired source merges on 2026-10-31 with package publication/dependency update deferred. Owned fixture branded types corrected; full and owned type checks pass."
+    "svg_entry_points": "Four production paths reviewed against a758e93d6a03e9f995973703cb886850a398a6d3. Matching runtime/declaration builds and 146 owned tests pass. Final plugin native sequence: all 20 cases pass, including ten main/popout UI cases, system chooser events and supplied mindmap color/alpha pixels, with zero captured errors/notifications and passing settling/cleanup/baseline restoration. Plugin portable: 549 tests, 105 measured-source subset, 96 focused SVG cases. System selection uses CDP after trusted menu input; cancellation is explicitly synthetic. The system picker and bounded local CSS variables remain plugin-owned; only the ImageMenu comment changed in this follow-up. See svg-conversion-entry-points.md for hashes, prior browser/packed/type validation and remaining limits. Maintainer explicitly requested paired source merges on 2026-10-31 with package publication/dependency update deferred. Owned fixture branded types corrected; full and owned type checks pass.",
+    "youtube_3048": {
+      "plugin_baseline": "78674a39ccf046b93b5de4155edcc871d82602cf",
+      "fork_baseline": "29b11ad978d0a793f6502dcdc259f3481054c368",
+      "scope": "OBS-016/033: two YouTube exclusions in the existing desktop webview predicate; upstream iframe unchanged. No protocol, package version or saved-data change.",
+      "validation": "Four real-editor source cases pass after two baseline failures; production/development browser suite passes including nested cross-origin fullscreen at zoom 0.5 and 2. Full and owned-test typechecks and Obsidian artifacts pass. Native CLI validation explicitly paused at maintainer request while another agent uses Obsidian.",
+      "inherited_tests": "Raw required yarn test:update failed, including ignored historical source copies. Filtering the retained report to current-tree paths yields 175 files (82 failed), with 1331 passed, 1513 failed assertions and one todo. This is not a clean compatibility result or a parent comparison. All 16 generated snapshot/inline-snapshot primary-tree changes were preserved as a patch then restored; no failed snapshots were accepted. Owned 161-case and 24-case built browser suites pass independently."
+    }
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "9108457500f24844456a3d354eb395976cef3824",
+      "parent_commit": "29b11ad978d0a793f6502dcdc259f3481054c368",
       "package": "@zsviczian/excalidraw",
       "version": "0.18.147"
     },
@@ -84,26 +91,26 @@
     },
     "plugin": {
       "kind": "Git working tree",
-      "commit": "8b6f79efa31b08b9579e21e38a7fcd7a8f9d8043",
+      "commit": "78674a39ccf046b93b5de4155edcc871d82602cf",
       "version": "2.29.2",
       "fork_dependency": "0.18.147",
-      "working_tree_changes": "PR #483 test-only: adapt native Zen/device reset to upstream menu, add required minimap case and feature map; production source/dependency unchanged."
+      "working_tree_changes": "PR #3052: embed control ownership/mobile positioning, optional empty-tab/ribbon UI, plugin-only pen toggle, unavailable Extras API guards and focused regressions. Fork version and exact dependency remain unchanged; local artifacts only."
     },
     "extras": {
       "kind": "Git working tree",
       "parent_commit": "4bd7af3325a8059a5ca68fc3e88169507b08c773",
       "converter": "3.6.0",
       "package_version": "0.1.1",
-      "plugin_version": "0.1.2",
-      "publication": "none; unreleased service contract unchanged by maintainer instruction",
-      "working_tree_changes": "Clean existing companion revision; no Extras changes in PR #483.",
+      "plugin_version": "0.2.1",
+      "publication": "No package publication in this handoff; existing selected companion revision only.",
+      "working_tree_changes": "Clean selected companion at 4bd7af3; no Extras source changes for plugin PR #3052.",
       "mermaid_service": "3.6.0"
     }
   },
   "comparison": {
     "fork": {
-      "files": 1366,
-      "sha256": "eed09506867884d684ea92766c5dbbab529ef0dd4e8d716a2d0d670591018d00"
+      "files": 1368,
+      "sha256": "6c72b4af147ebe11b98e2ad8bc860ac25659f45155fdb157c7262ddb5c33bb87"
     },
     "upstream": {
       "files": 1337,
@@ -1481,7 +1488,7 @@
     {
       "path": "packages/excalidraw/components/App.tsx",
       "status": "modified",
-      "fork_sha256": "53d0fb1c1e2b63ecde770983128ebd81d18c1405043f3261908c8bc5c3394938",
+      "fork_sha256": "4485c4f9f342c32607272ddf3a87486a2d95faddcbd56b2c5a500118b09647f7",
       "upstream_sha256": "996f5bc24f63916c872cafd6d69eb40c46416358d15b48f1f804e9b7b80a2c78",
       "ids": [
         "OBS-007",
@@ -1505,7 +1512,7 @@
         "OBS-032",
         "OBS-037"
       ],
-      "note": "Main cross-cutting integration: public adapters, early state, scaled webviews, highlighter layer, frame/link UI, image lifecycle, teardown/test-hook suppression, menus/input ordering, host layout, and selection/geometry wrappers. See catalog and API contract table. PR #458: setSelection retained byte-for-byte; selection and transform handlers follow the upstream extraction, with unlocked-hit override now in App.selectionTool.ts. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #463: crop/text-resize integration reviewed against incoming 2df993fb; see pr-463-merge-review.md. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Adopt upstream host-metrics forwarding; preserve the existing documented host behavior and compatibility. See pr-475-merge-review.md. PR #482: reviewed source and both parents, preserving all prior fork contracts; accounts separately for pre-existing #480/#481 frame changes and version 0.18.146. See pr-482-merge-review.md; 876 portable and 387 native cases pass, with additional focused Mermaid/SVG checks. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md.",
+      "note": "Main cross-cutting integration: public adapters, early state, scaled webviews, highlighter layer, frame/link UI, image lifecycle, teardown/test-hook suppression, menus/input ordering, host layout, and selection/geometry wrappers. See catalog and API contract table. PR #458: setSelection retained byte-for-byte; selection and transform handlers follow the upstream extraction, with unlocked-hit override now in App.selectionTool.ts. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #463: crop/text-resize integration reviewed against incoming 2df993fb; see pr-463-merge-review.md. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Adopt upstream host-metrics forwarding; preserve the existing documented host behavior and compatibility. See pr-475-merge-review.md. PR #482: reviewed source and both parents, preserving all prior fork contracts; accounts separately for pre-existing #480/#481 frame changes and version 0.18.146. See pr-482-merge-review.md; 876 portable and 387 native cases pass, with additional focused Mermaid/SVG checks. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. YouTube video and playlist wrappers use the existing iframe fallback so HTML fullscreen and postMessage stay in the owning document; generic desktop webviews and Vimeo remain unchanged. Plugin #3048 / PR #3052. Two fingerprinted conditions; no host protocol, URL transformation, permission or saved-data change.",
       "kind": "integration"
     },
     {
@@ -3300,7 +3307,7 @@
     {
       "path": "tests/obsidian/browser/run.mjs",
       "status": "fork-only",
-      "fork_sha256": "b08b97015adc2de2b0c032af165d233dd69d555a62eced1a3afdd90efa2c722b",
+      "fork_sha256": "cc0bd67a960549be9596e5fd4b463e8576355801d16a5aed95290a5a72a444bc",
       "upstream_sha256": null,
       "ids": [
         "OBS-003",
@@ -3311,7 +3318,7 @@
         "OBS-030"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Register the built production/development YouTube fullscreen regression with offline nested cross-origin provider fixtures, trusted clicks, two zoom levels and exit geometry. Plugin #3048 / PR #3052."
     },
     {
       "path": "tests/obsidian/browser/ttdClose.mjs",
@@ -3326,6 +3333,18 @@
       ],
       "kind": "Independent TTD close regression",
       "note": "Named single close control, both tabs/fallback, close/reopen/Escape and preserved scene. Browser checks trusted clicks/keyboard and settled desktop/tablet/phone geometry; see ttd-close-button.md. Plugin #3027: protocol-4 SVG insertion/menu boundary or coordinated fixture; source and consumers reviewed, no unrelated behavior retired. See svg-conversion-entry-points.md."
+    },
+    {
+      "path": "tests/obsidian/browser/youtubeFullscreen.mjs",
+      "status": "fork-only",
+      "fork_sha256": "90fe2771d037b7eb3f78961203d02d0decfec24f49e8db365386d8bac28d10a4",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-016",
+        "OBS-033"
+      ],
+      "kind": "test",
+      "note": "Owned actual-artifact browser regression: desktop iframe routing, nested cross-origin HTML fullscreen at two zoom levels and restoration with trusted clicks. Offline fixtures avoid reliance on YouTube availability. Native Electron and real playback remain separate gates. Plugin #3048 / PR #3052."
     },
     {
       "path": "tests/obsidian/compatibility/duplicateTitles.json",
@@ -3602,6 +3621,18 @@
       ],
       "kind": "Independent TTD close regression",
       "note": "Named single close control, both tabs/fallback, close/reopen/Escape and preserved scene. Browser checks trusted clicks/keyboard and settled desktop/tablet/phone geometry; see ttd-close-button.md. Plugin #3027: protocol-4 SVG insertion/menu boundary or coordinated fixture; source and consumers reviewed, no unrelated behavior retired. See svg-conversion-entry-points.md."
+    },
+    {
+      "path": "tests/obsidian/unit/youtubeEmbeddable.test.tsx",
+      "status": "fork-only",
+      "fork_sha256": "b70dc86b6f63567910020eaa86836961da4a4e1693b4e9327cd082aab46276e7",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-016",
+        "OBS-033"
+      ],
+      "kind": "test",
+      "note": "Real editor tests for desktop YouTube videos/playlists, Vimeo iframe and unchanged generic webviews. Both YouTube cases fail before the two-line routing fix and all four pass afterward. Plugin #3048 / PR #3052."
     },
     {
       "path": "vitest.obsidian-compat.config.mts",
