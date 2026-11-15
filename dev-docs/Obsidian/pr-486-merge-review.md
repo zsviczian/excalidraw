@@ -44,9 +44,8 @@ case also passes the parent, protecting behavior that must remain unchanged.
 
 All 28 built production/development browser cases pass, including W, link
 ownership, retained containers, frame discovery/layering and undo/redo in
-full/tray/compact. Complete portable/native and focused main/popout validation
-are pending. No zero-regression claim follows from the source/build checkpoint
-alone. The primary plugin's unrelated RankMessage edit
+full/tray/compact. Complete portable/native and focused main/popout acceptance
+now pass as recorded below. The primary plugin's unrelated RankMessage edit
 is preserved; a clean detached checkpoint supplies validation builds. Extras
 4bd7af33 and isolated K-Plex 69eb4642 keep companion inputs stable.
 
@@ -67,3 +66,42 @@ three consecutive undos/redos after layer changes. Exercise main/popout and
 full/tray/compact separately. Physical mobile and other desktop hosts remain
 separate environments. Package version remains 0.18.147; no publication or
 plugin dependency update is part of this merge.
+
+## Completed acceptance
+
+Runtime checkpoint: `63642251fac8dcf9ce8fcb85e3596686509087ee`, with clean isolated plugin 1a8ee3e4,
+Extras 4bd7af33 and K-Plex 69eb4642. [Exact results and hashes](pr-486-results.json).
+
+- All **1052 portable cases** pass: 797 plugin fast, 178 fork owned,
+  28 actual fork browser, 30 Extras source and 19 Extras browser. Full/owned
+  types, source coverage, normal ESM/Obsidian and plugin/library builds, both
+  packed consumers and focused lint pass.
+- All **468 required native cases** pass: 308 core and 160 device
+  cases across 40 profiles. Strict error/idle/source-stability gates, actual
+  unhandled-error negative control, cleanup and baseline restoration pass.
+- Six additional native W cases pass in main/popout and full/tray/compact:
+  generated-container link transfer versus existing-container retention,
+  including a save between W presses; raw Markdown/custom data, undo/redo,
+  interior frame discovery, marker exclusion, stacking and physical save/reopen.
+- Both complete coordinators finish successfully as independent commands; the
+  standard auditRegression accepts their combined **1520 canonical cases**.
+  All ten frozen runtime hashes match across the two builds.
+- main.js is **5,149,666 bytes**, 93,214 bytes below 5 MiB.
+
+The first focused native probe retained long skeleton-converter IDs across a
+save. ExcalidrawData deliberately replaces long text/linked-element IDs with
+eight-character IDs for Markdown block references; saved scene diagnostics
+confirmed that existing normalization, with the drawing and links preserved.
+The test's lookup retained the old ID. Fixtures now use normal interactive
+eight-character IDs; all workflow assertions, including save-between-W, remain.
+The three failed diagnostic reports are preserved under ignored pr486-native-wrap
+directories. No product code was changed to resolve this test setup failure.
+
+Native host: 1.15.1 (installer 1.14.5), Windows, Electron
+43.8.3. The initially closed app was opened at its
+already registered canonical test vault. The shared application-user-data lock
+remained exclusive; no competing agent session was taken over. Baseline settings
+and original automation-window bounds were restored. No personal vault deployment,
+package publication, version bump or plugin source/dependency commit was made.
+Physical Android/iOS, other native desktop systems and isolated whole-app restart
+remain separate environments.

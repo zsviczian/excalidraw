@@ -2,7 +2,7 @@
   "schema_version": 1,
   "review": {
     "date": "2026-11-15",
-    "dependency_precommit_tests": "Eighteen focused source and all 28 built-browser cases pass; full types and focused lint pass. Red diagnostics protect link transfer and multi-step redo order. Required raw test:update remains red (1345 pass/1532 fail/47 skip); exact-parent targeted harness failures reproduced, all sixteen generated snapshot paths restored. Complete acceptance pending.",
+    "dependency_precommit_tests": "Eighteen focused source cases, 28 actual-artifact browser cases, full/owned types and focused lint pass. Complete portable/native/package/source gates pass. Raw inherited diagnostic remains red with exact-parent harness failures reproduced and all sixteen generated snapshot paths restored; no failed snapshot accepted.",
     "method": "PR #486: inspect all eight incoming paths against fork f4f810960, merge base 9e9621b and incoming 82190fb. Resolve AppWrap by adopting upstream structure and porting only conditional host link ownership; retain marker guards and full/tray helper. No unrelated cleanup.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
@@ -10,10 +10,10 @@
       "upstream_parent": "82190fb28f58070b34b4017e70c0e2e83701a8e3",
       "merge_base": "9e9621b873c695e08d87ad7e1358306496d11aaf",
       "reference": "https://github.com/zsviczian/excalidraw/pull/486",
-      "state": "Resolved local checkpoint; complete portable/native acceptance pending before master update.",
+      "state": "Accepted at 63642251fac8dcf9ce8fcb85e3596686509087ee; complete matching-build portable/native and focused W cases pass. Only acceptance documentation changes afterward.",
       "companion": "Clean isolated plugin 1a8ee3e4; Extras 4bd7af33; isolated K-Plex 69eb4642; shared native lock."
     },
-    "runtime_validation": "PR #486 complete native/portable acceptance pending; prior PR #485 evidence remains historical.",
+    "runtime_validation": "PR #486 checkpoint 63642251f: 1052 portable and all 468 required native cases pass, plus six focused main/popout full/tray/compact W/link/frame/history/save-reopen cases. Ten frozen runtime hashes match; strict gates and cleanup/restoration pass. Physical mobile, other native hosts and isolated restart remain unverified. See pr-486-results.json.",
     "dependency_checkpoint": "2026-10-11: Obsidian artifact/declaration and plugin production/library builds pass. Local fork Windows Obsidian 1.14.4 smoke passes. Published 0.18.140 main/direct-popout/moved-popout input/save/cleanup smoke passes. Plugin npm tree/audit confirms no braces and source-map-js 1.2.2. Component full typecheck remains blocked by documented window.h/stale test-type failures. Packed manifest confirms Sass dev-only; no publication/version bump. The 5 MB target is 5 * 1024 * 1024 = 5,242,880 bytes. Plugin main.js: 5,051,865 bytes with published component (191,015 bytes of headroom), 5,057,617 with local fork (185,263 bytes of headroom); both are below the target. No full scanner, macOS or physical-mobile run in this checkpoint.",
     "layout_followup": "Validated follow-up: W/menu predicate enabled for full/tray/compact, excluded in mobile. 25 focused tests, isolated source typecheck, declarations/artifacts and plugin production/development builds pass. Full typecheck retains 262 existing diagnostics. Baseline tray/compact keyboard tests already passed; original reported tray failure was not reproduced. Extra live probe passed full-layout keyboard/link/history then stopped on unavailable host command-palette rendering; cleanup restored settings and removed owned drawing/controller. No full live layout-matrix pass claimed.",
     "layout_precommit": "Precommit snapshot-update run stopped at explicit maintainer request to skip further testing and commit/merge. Unrelated generated snapshots restored. Prior focused tests/builds remain the validation evidence.",
@@ -113,8 +113,26 @@
     "pr486": {
       "source": "18 focused cases pass, negative controls reproduce missing link ownership and old redo ordering. Full typecheck passes.",
       "browser": "28 actual production/development cases pass, including full/tray/compact W, links, retained containers, marker exclusion, framing and history.",
-      "acceptance": "pending",
-      "review": "pr-486-merge-review.md"
+      "acceptance": "PR #486 checkpoint 63642251f: 1052 portable and all 468 required native cases pass, plus six focused main/popout full/tray/compact W/link/frame/history/save-reopen cases. Ten frozen runtime hashes match; strict gates and cleanup/restoration pass. Physical mobile, other native hosts and isolated restart remain unverified. See pr-486-results.json.",
+      "review": "pr-486-merge-review.md",
+      "resultSummary": "pr-486-results.json",
+      "qualityGates": [
+        {
+          "suiteId": "plugin-source-coverage",
+          "status": "passed",
+          "cleanup": "passed"
+        },
+        {
+          "suiteId": "fork-package",
+          "status": "passed",
+          "cleanup": "passed"
+        },
+        {
+          "suiteId": "extras-package",
+          "status": "passed",
+          "cleanup": "passed"
+        }
+      ]
     }
   },
   "sources": {
@@ -122,7 +140,8 @@
       "kind": "Git working tree",
       "parent_commit": "f4f810960d5721e811181a8278ab97f01f64b668",
       "package": "@zsviczian/excalidraw",
-      "version": "0.18.147"
+      "version": "0.18.147",
+      "validated_merge_commit": "63642251fac8dcf9ce8fcb85e3596686509087ee"
     },
     "upstream": {
       "kind": "local Git commit",
@@ -1279,7 +1298,7 @@
         "OBS-009",
         "OBS-010"
       ],
-      "note": "PR #465: relocate existing bind/wrap link ownership into upstream extracted bindTextToContainer/wrapTextsInContainers, using the shared merge rule in obsidianText.ts. Legacy actions and W use the same helpers; raw Markdown is retained. See pr-465-merge-review.md. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; full native/portable acceptance pending. See pr-486-merge-review.md.",
+      "note": "PR #465: relocate existing bind/wrap link ownership into upstream extracted bindTextToContainer/wrapTextsInContainers, using the shared merge rule in obsidianText.ts. Legacy actions and W use the same helpers; raw Markdown is retained. See pr-465-merge-review.md. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; complete matching-build portable/native acceptance passes; see pr-486-results.json. See pr-486-merge-review.md.",
       "kind": "compatibility"
     },
     {
@@ -1609,7 +1628,7 @@
         "OBS-010"
       ],
       "kind": "behavior",
-      "note": "PR #465: retain upstream AppWrap, adding only explicit link ownership transfer during container deletion/restoration. Shared merge rule lives in obsidianText.ts; undo/redo and arrow binding are preserved. See pr-465-merge-review.md. PR #475: Adopt upstream host-metrics forwarding; preserve the existing documented host behavior and compatibility. See pr-475-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; full native/portable acceptance pending. See pr-486-merge-review.md."
+      "note": "PR #465: retain upstream AppWrap, adding only explicit link ownership transfer during container deletion/restoration. Shared merge rule lives in obsidianText.ts; undo/redo and arrow binding are preserved. See pr-465-merge-review.md. PR #475: Adopt upstream host-metrics forwarding; preserve the existing documented host behavior and compatibility. See pr-475-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; complete matching-build portable/native acceptance passes; see pr-486-results.json. See pr-486-merge-review.md."
     },
     {
       "path": "packages/excalidraw/components/ButtonSeparator.tsx",
@@ -3186,7 +3205,7 @@
         "OBS-029"
       ],
       "kind": "test",
-      "note": "PR #465: five independent mounted-keyboard/frame tests cover link/rawText/history round trips, original-container restoration, dark theme, frame-edge clipping and marker resize guards; no window.h dependency. Four host-layout cases verify W in full/tray/compact with tablet form factor, and block it in mobile layout. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; full native/portable acceptance pending. See pr-486-merge-review.md."
+      "note": "PR #465: five independent mounted-keyboard/frame tests cover link/rawText/history round trips, original-container restoration, dark theme, frame-edge clipping and marker resize guards; no window.h dependency. Four host-layout cases verify W in full/tray/compact with tablet form factor, and block it in mobile layout. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; complete matching-build portable/native acceptance passes; see pr-486-results.json. See pr-486-merge-review.md."
     },
     {
       "path": "packages/excalidraw/tests/queries/toolQueries.ts",
@@ -3379,7 +3398,7 @@
         "OBS-030"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Register the built production/development YouTube fullscreen regression with offline nested cross-origin provider fixtures, trusted clicks, two zoom levels and exit geometry. Plugin #3048 / PR #3052. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; full native/portable acceptance pending. See pr-486-merge-review.md."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Register the built production/development YouTube fullscreen regression with offline nested cross-origin provider fixtures, trusted clicks, two zoom levels and exit geometry. Plugin #3048 / PR #3052. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; complete matching-build portable/native acceptance passes; see pr-486-results.json. See pr-486-merge-review.md."
     },
     {
       "ids": [

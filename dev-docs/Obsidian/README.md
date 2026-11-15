@@ -25,8 +25,10 @@ Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md]
 `9e9621b87`. Adopt upstream retained containers, discovery and index restoration;
 port only the host link ownership points to their new conditional owners.
 Source negative controls reproduce link loss and the old redo-order defect.
-Complete portable/native acceptance is pending; package publication and version
-changes remain deferred. Use the incoming commit above for inventory comparison.
+All 1052 portable, 468 required native and six focused main/popout
+W cases pass, with matching runtime hashes and cleanup/restoration. Package
+publication and version changes remain deferred. Use the incoming commit above
+for inventory comparison.
 
 ### PR #485 caret zoom and editor resizing - 2026-11-15
 

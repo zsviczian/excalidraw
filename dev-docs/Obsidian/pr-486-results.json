@@ -1,0 +1,352 @@
+{
+  "reference": "https://github.com/zsviczian/excalidraw/pull/486",
+  "mergeCommit": "63642251fac8dcf9ce8fcb85e3596686509087ee",
+  "upstreamCommit": "82190fb28f58070b34b4017e70c0e2e83701a8e3",
+  "forkParent": "f4f810960d5721e811181a8278ab97f01f64b668",
+  "mergeBase": "9e9621b873c695e08d87ad7e1358306496d11aaf",
+  "source": {
+    "fork": {
+      "commit": "63642251fac8dcf9ce8fcb85e3596686509087ee",
+      "dirty": false,
+      "diffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "lockfileHash": "5ff2005c676da0a7250e859ce363fc40c832a64104732e21d40e827b02632d18"
+    },
+    "extras": {
+      "commit": "4bd7af3325a8059a5ca68fc3e88169507b08c773",
+      "dirty": false,
+      "diffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "lockfileHash": "e6419e0a6e01e7292c905ccd51efc54223eff4f80e8d1d9229ce94194eb282f9"
+    },
+    "kplex": {
+      "commit": "69eb4642dbf7bb995bff6d1b2e8409fd6e2c5046",
+      "dirty": false,
+      "diffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "lockfileHash": "a086f519213867690e08297d483787569d1fbb6629f4320000034e9ed7e7014f"
+    },
+    "plugin": {
+      "commit": "1a8ee3e46dce14546310e16b82884a1077486351",
+      "dirty": false,
+      "diffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "lockfileHash": "741c0318ef12f5b1661e3d86b9044949aab9f2132db6d23d2b119a3b4740d2b1"
+    }
+  },
+  "acceptance": {
+    "status": "passed",
+    "cleanup": "passed",
+    "canonicalCases": 1520,
+    "portableCases": 1052,
+    "nativeCore": 308,
+    "nativeDeviceCases": 160,
+    "focusedNativeWrap": [
+      {
+        "testId": "native:pr486:main:full",
+        "featureIds": [
+          "P03"
+        ],
+        "status": "passed",
+        "assertions": [
+          "trusted W transfers generated-container links without losing raw source",
+          "existing containers survive unbinding and rebinding",
+          "undo/redo preserves binding and link ownership",
+          "interior discovery preserves marker exclusion and non-child layering",
+          "physical save/reopen retains links, raw text, metadata and frame roles"
+        ],
+        "mode": "full",
+        "source": "[[note|caption]]",
+        "linkOwnership": true,
+        "retainedContainers": true,
+        "frameDiscovery": true,
+        "markerExclusion": true,
+        "history": true,
+        "persistence": true
+      },
+      {
+        "testId": "native:pr486:main:tray",
+        "featureIds": [
+          "P03"
+        ],
+        "status": "passed",
+        "assertions": [
+          "trusted W transfers generated-container links without losing raw source",
+          "existing containers survive unbinding and rebinding",
+          "undo/redo preserves binding and link ownership",
+          "interior discovery preserves marker exclusion and non-child layering",
+          "physical save/reopen retains links, raw text, metadata and frame roles"
+        ],
+        "mode": "tray",
+        "source": "[[note|caption]]",
+        "linkOwnership": true,
+        "retainedContainers": true,
+        "frameDiscovery": true,
+        "markerExclusion": true,
+        "history": true,
+        "persistence": true
+      },
+      {
+        "testId": "native:pr486:main:compact",
+        "featureIds": [
+          "P03"
+        ],
+        "status": "passed",
+        "assertions": [
+          "trusted W transfers generated-container links without losing raw source",
+          "existing containers survive unbinding and rebinding",
+          "undo/redo preserves binding and link ownership",
+          "interior discovery preserves marker exclusion and non-child layering",
+          "physical save/reopen retains links, raw text, metadata and frame roles"
+        ],
+        "mode": "compact",
+        "source": "[[note|caption]]",
+        "linkOwnership": true,
+        "retainedContainers": true,
+        "frameDiscovery": true,
+        "markerExclusion": true,
+        "history": true,
+        "persistence": true
+      },
+      {
+        "testId": "native:pr486:popout:full",
+        "featureIds": [
+          "P03"
+        ],
+        "status": "passed",
+        "assertions": [
+          "trusted W transfers generated-container links without losing raw source",
+          "existing containers survive unbinding and rebinding",
+          "undo/redo preserves binding and link ownership",
+          "interior discovery preserves marker exclusion and non-child layering",
+          "physical save/reopen retains links, raw text, metadata and frame roles"
+        ],
+        "mode": "full",
+        "source": "[[note|caption]]",
+        "linkOwnership": true,
+        "retainedContainers": true,
+        "frameDiscovery": true,
+        "markerExclusion": true,
+        "history": true,
+        "persistence": true
+      },
+      {
+        "testId": "native:pr486:popout:tray",
+        "featureIds": [
+          "P03"
+        ],
+        "status": "passed",
+        "assertions": [
+          "trusted W transfers generated-container links without losing raw source",
+          "existing containers survive unbinding and rebinding",
+          "undo/redo preserves binding and link ownership",
+          "interior discovery preserves marker exclusion and non-child layering",
+          "physical save/reopen retains links, raw text, metadata and frame roles"
+        ],
+        "mode": "tray",
+        "source": "[[note|caption]]",
+        "linkOwnership": true,
+        "retainedContainers": true,
+        "frameDiscovery": true,
+        "markerExclusion": true,
+        "history": true,
+        "persistence": true
+      },
+      {
+        "testId": "native:pr486:popout:compact",
+        "featureIds": [
+          "P03"
+        ],
+        "status": "passed",
+        "assertions": [
+          "trusted W transfers generated-container links without losing raw source",
+          "existing containers survive unbinding and rebinding",
+          "undo/redo preserves binding and link ownership",
+          "interior discovery preserves marker exclusion and non-child layering",
+          "physical save/reopen retains links, raw text, metadata and frame roles"
+        ],
+        "mode": "compact",
+        "source": "[[note|caption]]",
+        "linkOwnership": true,
+        "retainedContainers": true,
+        "frameDiscovery": true,
+        "markerExclusion": true,
+        "history": true,
+        "persistence": true
+      }
+    ],
+    "qualityGates": [
+      {
+        "suiteId": "plugin-source-coverage",
+        "status": "passed",
+        "cleanup": "passed"
+      },
+      {
+        "suiteId": "fork-package",
+        "status": "passed",
+        "cleanup": "passed"
+      },
+      {
+        "suiteId": "extras-package",
+        "status": "passed",
+        "cleanup": "passed"
+      }
+    ],
+    "matchingRuntimeArtifacts": [
+      {
+        "kind": "fork",
+        "role": "production-js",
+        "sha256": "0afe309505636c32402b5f7f7386208bf802d8ae2cde664e5d4bc0edb0ba8b6b"
+      },
+      {
+        "kind": "fork",
+        "role": "production-css",
+        "sha256": "ec335630eb0117a57585053c04ad014cf45471bbde39d5acca909c056899aabf"
+      },
+      {
+        "kind": "fork",
+        "role": "development-js",
+        "sha256": "6c9c1a224d44a1e94f63d101e3b5507f01eaa3729af813f61fa569228d1cafae"
+      },
+      {
+        "kind": "fork",
+        "role": "development-css",
+        "sha256": "4e3777b2799487b0a0aac432ff5db2588a59228d373bdff6c598bc9bff1ada3c"
+      },
+      {
+        "kind": "plugin",
+        "role": "main",
+        "sha256": "38a216b1e5b835fb1af492dfc4141391d5262bab3f9978ee48ddf15437d798d2"
+      },
+      {
+        "kind": "plugin",
+        "role": "manifest",
+        "sha256": "8e82828fd9125615e8a361d0f15553e548cac2ee7a303e55387378a53b925fd9"
+      },
+      {
+        "kind": "plugin",
+        "role": "styles",
+        "sha256": "c66306b0fd8f29348b58e50339b2ae614c82524c043c3241dc39e12ee287665e"
+      },
+      {
+        "kind": "extras",
+        "role": "main",
+        "sha256": "387e1c2642e92712bed038142f7e04bff2051456c440d2cd92fd7f15969a3f56"
+      },
+      {
+        "kind": "extras",
+        "role": "manifest",
+        "sha256": "6820958e66d6736ae5114f41349a24ea152495e9055a043f6bde47fde1e6e967"
+      },
+      {
+        "kind": "extras",
+        "role": "styles",
+        "sha256": "3de04a6882b3e43b48f81231962c5f52afbd7146cc986fb0c86631ac5de30eda"
+      }
+    ]
+  },
+  "host": {
+    "version": "1.15.1 (installer 1.14.5)",
+    "applicationIdentity": "C:\\Users\\viczi\\AppData\\Roaming\\obsidian",
+    "scheduling": {
+      "originalBackgroundThrottling": true,
+      "scopedBackgroundThrottling": false
+    },
+    "runtime": {
+      "installer": "1.14.5",
+      "versions": {
+        "node": "24.22.0",
+        "acorn": "8.18.0",
+        "ada": "4.0.0",
+        "amaro": "1.1.11",
+        "ares": "1.34.8",
+        "brotli": "1.2.0",
+        "cldr": "48.0",
+        "icu": "78.2",
+        "llhttp": "9.4.3",
+        "merve": "1.2.2",
+        "modules": "148",
+        "napi": "10",
+        "nbytes": "0.1.4",
+        "ncrypto": "0.0.1",
+        "nghttp2": "1.70.0",
+        "nghttp3": "",
+        "ngtcp2": "",
+        "openssl": "0.0.0",
+        "simdjson": "4.6.11",
+        "simdutf": "7.7.0",
+        "sqlite": "3.53.4",
+        "tz": "2026d",
+        "undici": "7.29.1",
+        "unicode": "17.0",
+        "uv": "1.52.1",
+        "uvwasi": "0.0.23",
+        "v8": "15.0.245.31-electron.0",
+        "zlib": "1.3.2.1-motley",
+        "zstd": "1.6.0",
+        "electron": "43.8.3",
+        "chrome": "150.0.7871.250"
+      },
+      "platform": "win32",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) obsidian/1.14.5 Chrome/150.0.7871.250 Electron/43.8.3 Safari/537.36"
+    },
+    "pluginDiscovery": {
+      "discovery": "existing"
+    },
+    "errorBaseline": "passed"
+  },
+  "bundle": {
+    "mainBytes": 5149666,
+    "headroomTo5MiB": 93214
+  },
+  "commands": {
+    "native": "npm run test:native",
+    "portable": "npm run test:regression:portable",
+    "fullTypes": "yarn test:typecheck",
+    "ownedTypes": "yarn test:obsidian:types",
+    "focusedLint": "zero findings",
+    "inheritedDiagnostic": {
+      "passed": 1345,
+      "failed": 1532,
+      "skipped": 47,
+      "restoredSnapshots": 16,
+      "parentTargeted": {
+        "history": {
+          "passed": 2,
+          "failed": 68
+        },
+        "wrap": {
+          "passed": 2,
+          "failed": 18
+        },
+        "delta": {
+          "passed": 28,
+          "failed": 0
+        }
+      }
+    },
+    "negativeControls": [
+      "Unmodified incoming AppWrap fails both removed-container link transfer and newly added freed-text link rebind.",
+      "Exact fork-parent delta fails three-undo/three-redo stacking order."
+    ]
+  },
+  "scope": {
+    "plugin": "Clean detached 1a8ee3e4; primary RankMessage edit preserved.",
+    "extras": "4bd7af33",
+    "kplex": "Clean isolated 69eb4642, independent of primary newer release.",
+    "deployment": "Marker-owned repository-local native vault only; shared host lock and baseline/window restoration.",
+    "packageVersion": "0.18.147 unchanged; no publication or plugin dependency change.",
+    "unverified": [
+      "Physical Android/iOS",
+      "Other native desktop hosts",
+      "Isolated whole-application restart"
+    ]
+  },
+  "nativeProbeSetup": {
+    "initialFailure": "The test retained long converter IDs after the existing eight-character Markdown ID normalization on save.",
+    "diagnostic": "Saved scene retained drawing/bindings/links under normalized IDs. No product change.",
+    "correction": "Use interactive eight-character fixture IDs; keep save-between-W and every workflow assertion.",
+    "failedEvidence": [
+      "pr486-native-wrap",
+      "pr486-native-wrap-diagnostic",
+      "pr486-native-wrap-save-diagnostic"
+    ],
+    "acceptedEvidence": "pr486-native-wrap-final"
+  }
+}
