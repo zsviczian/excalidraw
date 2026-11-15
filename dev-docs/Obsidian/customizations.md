@@ -129,6 +129,11 @@ Issue [plugin #2976](https://github.com/zsviczian/obsidian-excalidraw-plugin/iss
 <a id="obs-010"></a>
 ## OBS-010 — Obsidian links, suggestions, and link presentation
 
+**PR #486:** Adopt upstream retained-container W behavior. Transfer explicit
+links only when W actually removes its generated container; retained containers
+keep ownership, and rebind merges links added to freed text. Raw Markdown and
+undo transactions remain intact. See the [review](pr-486-merge-review.md).
+
 **Retain, review broad URL exceptions.** [Hyperlink.tsx](../../packages/excalidraw/components/hyperlink/Hyperlink.tsx) attaches the host suggester, listens for native input mutations, adds the mobile host search action, and suppresses upstream element-link UI. Link handles, tooltips, hit testing, and icon rendering also recognize `hasTextLink`; hover is forwarded to the plugin. Bound-text actions move/merge links onto containers instead of leaving duplicate ownership. [common/url.ts](../../packages/common/src/url.ts) accepts empty values, extracts an embedded HTTPS URL, and bypasses sanitization for `data:text/html`.
 
 `P: ExcalidrawRoot.ts` supplies `onLinkOpen`, `onLinkHover`, and mobile `insertLinkAction`; `ExcalidrawView.ts` handles Obsidian navigation/hover. Upstream `onLinkOpen` is reused, not a fork invention. Data-HTML acceptance and broad same-origin embedding are capability/security decisions, not safe generic sanitizer improvements; move host-specific resolution behind a typed policy/render callback where equivalence can be proven. `hasTextLink`, raw text, link preview, and container-link behavior must survive any UI migration. **Gate:** V04, V06, V08; D12, F03.
@@ -182,6 +187,12 @@ PR #477 / plugin #3022: `getCSSFontDefinition` respects `metadata.local`, return
 
 <a id="obs-015"></a>
 ## OBS-015 — Marker frames and frame presentation
+
+**PR #486:** Adopt upstream interior/near-edge/group discovery and frame stacking
+without changing actionFrame. Existing marker exclusion/target guards and marker
+naming remain at their existing owners. Source and actual-artifact regressions
+protect marker non-membership beside newly discovered ordinary-frame children.
+See the [review](pr-486-merge-review.md).
 
 PR #468 moves marker exclusion into the shared export preparation used by upstream exportScene, preserving custom label color/rawText and disabled marker decorations. Global frame colors now travel through explicit export config. SVG metadata exclusion remains; legacy PNG metadata is unchanged. See [merge review](pr-468-merge-review.md).
 
@@ -353,6 +364,11 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 <a id="obs-029"></a>
 ## OBS-029 — Selection, line editing, and geometry API adapters
 
+**PR #486:** Adopt upstream fractional-index conflict prioritization unchanged.
+Owned three-step undo/redo coverage preserves link/custom-data sentinels; exact
+parent code fails the final order. AppWrap adopts selection-scoped tracking and
+keeps existing containers/arrows on unbind. See the [review](pr-486-merge-review.md).
+
 **PR #485 (2026-11-15):** Adopt upstream edited-text side handles, current-scene
 lookup and Alt+W. Preserve the legacy two-argument helper, host metadata and
 unlocked-hit behavior. The approved two-line cleanup releases drag listeners on
@@ -442,6 +458,11 @@ scene-file loader. See the [review](pr-472-merge-review.md).
 
 <a id="obs-033"></a>
 ## OBS-033 — Fork regression tests and fixture adaptations
+
+**PR #486:** Extend owned wrap tests for retained-container links, newly added
+links, interior/group/locked/marker discovery and history collisions. Add trusted
+W/undo/redo browser input in full/tray/compact for both actual artifacts. Pending
+and completed execution are distinguished in the [review](pr-486-merge-review.md).
 
 **PR #485 (2026-11-15):** Eight owned source cases protect caret/center anchors,
 live host zoom policy and the exported text helper's legacy call. The actual

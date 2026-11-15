@@ -15,6 +15,7 @@ import { verifyTTDClose } from "./ttdClose.mjs";
 import { verifyMinimap } from "./minimap.mjs";
 import { verifyYouTubeFullscreen } from "./youtubeFullscreen.mjs";
 import { verifyTextEditing } from "./textEditing.mjs";
+import { verifyWrapMerge } from "./wrapMerge.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const shortcutModifier = process.platform === "darwin" ? "Meta" : "Control";
@@ -790,6 +791,11 @@ try {
     await run(
       "caret-zoom-text-placement",
       () => verifyTextEditing(page, shortcutModifier),
+      true,
+    );
+    await run(
+      "wrap-links-frames-history",
+      () => verifyWrapMerge(page, shortcutModifier),
       true,
     );
     await run("youtube-fullscreen", () => verifyYouTubeFullscreen(page), true);

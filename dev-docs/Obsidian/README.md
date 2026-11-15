@@ -9,7 +9,7 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 | [Customization catalog](customizations.md) | 39 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
-| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 279 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
+| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 280 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
 | [Validation and merge playbook](validation.md) | What was actually verified, existing regression tests, missing runtime evidence, and behavior-specific gates. |
 | [Obsidian runtime testing](OBSIDIAN_RUNTIME_TESTING.md) | Guarded CLI test-vault deployment, exact-build desktop smoke, reports, and feature-specific host probes. |
 | [Local audit checker](audit.py) / [checker tests](test_audit.py) | Dependency-free, offline source accounting; detects changed, new, or retired differences and stale tree fingerprints. |
@@ -17,6 +17,16 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md](../../CONTRIBUTING.md). This inventory documents existing deviations even when they do not yet comply with those policies; it does not silently approve them.
 
 ## Reviewed merge checkpoints
+
+### PR #486 wrap/frame selection and history - 2026-11-15
+
+[The review](pr-486-merge-review.md) accounts for all eight incoming paths against
+`82190fb28f58070b34b4017e70c0e2e83701a8e3`, fork parent `f4f810960` and merge base
+`9e9621b87`. Adopt upstream retained containers, discovery and index restoration;
+port only the host link ownership points to their new conditional owners.
+Source negative controls reproduce link loss and the old redo-order defect.
+Complete portable/native acceptance is pending; package publication and version
+changes remain deferred. Use the incoming commit above for inventory comparison.
 
 ### PR #485 caret zoom and editor resizing - 2026-11-15
 
@@ -31,7 +41,8 @@ portable, all 468 required native and six focused native text cases, with matchi
 runtime artifact hashes and cleanup/restoration. The outer coordinator timeout
 was recovered from completed native/portable reports; see the review. Preserve
 the exported text helper's two-argument call.
-Use the incoming commit above for the current inventory comparison. Package
+That historical checkpoint used the incoming commit above. The newest reviewed
+checkpoint supplies the current inventory comparison. Package
 version, publication and dependency changes remain deferred.
 
 ### PR #484 / plugin PR #3052 targeted follow-up - 2026-11-14
