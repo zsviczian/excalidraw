@@ -2,7 +2,7 @@
   "schema_version": 1,
   "review": {
     "date": "2026-11-15",
-    "dependency_precommit_tests": "Four provider cases, 161 owned source and 24 built-browser cases pass; full/owned types and artifacts pass. Paired complete checkpoint: 1023 portable and 468 required native cases pass, including 160 device cases, strict idle/error/source gates and cleanup/restoration. Final plugin-only pen-repeat guard has separate 789-fast/13-native evidence. Inherited test:update remains failed; see validation.md.",
+    "dependency_precommit_tests": "169 owned source cases and 26 actual-artifact browser cases pass, with coverage gates, full/owned types, normal ESM/Obsidian builds and packed consumers. Eight new focused source cases have exact-parent/unmodified-helper red evidence. Six native text cases pass; actual root teardown with active snap guide passes both artifacts. Baseline inherited bootstrap/import lint failures remain recorded. No version/dependency/protocol bump.",
     "method": "PR #485: review all twenty incoming paths, both conflicts and unmarked fork differences against 5a91f0c fork parent, 82d5847 merge base and incoming 9e9621b. Retire only two obsolete width-rounding lines; preserve host and legacy exported contracts; maintainer-approved two-line unmount cleanup.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
@@ -10,10 +10,10 @@
       "upstream_parent": "9e9621b873c695e08d87ad7e1358306496d11aaf",
       "merge_base": "82d5847e57dcb6fb5982833ea9ec2137fe0b2bd5",
       "reference": "https://github.com/zsviczian/excalidraw/pull/485",
-      "state": "Local resolved checkpoint: eight focused source, full/owned types and 26 actual-artifact browser cases pass including unmount cleanup; complete portable/native acceptance pending. No regression-free or release-ready claim.",
+      "state": "Resolved and accepted at 85577c092: standard combined audit passes 1509 canonical cases (1041 portable + 468 required native), with matching runtime hashes and cleanup/restoration. Six additional native text cases pass. Only acceptance documentation changed afterward; no physical-device or release-ready package claim.",
       "companion": "Plugin 1a8ee3e4; Extras 4bd7af33; clean isolated K-Plex 69eb4642; shared native lock required."
     },
-    "runtime_validation": "Windows Obsidian 1.15.0 / installer 1.14.5 / Electron 43.8.3. Minimap native case passes all six variants with cleanup/error gates. Current and clean pre-merge fork 910845750 both fail native:embed-table:main identically and phone Reading controls at x=-107; cleanup/restoration pass. Full candidate run records 284 passed/2 failed core identities and 54 passed/2 failed device identities, with important downstream cases unexecuted. Initial minimap driver failure does not recur with fresh DOM targeting. Separate workflow retry retained idle/text-save failures. See pr-483-results.json and merge review. Physical devices, other native OSes and isolated cold restart unverified. Final fresh candidate lifecycle/wheel/minimap lane passes all 11 canonical cases, errors, source-stability and cleanup; production bundle remains 5139573 bytes. See pr-483-results.json.",
+    "runtime_validation": "PR #485 checkpoint 85577c092: 1041 portable and all 468 required native cases pass, plus six actual main/popout full/tray/compact caret/Alt+W/drag/persistence cases. Windows Obsidian 1.15.1, installer 1.14.5, Electron 43.8.3. Matching frozen runtime hashes, strict gates, cleanup and original window restoration pass. Outer 30-minute coordinator timeout was preserved; its native child completed and standard auditRegression accepted both completed report sets. Physical mobile, other native OSes and isolated restart remain unverified. See pr-485-results.json.",
     "dependency_checkpoint": "2026-10-11: Obsidian artifact/declaration and plugin production/library builds pass. Local fork Windows Obsidian 1.14.4 smoke passes. Published 0.18.140 main/direct-popout/moved-popout input/save/cleanup smoke passes. Plugin npm tree/audit confirms no braces and source-map-js 1.2.2. Component full typecheck remains blocked by documented window.h/stale test-type failures. Packed manifest confirms Sass dev-only; no publication/version bump. The 5 MB target is 5 * 1024 * 1024 = 5,242,880 bytes. Plugin main.js: 5,051,865 bytes with published component (191,015 bytes of headroom), 5,057,617 with local fork (185,263 bytes of headroom); both are below the target. No full scanner, macOS or physical-mobile run in this checkpoint.",
     "layout_followup": "Validated follow-up: W/menu predicate enabled for full/tray/compact, excluded in mobile. 25 focused tests, isolated source typecheck, declarations/artifacts and plugin production/development builds pass. Full typecheck retains 262 existing diagnostics. Baseline tray/compact keyboard tests already passed; original reported tray failure was not reproduced. Extra live probe passed full-layout keyboard/link/history then stopped on unavailable host command-palette rendering; cleanup restored settings and removed owned drawing/controller. No full live layout-matrix pass claimed.",
     "layout_precommit": "Precommit snapshot-update run stopped at explicit maintainer request to skip further testing and commit/merge. Unrelated generated snapshots restored. Prior focused tests/builds remain the validation evidence.",
@@ -77,8 +77,28 @@
     "pr485": {
       "source": "Eight focused cases pass; full/owned TypeScript and focused lint pass. Inherited raw diagnostic: 1339 pass / 1527 fail / 47 skip, 159 text failures at undefined-scene bootstrap reproduced on the exact fork parent; sixteen generated snapshot/inline snapshot files restored.",
       "browser": "26 production/development cases pass with full/tray/compact and fractional DPR; red/green teardown demonstrates retained incoming resize listeners removed by the approved event subscription.",
-      "acceptance": "Complete combined portable/native pending. Physical mobile, other native OSes and isolated restart unverified."
-    }
+      "acceptance": "PR #485 checkpoint 85577c092: 1041 portable and all 468 required native cases pass, plus six actual main/popout full/tray/compact caret/Alt+W/drag/persistence cases. Windows Obsidian 1.15.1, installer 1.14.5, Electron 43.8.3. Matching frozen runtime hashes, strict gates, cleanup and original window restoration pass. Outer 30-minute coordinator timeout was preserved; its native child completed and standard auditRegression accepted both completed report sets. Physical mobile, other native OSes and isolated restart remain unverified. See pr-485-results.json.",
+      "qualityGates": [
+        {
+          "suiteId": "plugin-source-coverage",
+          "status": "passed",
+          "cleanup": "passed"
+        },
+        {
+          "suiteId": "fork-package",
+          "status": "passed",
+          "cleanup": "passed"
+        },
+        {
+          "suiteId": "extras-package",
+          "status": "passed",
+          "cleanup": "passed"
+        }
+      ],
+      "resultSummary": "pr-485-results.json"
+    },
+    "runtime_validation_before_pr485": "Windows Obsidian 1.15.0 / installer 1.14.5 / Electron 43.8.3. Minimap native case passes all six variants with cleanup/error gates. Current and clean pre-merge fork 910845750 both fail native:embed-table:main identically and phone Reading controls at x=-107; cleanup/restoration pass. Full candidate run records 284 passed/2 failed core identities and 54 passed/2 failed device identities, with important downstream cases unexecuted. Initial minimap driver failure does not recur with fresh DOM targeting. Separate workflow retry retained idle/text-save failures. See pr-483-results.json and merge review. Physical devices, other native OSes and isolated cold restart unverified. Final fresh candidate lifecycle/wheel/minimap lane passes all 11 canonical cases, errors, source-stability and cleanup; production bundle remains 5139573 bytes. See pr-483-results.json.",
+    "dependency_precommit_tests_before_pr485": "Four provider cases, 161 owned source and 24 built-browser cases pass; full/owned types and artifacts pass. Paired complete checkpoint: 1023 portable and 468 required native cases pass, including 160 device cases, strict idle/error/source gates and cleanup/restoration. Final plugin-only pen-repeat guard has separate 789-fast/13-native evidence. Inherited test:update remains failed; see validation.md."
   },
   "sources": {
     "fork": {
@@ -110,6 +130,12 @@
       "publication": "No package publication in this handoff; existing selected companion revision only.",
       "working_tree_changes": "Clean selected companion at 4bd7af3; no Extras source changes for plugin PR #3052.",
       "mermaid_service": "3.6.0"
+    },
+    "kplex": {
+      "kind": "Clean isolated detached Git checkout",
+      "parent_commit": "69eb4642dbf7bb995bff6d1b2e8409fd6e2c5046",
+      "package_version": "0.4.3",
+      "working_tree_changes": "Primary checkout contains unrelated active work; only the clean pinned checkout supplies native test artifacts."
     }
   },
   "comparison": {

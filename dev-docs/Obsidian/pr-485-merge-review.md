@@ -76,11 +76,56 @@ tray/mobile panel ownership have no upstream host equivalent and remain intact.
   backed up/restored; unrelated dirty work was preserved. Some ignored historical
   report formatting changed; recorded data was not intentionally altered.
 
-Combined portable/native acceptance is pending. Native uses the marker-owned
-repository-local vault and shared application-user-data lock. An actual CLI lock
-conflict requires the maintainer's priority decision. K-Plex is clean detached
-69eb4642 because its primary worktree has another agent's changes; Extras is
-4bd7af33. No personal vault is a regression target.
+## Completed acceptance
+
+Runtime checkpoint: `85577c09270d948a052dc8a8f761fb34694945ee` (merge parents
+5a91f0c and 9e9621b), with plugin 1a8ee3e4, Extras 4bd7af33 and clean isolated
+K-Plex 69eb4642. The primary K-Plex checkout's unrelated work was preserved.
+[The result summary](pr-485-results.json) records exact identities and hashes.
+
+- All **1,041 portable cases** pass: 797 plugin fast, 169 fork owned, 26 built
+  fork browser, 30 Extras source and 19 Extras browser. Coverage gates, full and
+  owned types, normal ESM/Obsidian builds, plugin/library builds and both packed
+  consumers pass. The exported helper's two-argument declaration compiles.
+- All **468 required native cases** pass: 308 core and 160 device cases across
+  all 40 declared profiles. Error/idle/source-stability gates, the actual
+  unhandled-error negative control, cleanup and baseline restoration pass.
+  Windows Obsidian 1.15.1, installer 1.14.5, Electron 43.8.3.
+- Six additional native cases pass in main/popout and full/tray/compact modes:
+  trusted caret zoom/reset with a live 7% step, Alt+W preserving editor/text/
+  selection, side dragging without leaving editing, and physical save/reopen
+  preserving raw text, custom metadata and wrapping mode. Initial probe failures
+  were fixture/driver errors: selection needed the actual converted ID; the
+  fitted camera started at 200%; an off-screen caret intentionally anchors to
+  the canvas edge; the task framework requires explicit assertion labels. The
+  corrected probe requires a visible caret and retains every behavior assertion.
+  Production code was not changed for these probe corrections.
+- The actual React-root unmount check also passes with a nonempty snap guide in
+  both frozen browser artifacts, without console/page errors or retained capture
+  listeners. This checks the existing stop() state-reset path during teardown.
+- Native and portable frozen builds have identical hashes for all ten runtime
+  artifacts compared: four fork files and three each for plugin and Extras.
+  Production main.js is 5,149,322 bytes, leaving 93,558 bytes below 5 MiB.
+
+The original combined command hit its outer 30-minute limit during device work.
+Its native child retained the shared lock and completed all cases; no native job
+was cancelled or replayed. The complete portable lane ran separately. The same
+auditRegression function then accepted both actual report sets, all required IDs
+and quality gates: **1,509 canonical cases**, cleanup passed. The original failed
+coordinator report remains intact. This is a recovered orchestration timeout,
+not a passing exit status for that original command. Native transport records
+78 completed-operation receipt recoveries and six bounded read-only eval
+retries; no mutation was replayed.
+
+Focused test-file lint is clean. Read-only production lint has one error and
+eleven warnings at existing import lines; the exact fork parent has the same
+findings plus one additional formatting warning. No new lint finding is hidden
+or fixed through unrelated source cleanup. Inventory comparison passes for all
+279 differing paths; all fifteen checker tests pass.
+
+The marker-owned repository-local vault was the sole native target, under the
+shared application-user-data lock. No competing agent's session was taken over.
+The declared baseline and original automation-window bounds were restored.
 
 Package version stays 0.18.147; no publication/dependency/protocol bump. Local
 artifacts prove temporary integration only. Physical Android/iOS keyboards,

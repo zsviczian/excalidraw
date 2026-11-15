@@ -1,5 +1,33 @@
 # Validation record and upstream-merge playbook
 
+## PR #485 text editing merge - 2026-11-15
+
+The [twenty-path review](pr-485-merge-review.md) and
+[result summary](pr-485-results.json) record fork 85577c092, upstream 9e9621b87,
+plugin 1a8ee3e4, Extras 4bd7af33 and isolated K-Plex 69eb4642. All 1,041 portable,
+468 required native and six additional native text cases pass. Full/owned types,
+coverage, packed consumers, artifact builds, strict error/idle/source gates and
+cleanup/restoration pass. Ten runtime artifacts match between frozen builds.
+Windows Obsidian 1.15.1 / installer 1.14.5 / Electron 43.8.3; main.js 5,149,322
+bytes. Native exercises actual main/popout and full/tray/compact behavior;
+device emulation covers all forty declared profiles.
+
+The outer combined coordinator expired at thirty minutes. Its retained native
+child completed under its original lock, portable checks ran separately and the
+standard auditRegression accepted all 1,509 canonical cases and required gates.
+Original failures remain preserved. A separate built-browser probe verifies
+unmount with an active snap guide. New source and browser regressions protect
+caret/custom zoom policy, exported helper compatibility, fractional text widths,
+Alt+W, drag identity/source and teardown. Retire only two redundant width-rounding
+overrides; preserve the host contracts and apply the approved two-line cleanup.
+
+Raw inherited diagnostics remain red at the old undefined-scene bootstrap,
+reproduced on the exact fork parent; generated snapshots were restored. Existing
+production import lint findings also reproduce on the parent. These are recorded
+limits, not clean inherited/lint passes. Physical mobile, other native operating
+systems, actual application-zoom parity and isolated whole-app restart remain
+manual environments. Package version, dependency and protocol are unchanged.
+
 ## Plugin #3048 / PR #3052 YouTube fullscreen - 2026-11-14
 
 Two fingerprinted exclusions route desktop YouTube videos and playlists through

@@ -355,8 +355,10 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 
 **PR #485 (2026-11-15):** Adopt upstream edited-text side handles, current-scene
 lookup and Alt+W. Preserve the legacy two-argument helper, host metadata and
-unlocked-hit behavior. Full/tray/compact coverage and the resize-unmount finding
-are recorded in the [review](pr-485-merge-review.md).
+unlocked-hit behavior. The approved two-line cleanup releases drag listeners on
+editor unmount and its subscription on pointer completion. Full/tray/compact
+browser and native main/popout coverage, including actual root teardown with a
+snap guide, is recorded in the [review](pr-485-merge-review.md).
 
 **Preserve public adapters, favor upstream internals.** `App` exposes history undo/redo, selection and z-order wrappers, line editor entry, container resizing, arrow-binding refresh, and scene-point color sampling. Selection resolves groups and bound text; `setSelection` is an internal App helper. `refreshAllArrows` in `obsidianUtils` recalculates arrow binding geometry and cache/capture state; `updateContainerSize` delegates to exported element resize calculations. `forceFlushSync` optionally flushes AppState updates for host ordering. Additional input changes favor unlocked hits over locked ones, protect selection while the mobile context menu is open, and avoid a synthetic touchscreen line adjustment when no segment exists.
 
@@ -440,6 +442,14 @@ scene-file loader. See the [review](pr-472-merge-review.md).
 
 <a id="obs-033"></a>
 ## OBS-033 — Fork regression tests and fixture adaptations
+
+**PR #485 (2026-11-15):** Eight owned source cases protect caret/center anchors,
+live host zoom policy and the exported text helper's legacy call. The actual
+artifact driver protects glyph masks, fractional widths/paste, full/tray/compact,
+Alt+W, drag identity and unmount cleanup. Packed declarations protect the old
+helper signature. Complete matching-build acceptance and six focused native text
+cases pass; historical bootstrap/lint limits and the recovered outer deadline
+remain explicit in the [review](pr-485-merge-review.md).
 
 **PR #483 (2026-11-13):** Owned minimapIntegration tests and built-browser minimap driver protect full/compact/tray, opt-outs, live limits, actual pixels/navigation, export omission and scene-destroy cleanup. Native minimap/Zen/device coverage is registered by the plugin coordinator. Execution and remaining native failures are recorded in the [review](pr-483-merge-review.md).
 

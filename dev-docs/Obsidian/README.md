@@ -26,8 +26,11 @@ Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md]
 host zoom policy and Markdown/suggester/theme/tray contracts. Retire two local
 width-rounding overrides in favor of upstream's growing/wrapping distinction.
 Eight focused source cases and all 26 browser cases pass, including the
-maintainer-approved two-line resize-unmount cleanup. Combined acceptance is
-pending. Preserve the exported text helper's two-argument call.
+maintainer-approved two-line resize-unmount cleanup. Acceptance passes 1,041
+portable, all 468 required native and six focused native text cases, with matching
+runtime artifact hashes and cleanup/restoration. The outer coordinator timeout
+was recovered from completed native/portable reports; see the review. Preserve
+the exported text helper's two-argument call.
 Use the incoming commit above for the current inventory comparison. Package
 version, publication and dependency changes remain deferred.
 
