@@ -2024,6 +2024,8 @@ class App extends React.Component<AppProps, AppState> {
             !isIframeElement(el) &&
             this.props.renderWebview &&
             embedLink?.type !== "document" &&
+            !embedLink?.link?.startsWith("https://releases.obsidian.md/youtube?") && // zsviczian -- YouTube needs iframe fullscreen/postMessage, plugin #3048
+            !embedLink?.link?.startsWith("https://www.youtube.com/embed/") && // zsviczian -- include playlists on the same iframe path, plugin #3048
             !embedLink?.link?.startsWith?.("https://player.vimeo.com");
 
           // Modify the scale based on el.scale property

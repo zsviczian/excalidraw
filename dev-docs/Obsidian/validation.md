@@ -1,5 +1,56 @@
 # Validation record and upstream-merge playbook
 
+## Plugin #3048 / PR #3052 YouTube fullscreen - 2026-11-14
+
+Two fingerprinted exclusions route desktop YouTube videos and playlists through
+the existing iframe rather than an Electron guest webview. Four real-editor
+provider cases pass (the two YouTube assertions fail on the parent), full and
+owned-test typechecks pass, and both Obsidian artifacts build. The complete
+owned source suite passes 161 cases; coverage floors pass (48.11% lines,
+64.01% branches, 45.03% functions). Both production/development browser suites
+pass, including trusted nested cross-origin fullscreen at zoom 0.5 and 2,
+viewport-sized video bounds and restored embedded geometry after exit. The
+provider responses are offline test fixtures; real playback is not claimed.
+
+Baseline fork: `29b11ad978d0a793f6502dcdc259f3481054c368`; plugin:
+`78674a39ccf046b93b5de4155edcc871d82602cf`. Reports are retained under
+`.test-work/reports/pr3052-youtube-browser/` and `fork-owned-source/`.
+After the maintainer's CLI go-ahead, the complete paired checkpoint at plugin
+`fdca179677bcabccb83e883e89026723345be67b`, this fork's implementation
+`8260fa444f84c616d1486c2a47365c1b72c4be9a` and Extras `4bd7af33` passes
+1,023 portable and all 468 required Windows native cases, including 160 device
+cases, 40 layout profiles, error/idle/source-stability gates and cleanup/baseline
+restoration. Host: Obsidian 1.15.1, installer 1.14.5, Electron 43.8.3.
+One isolated ResizeObserver notification occurred; no storm or gate waiver.
+Native main/popout offline iframe fullscreen entry, viewport geometry and trusted
+player-button exit pass. Both browser artifacts additionally cover a nested
+cross-origin provider fixture. The plugin-only PNG lifetime correction preserves
+frame pixel reads and actual main/popout/main Markdown migration.
+
+A final plugin-only held-P guard at `78782221011caa2e8eb0e5f9655f426d4bb60c01`
+passes all 789 fast tests and a fresh focused native run (all nine issue
+identities, 13 total checks), including real repeated-key input in main/popout.
+This is separate from the complete native checkpoint, not a complete rerun.
+Fork/Extras artifact hashes are identical across those checkpoints. See the
+[plugin validation and sanitized case evidence](https://github.com/zsviczian/obsidian-excalidraw-plugin/blob/2026-11-14-issue-3049-embed-and-startup-fixes/docs/ISSUE_3052_VALIDATION.md).
+
+Earlier failed PNG/observer/frame runs remain recorded. No unrelated observer
+production fix is claimed. Physical Escape remains unverified: desktop automation
+failed twice to activate the test window and sent no physical input; its fixture
+was cleaned up. Actual YouTube playback, physical Android/iOS, other native OSes
+and isolated whole-app restart remain separate checks. The reporter's #3051
+Lazy Loader startup combination is not reproduced. No version, dependency,
+host protocol or serialized-data change is included; the handoff uses unpublished
+local artifacts and is not a package release.
+
+The required raw `yarn test:update` command remains red and also discovers
+ignored historical source copies. In its current-tree subset, 175 files run
+(82 fail), with 1,331 passed and 1,513 failed assertions plus one todo. This
+does not establish a clean inherited baseline or a parent comparison. The
+original JSON/log and generated changes are retained in
+`.test-work/reports/pr3052-inherited/`; all 16 generated primary-tree snapshot
+and inline-snapshot changes were restored. No failed snapshot was accepted.
+
 ## PR #477 / plugin #3022 coordinated regression checkpoint - 2026-10-30
 
 Tested fork `053a3b9f9e77917c457fce8ca9453d38b92a303b`, plugin

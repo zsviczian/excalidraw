@@ -12,6 +12,7 @@ import { chromium } from "playwright";
 import { sourceIdentity } from "../provenance.mjs";
 import { verifyTTDClose } from "./ttdClose.mjs";
 import { verifyMinimap } from "./minimap.mjs";
+import { verifyYouTubeFullscreen } from "./youtubeFullscreen.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const shortcutModifier = process.platform === "darwin" ? "Meta" : "Control";
@@ -784,6 +785,7 @@ try {
     });
     await run("ttd-close-button", () => verifyTTDClose(page), true);
     await run("minimap-zoom-layouts", () => verifyMinimap(page), true);
+    await run("youtube-fullscreen", () => verifyYouTubeFullscreen(page), true);
     await page.screenshot({ path: join(output, `${mode}-editor.png`) });
     await page.evaluate(() => {
       window.__testRoot.unmount();

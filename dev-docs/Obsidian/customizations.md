@@ -183,6 +183,17 @@ PR #468 moves marker exclusion into the shared export preparation used by upstre
 <a id="obs-016"></a>
 ## OBS-016 — Webviews, rich embeds, and embed magnification
 
+**Plugin #3048 / PR #3052:** Desktop YouTube videos and playlists now bypass
+the guest-webview branch and use the existing upstream iframe, as Vimeo already
+does. The Obsidian wrapper URL, sandbox, permissions, scene scale and public
+contracts remain unchanged. Four real-editor cases and both built browser
+artifacts cover provider routing and trusted nested cross-origin fullscreen at
+two zoom levels. Windows Obsidian 1.15.1 main/popout offline iframe fullscreen,
+viewport geometry and trusted player exit pass. The paired complete checkpoint
+passes 1,023 portable and 468 native cases; the final plugin-only keyboard
+follow-up has separate focused evidence. Real YouTube playback, physical Escape
+and physical mobile remain distinct checks; see [validation](validation.md).
+
 **PR #471:** Adopt upstream Instagram post/reel normalization and portrait bounds.
 Existing HTML-data, YouTube routing, webview, magnification and same-origin
 customizations remain; this provider addition does not supply their replacement.
