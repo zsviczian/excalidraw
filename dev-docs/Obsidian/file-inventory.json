@@ -95,7 +95,18 @@
           "cleanup": "passed"
         }
       ],
-      "resultSummary": "pr-485-results.json"
+      "resultSummary": "pr-485-results.json",
+      "upstreamCleanup": {
+        "url": "https://github.com/excalidraw/excalidraw/pull/12637",
+        "commit": "1420f44e4208e940e33050e52a189d6333c61bbe",
+        "productionLinesAdded": 2,
+        "filesChanged": 2,
+        "forkFingerprints": false,
+        "sourceCases": 3,
+        "fullTypecheck": "passed",
+        "focusedLint": "passed",
+        "comment": "https://github.com/excalidraw/excalidraw/pull/12634#issuecomment-6895550390"
+      }
     },
     "runtime_validation_before_pr485": "Windows Obsidian 1.15.0 / installer 1.14.5 / Electron 43.8.3. Minimap native case passes all six variants with cleanup/error gates. Current and clean pre-merge fork 910845750 both fail native:embed-table:main identically and phone Reading controls at x=-107; cleanup/restoration pass. Full candidate run records 284 passed/2 failed core identities and 54 passed/2 failed device identities, with important downstream cases unexecuted. Initial minimap driver failure does not recur with fresh DOM targeting. Separate workflow retry retained idle/text-save failures. See pr-483-results.json and merge review. Physical devices, other native OSes and isolated cold restart unverified. Final fresh candidate lifecycle/wheel/minimap lane passes all 11 canonical cases, errors, source-stability and cleanup; production bundle remains 5139573 bytes. See pr-483-results.json.",
     "dependency_precommit_tests_before_pr485": "Four provider cases, 161 owned source and 24 built-browser cases pass; full/owned types and artifacts pass. Paired complete checkpoint: 1023 portable and 468 required native cases pass, including 160 device cases, strict idle/error/source gates and cleanup/restoration. Final plugin-only pen-repeat guard has separate 789-fast/13-native evidence. Inherited test:update remains failed; see validation.md."

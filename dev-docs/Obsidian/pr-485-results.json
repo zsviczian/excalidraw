@@ -237,5 +237,16 @@
     "Other native desktop operating systems",
     "Isolated whole-application restart",
     "Physical application-zoom parity beyond browser fractional-DPR coverage"
-  ]
+  ],
+  "upstreamContribution": {
+    "url": "https://github.com/excalidraw/excalidraw/pull/12637",
+    "commit": "1420f44e4208e940e33050e52a189d6333c61bbe",
+    "productionLinesAdded": 2,
+    "filesChanged": 2,
+    "forkFingerprints": false,
+    "sourceCases": 3,
+    "fullTypecheck": "passed",
+    "focusedLint": "passed",
+    "comment": "https://github.com/excalidraw/excalidraw/pull/12634#issuecomment-6895550390"
+  }
 }

@@ -127,6 +127,14 @@ The marker-owned repository-local vault was the sole native target, under the
 shared application-user-data lock. No competing agent's session was taken over.
 The declared baseline and original automation-window bounds were restored.
 
+After this merge, the same two-line cleanup and three upstream controller cases
+were submitted without fork fingerprints as
+[upstream PR #12637](https://github.com/excalidraw/excalidraw/pull/12637), from
+pristine upstream 9e9621b plus commit 1420f44e4. The proposed fix is linked in
+[David's originating PR #12634](https://github.com/excalidraw/excalidraw/pull/12634#issuecomment-6895550390).
+Retire the local cleanup fingerprints when an upstream merge supplies the same
+behavior, keeping the teardown regressions.
+
 Package version stays 0.18.147; no publication/dependency/protocol bump. Local
 artifacts prove temporary integration only. Physical Android/iOS keyboards,
 other native desktop systems, isolated restart and physical Electron application
