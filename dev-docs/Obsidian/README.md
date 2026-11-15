@@ -9,7 +9,7 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 | [Customization catalog](customizations.md) | 39 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
-| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 276 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
+| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 279 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
 | [Validation and merge playbook](validation.md) | What was actually verified, existing regression tests, missing runtime evidence, and behavior-specific gates. |
 | [Obsidian runtime testing](OBSIDIAN_RUNTIME_TESTING.md) | Guarded CLI test-vault deployment, exact-build desktop smoke, reports, and feature-specific host probes. |
 | [Local audit checker](audit.py) / [checker tests](test_audit.py) | Dependency-free, offline source accounting; detects changed, new, or retired differences and stale tree fingerprints. |
@@ -17,6 +17,19 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md](../../CONTRIBUTING.md). This inventory documents existing deviations even when they do not yet comply with those policies; it does not silently approve them.
 
 ## Reviewed merge checkpoints
+
+### PR #485 caret zoom and editor resizing - 2026-11-15
+
+[The review](pr-485-merge-review.md) accounts for all twenty incoming paths against
+`9e9621b873c695e08d87ad7e1358306496d11aaf`, fork parent `5a91f0c00` and merge base
+`82d5847e5`. Adopt upstream caret anchors and editor transforms, retaining live
+host zoom policy and Markdown/suggester/theme/tray contracts. Retire two local
+width-rounding overrides in favor of upstream's growing/wrapping distinction.
+Eight focused source cases and all 26 browser cases pass, including the
+maintainer-approved two-line resize-unmount cleanup. Combined acceptance is
+pending. Preserve the exported text helper's two-argument call.
+Use the incoming commit above for the current inventory comparison. Package
+version, publication and dependency changes remain deferred.
 
 ### PR #484 / plugin PR #3052 targeted follow-up - 2026-11-14
 

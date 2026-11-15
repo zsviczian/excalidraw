@@ -84,6 +84,15 @@ Move pure host preference decisions to the adapter/prop layer and reuse the upst
 <a id="d09"></a>
 ## D09 — Consolidate zoom/navigation shims without losing preferences
 
+**PR #485 partial retirement (2026-11-15):** Remove the two WYSIWYG
+`Math.ceil(width)` overrides. Upstream's anchor transform and growing/wrapping
+distinction supply the required stable text placement while preserving exact
+wrapping widths. Pixel, bound-paste, caret and custom-step browser/source cases
+cover full/tray/compact and fractional device scales. Keep live host zoom
+preferences, Markdown/suggester/theme behavior and panel ownership; upstream's
+constant step does not replace those contracts. See the
+[merge review](pr-485-merge-review.md) for acceptance and remaining device gates.
+
 **Priority P2; current upstream reuse is already substantial; OBS-028.** The fork zoom-to-fit wrapper already delegates to upstream viewport calculations. Preserve its host-facing max zoom/margin semantics and use upstream navigation for ordinary behavior. Host min/max/step, touch preferences, pointer-down ordering, and the `M` navigation path are separate policies.
 
 Revert duplicated implementation only after proving the upstream path accepts the needed parameters and fires host callbacks in the same order. Right-button pan and `ownerDocument` existing upstream do not prove the complete input customization obsolete. Gate: V02/V03/V09 with mouse, pen, one/two-finger gestures, keyboard, minimum/maximum zoom, and callback ordering.

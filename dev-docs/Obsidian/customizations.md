@@ -87,6 +87,10 @@ Windows real-Extras main/popout evidence is in the review's correction section.
 <a id="obs-007"></a>
 ## OBS-007 — Public props, imperative methods, and library exports
 
+**PR #485 (2026-11-15):** Preserve getActiveTextElement's exported two-argument
+declaration with a default map; upstream internal calls supply the current scene
+map. Source and packed-consumer checks protect both forms. See [review](pr-485-merge-review.md).
+
 **PR #469 (2026-10-20):** Upstream RenderEnvironment is an additive root/type export. Public legacy exports and imperative host methods remain; the legacy raster viewport hook now supplies its actual scale to both scene and render configuration. [Merge review](pr-469-merge-review.md).
 
 PR #468 preserves legacy public export signatures in fork-owned obsidianExport.ts and adds upstream exportScene. Root and utility clipboard entry points accept both old flat and new data/config options. Plugin constants, package validation, EA exports and community scripts retain their interface. No host protocol change. See [merge review](pr-468-merge-review.md).
@@ -104,6 +108,13 @@ Direct consumers are `P: ExcalidrawRoot.ts`, `ExcalidrawView.ts`, `ExcalidrawAut
 
 <a id="obs-009"></a>
 ## OBS-009 — Raw Markdown text lifecycle
+
+**PR #485 (2026-11-15):** Upstream anchor-based editor placement replaces the
+two local unconditional width-rounding overrides. Growing text retains upstream
+rounding; wrapping text and bound paste preserve fractional widths. Raw Markdown,
+host suggestions, caret theme and tray/mobile panel editing remain. Pixel and
+caret-zoom regressions cover full/tray/compact and fractional device scales;
+[the review](pr-485-merge-review.md) records native/platform acceptance separately.
 
 **PR #475 (2026-10-27):** Adopt upstream label/binding metrics and skeleton placement; preserve rawText, legacyTextWrap and Markdown history/link ownership. The mounted host-metrics regression and Windows main/popout text history checks pass. No source-field migration or label customization is retired. See the [PR #475 review](pr-475-merge-review.md).
 
@@ -313,6 +324,11 @@ Consumers include `P: ExcalidrawView.ts` theme updates, custom embed renderers, 
 <a id="obs-028"></a>
 ## OBS-028 — Zoom, pen/touch gestures, and navigation
 
+**PR #485 (2026-11-15):** Adopt upstream caret-anchored keyboard zoom while
+preserving live host step/min/max. Null anchors still use the viewport center;
+canvas offsets and changed settings are covered by seven owned action cases.
+There is no mode/protocol/data change. See [the review](pr-485-merge-review.md).
+
 **PR #483 (2026-11-13):** Centered minimap wheel zoom reuses upstream AppWheel/AppViewport while preserving live host limits and modifier behavior. The new zoom menu reads the same live limits, including values beyond upstream defaults. See [merge review](pr-483-merge-review.md).
 
 Final combined macOS validation passed all feature scenarios, the JavaScript
@@ -336,6 +352,11 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 
 <a id="obs-029"></a>
 ## OBS-029 — Selection, line editing, and geometry API adapters
+
+**PR #485 (2026-11-15):** Adopt upstream edited-text side handles, current-scene
+lookup and Alt+W. Preserve the legacy two-argument helper, host metadata and
+unlocked-hit behavior. Full/tray/compact coverage and the resize-unmount finding
+are recorded in the [review](pr-485-merge-review.md).
 
 **Preserve public adapters, favor upstream internals.** `App` exposes history undo/redo, selection and z-order wrappers, line editor entry, container resizing, arrow-binding refresh, and scene-point color sampling. Selection resolves groups and bound text; `setSelection` is an internal App helper. `refreshAllArrows` in `obsidianUtils` recalculates arrow binding geometry and cache/capture state; `updateContainerSize` delegates to exported element resize calculations. `forceFlushSync` optionally flushes AppState updates for host ordering. Additional input changes favor unlocked hits over locked ones, protect selection while the mobile context menu is open, and avoid a synthetic touchscreen line adjustment when no segment exists.
 

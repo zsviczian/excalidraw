@@ -16,8 +16,8 @@ export async function verifyYouTubeFullscreen(page) {
     route.fulfill({ contentType: "text/html", body: player }),
   );
   await page.evaluate(() => {
-    const lib = window.__testLibrary,
-      { React, ReactDOM } = window.__testRuntime;
+    const lib = window.__testLibrary;
+    const { React, ReactDOM } = window.__testRuntime;
     window.__youtubeDispose = lib.configureObsidianCommonHost({
       protocolVersion: lib.OBSIDIAN_COMMON_HOST_PROTOCOL_VERSION,
       getDeviceInfo: () => ({
@@ -78,8 +78,8 @@ export async function verifyYouTubeFullscreen(page) {
     );
     for (const zoom of [0.5, 2]) {
       await page.evaluate((zoom) => {
-        const api = window.__youtubeAPI,
-          element = api.getSceneElements()[0];
+        const api = window.__youtubeAPI;
+        const element = api.getSceneElements()[0];
         api.updateScene({
           appState: {
             zoom: { value: zoom },
@@ -93,6 +93,7 @@ export async function verifyYouTubeFullscreen(page) {
       assert.equal(await page.locator("#youtube-test webview").count(), 0);
       const outer = page.locator("#youtube-test iframe.excalidraw__embeddable");
       await outer.waitFor();
+      const embeddedBounds = await outer.boundingBox();
       assert.match(
         await outer.getAttribute("src"),
         /^https:\/\/releases\.obsidian\.md\/youtube\?/,
@@ -121,7 +122,26 @@ export async function verifyYouTubeFullscreen(page) {
       assert.equal(bounds.sameDocument, true);
       await button.click();
       await page.waitForFunction(() => !document.fullscreenElement);
-      assert.ok((await outer.boundingBox()).width < bounds.width);
+      // A physical fullscreen display can be smaller than the emulated page.
+      // Compare with the original embed after its layout commit, in CSS pixels.
+      await page.waitForFunction((expected) => {
+        const rect = document
+          .querySelector("#youtube-test iframe.excalidraw__embeddable")
+          ?.getBoundingClientRect();
+        return (
+          rect &&
+          ["x", "y", "width", "height"].every(
+            (key) => Math.abs(rect[key] - expected[key]) < 1,
+          )
+        );
+      }, embeddedBounds);
+      const restoredBox = await outer.boundingBox();
+      assert.ok(
+        ["x", "y", "width", "height"].every(
+          (key) => Math.abs(restoredBox[key] - embeddedBounds[key]) < 1,
+        ),
+        JSON.stringify({ zoom, embeddedBounds, restoredBox }),
+      );
       evidence.push({ zoom, fullscreenViewport: bounds.bounds, exited: true });
     }
     return {
@@ -135,7 +155,9 @@ export async function verifyYouTubeFullscreen(page) {
     };
   } finally {
     await page.evaluate(async () => {
-      if (document.fullscreenElement) await document.exitFullscreen();
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      }
       window.__youtubeRoot?.unmount();
       window.__youtubeDispose?.();
       document.getElementById("youtube-test")?.remove();

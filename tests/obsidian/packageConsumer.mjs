@@ -83,6 +83,10 @@ writeFileSync(
   join(work, "consumer.ts"),
   `import {OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION,configureObsidianExcalidrawHost} from '@zsviczian/excalidraw';
 import type {ObsidianCommonHostAdapter} from '@zsviczian/excalidraw/common/commonObsidianHost';
+// zsviczian -- PR #485 must preserve legacy two-argument exported declarations.
+import type {getActiveTextElement} from '@zsviczian/excalidraw/element/selection';
+declare const activeText: typeof getActiveTextElement;
+void activeText([], {editingTextElement:null});
 const protocol:4=OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION;
 declare const component:Parameters<typeof configureObsidianExcalidrawHost>[0];
 declare const common:ObsidianCommonHostAdapter;

@@ -1535,6 +1535,8 @@ const renderTextBox = (
   context: CanvasRenderingContext2D,
   appState: InteractiveCanvasAppState,
   selectionColor: InteractiveCanvasRenderConfig["selectionColor"],
+  /** the box's left ("w") or right ("e") side alone */
+  side?: "e" | "w",
 ) => {
   context.save();
   const padding = getTextBoxPadding(appState.zoom.value);
@@ -1550,7 +1552,15 @@ const renderTextBox = (
   context.strokeStyle = selectionColor;
   context.globalAlpha = 0.5;
   context.setLineDash([6 / appState.zoom.value, 4 / appState.zoom.value]);
-  context.strokeRect(shiftX, shiftY, width, height);
+  if (side) {
+    const x = side === "w" ? shiftX : shiftX + width;
+    context.beginPath();
+    context.moveTo(x, shiftY);
+    context.lineTo(x, shiftY + height);
+    context.stroke();
+  } else {
+    context.strokeRect(shiftX, shiftY, width, height);
+  }
   context.restore();
 };
 
@@ -1750,7 +1760,11 @@ const _renderInteractiveScene = ({
     }
   }
 
-  const activeTextElement = getActiveTextElement(selectedElements, appState);
+  const activeTextElement = getActiveTextElement(
+    selectedElements,
+    appState,
+    allElementsMap,
+  );
 
   if (activeTextElement && !activeTextElement.autoResize) {
     renderResetAutoResizeHandle(
@@ -1766,12 +1780,20 @@ const _renderInteractiveScene = ({
     const textElement = allElementsMap.get(appState.editingTextElement.id) as
       | ExcalidrawTextElement
       | undefined;
-    if (textElement && !textElement.autoResize) {
+    // a wrapped text gets its box; one that grows with its content, the
+    // side under the pointer, which wraps it when dragged
+    if (
+      textElement &&
+      (!textElement.autoResize || app.text.editedTextHoveredSide)
+    ) {
       renderTextBox(
         textElement,
         context,
         appState,
         renderConfig.selectionColor,
+        textElement.autoResize
+          ? app.text.editedTextHoveredSide ?? undefined
+          : undefined,
       );
     }
   }
