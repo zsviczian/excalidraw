@@ -188,6 +188,13 @@ PR #477 / plugin #3022: `getCSSFontDefinition` respects `metadata.local`, return
 <a id="obs-015"></a>
 ## OBS-015 — Marker frames and frame presentation
 
+**Frame-drag performance (2026-11-19):** The upstream group selector reselected
+the same group once per candidate member while calculating frame highlights.
+A call-local guard skips groups already selected, retaining group editing,
+partial enclosure and marker behavior. This is a general upstream-candidate
+fix; no public API or saved-scene change. See
+[the scoped investigation and validation](frame-drag-group-selection.md).
+
 **PR #486:** Adopt upstream interior/near-edge/group discovery and frame stacking
 without changing actionFrame. Existing marker exclusion/target guards and marker
 naming remain at their existing owners. Source and actual-artifact regressions

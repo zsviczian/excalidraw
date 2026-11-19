@@ -133,6 +133,16 @@
           "cleanup": "passed"
         }
       ]
+    },
+    "frame_drag_20261119": {
+      "fork_checkpoint": "5516b06fc",
+      "region_upstream_baseline": "d732d4f3d50e6ac092ec6e86a4e04a40546a9395",
+      "inventory_upstream_baseline": "82190fb28f58070b34b4017e70c0e2e83701a8e3",
+      "scope": [
+        "packages/element/src/groups.ts",
+        "tests/obsidian/unit/frameGroupSelection.test.ts"
+      ],
+      "accounting": "Only this targeted fix and its regression are refreshed. The audit already reports 22 unrelated drift items from later upstream/release changes; those fingerprints and comparison provenance are not silently accepted."
     }
   },
   "sources": {
@@ -1149,6 +1159,17 @@
       ],
       "note": "Custom perfect-freehand path/outline generation with saved easing, pressure, cap, taper, and stroke options.",
       "kind": "compatibility"
+    },
+    {
+      "path": "packages/element/src/groups.ts",
+      "status": "modified",
+      "fork_sha256": "e7d055a228d54b2c8b20eba8d398af5ceede805718e2e570aa623f82cf07b461",
+      "upstream_sha256": "c1d259042c2ae0179c3d0dcb497ea317838c4799bafca491c41e143c889b24fd",
+      "ids": [
+        "OBS-015"
+      ],
+      "kind": "Targeted upstream-candidate performance fix",
+      "note": "Frame creation/resizing reuses a group already selected in the current call, avoiding a full candidate scan and selection-map copy for every group member. No persisted cache or serialized/API change. Relevant upstream code is unchanged at d732d4f3d. See frame-drag-group-selection.md."
     },
     {
       "path": "packages/element/src/image.ts",
@@ -3656,6 +3677,18 @@
       ],
       "kind": "Independent upstream-placement regression",
       "note": "PR #478: real Scene/addNewNodes integration preserves centered growth in four directions, arrow bindings and host styles; no upstream test-helper adaptation. Seven cases also cover connected-node gaps and fractional rounding; complete AppState and real scene indices/types are checked."
+    },
+    {
+      "path": "tests/obsidian/unit/frameGroupSelection.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "a0c166c043d8e1db3b4dd30ede09d51b5a7af6936c53c97b35c84ad432b037b2",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-015",
+        "OBS-033"
+      ],
+      "kind": "Independent frame/group regression",
+      "note": "Four source cases cover bounded group work, nested/editing groups, singleton handling, partial enclosure and marker exclusion. Regression fails before the guard; see frame-drag-group-selection.md."
     },
     {
       "path": "tests/obsidian/unit/imageVariants.test.ts",
