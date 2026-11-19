@@ -110,6 +110,11 @@ export const selectGroupsFromGivenElements = (
     }
     if (groupIds.length > 0) {
       const groupId = groupIds[groupIds.length - 1];
+      // zsviczian START -- frame dragging must not rescan/reselect an already selected group per member.
+      if (nextAppState.selectedGroupIds[groupId] === true) {
+        continue;
+      }
+      // zsviczian END
       nextAppState = {
         ...nextAppState,
         ...selectGroup(groupId, nextAppState, elements),
