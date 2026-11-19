@@ -22,9 +22,37 @@ const { externalGlobalPlugin } = require("esbuild-plugin-external-global");
 
 const { parseEnvVariables } = require("../packages/excalidraw/env.cjs");
 
+const { compactTranslations } = require("./compactTranslations.cjs");
+
 const REPOSITORY_ROOT = path.resolve(__dirname, "..");
 const PACKAGE_ROOT = path.join(REPOSITORY_ROOT, "packages/excalidraw");
 const OUTPUT_ROOT = path.join(PACKAGE_ROOT, "dist/obsidian");
+const LOCALES_ROOT = path.join(PACKAGE_ROOT, "locales");
+const fallbackTranslations = JSON.parse(
+  fs.readFileSync(path.join(LOCALES_ROOT, "en.json"), "utf8"),
+);
+
+// zsviczian -- i18n.t already supplies empty/identical English fallbacks, PR #491.
+const compactLocalePlugin = {
+  name: "obsidian-compact-translations",
+  setup(buildContext) {
+    buildContext.onLoad({ filter: /\.json$/ }, (args) => {
+      if (
+        path.dirname(args.path) !== LOCALES_ROOT ||
+        ["en.json", "percentages.json"].includes(path.basename(args.path))
+      ) {
+        return;
+      }
+      const translations = JSON.parse(fs.readFileSync(args.path, "utf8"));
+      return {
+        contents: JSON.stringify(
+          compactTranslations(translations, fallbackTranslations),
+        ),
+        loader: "json",
+      };
+    });
+  },
+};
 
 // zsviczian: clean only the consumer-specific output so build:obsidian can run
 // after upstream build:esm without deleting its ESM and declaration artifacts.
@@ -147,6 +175,7 @@ const buildObsidianRuntime = (mode) => {
       "process.env.NODE_ENV": JSON.stringify(mode),
     },
     plugins: [
+      ...(isProduction ? [compactLocalePlugin] : []),
       externalGlobalPlugin({
         react: "React",
         "react-dom": "ReactDOM",

@@ -954,6 +954,7 @@ export const textWysiwyg = ({
     };
 
     editable.oninput = () => {
+      followsScene = false;
       const normalized = normalizeText(editable.value);
       if (editable.value !== normalized) {
         const selectionStart = editable.selectionStart;
@@ -1165,18 +1166,25 @@ export const textWysiwyg = ({
     // it'd get stuck in an infinite loop of blur→onSubmit after we re-focus the
     // wysiwyg on update
     cleanup();
-    const updateElement = app.scene.getElement(
-      element.id,
-    ) as ExcalidrawTextElement;
-    if (!updateElement) {
+    // torn down with the app (see AppText.destroy): its scene is gone, and
+    // what was typed is in the last change it reported
+    if (app.unmounted) {
       return;
     }
-    const container = getContainerElement(
-      updateElement,
-      app.scene.getNonDeletedElementsMap(),
+    const updateElement = app.scene.getElement<ExcalidrawTextElement>(
+      element.id,
     );
+    // gone from the scene (see the scene update handler below): the edit
+    // still ends, and nothing is written
+    const container =
+      updateElement && !updateElement.isDeleted
+        ? getContainerElement(
+            updateElement,
+            app.scene.getNonDeletedElementsMap(),
+          )
+        : null;
 
-    if (container) {
+    if (updateElement && container) {
       if (editable.value.trim()) {
         const boundTextElementId = getBoundTextElementId(container);
         if (!boundTextElementId || boundTextElementId !== element.id) {
@@ -1215,6 +1223,29 @@ export const textWysiwyg = ({
     });
   };
 
+  // The textarea also blurs when the window does (switching tabs or apps).
+  // It stays the document's active element then, and gets the focus back
+  // with the window: the edit goes on. Only a focus that moved elsewhere in
+  // the document submits.
+  const handleBlur = () => {
+    if (ownerDocument.activeElement !== editable) {
+      handleSubmit();
+      return;
+    }
+    // nobody is typing while the window is away
+    followsScene = true;
+  };
+
+  // The window lost focus while submit was disabled for a press (see
+  // temporarilyDisableSubmit), whose pointerup may never come: the press is
+  // over, and submit on blur is back.
+  const onWindowBlur = () => {
+    ownerWindow.removeEventListener("blur", onWindowBlur);
+    ownerWindow.removeEventListener("pointerup", bindBlurEvent);
+    editable.onblur = handleBlur;
+    handleBlur();
+  };
+
   const cleanup = () => {
     // (the canvas takes the editor's place under the pointer, with the
     // cursor given to it for around the editor: see the pointermove below)
@@ -1234,7 +1265,7 @@ export const textWysiwyg = ({
       capture: true,
     });
     ownerWindow.removeEventListener("pointerup", bindBlurEvent);
-    ownerWindow.removeEventListener("blur", handleSubmit);
+    ownerWindow.removeEventListener("blur", onWindowBlur);
     ownerWindow.removeEventListener("beforeunload", handleSubmit);
     unbindUpdate();
     unsubOnChange();
@@ -1278,7 +1309,7 @@ export const textWysiwyg = ({
       // let the focus scroll the container: for a box reaching past the
       // viewport, revealing the caret the textarea has until the click's is
       // placed (the end of the value) would pan the canvas there.
-      editable.onblur = handleSubmit;
+      editable.onblur = handleBlur;
       editable.focus({ preventScroll: true });
       if (pendingInitialSelection) {
         editable.setSelectionRange(
@@ -1295,7 +1326,7 @@ export const textWysiwyg = ({
     ownerWindow.addEventListener("pointerup", bindBlurEvent);
     // handle edge-case where pointerup doesn't fire e.g. due to user
     // alt-tabbing away
-    ownerWindow.addEventListener("blur", handleSubmit);
+    ownerWindow.addEventListener("blur", onWindowBlur);
   };
 
   // prevent blur when changing properties from the menu
@@ -1420,6 +1451,40 @@ export const textWysiwyg = ({
 
   // handle updates of textElement properties of editing element
   const unbindUpdate = app.scene.onUpdate(() => {
+    const latestElement = app.scene.getElement(element.id);
+    if (!latestElement || latestElement.isDeleted) {
+      // the element went away under the edit (another tab's sync, a host's
+      // update): so does the editor. After the update that's under way, and
+      // unless that brought it back (a reset followed by a load).
+      queueMicrotask(() => {
+        const currentElement = app.scene.getElement(element.id);
+        if (!currentElement || currentElement.isDeleted) {
+          handleSubmit();
+        }
+      });
+      return;
+    }
+    // Until the user types, the editor shows the scene's text: a change
+    // from outside (another tab's sync, a collaborator's edit, a host's
+    // update) is taken. Setting the value fires no input event: nothing is
+    // written back.
+    if (followsScene && isTextElement(latestElement)) {
+      // zsviczian START -- external scene updates must keep editable Markdown, PR #491
+      // const nextValue = normalizeText(latestElement.originalText);
+      const nextValue = normalizeText(
+        app.props.onBeforeTextEdit?.(latestElement, true) ??
+          latestElement.originalText,
+      );
+      // zsviczian END
+      if (nextValue !== editable.value) {
+        const { selectionStart, selectionEnd } = editable;
+        editable.value = nextValue;
+        editable.setSelectionRange(
+          Math.min(selectionStart, nextValue.length),
+          Math.min(selectionEnd, nextValue.length),
+        );
+      }
+    }
     updateWysiwygStyle();
     const isPopupOpened = !!ownerDocument.activeElement?.closest(
       ".properties-content",
@@ -1467,6 +1532,12 @@ export const textWysiwyg = ({
   // ---------------------------------------------------------------------------
 
   let isDestroyed = false;
+  // Whether the editor takes the scene's text when it changes from outside
+  // (see the scene update handler). Typing makes the text the user's draft,
+  // which is theirs until submitted: a collaborator typing into the same
+  // text doesn't change it under them. The window going away gives it back
+  // to the scene.
+  let followsScene = true;
 
   if (autoSelect && !pendingInitialSelection) {
     // select on init (focusing is done separately inside the bindBlurEvent()

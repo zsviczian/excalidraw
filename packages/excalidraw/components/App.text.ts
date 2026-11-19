@@ -119,6 +119,15 @@ export class AppText {
   constructor(private app: App, private dependencies: AppTextDependencies) {}
 
   public textWysiwygSubmitHandler: ReturnType<typeof textWysiwyg> | null = null;
+
+  /**
+   * Tears down an open text editor with the app: its listeners on the window
+   * would otherwise outlive it.
+   */
+  public destroy = () => {
+    this.textWysiwygSubmitHandler?.();
+    this.textWysiwygSubmitHandler = null;
+  };
   private getTextCreationGridPoint = (x: number, y: number) => {
     const effectiveGridSize = this.app.getEffectiveGridSize();
 
@@ -234,7 +243,12 @@ export class AppText {
       const latestTextElement =
         this.app.scene.getElement<ExcalidrawTextElement>(element.id);
 
-      if (!latestTextElement || !isTextElement(latestTextElement)) {
+      if (
+        !latestTextElement ||
+        !isTextElement(latestTextElement) ||
+        // deleted from under the edit: the submit doesn't bring it back
+        latestTextElement.isDeleted
+      ) {
         return;
       }
 

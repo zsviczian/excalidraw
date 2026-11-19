@@ -16,6 +16,7 @@ import { verifyMinimap } from "./minimap.mjs";
 import { verifyYouTubeFullscreen } from "./youtubeFullscreen.mjs";
 import { verifyTextEditing } from "./textEditing.mjs";
 import { verifyWrapMerge } from "./wrapMerge.mjs";
+import { verifyTextFocus } from "./textFocus.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const shortcutModifier = process.platform === "darwin" ? "Meta" : "Control";
@@ -794,11 +795,68 @@ try {
       true,
     );
     await run(
+      "text-focus-markdown-teardown",
+      () => verifyTextFocus(page, shortcutModifier),
+      true,
+    );
+    await run(
       "wrap-links-frames-history",
       () => verifyWrapMerge(page, shortcutModifier),
       true,
     );
     await run("youtube-fullscreen", () => verifyYouTubeFullscreen(page), true);
+    await run(
+      "unicode-locale-labels",
+      async () => {
+        const languages = [
+          ["ja-JP", "四角"],
+          ["zh-CN", "矩形"],
+          ["ru-RU", "Прямоугольник"],
+          ["ar-SA", "مستطيل"],
+        ];
+        const setLanguage = async (langCode, expected) => {
+          await page.evaluate((langCode) => {
+            const { React } = window.__testRuntime;
+            window.__testRoot.render(
+              React.createElement(window.__testLibrary.Excalidraw, {
+                key: `locale-${langCode}`,
+                ownerDocument: document,
+                langCode,
+                onExcalidrawAPI: (api) => {
+                  window.__testAPI = api;
+                },
+              }),
+            );
+          }, langCode);
+          await page.waitForFunction(
+            (expected) =>
+              document
+                .querySelector('[data-testid="toolbar-rectangle"]')
+                ?.getAttribute("aria-label") === expected,
+            expected,
+          );
+          assert.equal(
+            await page
+              .locator('[data-testid="toolbar-rectangle"]')
+              .getAttribute("aria-label"),
+            expected,
+          );
+        };
+        try {
+          for (const [langCode, expected] of languages) {
+            await setLanguage(langCode, expected);
+          }
+          return {
+            languages: languages.map(([code]) => code),
+            unicodeStringsPreserved: true,
+            offline: true,
+          };
+        } finally {
+          await setLanguage("en", "Rectangle");
+        }
+      },
+      true,
+    );
     await page.screenshot({ path: join(output, `${mode}-editor.png`) });
     await page.evaluate(() => {
       window.__testRoot.unmount();

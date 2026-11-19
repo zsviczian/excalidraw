@@ -4,6 +4,16 @@ This is the compatibility index for the [customization catalog](customizations.m
 
 ## Three different compatibility boundaries
 
+**PR #491 text-session checkpoint:** A window blur keeps the editor open; moving
+focus elsewhere in its document submits. An unfocused editor follows external
+scene text until the user types again. Obsidian obtains that replacement's
+editable Markdown through the existing `onBeforeTextEdit(element, true)` callback,
+so its return value may be requested again during an open, externally updated
+session. Undefined results retain upstream `originalText`. Deleted text is not
+resurrected, and unmount destroys the textarea/listeners without submitting.
+Callback signatures, host protocols and saved fields are unchanged. See
+[review](pr-491-merge-review.md).
+
 **Internal host protocol.** The plugin and evaluated component runtime register structural capability adapters. Protocol changes can be coordinated across the two repositories with explicit version rejection. They must not expose plugin classes, a raw settings object, a view instance, or undocumented global discovery.
 
 **Public component and scripting surface.** The fork's root exports, imperative API, and the plugin's ExcalidrawAutomate surface may be used by community scripts absent from these snapshots. An empty repository search is not deprecation evidence. Preserve a small compatibility wrapper where possible; removing a method requires a public migration decision, not just a protocol bump.
@@ -12,6 +22,15 @@ This is the compatibility index for the [customization catalog](customizations.m
 
 <a id="artifact-contract"></a>
 ## Runtime and delivery contract — OBS-002/003/004/019/020/021
+
+PR #491 compacts locale JSON only in the production Obsidian artifact. Empty
+strings and strings equal to English are omitted because upstream `t()` already
+resolves those values to the same English fallback. Preserve nested object
+shape, non-string values, English, completion percentages and source locale
+files. All languages remain available. ESM, original development JSON source maps,
+the runtime inflater,
+dependency graph and four-file contract are unchanged. Exhaustive effective-
+translation, actual built-label and full consumer size gates apply.
 
 [buildObsidianPackage.js](../../scripts/buildObsidianPackage.js), [obsidianEntry.ts](../../packages/excalidraw/obsidianEntry.ts), the [package manifest](../../packages/excalidraw/package.json), and `P: src/core/managers/PackageManager.ts` define the delivery boundary. The required runtime artifact names are:
 

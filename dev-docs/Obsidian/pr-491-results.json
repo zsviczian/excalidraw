@@ -1,0 +1,256 @@
+{
+  "reference": "https://github.com/zsviczian/excalidraw/pull/491",
+  "upstreamCommit": "2c3dcc06ec807e81ab9437eceb1a8f7a3c590743",
+  "forkParent": "fd6fb4fc77cc428c5c23fef022d484ae30a7e289",
+  "mergeBase": "d732d4f3d50e6ac092ec6e86a4e04a40546a9395",
+  "testedCandidateSources": {
+    "plugin": {
+      "commit": "73b631abff6acb18a52acea72aad13307c49907f",
+      "dirty": false,
+      "diffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "lockfileHash": "3766633e2e27c3983407bc06db6cf4f0c84ec0fb1d8fea52c705e9ba6eef2cbb"
+    },
+    "fork": {
+      "commit": "fd6fb4fc77cc428c5c23fef022d484ae30a7e289",
+      "dirty": true,
+      "diffHash": "4b569c10595ed9c431bb55dd558ef68275406ee322af4d2912f0d9496e54df91",
+      "lockfileHash": "5ff2005c676da0a7250e859ce363fc40c832a64104732e21d40e827b02632d18"
+    },
+    "extras": {
+      "commit": "2623016ab1bf0685911848748cf2d2f2d3e91d29",
+      "dirty": false,
+      "diffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "lockfileHash": "7d916b9279a3523c605d2e952b2601be3655ba92f4c4df09a67627dac74ca42f"
+    }
+  },
+  "sourceNote": "Matching frozen working-tree candidate before this acceptance-only documentation update. All changed implementation/test/policy paths below are unchanged after testing; inventory documentation is intentionally excluded from the source-tree audit.",
+  "implementationHashes": {
+    ".github/workflows/locales-coverage.yml": "55c8c9d0b7ae69821191d74a4d22cf445abeb1e2038fb93eebc016c862d0cad6",
+    "AGENTS.md": "69058be8c02ceec3f32478168fde95325ffa2743dd4e74a00d7f489a6f84188b",
+    "excalidraw-app/App.tsx": "e2c5bc810b64b8df9aab61561e347535790d409ca95135f994f6db5806db4190",
+    "packages/element/src/groups.ts": "01c78a87badfa84a9a714c091e647bc0345459062961909809b578390cf70200",
+    "packages/element/tests/groups.test.ts": "47337acb157d0e445885c8d9055c089b66c2d541a1ab22cfcccd83156d891674",
+    "packages/excalidraw/components/App.text.ts": "dce206ca7f5409b715f68f5a42f8ecfed20933b52bf5ad02e85deae6802c08f9",
+    "packages/excalidraw/components/App.tsx": "a4e96e591968f83879ef3427dfaf9bb4f747945a36cde1997100f4feb2aca884",
+    "packages/excalidraw/data/reconcile.ts": "5fc65669562fc509d3f1c466ac9be019c049f9e6b263df05e2c578f74150c8a4",
+    "packages/excalidraw/locales/ar-SA.json": "99e538287e9fdfe4dcb881a74fd742c7818ecc9b13cbaa97c680abbc53264f04",
+    "packages/excalidraw/locales/az-AZ.json": "d7fa1b44b234994c574e846040ae4bbc6158712b5b6f2df16a93108c6e29596d",
+    "packages/excalidraw/locales/bg-BG.json": "3bf18389770941514f9e2db0f4a093158d9caec6a654c10109ae15a5919c6bb6",
+    "packages/excalidraw/locales/bn-BD.json": "3bf5e8a32e424a9270211c8c2fc4c80e55e86cc717f695a269da06ceff2a50b1",
+    "packages/excalidraw/locales/bn-IN.json": "3bf5e8a32e424a9270211c8c2fc4c80e55e86cc717f695a269da06ceff2a50b1",
+    "packages/excalidraw/locales/ca-ES.json": "eb530a4a98fe2ae3c32277b715a6f1d6adc6617f15542bb26f2c63dfd80b5096",
+    "packages/excalidraw/locales/cs-CZ.json": "12571df3eb37512a3158e72ee8d1916ea471f65cf3b48a1bd1188376b59cc375",
+    "packages/excalidraw/locales/da-DK.json": "2418238f795a96b34aa6a8e8199fcd20b33f332669a44366fe3c1dc1188e58d3",
+    "packages/excalidraw/locales/de-CH.json": "ec239fd81eec0835b5fb544ffd7bfe7c8ca8dff0c02e7c78d4e98eae7686abee",
+    "packages/excalidraw/locales/de-DE.json": "ec239fd81eec0835b5fb544ffd7bfe7c8ca8dff0c02e7c78d4e98eae7686abee",
+    "packages/excalidraw/locales/el-GR.json": "4f60d37cf53c9771fcfa73f61bf96d1c0f847b17d1e913e37ef5f5e0c8a26f79",
+    "packages/excalidraw/locales/es-ES.json": "85afe480c79ff0a094445f6d181a73e8dc97ce352b36ebc6bb0b2bf549ccf1eb",
+    "packages/excalidraw/locales/eu-ES.json": "4dad5a93584070532d373b5613cca1ddd3f78a860666c39eaed46ea48ae22bcc",
+    "packages/excalidraw/locales/fa-IR.json": "6553cb232432db67aa264f02d2debb912faa57e3a34ef1b6187a6414d364cfd5",
+    "packages/excalidraw/locales/fi-FI.json": "4b9c2a7a688466c8dfd92cae36460b88e81fde3dcbdda7ca8ba5454da6c60c7c",
+    "packages/excalidraw/locales/fr-FR.json": "62e53b9fe44a06dc2746fda65d9b21ab1542b5bde9410e391257ac0b18e04936",
+    "packages/excalidraw/locales/gl-ES.json": "7752f84f52e1d0f829e7b2f2a5068738d28d17f515b297b62230ed2f2b9a4dcc",
+    "packages/excalidraw/locales/he-IL.json": "a71ac32b4831f9564e60c7c74a2de5c83ba98f13a662c6116b767a0c98b4aec1",
+    "packages/excalidraw/locales/hi-IN.json": "b008a63f2c691e21a6aad9bf53c38c5753e4543f87ac4953082da0a7d1c0e74b",
+    "packages/excalidraw/locales/hu-HU.json": "1303ff9d301871707d8cd498d3a370de21932b23cf502fae0b30cba9a665cbbb",
+    "packages/excalidraw/locales/id-ID.json": "6947f8d4e419b2a7749cbc077ffea9e57f7020633e067721a31d657e85d04a16",
+    "packages/excalidraw/locales/it-IT.json": "98268b0bde74bbf69592f37b6e75b88bafd8fdfb247fbf5592ddea2d0ce9947c",
+    "packages/excalidraw/locales/ja-JP.json": "7d82cc6fe4bc1deb130fec9f2b12003203ebbf2cf3795cd9e9921eb9f8ba16b6",
+    "packages/excalidraw/locales/kaa.json": "d056603999cdf3823618ea8c47a84ddde072e4180794ae3eebf339f6d53fb581",
+    "packages/excalidraw/locales/kab-KAB.json": "ad96c8cc0c0a1fd6041d0177a209a2c9b50753bdee17d886bf8b36e50843e2f1",
+    "packages/excalidraw/locales/kk-KZ.json": "97b7fdc3448d18d37b073baedc3dc4cb80ae80dc2d89fbd8fdc0e7865cab039a",
+    "packages/excalidraw/locales/km-KH.json": "fbcdbc7e45afbc40697143c88f41ac69ac890df293d306c7290328b5be2e4091",
+    "packages/excalidraw/locales/ko-KR.json": "8066b2ddc300d9231a16568a6327e137fb2ca5b0023b41977ef9e891a766b46d",
+    "packages/excalidraw/locales/ku-TR.json": "ec7ab4b78ba9d676d820de5ef47ed9393a4923b13796feda155480f5c804fca8",
+    "packages/excalidraw/locales/lt-LT.json": "dd99145fb284375bf18162a2dbe585714f0cfac769a4f80b4cdb4c21e599944e",
+    "packages/excalidraw/locales/lv-LV.json": "e8f28dddace45a6e2dca85a2464d0d1499b4a9c27e466c197d63bdfbca9e189c",
+    "packages/excalidraw/locales/mr-IN.json": "138c9dbc3009fc3b1f37f96565ebf06cd6078802b3119f34de6ae0c124517afa",
+    "packages/excalidraw/locales/my-MM.json": "b7235af3e2150255a782fe51d55e29ca9870c4cc2d88835cbfd5e4edd8b8c87d",
+    "packages/excalidraw/locales/nb-NO.json": "62e9b9a2529c04b2f419fb0a379973dc71b60928e60966119fb4e5398316c754",
+    "packages/excalidraw/locales/nl-NL.json": "cb7b690a06516df20dc35e648e3b1dab108605875ac5ee72454a0afa5cd7e3d3",
+    "packages/excalidraw/locales/nn-NO.json": "414dcbbcacc2c634aa25acba9fc8f600e5609f9a9912641f1a7555ac161e9543",
+    "packages/excalidraw/locales/oc-FR.json": "c0bae582ca47db97934962ba5a300bcb398e39586d00a7f3810b6a59ec1c5a71",
+    "packages/excalidraw/locales/pa-IN.json": "98d7d3105bd5314aac3724c74c770d5d00a96f6e0f7440d8700e211139a1f792",
+    "packages/excalidraw/locales/percentages.json": "42998d0a1afe681f8f06aea1d72d9b4bc4086cd0d46cb2675642a015e8c6b278",
+    "packages/excalidraw/locales/pl-PL.json": "dc958e3c63cfcfa621526c33ac912a788387d835db922c841e07774538a5b5c4",
+    "packages/excalidraw/locales/pt-BR.json": "7006f33a3ffa4d9982e664c33045f964d0418b5da4da2286733f3c65c2ebd34e",
+    "packages/excalidraw/locales/pt-PT.json": "2984482804071391d002a825b5c648c03b4cae78937b17f140aff6263430d861",
+    "packages/excalidraw/locales/ro-RO.json": "3cab3ce87b31c83b188e2067e879445083ec1c576eeecb729d32cc669c4afbc5",
+    "packages/excalidraw/locales/ru-RU.json": "c7507503e39072102a84e30ce3b81a087d5459a96b38326f07a94aef54e06f55",
+    "packages/excalidraw/locales/si-LK.json": "6d99158745b83aa50df4cbed13d5cc0c7807839e86e56b536f1a861e2f38443a",
+    "packages/excalidraw/locales/sk-SK.json": "f9ed94415611e08eff49713b342e87768c1389f7cd70cce2efa90208053d68df",
+    "packages/excalidraw/locales/sl-SI.json": "66a9a1bb100faf5bc30eae2efb36ade0d20206b6c10d185fa5170cf266970a1e",
+    "packages/excalidraw/locales/sv-SE.json": "102f4e3f2fb161b69b9c12155599d720b2d7becb3d2d6a5c0116b366ad6a18b7",
+    "packages/excalidraw/locales/ta-IN.json": "9c158b1310370e0d40d1ad9ff138feaea73e051f6bc6b5150eba342eff0fa4d7",
+    "packages/excalidraw/locales/th-TH.json": "1654eb217fd49c46bfd0166088e9dcff68ad9b6d1aa9b9cef6ace37d07e634c3",
+    "packages/excalidraw/locales/tr-TR.json": "5d5d2a361f9b46b6e2014ef8283580fe4561c281828cdfcd17d134c246276723",
+    "packages/excalidraw/locales/uk-UA.json": "139cbf4e93fadb80f296736bb9c6b0c5d5fe9a7a56c109c09be00863a81ee864",
+    "packages/excalidraw/locales/uz-UZ.json": "d2ea0797873c4f5441e647029bd473ef19f26e127b861fd738a2c54fabaf75b8",
+    "packages/excalidraw/locales/vi-VN.json": "7ba3be80c8da167336f540764f63e0431f903ec951156b5913fd9e28a3cf129b",
+    "packages/excalidraw/locales/zh-CN.json": "cf4c5f75b9f09acf828ad6619529f7b0fa7bc79206909628ae47893c9ab5581d",
+    "packages/excalidraw/locales/zh-HK.json": "d04a7cd6cd7518f2d61cfe937cc587bae3afa507b939dffeee0373e6e31cf871",
+    "packages/excalidraw/locales/zh-TW.json": "cadb5dc2baf7a94b315c2e6457d9ca54258575a6995faf8fc7eeaacdd4671cb1",
+    "packages/excalidraw/tests/data/reconcile.test.ts": "4481fdd499e1370260ed868dd1a2ce68b3349922748a404fb43ade85c2db66a0",
+    "packages/excalidraw/tests/stickyNotes.test.tsx": "9da505afa12de8cb0a868bc2fbe058b5a0bc453ac8c2415a5aed7f82c7e626d1",
+    "packages/excalidraw/wysiwyg/textWysiwyg.outside.test.tsx": "18fbf1a7ea9c65bca5ec997ac5d3393cae5f71e61b42b168b133eb85c417a056",
+    "packages/excalidraw/wysiwyg/textWysiwyg.tsx": "40013a0cb0806c91119469ab81b0fca99adfaeac3e8372dccd9ee85f353275c8",
+    "scripts/buildObsidianPackage.js": "522bb3af7fb75253eb7ebc215c5d3ddf89cbbba78cad62a61ec9307b02e38e7e",
+    "scripts/compactTranslations.cjs": "4cfe2a0700a00412146f51f88a0d06d5b9a121225d179c50b55dcac342efa720",
+    "scripts/locales-coverage-description.js": "a62727e93d1cad2d6210ef7f14f46d03fd1af02af531c0bdb3866d04a05e1c35",
+    "tests/obsidian/browser/run.mjs": "de0cf15ab36ce43b5a82581957ffd764975e0f75a8f6cb5187b55e0096203451",
+    "tests/obsidian/browser/textFocus.mjs": "f1f09ec59469c27caa3f87bf2ba4aedd783e8729ff3f4382ba3933522c83d2c8",
+    "tests/obsidian/unit/compactTranslations.test.ts": "de6c26252a08a7bb7b9161d2a362bf10464b5ce036e9a99f7e9489bf18795b51",
+    "tests/obsidian/unit/textFocusMerge.test.tsx": "93b677b44c497f3a6088a69de1db91285fc8aa5c4a4c46ac5424d9e304efa8bc"
+  },
+  "acceptance": {
+    "status": "passed",
+    "cleanup": "passed",
+    "canonicalCases": 1614,
+    "portableCases": 1142,
+    "nativeCore": 312,
+    "nativeDeviceCases": 160,
+    "requiredCasesMissing": [],
+    "baselineRestored": true,
+    "windowRestored": true,
+    "originalBounds": {
+      "x": 250,
+      "y": 305,
+      "width": 629,
+      "height": 800
+    }
+  },
+  "runtimeArtifacts": {
+    "fork": [
+      {
+        "role": "production-js",
+        "path": "packages/excalidraw/dist/obsidian/excalidraw.production.min.js",
+        "bytes": 6668193,
+        "sha256": "20b56d745d1c4799a1e50e78826e4e13809b718ddb3fec3bca13f62be645c8fe"
+      },
+      {
+        "role": "production-css",
+        "path": "packages/excalidraw/dist/obsidian/excalidraw.production.min.css",
+        "bytes": 314075,
+        "sha256": "ec335630eb0117a57585053c04ad014cf45471bbde39d5acca909c056899aabf"
+      },
+      {
+        "role": "development-js",
+        "path": "packages/excalidraw/dist/obsidian/excalidraw.development.js",
+        "bytes": 31033062,
+        "sha256": "f82f13bd8abca763352a1cfa995729c20617acae0df3d4dcd04ce70402232ea6"
+      },
+      {
+        "role": "development-css",
+        "path": "packages/excalidraw/dist/obsidian/excalidraw.development.css",
+        "bytes": 355823,
+        "sha256": "4e3777b2799487b0a0aac432ff5db2588a59228d373bdff6c598bc9bff1ada3c"
+      },
+      {
+        "role": "package-manifest",
+        "path": "packages/excalidraw/package.json",
+        "bytes": 4669,
+        "sha256": "cc61f22dc29347c40cc4ff0d3a61ec7bb0d3aebb0bb17e3e6dcb7a3ec0a5b3ab"
+      }
+    ],
+    "extras": [
+      {
+        "role": "main",
+        "path": "dist/main.js",
+        "bytes": 2591898,
+        "sha256": "387e1c2642e92712bed038142f7e04bff2051456c440d2cd92fd7f15969a3f56"
+      },
+      {
+        "role": "manifest",
+        "path": "dist/manifest.json",
+        "bytes": 303,
+        "sha256": "6820958e66d6736ae5114f41349a24ea152495e9055a043f6bde47fde1e6e967"
+      },
+      {
+        "role": "styles",
+        "path": "dist/styles.css",
+        "bytes": 1427,
+        "sha256": "3de04a6882b3e43b48f81231962c5f52afbd7146cc986fb0c86631ac5de30eda"
+      }
+    ],
+    "kplex": [
+      {
+        "role": "main",
+        "path": "dist/main.js",
+        "bytes": 4806078,
+        "sha256": "2f3b0a7589b73d1766f0efb9717fec82a65a42744f1391090a27492a842bd9e4"
+      },
+      {
+        "role": "manifest",
+        "path": "dist/manifest.json",
+        "bytes": 329,
+        "sha256": "9fb353aa649b6d6c11609bbf39bf2891615c1c8c88b3fa52141399ef2a2812ff"
+      },
+      {
+        "role": "styles",
+        "path": "dist/styles.css",
+        "bytes": 164880,
+        "sha256": "0dcc26f7367ae38c900761bf5ceb52c9a4efc99d0be5138eec0adf4a59cfa841"
+      }
+    ],
+    "plugin": [
+      {
+        "role": "main",
+        "path": "dist/main.js",
+        "bytes": 5218572,
+        "sha256": "334a6be140c4f914e1d6bd7c9b5a8978e5cf4451c6362474dcc807fe41b27a2a"
+      },
+      {
+        "role": "manifest",
+        "path": "dist/manifest.json",
+        "bytes": 470,
+        "sha256": "8e82828fd9125615e8a361d0f15553e548cac2ee7a303e55387378a53b925fd9"
+      },
+      {
+        "role": "styles",
+        "path": "dist/styles.css",
+        "bytes": 368688,
+        "sha256": "d5d999fb745a0d293e76b03996da5eca75a4c41a77a0e30c83f51cddd40293ae"
+      }
+    ]
+  },
+  "validation": {
+    "fullTypecheck": "passed",
+    "ownedTypes": "passed",
+    "focusedTextAndFrameCases": 12,
+    "translationFallbackCases": 57,
+    "actualArtifactBrowserCases": 32,
+    "inventoryPaths": 285,
+    "checkerCases": 15,
+    "lintErrors": 0,
+    "preExistingLintWarnings": 2,
+    "pluginDevelopmentBuild": "passed",
+    "pluginProductionBuild": "passed"
+  },
+  "reports": {
+    "portable": "C:\\Users\\viczi\\GitHub\\obsidian-excalidraw-plugin\\.test-work\\reports\\regression-3ccb221a-34a2-4149-9d3a-a5960df81349",
+    "native": "C:\\Users\\viczi\\GitHub\\obsidian-excalidraw-plugin\\.test-work\\reports\\native-a5fba815-c0df-47ae-8b53-a8ef3067d755",
+    "combined": "C:\\Users\\viczi\\GitHub\\obsidian-excalidraw-plugin\\.test-work\\pr491\\combined-acceptance.json",
+    "focused": "C:\\Users\\viczi\\GitHub\\obsidian-excalidraw-plugin\\.test-work\\reports\\native-e4a55eb7-3b43-45ce-86b4-2be4c8d3da89",
+    "geometry": "C:\\Users\\viczi\\GitHub\\obsidian-excalidraw-plugin\\.test-work\\pr491\\window-restore-result.json"
+  },
+  "historicalRuns": {
+    "initialPortable": "regression-2c915bf7-7481-4015-a456-397c1625090b: failed unchanged 5 MiB gate before translation compaction",
+    "interruptedPortable": "regression-0691e469-ee93-4f47-aba9-74259c84dce0: stopped for final lint-only corrections; not accepted",
+    "narrowFocused": "native-d0fc0871-5d01-49de-8810-0baa29dd619c: split alias failed at 629x800",
+    "narrowFull": "native-5469dd84-0198-41c3-aa6a-f6825b8cec43: split alias and text-creation geometry failed at 629x800; cleanup and 160 device cases passed"
+  },
+  "environmentRecovery": "Held the shared application-user-data lock and verified the marker-owned vault/window, no pending tasks/popouts/debugger. Widened only that window to 1200x1000. Focused and complete runs passed without production/test assertion changes. Restored its exact original 629x800 bounds after cleanup; other vaults untouched.",
+  "limitations": [
+    "Browser blur cases simulate handlers; they do not prove real OS Alt-Tab behavior.",
+    "Windows Obsidian 1.15.1 is tested; other native desktop hosts, physical Android/iOS and isolated whole-app restart were unavailable.",
+    "Local artifacts are an unpublished integration handoff. Version 0.18.148, dependency declarations and lockfiles are unchanged."
+  ],
+  "nativeCompanionSources": {
+    "kplex": {
+      "commit": "3df07efaf7d43f4cf5f97b9a8e069b5b106b18f2",
+      "dirty": false,
+      "diffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "lockfileHash": "0efc4d386a9605f70d2ba2bac3120f3b558fd543b6274943ba5c9bf327b3594d"
+    }
+  }
+}

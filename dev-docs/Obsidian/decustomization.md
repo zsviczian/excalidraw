@@ -6,6 +6,15 @@ Scope is the supplied snapshots, with [provenance and limitations](README.md). �
 
 ## Recommended sequence
 
+**PR #491 completed upstream retirement (2026-11-19):** The frame/group selection
+guard accepted in upstream #12692 now owns the complete `groups.ts` change.
+Restore the exact upstream file and retire its fork fingerprint/file row under
+OBS-015, retaining marker/partial-enclosure regression coverage. Upstream text
+cleanup does not replace the separate resize-drag cancellation or host Markdown,
+suggester, caret and tray contracts; those remain. The new external-scene text
+path needs the existing Markdown-source callback to avoid replacing source with
+its parsed label. [Evidence and validation](pr-491-merge-review.md).
+
 First make the existing package/test baseline trustworthy (F01, F02, F04), without mixing unrelated fixes into an upstream merge. Then land the independently reviewable no-op/artifact cleanup in D01–D04. Next replace remaining direct plugin discovery with semantic capabilities (F03) and reduce policy/presentation patches through D07–D15. Finally reassess package divergence and absent examples using real ancestry and consumer tests (D16–D17). Do not prioritize lines deleted over saved-data compatibility or reliable package delivery.
 
 The first four items are the best initial retirement targets. They do not justify removing a whole behavior family. Public declaration-only helpers belong to D05, not the private-unused-code bucket.

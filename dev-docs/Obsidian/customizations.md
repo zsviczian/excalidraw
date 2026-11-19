@@ -36,6 +36,17 @@ Verification: component Obsidian/declaration build, plugin production/library bu
 <a id="obs-003"></a>
 ## OBS-003 — Single-artifact Obsidian delivery
 
+**PR #491:** Crowdin's expanded translations pushed the plugin to 5,259,152
+bytes, above its unchanged 5 MiB target. The production Obsidian builder omits only empty
+translations and strings identical to their English fallback; upstream `t()`
+already returns that same fallback. Source JSON, all languages, English and
+completion percentages remain unchanged. ESM and original development JSON
+source maps are unaffected.
+The plugin becomes 5,218,572 bytes. Fifty-seven compaction cases and four
+non-Latin toolbar labels in both actual artifacts protect the equivalence.
+There is no new runtime dependency, inflater or asset boundary. See
+[measurements and acceptance](pr-491-merge-review.md).
+
 **PR #483 (2026-11-13):** The new minimap uses upstream's main-thread fallback directly when the evaluated artifact has no import.meta.url. ESM retains worker support; no runtime chunk/network fetch is added. See [review](pr-483-merge-review.md).
 
 **Retain.** [buildObsidianPackage.js](../../scripts/buildObsidianPackage.js) and [obsidianEntry.ts](../../packages/excalidraw/obsidianEntry.ts) create one function-evaluable IIFE plus CSS per environment. The builder aliases workspace sources, externalizes private React/ReactDOM/JSX references, exposes `ExcalidrawLib`, disables runtime `import.meta.url` use, embeds required assets/fonts, resolves lazy CJK paths, and cleans only its own output directory. The entry adds Obsidian-only CSS without making it part of upstream's normal entry. Production/development source-map policies differ intentionally. [subset-main.ts](../../packages/excalidraw/subset/subset-main.ts) disables the external worker path.
@@ -108,6 +119,15 @@ Direct consumers are `P: ExcalidrawRoot.ts`, `ExcalidrawView.ts`, `ExcalidrawAut
 
 <a id="obs-009"></a>
 ## OBS-009 — Raw Markdown text lifecycle
+
+**PR #491 (2026-11-19):** Adopt upstream window-blur continuation, remote text
+reconciliation and deleted-text/unmount cleanup. When an external scene replaces
+the followed text, the existing `onBeforeTextEdit(element, true)` callback must
+still supply the editable source; upstream `originalText` can be only its parsed
+label. A mounted-editor negative control reproduces the source loss. Keep the
+small fingerprinted callback at that new upstream update point, including its
+standalone fallback. Local drafts remain authoritative until submitted. No new
+prop, protocol or saved field. See [review and acceptance](pr-491-merge-review.md).
 
 **PR #485 (2026-11-15):** Upstream anchor-based editor placement replaces the
 two local unconditional width-rounding overrides. Growing text retains upstream
@@ -195,6 +215,14 @@ partial enclosure and marker behavior. This is a general upstream-candidate
 fix; no public API or saved-scene change. See
 [the scoped investigation and validation](frame-drag-group-selection.md).
 
+**PR #491 retirement:** Upstream accepted the guard and three focused tests in
+excalidraw/excalidraw#12692 (`2c3dcc06e`). `packages/element/src/groups.ts` now
+matches that upstream file byte-for-byte; remove its fingerprint and active
+file-ledger row. Keep OBS-015 active for marker semantics and retain the four
+independent regressions, which additionally protect partial enclosure and marker
+exclusion. No public API, serialized state or selection algorithm changes beyond
+the accepted upstream implementation. See [merge review](pr-491-merge-review.md).
+
 **PR #486:** Adopt upstream interior/near-edge/group discovery and frame stacking
 without changing actionFrame. Existing marker exclusion/target guards and marker
 naming remain at their existing owners. Source and actual-artifact regressions
@@ -256,6 +284,14 @@ PR #463 adopts upstream's single-bitmap faded/clip crop rendering while retainin
 
 <a id="obs-019"></a>
 ## OBS-019 — Teardown and shared-cache cleanup
+
+**PR #491:** Adopt upstream `AppText.destroy()` after `app.unmounted` becomes
+true. It removes the active textarea and its owner-window listeners without
+submitting into the destroyed scene. Preserve the separate PR #485 resize-drag
+unmount subscription: destroying a textarea does not stop a resize drag. Image
+cancellation, host root ownership and shared-cache policy are also separate
+contracts. Source and built-artifact teardown cases are recorded in the
+[review](pr-491-merge-review.md).
 
 **PR #469 (2026-10-20):** Adopt upstream AppHost destruction and its ownership-checked interaction cleanup. Keep the existing image cancellation/late-result guard and source-root lifecycle; do not replace plugin migration persistence or source-unmount ordering. [Merge review](pr-469-merge-review.md).
 
@@ -465,6 +501,15 @@ scene-file loader. See the [review](pr-472-merge-review.md).
 
 <a id="obs-033"></a>
 ## OBS-033 — Fork regression tests and fixture adaptations
+
+**PR #491:** Eight independent mounted-editor/reconciliation cases protect raw
+Markdown versus parsed labels, window-blur continuation, actual document-focus
+submission, external updates, local drafts, deletion and unmount. The new actual
+artifact case runs in both production and development with trusted text input
+and canvas hit checks. Headless blur events cover handlers, not OS focus; native
+Obsidian and remaining platform evidence are listed separately in the
+[review](pr-491-merge-review.md). Preserve the upstream frame tests verbatim and
+the broader four-case owned marker/group regression.
 
 **PR #486:** Extend owned wrap tests for retained-container links, newly added
 links, interior/group/locked/marker discovery and history collisions. Add trusted
