@@ -22,33 +22,34 @@ const { externalGlobalPlugin } = require("esbuild-plugin-external-global");
 
 const { parseEnvVariables } = require("../packages/excalidraw/env.cjs");
 
-const { compactTranslations } = require("./compactTranslations.cjs");
+const { compressWasmModule } = require("./compressObsidianWasm.cjs");
+const { createPackedLocalePlugin } = require("./packedLocalePlugin.cjs");
 
 const REPOSITORY_ROOT = path.resolve(__dirname, "..");
 const PACKAGE_ROOT = path.join(REPOSITORY_ROOT, "packages/excalidraw");
 const OUTPUT_ROOT = path.join(PACKAGE_ROOT, "dist/obsidian");
 const LOCALES_ROOT = path.join(PACKAGE_ROOT, "locales");
-const fallbackTranslations = JSON.parse(
-  fs.readFileSync(path.join(LOCALES_ROOT, "en.json"), "utf8"),
-);
+const packedLocalePlugin = createPackedLocalePlugin(LOCALES_ROOT);
 
-// zsviczian -- i18n.t already supplies empty/identical English fallbacks, PR #491.
-const compactLocalePlugin = {
-  name: "obsidian-compact-translations",
+// zsviczian -- scope binary packing to the two existing font-subsetting assets.
+const compressedWasmPaths = new Set([
+  path.join(PACKAGE_ROOT, "subset/woff2/woff2-wasm.ts"),
+  path.join(PACKAGE_ROOT, "subset/harfbuzz/harfbuzz-wasm.ts"),
+]);
+const compressFontWasmPlugin = {
+  name: "obsidian-compressed-font-wasm",
   setup(buildContext) {
-    buildContext.onLoad({ filter: /\.json$/ }, (args) => {
-      if (
-        path.dirname(args.path) !== LOCALES_ROOT ||
-        ["en.json", "percentages.json"].includes(path.basename(args.path))
-      ) {
+    buildContext.onLoad({ filter: /-wasm\.ts$/ }, (args) => {
+      if (!compressedWasmPaths.has(args.path)) {
         return;
       }
-      const translations = JSON.parse(fs.readFileSync(args.path, "utf8"));
       return {
-        contents: JSON.stringify(
-          compactTranslations(translations, fallbackTranslations),
+        contents: compressWasmModule(
+          fs.readFileSync(args.path, "utf8"),
+          args.path,
         ),
-        loader: "json",
+        loader: "js",
+        watchFiles: [args.path],
       };
     });
   },
@@ -151,6 +152,12 @@ const buildObsidianRuntime = (mode) => {
     globalName: "ExcalidrawLib",
     platform: "browser",
     target: "es2020",
+    // zsviczian -- packed JSON keeps string-named exports (e.g. dashed keys).
+    // These are input syntax only: bundling removes module boundaries from the
+    // IIFE, so the emitted browser target remains ES2020.
+    supported: isProduction
+      ? { "arbitrary-module-namespace-names": true }
+      : undefined,
     minify: isProduction,
     // zsviczian: retain original TS/TSX sources in debugger-only builds.
     sourcemap: isProduction ? false : "inline",
@@ -175,7 +182,7 @@ const buildObsidianRuntime = (mode) => {
       "process.env.NODE_ENV": JSON.stringify(mode),
     },
     plugins: [
-      ...(isProduction ? [compactLocalePlugin] : []),
+      ...(isProduction ? [packedLocalePlugin, compressFontWasmPlugin] : []),
       externalGlobalPlugin({
         react: "React",
         "react-dom": "ReactDOM",

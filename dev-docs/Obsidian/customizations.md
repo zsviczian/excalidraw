@@ -657,3 +657,7 @@ this hook only when upstream supplies an equivalent scoped pre-insertion
 extension. Existing OBS-006/023/030 behavior is retained, not duplicated.
 Validation and platform limits are recorded in `svg-conversion-entry-points.md`.
 **Gate:** V01, V03, V04, V07, V08, V10.
+
+## Runtime compaction checkpoint (OBS-003, OBS-013, OBS-032, OBS-033)
+
+Production packaging compresses exact font-subsetting binaries and shares locale paths while retaining JSON module namespaces. The plugin reuses existing font metadata and narrows its private Chroma entry. Source/namespace/binary/browser/native assertions preserve the existing contracts. See [scope, measurements and acceptance](runtime-compaction.md).

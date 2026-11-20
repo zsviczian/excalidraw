@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "review": {
-    "date": "2026-11-19",
-    "dependency_precommit_tests": "PR #491 accepted: full/owned types, 12 focused text/frame cases, 57 fallback cases, 32 actual-artifact browser cases, production/development plugin builds and all 1,614 canonical portable/native cases pass. Exact source and artifact identities match; inventory 285 paths and 15 checker tests pass. Zero lint errors; two pre-existing import-order warnings.",
-    "method": "PR #491: three-way review of all 70 incoming paths (57 locales), fork fd6fb4fc7, merge base d732d4f3d, incoming 2c3dcc06e. Preserve both policies, retire exact upstream groups.ts, adopt text focus/sync/teardown with the existing host source callback at the new external-scene update.",
+    "date": "2026-11-20",
+    "dependency_precommit_tests": "Runtime compaction: 1,637 canonical cases pass (1,161 portable + 316 core + 160 device), full/owned types, development/production/library builds, packed consumers, strict gates and cleanup. 290 reviewed differing paths; 15 checker tests. Exact identities and platform limits: runtime-compaction-results.json.",
+    "method": "2026-11-20 approved runtime packaging checkpoint after reviewed PR #491: exact WASM compression, shared locale paths and real-artifact regression tests; preserve all prior runtime and upstream contracts. No new upstream merge.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
       "fork_parent": "fd6fb4fc77cc428c5c23fef022d484ae30a7e289",
@@ -12,7 +12,7 @@
       "reference": "https://github.com/zsviczian/excalidraw/pull/491",
       "state": "Resolved and validated two-parent merge checkpoint. Only final acceptance documentation differs from the frozen candidate; implementation hashes are recorded in pr-491-results.json. No version/publication/plugin dependency change."
     },
-    "runtime_validation": "PR #491: 1,142 portable + 312 native core + 160 device cases pass with required identities complete, exact portable/native artifact hashes, cleanup and baseline restoration. Guarded test-window geometry recovery restored original bounds afterward. Windows Obsidian 1.15.1; physical/mobile/other native hosts/isolated restart and real OS Alt-Tab limits remain explicit. See pr-491-results.json.",
+    "runtime_validation": "Runtime compaction: complete coordinated acceptance, baseline restoration and guarded original window bounds restored. Only final acceptance documentation follows the frozen successful candidate; implementation hashes remain unchanged. See runtime-compaction-results.json.",
     "dependency_checkpoint": "2026-10-11: Obsidian artifact/declaration and plugin production/library builds pass. Local fork Windows Obsidian 1.14.4 smoke passes. Published 0.18.140 main/direct-popout/moved-popout input/save/cleanup smoke passes. Plugin npm tree/audit confirms no braces and source-map-js 1.2.2. Component full typecheck remains blocked by documented window.h/stale test-type failures. Packed manifest confirms Sass dev-only; no publication/version bump. The 5 MB target is 5 * 1024 * 1024 = 5,242,880 bytes. Plugin main.js: 5,051,865 bytes with published component (191,015 bytes of headroom), 5,057,617 with local fork (185,263 bytes of headroom); both are below the target. No full scanner, macOS or physical-mobile run in this checkpoint.",
     "layout_followup": "Validated follow-up: W/menu predicate enabled for full/tray/compact, excluded in mobile. 25 focused tests, isolated source typecheck, declarations/artifacts and plugin production/development builds pass. Full typecheck retains 262 existing diagnostics. Baseline tray/compact keyboard tests already passed; original reported tray failure was not reproduced. Extra live probe passed full-layout keyboard/link/history then stopped on unavailable host command-palette rendering; cleanup restored settings and removed owned drawing/controller. No full live layout-matrix pass claimed.",
     "layout_precommit": "Precommit snapshot-update run stopped at explicit maintainer request to skip further testing and commit/merge. Unrelated generated snapshots restored. Prior focused tests/builds remain the validation evidence.",
@@ -170,15 +170,22 @@
         "firstPortableFailure": ".test-work/reports/regression-2c915bf7-7481-4015-a456-397c1625090b"
       }
     },
-    "pr486_runtime_validation": "PR #486 checkpoint 63642251f: 1052 portable and all 468 required native cases pass, plus six focused main/popout full/tray/compact W/link/frame/history/save-reopen cases. Ten frozen runtime hashes match; strict gates and cleanup/restoration pass. Physical mobile, other native hosts and isolated restart remain unverified. See pr-486-results.json."
+    "pr486_runtime_validation": "PR #486 checkpoint 63642251f: 1052 portable and all 468 required native cases pass, plus six focused main/popout full/tray/compact W/link/frame/history/save-reopen cases. Ten frozen runtime hashes match; strict gates and cleanup/restoration pass. Physical mobile, other native hosts and isolated restart remain unverified. See pr-486-results.json.",
+    "runtime_compaction": {
+      "reference": "runtime-compaction.md",
+      "parent": "0a93447eb2dfeb2bbdbf9c6ab4f85132d26111a4",
+      "scope": "Packaging-only production WASM and locale paths; preserve exact binaries, JSON namespaces and dev artifacts. Paired plugin CJK reuse/private Chroma.",
+      "validation": "Runtime compaction: 1,637 canonical cases pass (1,161 portable + 316 core + 160 device), full/owned types, development/production/library builds, packed consumers, strict gates and cleanup. 290 reviewed differing paths; 15 checker tests. Exact identities and platform limits: runtime-compaction-results.json.",
+      "maintainer_acceptance": "2026-11-20: maintainer confirmed Obsidian mobile works and authorized commit, push, PR and merge. Package version upgrades remain with maintainer."
+    }
   },
   "sources": {
     "fork": {
-      "kind": "Git resolved merge working tree",
-      "parent_commit": "fd6fb4fc77cc428c5c23fef022d484ae30a7e289",
+      "kind": "Git working tree",
+      "parent_commit": "0a93447eb2dfeb2bbdbf9c6ab4f85132d26111a4",
       "package": "@zsviczian/excalidraw",
       "version": "0.18.148",
-      "working_tree_changes": "PR #491 resolved upstream integration and regression/inventory updates; no new version bump."
+      "working_tree_changes": "Approved runtime compaction on perf/compact-obsidian-artifact; no package/version/protocol change."
     },
     "upstream": {
       "kind": "local Git commit",
@@ -192,7 +199,7 @@
       "commit": "73b631abff6acb18a52acea72aad13307c49907f",
       "version": "2.29.2",
       "fork_dependency": "0.18.148",
-      "working_tree_changes": "Clean primary master; temporary four-file local artifact integration only. Dependency is unchanged."
+      "working_tree_changes": "Approved runtime compaction on perf/compact-plugin-runtime; dependency unchanged, temporary four-artifact local integration."
     },
     "extras": {
       "kind": "Git working tree",
@@ -201,20 +208,20 @@
       "package_version": "0.1.2",
       "plugin_version": "0.2.1",
       "publication": "No package publication in this handoff; existing selected companion revision only.",
-      "working_tree_changes": "Clean primary master, unchanged by PR #491.",
+      "working_tree_changes": "Selected clean maintainer revision preserved without source changes by runtime compaction.",
       "mermaid_service": "3.6.0"
     },
     "kplex": {
       "kind": "Git source checkpoint",
-      "parent_commit": "e225456d658fb33ed1fde8a7338d30a3724b1fbe",
+      "parent_commit": "e6a686720dc59f42ca93005728d72ee2209e7197",
       "package_version": "0.4.4",
-      "working_tree_changes": "Clean maintainer main, locally ahead of origin; preserved without edits, commits or publication."
+      "working_tree_changes": "Selected clean maintainer revision preserved without source changes by runtime compaction."
     }
   },
   "comparison": {
     "fork": {
-      "files": 1381,
-      "sha256": "6baba9623aa2e6c9316729441b58dbcfa12733324eb4ff5e5110a775ffe53a3e"
+      "files": 1386,
+      "sha256": "0984f898e344ce99c78becd33b7d0f5c7c673a41d5aeee728f91ff53f3b9779d"
     },
     "upstream": {
       "files": 1342,
@@ -3374,14 +3381,14 @@
     {
       "path": "scripts/buildObsidianPackage.js",
       "status": "fork-only",
-      "fork_sha256": "522bb3af7fb75253eb7ebc215c5d3ddf89cbbba78cad62a61ec9307b02e38e7e",
+      "fork_sha256": "d2f1ac60594ee3df73068604415ceff8b755b4b1c3a6ab01086e8e36bd64ac5a",
       "upstream_sha256": null,
       "ids": [
         "OBS-003",
         "OBS-013",
         "OBS-032"
       ],
-      "note": "Dedicated esbuild IIFE dev/prod JS/CSS, private React externals, workspace aliases, embedded assets, lazy CJK resolution, and scoped output cleanup. PR #491 release-size preservation: production-only empty/English-equivalent translation compaction with exhaustive fallback and four-language browser verification; unchanged 5 MiB gate passes at 5,218,572 bytes.",
+      "note": "Dedicated esbuild IIFE dev/prod JS/CSS, private React externals, workspace aliases, embedded assets, lazy CJK resolution, and scoped output cleanup. PR #491 release-size preservation: production-only empty/English-equivalent translation compaction with exhaustive fallback and four-language browser verification; unchanged 5 MiB gate passes at 5,218,572 bytes. Runtime compaction: production exact WASM/shared locale paths and first/warm actual-browser subset regression; see runtime-compaction.md.",
       "kind": "packaging"
     },
     {
@@ -3397,6 +3404,18 @@
       "note": "Pure immutable build helper omits empty strings and values equal to English fallback, preserving effective i18n.t output. Only production Obsidian JSON is transformed; ESM, source locales, all languages, completion percentages and development source maps remain unchanged. PR #491; 57 exhaustive locale cases plus 32 built-browser cases."
     },
     {
+      "path": "scripts/compressObsidianWasm.cjs",
+      "status": "fork-only",
+      "fork_sha256": "3d6f626fdba28f12d365c6417ece8191837042bf6fa8b86016105ad41fe16308",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-003",
+        "OBS-013"
+      ],
+      "kind": "packaging",
+      "note": "Production-only exact font WASM compression with existing Pako; rejects invalid generated modules. See runtime-compaction.md."
+    },
+    {
       "path": "scripts/generate-repository-zip.sh",
       "status": "fork-only",
       "fork_sha256": "0a3c8cac239f8964d3e0c57d3fd170d5ab53da8772eeed4e2c39a4b037b61789",
@@ -3406,6 +3425,18 @@
       ],
       "note": "Optional text-focused repository exporter excludes binaries/assets; unsuitable as a complete upstream comparison baseline.",
       "kind": "housekeeping"
+    },
+    {
+      "path": "scripts/packedLocalePlugin.cjs",
+      "status": "fork-only",
+      "fork_sha256": "791107ba238aa6bee1d9f633b99e102dfa1d867d4bdc264009f623e19579f8ba",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-003",
+        "OBS-032"
+      ],
+      "kind": "packaging",
+      "note": "Production-only shared locale path dictionary after existing fallback pruning; preserves JSON default and named exports. See runtime-compaction.md."
     },
     {
       "path": "tests/obsidian/README.md",
@@ -3437,7 +3468,7 @@
     {
       "path": "tests/obsidian/browser/run.mjs",
       "status": "fork-only",
-      "fork_sha256": "de0cf15ab36ce43b5a82581957ffd764975e0f75a8f6cb5187b55e0096203451",
+      "fork_sha256": "19a7eae157c71f6b2bf567cedaa32f3bca899bee2ff7bd150438277ff8e011ec",
       "upstream_sha256": null,
       "ids": [
         "OBS-003",
@@ -3449,7 +3480,7 @@
         "OBS-032"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Register the built production/development YouTube fullscreen regression with offline nested cross-origin provider fixtures, trusted clicks, two zoom levels and exit geometry. Plugin #3048 / PR #3052. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; complete matching-build portable/native acceptance passes; see pr-486-results.json. See pr-486-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately. PR #491 release-size preservation: production-only empty/English-equivalent translation compaction with exhaustive fallback and four-language browser verification; unchanged 5 MiB gate passes at 5,218,572 bytes."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Register the built production/development YouTube fullscreen regression with offline nested cross-origin provider fixtures, trusted clicks, two zoom levels and exit geometry. Plugin #3048 / PR #3052. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; complete matching-build portable/native acceptance passes; see pr-486-results.json. See pr-486-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately. PR #491 release-size preservation: production-only empty/English-equivalent translation compaction with exhaustive fallback and four-language browser verification; unchanged 5 MiB gate passes at 5,218,572 bytes. Runtime compaction: production exact WASM/shared locale paths and first/warm actual-browser subset regression; see runtime-compaction.md."
     },
     {
       "ids": [
@@ -3592,6 +3623,19 @@
       "note": "PR #477 / plugin #3022 follow-up: immutable pairwise host image metadata/shared-source crop and dimension evidence; source restore only, decoded rendering belongs to native coordinator."
     },
     {
+      "path": "tests/obsidian/localeModules.mjs",
+      "status": "fork-only",
+      "fork_sha256": "793b9e8fdc06b0a8749472a6ab2041bb0a198fecfb9eeb04b3a2df06b44bdeae",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-003",
+        "OBS-032",
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "Node-realm real-esbuild comparison of all 56 locale namespaces/defaults and unusual root-key fixture; no runtime payload."
+    },
+    {
       "path": "tests/obsidian/packageConsumer.mjs",
       "status": "fork-only",
       "fork_sha256": "82155a2d4dd6e336d3d779bf98a8d04e835e7bdf1c018f9d7c1270eb6ab9e3c5",
@@ -3698,6 +3742,19 @@
       "note": "57 cases protect every effective source/English fallback path across 56 non-English locales, unknown/non-string preservation, nested object shape and source immutability. PR #491."
     },
     {
+      "path": "tests/obsidian/unit/compressedWasm.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "17c95dfc99333bd74458342ccdc2f4e52ed6ed51a4fc07305b5027763434f89a",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-003",
+        "OBS-013",
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "Executes both original and compressed generated modules with actual Pako; byte equality, WASM validation/exports and malformed source guards."
+    },
+    {
       "path": "tests/obsidian/unit/coreRegression.test.tsx",
       "status": "fork-only",
       "fork_sha256": "6a99762c5e57b9706318cebc818c20eb456290e1932c99f9fb01cf0db711d85f",
@@ -3782,6 +3839,19 @@
       ],
       "kind": "test",
       "note": "Nine real-editor cases: host layout/opt-outs/height, export omission, scene-destroy cleanup, live limits and centered wheel. PR #483."
+    },
+    {
+      "path": "tests/obsidian/unit/packedLocales.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "ebbf4088bc980cbaf5e31f981c2b1295dec908700c64978bfac4661525308331",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-003",
+        "OBS-032",
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "Real JSON namespace equivalence, deterministic paths, input immutability, empty objects/arrays and prototype-like keys."
     },
     {
       "path": "tests/obsidian/unit/svgDiagramInsert.test.ts",

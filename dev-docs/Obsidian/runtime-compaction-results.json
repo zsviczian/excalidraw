@@ -1,0 +1,472 @@
+{
+  "date": "2026-11-20",
+  "branches": {
+    "plugin": "perf/compact-plugin-runtime",
+    "fork": "perf/compact-obsidian-artifact"
+  },
+  "upstream": "2c3dcc06ec807e81ab9437eceb1a8f7a3c590743",
+  "scope": "Four approved compaction checkpoints; no API, protocol, package version or dependency change.",
+  "measurements": {
+    "baseline": {
+      "bytes": 5218572,
+      "sha256": "334a6be140c4f914e1d6bd7c9b5a8978e5cf4451c6362474dcc807fe41b27a2a"
+    },
+    "cjkReuse": 5108897,
+    "narrowChroma": 5090334,
+    "packedWasm": 4881274,
+    "sharedLocaleKeys": 4841250,
+    "savedBytes": 377322,
+    "headroomToFiveMiB": 401630
+  },
+  "acceptance": {
+    "report": ".test-work/reports/regression-11104c08-9de2-4380-9781-1373c13eda4e/report.json",
+    "status": "passed",
+    "cleanup": "passed",
+    "profile": "portable-and-native-core",
+    "canonicalCases": 1637,
+    "lanes": [
+      {
+        "suiteId": "native-obsidian",
+        "total": 316,
+        "passed": 316
+      },
+      {
+        "suiteId": "native-devices",
+        "total": 160,
+        "passed": 160
+      },
+      {
+        "suiteId": "plugin-fast",
+        "total": 826,
+        "passed": 826
+      },
+      {
+        "suiteId": "fork-owned",
+        "total": 252,
+        "passed": 252
+      },
+      {
+        "suiteId": "fork-browser",
+        "total": 34,
+        "passed": 34
+      },
+      {
+        "suiteId": "extras-source",
+        "total": 30,
+        "passed": 30
+      },
+      {
+        "suiteId": "extras-browser",
+        "total": 19,
+        "passed": 19
+      }
+    ],
+    "missing": [],
+    "failedSuites": [],
+    "gates": [
+      {
+        "suiteId": "plugin-source-coverage",
+        "status": "passed",
+        "cleanup": "passed"
+      },
+      {
+        "suiteId": "fork-package",
+        "status": "passed",
+        "cleanup": "passed"
+      },
+      {
+        "suiteId": "extras-package",
+        "status": "passed",
+        "cleanup": "passed"
+      }
+    ],
+    "coverageAccounting": "Coordinator new/reused identities compare to its older maintained coverage baseline; this change adds 19 portable and four native cases relative to PR #491."
+  },
+  "sources": {
+    "plugin": {
+      "commit": "73b631abff6acb18a52acea72aad13307c49907f",
+      "dirty": true,
+      "diffHash": "03ebdd070a5579f8b3ae271003766c849ff6f2241e58f7e87d7afd65dc7122fb",
+      "lockfileHash": "3766633e2e27c3983407bc06db6cf4f0c84ec0fb1d8fea52c705e9ba6eef2cbb"
+    },
+    "fork": {
+      "commit": "0a93447eb2dfeb2bbdbf9c6ab4f85132d26111a4",
+      "dirty": true,
+      "diffHash": "5e4ef811a7f8d3052b7b07740087bfc4e1c9e72bfaca622f2337fa452db42f13",
+      "lockfileHash": "5ff2005c676da0a7250e859ce363fc40c832a64104732e21d40e827b02632d18"
+    },
+    "extras": {
+      "commit": "2623016ab1bf0685911848748cf2d2f2d3e91d29",
+      "dirty": false,
+      "diffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "lockfileHash": "7d916b9279a3523c605d2e952b2601be3655ba92f4c4df09a67627dac74ca42f"
+    }
+  },
+  "manifests": {
+    "fork": {
+      "commit": "0a93447eb2dfeb2bbdbf9c6ab4f85132d26111a4",
+      "dirty": true,
+      "diffHash": "5e4ef811a7f8d3052b7b07740087bfc4e1c9e72bfaca622f2337fa452db42f13",
+      "lockfileHash": "5ff2005c676da0a7250e859ce363fc40c832a64104732e21d40e827b02632d18",
+      "buildCommand": "yarn build:esm && yarn build:obsidian",
+      "toolchain": {
+        "node": "v22.22.3",
+        "platform": "win32"
+      },
+      "artifacts": [
+        {
+          "role": "production-js",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.production.min.js",
+          "sha256": "d82786b43774256c0beed43c4e95505a7a10ae4d6ff9a49bf9fea46008163110",
+          "bytes": 5504568
+        },
+        {
+          "role": "production-css",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.production.min.css",
+          "sha256": "ec335630eb0117a57585053c04ad014cf45471bbde39d5acca909c056899aabf",
+          "bytes": 314075
+        },
+        {
+          "role": "development-js",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.development.js",
+          "sha256": "f82f13bd8abca763352a1cfa995729c20617acae0df3d4dcd04ce70402232ea6",
+          "bytes": 31033062
+        },
+        {
+          "role": "development-css",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.development.css",
+          "sha256": "4e3777b2799487b0a0aac432ff5db2588a59228d373bdff6c598bc9bff1ada3c",
+          "bytes": 355823
+        },
+        {
+          "role": "package-manifest",
+          "relativePath": "packages/excalidraw/package.json",
+          "sha256": "cc61f22dc29347c40cc4ff0d3a61ec7bb0d3aebb0bb17e3e6dcb7a3ec0a5b3ab",
+          "bytes": 4669
+        },
+        {
+          "role": "declarations",
+          "relativePath": "packages/excalidraw/types/excalidraw/index.d.ts",
+          "sha256": "1c7b902df4906cd290cbefaab4bd2eefe01cd2ecde3912fd8b72eba8206e6196",
+          "bytes": 6227
+        }
+      ]
+    },
+    "extras": {
+      "commit": "2623016ab1bf0685911848748cf2d2f2d3e91d29",
+      "dirty": false,
+      "diffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "lockfileHash": "7d916b9279a3523c605d2e952b2601be3655ba92f4c4df09a67627dac74ca42f",
+      "buildCommand": "npm run build && npm run build:api",
+      "toolchain": {
+        "node": "v22.22.3",
+        "platform": "win32"
+      },
+      "artifacts": [
+        {
+          "role": "main",
+          "relativePath": "dist/main.js",
+          "sha256": "387e1c2642e92712bed038142f7e04bff2051456c440d2cd92fd7f15969a3f56",
+          "bytes": 2591898
+        },
+        {
+          "role": "manifest",
+          "relativePath": "dist/manifest.json",
+          "sha256": "6820958e66d6736ae5114f41349a24ea152495e9055a043f6bde47fde1e6e967",
+          "bytes": 303
+        },
+        {
+          "role": "styles",
+          "relativePath": "dist/styles.css",
+          "sha256": "3de04a6882b3e43b48f81231962c5f52afbd7146cc986fb0c86631ac5de30eda",
+          "bytes": 1427
+        },
+        {
+          "role": "declarations",
+          "relativePath": "api/api/index.d.ts",
+          "sha256": "54138761aea20e80fc664c7f31c6b4d1ebf230f957ca3aaa5dfea169d286b23f",
+          "bytes": 100
+        }
+      ]
+    },
+    "kplex": {
+      "commit": "e6a686720dc59f42ca93005728d72ee2209e7197",
+      "dirty": false,
+      "diffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "lockfileHash": "0efc4d386a9605f70d2ba2bac3120f3b558fd543b6274943ba5c9bf327b3594d",
+      "buildCommand": "npm run build",
+      "toolchain": {
+        "node": "v22.22.3",
+        "platform": "win32"
+      },
+      "artifacts": [
+        {
+          "role": "main",
+          "relativePath": "dist/main.js",
+          "sha256": "65426b4bf7e41ecf9d06acd55defeefba4e1fa631c7640d1ef3a1942c35a4cd5",
+          "bytes": 4808526
+        },
+        {
+          "role": "manifest",
+          "relativePath": "dist/manifest.json",
+          "sha256": "9fb353aa649b6d6c11609bbf39bf2891615c1c8c88b3fa52141399ef2a2812ff",
+          "bytes": 329
+        },
+        {
+          "role": "styles",
+          "relativePath": "dist/styles.css",
+          "sha256": "ca5221830ece8e88ab5a22b7a22870d5aca40becd58ba6e05f05f162af6a635f",
+          "bytes": 165052
+        }
+      ]
+    },
+    "plugin": {
+      "commit": "73b631abff6acb18a52acea72aad13307c49907f",
+      "dirty": true,
+      "diffHash": "03ebdd070a5579f8b3ae271003766c849ff6f2241e58f7e87d7afd65dc7122fb",
+      "lockfileHash": "3766633e2e27c3983407bc06db6cf4f0c84ec0fb1d8fea52c705e9ba6eef2cbb",
+      "buildCommand": "npm run build",
+      "toolchain": {
+        "node": "v22.22.3",
+        "platform": "win32"
+      },
+      "artifacts": [
+        {
+          "role": "main",
+          "relativePath": "dist/main.js",
+          "sha256": "61fc40f3ccbcc9f824f749b05f5547fadf03e0c02d0e8f193e1b87308144fd80",
+          "bytes": 4841250
+        },
+        {
+          "role": "manifest",
+          "relativePath": "dist/manifest.json",
+          "sha256": "8e82828fd9125615e8a361d0f15553e548cac2ee7a303e55387378a53b925fd9",
+          "bytes": 470
+        },
+        {
+          "role": "styles",
+          "relativePath": "dist/styles.css",
+          "sha256": "d5d999fb745a0d293e76b03996da5eca75a4c41a77a0e30c83f51cddd40293ae",
+          "bytes": 368688
+        }
+      ]
+    }
+  },
+  "implementation": [
+    {
+      "repository": "plugin",
+      "path": "rollup.config.mjs",
+      "sha256": "0353a01954384d20379b2b412ab28f24420c1ff1e68f0f2039c948d82f16804b"
+    },
+    {
+      "repository": "plugin",
+      "path": "scripts/chromaParser.mjs",
+      "sha256": "a2ffc086da3a833c6a82d5da02bc7e92fb8d2b13ee066aa4c18fb72ccc0d9d31"
+    },
+    {
+      "repository": "plugin",
+      "path": "scripts/testing/chromaParser.test.mjs",
+      "sha256": "8a94f5cb00f5a8eb2bbb269e86bf2e5f68edcfdb05b996e447145cbf768f42c8"
+    },
+    {
+      "repository": "plugin",
+      "path": "scripts/testing/cjkFonts.source.test.mjs",
+      "sha256": "a6a03bdc299812551fe8de1317eb6518c4d7fcbb0956690066540b2a0ecbc668"
+    },
+    {
+      "repository": "plugin",
+      "path": "scripts/testing/host/runtimeCompaction.mjs",
+      "sha256": "c1b4772d6bd0a72b9c9a2ada3acf83afaa2218cf4a1c8194fc288d7bf65d1717"
+    },
+    {
+      "repository": "plugin",
+      "path": "scripts/testing/host/verify.mjs",
+      "sha256": "be5137485bef17eaa19bce9576ca1cfc97bab8fba5736971e6e0fcbd7962dda4"
+    },
+    {
+      "repository": "plugin",
+      "path": "scripts/testing/regression.mjs",
+      "sha256": "eef9a9cfc86641002c69b1dc5e6a43734e28983c4ec3400004efc3d152a765b9"
+    },
+    {
+      "repository": "plugin",
+      "path": "src/utils/CJKLoader.ts",
+      "sha256": "f50011fb98dd2f0c6823b525677b922bc459ad9c2581076a34953947a8a41193"
+    },
+    {
+      "repository": "plugin",
+      "path": "src/core/managers/FontManager.ts",
+      "sha256": "b66274b84f66b5d8f785465eb056335aff95963836518c9e5b85496baa853756"
+    },
+    {
+      "repository": "plugin",
+      "path": "src/types/excalidrawLib.d.ts",
+      "sha256": "cf85c40b3deffa037af1f3f89ec27c2d5417d14b71967e7bd03cd3b3ef75482c"
+    },
+    {
+      "repository": "plugin",
+      "path": "tests/inventory.json",
+      "sha256": "2dffe01e45f560193d6067e21a205e0412b176400c873e3bbbd8e68f8e2cf55c"
+    },
+    {
+      "repository": "plugin",
+      "path": "tests/fixtures/cjk-font-faces.json",
+      "sha256": "fc4b64cef4c5d1ac88bfe107f14edb6f985c4f70fb79d04c7963bfc6c98452e7"
+    },
+    {
+      "repository": "plugin",
+      "path": "tests/fixtures/cjk-range-selections.json",
+      "sha256": "608c31755838885248d8825391b82a75e59419b17a7ac6d5a7320938aa861de0"
+    },
+    {
+      "repository": "fork",
+      "path": "scripts/buildObsidianPackage.js",
+      "sha256": "d2f1ac60594ee3df73068604415ceff8b755b4b1c3a6ab01086e8e36bd64ac5a"
+    },
+    {
+      "repository": "fork",
+      "path": "scripts/compressObsidianWasm.cjs",
+      "sha256": "3d6f626fdba28f12d365c6417ece8191837042bf6fa8b86016105ad41fe16308"
+    },
+    {
+      "repository": "fork",
+      "path": "scripts/packedLocalePlugin.cjs",
+      "sha256": "791107ba238aa6bee1d9f633b99e102dfa1d867d4bdc264009f623e19579f8ba"
+    },
+    {
+      "repository": "fork",
+      "path": "tests/obsidian/browser/run.mjs",
+      "sha256": "19a7eae157c71f6b2bf567cedaa32f3bca899bee2ff7bd150438277ff8e011ec"
+    },
+    {
+      "repository": "fork",
+      "path": "tests/obsidian/localeModules.mjs",
+      "sha256": "793b9e8fdc06b0a8749472a6ab2041bb0a198fecfb9eeb04b3a2df06b44bdeae"
+    },
+    {
+      "repository": "fork",
+      "path": "tests/obsidian/unit/compressedWasm.test.ts",
+      "sha256": "17c95dfc99333bd74458342ccdc2f4e52ed6ed51a4fc07305b5027763434f89a"
+    },
+    {
+      "repository": "fork",
+      "path": "tests/obsidian/unit/packedLocales.test.ts",
+      "sha256": "ebbf4088bc980cbaf5e31f981c2b1295dec908700c64978bfac4661525308331"
+    }
+  ],
+  "native": {
+    "version": "1.15.1 (installer 1.14.5)",
+    "baselineRestoration": {
+      "restored": true,
+      "pluginEnabled": true,
+      "extrasEnabled": true,
+      "kplexEnabled": true,
+      "theme": "moonstone",
+      "restoredFixturePaths": []
+    },
+    "compaction": [
+      {
+        "testId": "native:runtime-compaction:cjk:main",
+        "featureIds": [
+          "P03",
+          "P08"
+        ],
+        "status": "passed",
+        "assertions": [
+          "local subset settings survive real reload",
+          "font registered in the view's owning document",
+          "CJK pixels exactly match the original font bytes"
+        ]
+      },
+      {
+        "testId": "native:runtime-compaction:font-subset:main",
+        "featureIds": [
+          "P03",
+          "P08"
+        ],
+        "status": "passed",
+        "assertions": [
+          "actual WASM produces smaller embedded font",
+          "owner-window FontFace decodes output",
+          "warm export preserves exact subset bytes"
+        ],
+        "firstExportMs": 129.69999992847443,
+        "subsetBytes": 1136,
+        "completeBytes": 56156
+      },
+      {
+        "testId": "native:runtime-compaction:cjk:popout",
+        "featureIds": [
+          "P03",
+          "P08"
+        ],
+        "status": "passed",
+        "assertions": [
+          "local subset settings survive real reload",
+          "font registered in the view's owning document",
+          "CJK pixels exactly match the original font bytes"
+        ]
+      },
+      {
+        "testId": "native:runtime-compaction:font-subset:popout",
+        "featureIds": [
+          "P03",
+          "P08"
+        ],
+        "status": "passed",
+        "assertions": [
+          "actual WASM produces smaller embedded font",
+          "owner-window FontFace decodes output",
+          "warm export preserves exact subset bytes"
+        ],
+        "firstExportMs": 58.200000047683716,
+        "subsetBytes": 1136,
+        "completeBytes": 56156
+      }
+    ],
+    "geometryRestoration": "Original 629x800 at x250/y305 restored under the application-user-data lock. No popouts, pending tasks, print windows or debugger attachment remain; plugin .test-work/compaction-implementation/window-restore.log."
+  },
+  "focused": {
+    "cjkSourceCases": 10,
+    "chromaInputs": 1670,
+    "wasmCases": 3,
+    "localeCases": 2,
+    "localeLanguages": 56,
+    "componentBrowserCases": 34,
+    "fullComponentTypecheck": "passed",
+    "ownedComponentTypecheck": "passed",
+    "developmentPluginBuild": "exit 0",
+    "focusedRuntimeTypeScriptLint": "zero errors/warnings",
+    "focusedComponentLint": "zero errors/warnings; final test annotation rechecked",
+    "pluginJavaScriptHelpers": "Default plugin ESLint excludes .mjs tooling; explicit source syntax checks and full functional tests pass."
+  },
+  "recoveredRuns": [
+    {
+      "path": ".test-work/compaction-implementation/native-focused.log",
+      "reason": "Test waited for loaded before first requesting an intentionally lazy font; corrected registration/request/load order."
+    },
+    {
+      "path": ".test-work/compaction-implementation/native-focused-lazy.log",
+      "reason": "Four native assertions passed; diagnostic arrays needed flattening at the scenario-report boundary. Cleanup/restoration passed."
+    },
+    {
+      "path": ".test-work/compaction-implementation/portable-preflight.log",
+      "reason": "Required inventory update for two new test files; reviewed and regenerated."
+    },
+    {
+      "path": ".test-work/compaction-implementation/portable-reviewed.log",
+      "reason": "Owned WASM test type needed a copied ArrayBuffer for VM results; corrected and full types pass."
+    }
+  ],
+  "limits": [
+    "Windows native and desktop device emulation are automated evidence. Maintainer separately confirmed Obsidian mobile manually; no automated physical-device run, macOS/Linux, isolated whole-application restart or real OS Alt-Tab proof.",
+    "Temporary four-artifact integration into installed component; a later npm install restores the published component until the fork is published and the plugin dependency updated.",
+    "Only final acceptance documentation changes follow the frozen successful run; implementation hashes above remain unchanged."
+  ],
+  "release": "Maintainer authorized implementation commits and PR merges. No publication, package version or dependency update in this checkpoint.",
+  "maintainerAcceptance": {
+    "source": "Maintainer confirmation in this session",
+    "mobile": "Maintainer confirmed the solution works as expected on Obsidian mobile; OS/device unspecified.",
+    "authorization": "Commit, push, open PRs and merge both repositories. Maintainer handles package version upgrades separately."
+  }
+}

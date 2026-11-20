@@ -368,3 +368,11 @@ mobile, macOS/Linux and web-app Firebase/PWA deployment are not claimed tested.
 ## PR #483 minimap/zoom checkpoint (2026-11-13)
 
 See [merge review](pr-483-merge-review.md) for the exact parents, 37-path checklist, retained contracts, partial tray decustomization and current test results. 1004 portable cases and all six focused native minimap variants pass. Full native remains failed on table/phone plugin defects reproduced with the exact pre-merge fork; table controls are tracked in plugin #3049. Physical mobile and other desktop environments remain separate.
+
+## Runtime compaction — 2026-11-20
+
+Implementation and focused validation are recorded in [runtime-compaction.md](runtime-compaction.md). Full coordinated portable/native acceptance is pending. No release or publication is claimed.
+
+Final runtime-compaction acceptance: `npm run test:regression` passes all 1,637 canonical cases: 1,161 portable, 316 native core and 160 device cases. Required identities, source/artifact checks, coverage, package consumers, strict errors and cleanup pass; baseline restored. Windows Obsidian 1.15.1 (installer 1.14.5), Node 22.22.3. Guarded restoration returned the test window to its original bounds. Main.js is 4,841,250 bytes (377,322 saved). See [exact sources, artifacts and limits](runtime-compaction-results.json). Only final acceptance documentation follows the frozen run.
+
+Maintainer acceptance, 2026-11-20: solution confirmed working on Obsidian mobile (OS/device unspecified). Maintainer authorized commit/push/PR/merge of both compaction branches and will handle package version upgrades separately. This is reported manual mobile acceptance, not an automated physical-device result.

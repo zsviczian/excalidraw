@@ -648,6 +648,65 @@ try {
         pixel,
       };
     });
+    await run("font-subset-cold-warm", async () => {
+      // zsviczian -- use a single-face font so full/subset sizes are comparable.
+      const lib = window.__testLibrary;
+      const elements = lib.convertToExcalidrawElements([
+        { type: "text", text: "ABC", x: 0, y: 0, fontFamily: 1, fontSize: 28 },
+      ]);
+      await lib.loadSceneFonts(elements);
+      const faces = lib.Fonts.registered.get(1).fontFaces;
+      if (faces.length !== 1 || typeof faces[0].urls[0] !== "string") {
+        throw Error("Virgil subset fixture must have one embedded font face");
+      }
+      const fullBytes = atob(faces[0].urls[0].split(",")[1]).length;
+      const fontPayloads = (node) =>
+        [
+          ...node.outerHTML.matchAll(
+            /data:font\/woff2;base64,([A-Za-z0-9+/=]+)/g,
+          ),
+        ].map((match) => match[1]);
+      const options = {
+        elements,
+        files: {},
+        appState: { exportBackground: false },
+        exportPadding: 0,
+      };
+      const coldStart = performance.now();
+      const first = fontPayloads(await lib.exportToSvg(options));
+      const firstExportMs = performance.now() - coldStart;
+      if (first.length !== 1 || atob(first[0]).length >= fullBytes) {
+        throw Error(
+          `Expected one smaller Virgil subset: ${first.map(
+            (font) => atob(font).length,
+          )} / ${fullBytes}`,
+        );
+      }
+      const binary = Uint8Array.from(atob(first[0]), (char) =>
+        char.charCodeAt(0),
+      );
+      if (String.fromCharCode(...binary.subarray(0, 4)) !== "wOF2") {
+        throw Error("SVG font subset is not WOFF2");
+      }
+      await new FontFace("SubsetValidation", binary.buffer).load();
+      const warmStart = performance.now();
+      const second = fontPayloads(await lib.exportToSvg(options));
+      const warmExportMs = performance.now() - warmStart;
+      if (JSON.stringify(first) !== JSON.stringify(second)) {
+        throw Error("Warm WASM export changed font subset bytes");
+      }
+      return {
+        assertions: [
+          "real glyph subsetting",
+          "browser-decodable WOFF2",
+          "identical cold/warm output",
+        ],
+        fullBytes,
+        subsetBytes: binary.length,
+        firstExportMs,
+        warmExportMs,
+      };
+    });
     await run("offline-font-and-unicode-export", async () => {
       const lib = window.__testLibrary;
       const elements = lib.convertToExcalidrawElements([
