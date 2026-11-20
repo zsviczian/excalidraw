@@ -281,3 +281,7 @@ python dev-docs/Obsidian/audit.py --upstream /absolute/path/to/upstream-root
 No command silently refreshes the reviewed JSON. Root policy changes count as source drift and must be acknowledged just like other documentation differences. Check the inventory directory itself through ordinary diff review and checker tests because it intentionally excludes itself. The checker detects file accounting drift, **not** an inaccurate narrative or an untested behavioral claim.
 
 For upstream merges, use a real merge base and inspect both parents as required by root policy; the two-snapshot checker is only an additional coverage gate. See the [merge playbook](validation.md#merge-playbook) for sequencing and the [retirement backlog](decustomization.md) for small, separately reviewable checkpoints.
+
+## Runtime compaction checkpoint
+
+See [runtime-compaction.md](runtime-compaction.md) for the four approved changes, paired branches, exact size measurements, tests and platform limits. This follows PR #491; upstream comparison remains `2c3dcc06ec807e81ab9437eceb1a8f7a3c590743`.
