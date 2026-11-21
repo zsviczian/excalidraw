@@ -194,15 +194,21 @@
       "run": "44889615453",
       "cause": "One antialias fringe pixel changed gray 204 to 192; 64/128 masks were identical.",
       "validation": "All 38 artifact browser cases, 259 owned cases with coverage (including seven exact-fixture/displacement/core/blank checks), focused lint and owned typecheck pass. Linux hosted rerun remains pending."
+    },
+    "fractional_paste_ci": {
+      "run": "44891234165",
+      "cause": "Linux measured a valid natural width of 195px; the original test incorrectly assumed every font measurement is fractional.",
+      "correction": "Force the paste width to reach the fractional container limit with a large glyph; assert exactly 200.46px instead of guessing font metrics.",
+      "validation": "All 38 production/development artifact browser cases pass; focused formatting and lint pass. Hosted Linux rerun pending."
     }
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "c8badcad3cf44bd756193a284cb754d366b56ba8",
+      "parent_commit": "cf11a3ca55aaed413f219c90fbcc1de934d766c8",
       "package": "@zsviczian/excalidraw",
       "version": "0.18.149",
-      "working_tree_changes": "Only test comparison/helper/fixture and inventory changes; no production runtime or package version modification."
+      "working_tree_changes": "Test-only fractional paste fixture correction; production runtime, package versions and dependency declarations unchanged."
     },
     "upstream": {
       "kind": "local Git commit",
@@ -238,7 +244,7 @@
   "comparison": {
     "fork": {
       "files": 1391,
-      "sha256": "2a11a5c54f66aab90c01504690ea0ef0294a2e5930203e8ccb60ab61e5a827d0"
+      "sha256": "343171576d6817b316d9a26450496d9178face5c6d6d15e8bd340488a6ffd4b1"
     },
     "upstream": {
       "files": 1342,
@@ -3533,10 +3539,10 @@
         "OBS-033"
       ],
       "kind": "test",
-      "note": "PR #485: actual production/development artifact glyph geometry, fractional wrap/paste, caret/custom-step zoom, Alt+W, side drag and mid-drag unmount cleanup; full/tray/compact and fractional DPR. See pr-485-merge-review.md. CI #3064: retain strict glyph-core invariance with displacement negative controls; threshold-200 fringe changes remain diagnostic. No text runtime change.",
+      "note": "PR #485: actual production/development artifact glyph geometry, fractional wrap/paste, caret/custom-step zoom, Alt+W, side drag and mid-drag unmount cleanup; full/tray/compact and fractional DPR. See pr-485-merge-review.md. CI #3064: retain strict glyph-core invariance with displacement negative controls; threshold-200 fringe changes remain diagnostic. No text runtime change. CI run 44891234165: use a glyph wider than the fractional container limit and assert exact 200.46px paste width; natural system-font widths may be integral. No runtime change.",
       "path": "tests/obsidian/browser/textEditing.mjs",
       "status": "fork-only",
-      "fork_sha256": "8029e593cb88118536353a54d93925f2d0ef5d413a3ee8e5814238a7caebe62b",
+      "fork_sha256": "617fea32b5c68bebe247dcc8edcabe7afaa0c65a5d4fed2c46981a1ee0817ac5",
       "upstream_sha256": null
     },
     {

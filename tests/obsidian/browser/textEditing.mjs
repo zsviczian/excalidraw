@@ -130,6 +130,10 @@ export async function verifyTextEditing(page, modifier) {
             viewModeEnabled: false,
             theme: "light",
             viewBackgroundColor: "#ffffff",
+            // Make a pasted glyph wider than the fractional container limit.
+            // Natural system-font widths may legitimately be integers on Linux.
+            currentItemFontSize: bound ? 400 : 20,
+            currentItemFontFamily: 2,
             openSidebar: null,
             openMenu: null,
           },
@@ -348,10 +352,7 @@ export async function verifyTextEditing(page, modifier) {
       await open(mode, "left", false, true);
       const pasteWidth = await editor.evaluate(async (input) => {
         const transfer = new DataTransfer();
-        transfer.setData(
-          "text/plain",
-          "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",
-        );
+        transfer.setData("text/plain", "W");
         await input.onpaste(
           new ClipboardEvent("paste", {
             clipboardData: transfer,
@@ -360,10 +361,9 @@ export async function verifyTextEditing(page, modifier) {
         );
         return Number.parseFloat(input.style.width);
       });
-      assert.ok(
-        pasteWidth > 0 &&
-          pasteWidth <= 200.46 &&
-          Math.abs(pasteWidth - Math.round(pasteWidth)) > 0.01,
+      assert.equal(
+        pasteWidth,
+        200.46,
         `bound paste rounded away its fractional wrapping width: ${pasteWidth}`,
       );
       await close();

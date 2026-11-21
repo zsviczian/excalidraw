@@ -396,3 +396,7 @@ The supplied configuration identified Alt+Up/Down bound to core move-line comman
 ## Glyph pixel CI comparison — 2026-11-21
 
 Plugin PR #3064 run 44889615453 passed source/coverage/type stages and then flagged a gray-204→192 fringe pixel as text movement. The two dark masks were identical. All 38 browser cases pass with an exact-fixture oracle correction; seven controls still reject real one-pixel movement in every direction, one removed core pixel and absent/malformed images. Owned types pass. Production code/artifacts are unchanged, so no new native behavior is claimed. See [evidence](glyph-pixel-ci.md).
+
+## Fractional paste fixture in Linux CI — OBS-019/033
+
+Plugin PR #3064 run 44891234165 passed the corrected glyph comparison, then exposed a platform-dependent paste fixture: Linux measured a legitimate natural text width of 195px. The test now pastes a glyph at 400px so its width exceeds the 200.46px container limit, and requires exactly that fractional limit. This strengthens the precision assertion without assuming system-font metrics. All 38 production/development browser cases and focused lint/format pass; the hosted rerun remains pending. Production text code, artifacts, versions and public/serialized contracts are unchanged. Existing Windows native keyboard evidence remains applicable; this test-only correction does not require a new device workflow.
