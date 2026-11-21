@@ -3,7 +3,7 @@
   "review": {
     "date": "2026-11-21",
     "dependency_precommit_tests": "1,163 portable cases including 36 real-artifact browser cases, focused main/popout native recolor/toolbar/panel tests, full/owned types, coverage, package consumers, strict errors and cleanup pass. Baseline and original window bounds restored. Exact evidence: color-shortcuts-3061-results.json.",
-    "method": "Alt/Option+Arrow artifact baseline coverage plus confirmed plugin-only core-hotkey fix; upstream navigation unchanged at 2c3dcc06e. No upstream merge.",
+    "method": "Test-only glyph oracle follow-up for plugin PR #3064, against the existing reviewed 2c3dcc06e upstream baseline. Production text placement and all package versions unchanged.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
       "fork_parent": "fd6fb4fc77cc428c5c23fef022d484ae30a7e289",
@@ -189,15 +189,20 @@
       "reference": "alt-arrow-navigation.md",
       "validation": "Genuine native main/popout negative control with core move-line hotkeys; fixed plugin passes navigation, actual Markdown line movement and root-scope lifecycle. 829 plugin fast cases, five bundle contracts, 38 browser cases, focused lint and inventories pass.",
       "merge_authorization": "Maintainer requested commits, paired PRs and merges. No component version bump or npm publication."
+    },
+    "glyph_comparison_ci": {
+      "run": "44889615453",
+      "cause": "One antialias fringe pixel changed gray 204 to 192; 64/128 masks were identical.",
+      "validation": "All 38 artifact browser cases, 259 owned cases with coverage (including seven exact-fixture/displacement/core/blank checks), focused lint and owned typecheck pass. Linux hosted rerun remains pending."
     }
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "d89c0da019c0ff75e2b2bd8e1077119d6ab54fb0",
+      "parent_commit": "c8badcad3cf44bd756193a284cb754d366b56ba8",
       "package": "@zsviczian/excalidraw",
       "version": "0.18.149",
-      "working_tree_changes": "Test-only Alt/Option+Arrow navigation coverage on fix/popout-color-shortcuts-3061; product runtime unchanged."
+      "working_tree_changes": "Only test comparison/helper/fixture and inventory changes; no production runtime or package version modification."
     },
     "upstream": {
       "kind": "local Git commit",
@@ -232,8 +237,8 @@
   },
   "comparison": {
     "fork": {
-      "files": 1388,
-      "sha256": "828692519f409ea44bf2299489936460d42cb0c519104ba4ffb17fa7cf5cdacc"
+      "files": 1391,
+      "sha256": "2a11a5c54f66aab90c01504690ea0ef0294a2e5930203e8ccb60ab61e5a827d0"
     },
     "upstream": {
       "files": 1342,
@@ -3528,10 +3533,10 @@
         "OBS-033"
       ],
       "kind": "test",
-      "note": "PR #485: actual production/development artifact glyph geometry, fractional wrap/paste, caret/custom-step zoom, Alt+W, side drag and mid-drag unmount cleanup; full/tray/compact and fractional DPR. See pr-485-merge-review.md.",
+      "note": "PR #485: actual production/development artifact glyph geometry, fractional wrap/paste, caret/custom-step zoom, Alt+W, side drag and mid-drag unmount cleanup; full/tray/compact and fractional DPR. See pr-485-merge-review.md. CI #3064: retain strict glyph-core invariance with displacement negative controls; threshold-200 fringe changes remain diagnostic. No text runtime change.",
       "path": "tests/obsidian/browser/textEditing.mjs",
       "status": "fork-only",
-      "fork_sha256": "cbdac9fb5ba33f0d09464c0526d8bc50f340e0b81d5eebafb62e09af5dca84f4",
+      "fork_sha256": "8029e593cb88118536353a54d93925f2d0ef5d413a3ee8e5814238a7caebe62b",
       "upstream_sha256": null
     },
     {
@@ -3546,6 +3551,18 @@
       ],
       "kind": "Actual-artifact text focus regression",
       "note": "PR #491: both actual artifacts exercise blur handlers, external Markdown, trusted keyboard submit, deletion and active-editor unmount. Headless focus emulation prevents OS-focus proof; native/platform limits remain explicit. Trusted double-clicks require canvas hits."
+    },
+    {
+      "path": "tests/obsidian/browser/textGlyphPixels.mjs",
+      "status": "fork-only",
+      "fork_sha256": "400f7597af976e3aa4c405e328711cf74603f2e2c1eebabf4483a2c6931662aa",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-019",
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "Plugin PR #3064 CI run 44889615453: preserve the exact synthetic glyph fixture, compare dark cores without fringe threshold false positives, and reject one-pixel translations in four directions, one removed core pixel, blanks and mismatched inputs. Production code unchanged."
     },
     {
       "path": "tests/obsidian/browser/ttdClose.mjs",
@@ -3659,6 +3676,18 @@
       ],
       "kind": "test-tooling",
       "note": "PR #477 / plugin #3022 follow-up: immutable pairwise host image metadata/shared-source crop and dimension evidence; source restore only, decoded rendering belongs to native coordinator."
+    },
+    {
+      "path": "tests/obsidian/fixtures/text-glyph-ci.json",
+      "status": "fork-only",
+      "fork_sha256": "9563ac1ce7661eba5503f8dc6fbdebd19d92c8a47c64fed4a21eda71c1f1524e",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-019",
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "Plugin PR #3064 CI run 44889615453: preserve the exact synthetic glyph fixture, compare dark cores without fringe threshold false positives, and reject one-pixel translations in four directions, one removed core pixel, blanks and mismatched inputs. Production code unchanged."
     },
     {
       "path": "tests/obsidian/localeModules.mjs",
@@ -3939,6 +3968,18 @@
       ],
       "kind": "Mounted text focus and reconciliation regression",
       "note": "PR #491: eight actual-editor/reconciliation cases cover raw versus display source, window/document blur, external updates, local drafts, deletion, unmount and standalone following. Negative control reproduces lost editable Markdown before the host-source hook."
+    },
+    {
+      "path": "tests/obsidian/unit/textGlyphPixels.test.ts",
+      "status": "fork-only",
+      "fork_sha256": "6707ecf88ed21b26b3d4f353d5ca5e343c677bb2179261b02bf09ddd20b83517",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-019",
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "Plugin PR #3064 CI run 44889615453: preserve the exact synthetic glyph fixture, compare dark cores without fringe threshold false positives, and reject one-pixel translations in four directions, one removed core pixel, blanks and mismatched inputs. Production code unchanged."
     },
     {
       "path": "tests/obsidian/unit/ttdCloseButton.test.tsx",

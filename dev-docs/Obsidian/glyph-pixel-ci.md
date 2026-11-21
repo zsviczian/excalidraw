@@ -1,0 +1,7 @@
+# Glyph comparison in portable CI
+
+Plugin PR #3064 run 44889615453 failed the production caret-zoom-text-placement browser case at full / DPR 0.8 / right alignment. Both screenshots are 97×17. Their only differing pixel is (2,14), opaque gray 204 before and 192 after. The 64 and 128 glyph masks have zero changes; threshold 200 reports one. The editor keeps the same right anchor at (600,300).
+
+This is a fringe rasterization difference, not displacement. The text runtime is unchanged. A test-only comparator requires exact equality of both darker silhouettes and nonempty glyph cores, while retaining threshold-200 differences for diagnostics. Seven executable controls use the exact run-length encoded CI samples: accept the fringe-only sample; reject one-pixel translations in all four directions, removal of even one core pixel, blank and mismatched images. No changed core pixel is tolerated and no snapshot is accepted as a product fix.
+
+All 38 production/development browser cases, seven comparator cases and the owned typecheck pass locally. Reports: .test-work/browser-glyph-ci-fix/report.json, .test-work/text-glyph-tests.log and .test-work/text-glyph-types.log. All 259 owned cases and the coverage gates pass. The Linux hosted rerun remains a closeout gate. Earlier Windows/native keyboard evidence remains unchanged; this follow-up does not modify production artifacts, component versions, dependencies or the user's personal vault.

@@ -392,3 +392,7 @@ All 38 actual-artifact browser cases pass, including 48 plain/labeled pointer-se
 ### Confirmed core-Obsidian hotkey conflict and plugin fix
 
 The supplied configuration identified Alt+Up/Down bound to core move-line commands. Both windows fail navigation with those bindings before the plugin edit and pass afterward. The scoped wildcard preserves actual Markdown line movement, repeated registration/teardown and drawing reopen. All 829 fast cases, five bundle contracts and changed-source lint pass; four unchanged component artifacts match the 38-case browser report and native plugin inputs. [Exact record](alt-arrow-navigation-results.json). No component runtime/package version changed; personal-vault inspection was read-only.
+
+## Glyph pixel CI comparison — 2026-11-21
+
+Plugin PR #3064 run 44889615453 passed source/coverage/type stages and then flagged a gray-204→192 fringe pixel as text movement. The two dark masks were identical. All 38 browser cases pass with an exact-fixture oracle correction; seven controls still reject real one-pixel movement in every direction, one removed core pixel and absent/malformed images. Owned types pass. Production code/artifacts are unchanged, so no new native behavior is claimed. See [evidence](glyph-pixel-ci.md).
