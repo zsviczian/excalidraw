@@ -1,0 +1,285 @@
+{
+  "date": "2026-11-21",
+  "scope": "Bundled floating tools-panel width and popout color shortcut fixes; component change is one owning-document autofocus guard.",
+  "branches": {
+    "plugin": "fix/tools-panel-drag-bar-width",
+    "fork": "fix/popout-color-shortcuts-3061"
+  },
+  "issue": "https://github.com/zsviczian/obsidian-excalidraw-plugin/issues/3061",
+  "context": "https://github.com/excalidraw/excalidraw/pull/11997",
+  "nativeBefore": ".test-work/reports/native-007f0984-867d-43df-a1c5-1b3a0b246457/report.json",
+  "browserBefore": ".test-work/issue-3061/browser-negative/report.json",
+  "negativeControl": "Same trusted S/S text recolor passes main and fails popout before any component edit. Focus trace shows outer dialog. Actual production artifact independently fails nested-focus assertion.",
+  "native": {
+    "report": ".test-work/reports/native-0c47e159-e476-4312-9e3b-7af758563e98/report.json",
+    "status": "passed",
+    "cleanup": "passed",
+    "baselineRestoration": {
+      "restored": true,
+      "pluginEnabled": true,
+      "extrasEnabled": true,
+      "kplexEnabled": false,
+      "theme": "moonstone",
+      "restoredFixturePaths": []
+    },
+    "host": "1.15.1 (installer 1.14.5)",
+    "tests": [
+      {
+        "testId": "native:behavior:main:toolbar-context-shortcuts",
+        "status": "passed",
+        "assertions": [
+          "desktop color-picker shortcuts recolor selected text in its owning window",
+          "floating tools panel header and body edges align",
+          "tools panel collapses and expands through trusted input",
+          "trusted toolbar and context menu",
+          "keyboard shortcut and cancellation",
+          "scene state and on-disk save"
+        ],
+        "toolsPanelLayouts": [
+          {
+            "handle": {
+              "left": 507.796875,
+              "right": 715.796875
+            },
+            "body": {
+              "left": 507.796875,
+              "right": 715.796875
+            }
+          },
+          {
+            "handle": {
+              "left": 507.796875,
+              "right": 715.796875
+            },
+            "body": {
+              "left": 507.796875,
+              "right": 715.796875
+            }
+          }
+        ]
+      },
+      {
+        "testId": "native:behavior:popout:toolbar-context-shortcuts",
+        "status": "passed",
+        "assertions": [
+          "desktop color-picker shortcuts recolor selected text in its owning window",
+          "floating tools panel header and body edges align",
+          "tools panel collapses and expands through trusted input",
+          "trusted toolbar and context menu",
+          "keyboard shortcut and cancellation",
+          "scene state and on-disk save"
+        ],
+        "toolsPanelLayouts": [
+          {
+            "handle": {
+              "left": 397.796875,
+              "right": 592.796875
+            },
+            "body": {
+              "left": 397.796875,
+              "right": 592.796875
+            }
+          },
+          {
+            "handle": {
+              "left": 397.796875,
+              "right": 592.796875
+            },
+            "body": {
+              "left": 397.796875,
+              "right": 592.796875
+            }
+          }
+        ]
+      }
+    ],
+    "scope": "Focused desktop main/popout; generic load/error/source gates also pass. No complete native profile claimed."
+  },
+  "portable": {
+    "report": ".test-work/reports/regression-35955569-ab55-4ff6-bb47-b27c9511cf30/report.json",
+    "status": "passed",
+    "cleanup": "passed",
+    "canonicalCases": 1163,
+    "lanes": [
+      {
+        "suiteId": "plugin-fast",
+        "total": 826,
+        "passed": 826
+      },
+      {
+        "suiteId": "fork-owned",
+        "total": 252,
+        "passed": 252
+      },
+      {
+        "suiteId": "fork-browser",
+        "total": 36,
+        "passed": 36
+      },
+      {
+        "suiteId": "extras-source",
+        "total": 30,
+        "passed": 30
+      },
+      {
+        "suiteId": "extras-browser",
+        "total": 19,
+        "passed": 19
+      }
+    ],
+    "gates": [
+      {
+        "suiteId": "plugin-source-coverage",
+        "status": "passed",
+        "cleanup": "passed"
+      },
+      {
+        "suiteId": "fork-package",
+        "status": "passed",
+        "cleanup": "passed"
+      },
+      {
+        "suiteId": "extras-package",
+        "status": "passed",
+        "cleanup": "passed"
+      }
+    ],
+    "missing": []
+  },
+  "types": "Full and owned checks pass; generated declarations and ESM/Obsidian/package consumers build.",
+  "lint": "Zero errors. The same two PropertiesPopover JSX/comment warnings reproduce on its untouched parent; other touched fork files have zero warnings.",
+  "inventory": "291 reviewed differing paths; complete fingerprints and 15 checker tests pass. Prior maintainer release 0.18.149 explicitly accounted; no version change by this task.",
+  "implementation": [
+    {
+      "repository": "plugin",
+      "path": "styles.css",
+      "sha256": "e6b7fe03d697ea960fcb2023908b3849cfff360509b9acf0a9f805b3e7453dea"
+    },
+    {
+      "repository": "plugin",
+      "path": "scripts/testing/behaviorPlan.mjs",
+      "sha256": "6a07cd766b4d771e313e9ab311e3808cebef98362503ac6e23c4fee2fd5d2f88"
+    },
+    {
+      "repository": "plugin",
+      "path": "scripts/testing/host/interactionBehavior.mjs",
+      "sha256": "db833f2240c1cf95ecebf8bb121d510be7fd96f6b9ccb0c03d6a4c11c91ffceb"
+    },
+    {
+      "repository": "plugin",
+      "path": "tests/features.json",
+      "sha256": "43501725cb3ee4cf1a795b2071dbb5ad8aba23cb48726a3dbe80e6492214b7e7"
+    },
+    {
+      "repository": "fork",
+      "path": "packages/excalidraw/components/PropertiesPopover.tsx",
+      "sha256": "6179ec534345c6e772d52edb0efe1fc3c395f85a1c67649ea8175ea928178b4a"
+    },
+    {
+      "repository": "fork",
+      "path": "tests/obsidian/browser/run.mjs",
+      "sha256": "f9b0de3d1a40e7e5bb86c5a4d8970381f77af1b2fa31b877d3ef42e5c96e9dc2"
+    },
+    {
+      "repository": "fork",
+      "path": "tests/obsidian/browser/colorShortcuts.mjs",
+      "sha256": "9eac45560493ecaef45eaedbd6e3e80cdd0e82a206b090088dae2be102090097"
+    }
+  ],
+  "manifests": {
+    "fork": {
+      "commit": "6a731945b98c57d1f03d8eb42f1d2d1f82caf924",
+      "dirty": true,
+      "diffHash": "887ada6a85a0ce52114b36386dc650eb30a5dfcba5087e443f8f86cf0332be82",
+      "lockfileHash": "5ff2005c676da0a7250e859ce363fc40c832a64104732e21d40e827b02632d18",
+      "artifacts": [
+        {
+          "role": "production-js",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.production.min.js",
+          "sha256": "d9279c841e0d8d9417e8b66042bc29e9db59ad2e2c8e78e7d879bbd91d3d6f47",
+          "bytes": 5504707
+        },
+        {
+          "role": "production-css",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.production.min.css",
+          "sha256": "ec335630eb0117a57585053c04ad014cf45471bbde39d5acca909c056899aabf",
+          "bytes": 314075
+        },
+        {
+          "role": "development-js",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.development.js",
+          "sha256": "04a72e928c28f960eb295bb44a7801d49ceea87b29bf3f0327608d18a9e373a9",
+          "bytes": 31034442
+        },
+        {
+          "role": "development-css",
+          "relativePath": "packages/excalidraw/dist/obsidian/excalidraw.development.css",
+          "sha256": "4e3777b2799487b0a0aac432ff5db2588a59228d373bdff6c598bc9bff1ada3c",
+          "bytes": 355823
+        }
+      ]
+    },
+    "extras": {
+      "commit": "2623016ab1bf0685911848748cf2d2f2d3e91d29",
+      "dirty": false,
+      "diffHash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "lockfileHash": "7d916b9279a3523c605d2e952b2601be3655ba92f4c4df09a67627dac74ca42f",
+      "artifacts": [
+        {
+          "role": "main",
+          "relativePath": "dist/main.js",
+          "sha256": "387e1c2642e92712bed038142f7e04bff2051456c440d2cd92fd7f15969a3f56",
+          "bytes": 2591898
+        },
+        {
+          "role": "manifest",
+          "relativePath": "dist/manifest.json",
+          "sha256": "6820958e66d6736ae5114f41349a24ea152495e9055a043f6bde47fde1e6e967",
+          "bytes": 303
+        },
+        {
+          "role": "styles",
+          "relativePath": "dist/styles.css",
+          "sha256": "3de04a6882b3e43b48f81231962c5f52afbd7146cc986fb0c86631ac5de30eda",
+          "bytes": 1427
+        }
+      ]
+    },
+    "plugin": {
+      "commit": "4f0e2fb7d7eb2788707806ca3003dc3f557a775c",
+      "dirty": true,
+      "diffHash": "63f6b46720b207252d7d87b0a195eb5cdabb90abe8c5ab16e1889272dbc47858",
+      "lockfileHash": "d782db97a1bbe8d10a7f6544d480aad5fe03266978c26e36d43a4b8dd757b775",
+      "artifacts": [
+        {
+          "role": "main",
+          "relativePath": "dist/main.js",
+          "sha256": "95daa68f427d14606ae1aa098da28b4d4df2e31bdda5808e7fc212d008e1c8a2",
+          "bytes": 4841292
+        },
+        {
+          "role": "manifest",
+          "relativePath": "dist/manifest.json",
+          "sha256": "8e82828fd9125615e8a361d0f15553e548cac2ee7a303e55387378a53b925fd9",
+          "bytes": 470
+        },
+        {
+          "role": "styles",
+          "relativePath": "dist/styles.css",
+          "sha256": "0e5f003b73772b695dbf764a12428ae9821792e28e1c04d2bae4733b8654562a",
+          "bytes": 368703
+        }
+      ]
+    }
+  },
+  "pluginMainBytes": 4841292,
+  "windowRestoration": "Original 629x800 at x250/y305 restored under lock; no pending tasks, popouts, print windows or debugger attachment.",
+  "messagesPreserved": true,
+  "limits": [
+    "Physical mobile, other native desktop OSes and isolated whole-application restart not tested in this checkpoint.",
+    "After frozen acceptance, only validation/inventory documentation changed; implementation hashes above remain unchanged.",
+    "Local four-artifact fork integration. Published dependency remains 0.18.149; npm install restores the published artifact until the maintainer publishes/upgrades."
+  ],
+  "handoff": "Implementation commits/push and a clean upstream PR authorized. Package publication and dependency/version updates remain separate.",
+  "maintainerAcceptance": "2026-11-21: maintainer confirmed #3061 fixed and authorized commit/push plus a succinct targeted upstream PR following #11997."
+}

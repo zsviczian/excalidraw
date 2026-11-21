@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "review": {
-    "date": "2026-11-20",
-    "dependency_precommit_tests": "Runtime compaction: 1,637 canonical cases pass (1,161 portable + 316 core + 160 device), full/owned types, development/production/library builds, packed consumers, strict gates and cleanup. 290 reviewed differing paths; 15 checker tests. Exact identities and platform limits: runtime-compaction-results.json.",
-    "method": "2026-11-20 approved runtime packaging checkpoint after reviewed PR #491: exact WASM compression, shared locale paths and real-artifact regression tests; preserve all prior runtime and upstream contracts. No new upstream merge.",
+    "date": "2026-11-21",
+    "dependency_precommit_tests": "1,163 portable cases including 36 real-artifact browser cases, focused main/popout native recolor/toolbar/panel tests, full/owned types, coverage, package consumers, strict errors and cleanup pass. Baseline and original window bounds restored. Exact evidence: color-shortcuts-3061-results.json.",
+    "method": "Alt/Option+Arrow artifact baseline coverage plus confirmed plugin-only core-hotkey fix; upstream navigation unchanged at 2c3dcc06e. No upstream merge.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
       "fork_parent": "fd6fb4fc77cc428c5c23fef022d484ae30a7e289",
@@ -12,7 +12,7 @@
       "reference": "https://github.com/zsviczian/excalidraw/pull/491",
       "state": "Resolved and validated two-parent merge checkpoint. Only final acceptance documentation differs from the frozen candidate; implementation hashes are recorded in pr-491-results.json. No version/publication/plugin dependency change."
     },
-    "runtime_validation": "Runtime compaction: complete coordinated acceptance, baseline restoration and guarded original window bounds restored. Only final acceptance documentation follows the frozen successful candidate; implementation hashes remain unchanged. See runtime-compaction-results.json.",
+    "runtime_validation": "1,163 portable cases including 36 real-artifact browser cases, focused main/popout native recolor/toolbar/panel tests, full/owned types, coverage, package consumers, strict errors and cleanup pass. Baseline and original window bounds restored. Exact evidence: color-shortcuts-3061-results.json.",
     "dependency_checkpoint": "2026-10-11: Obsidian artifact/declaration and plugin production/library builds pass. Local fork Windows Obsidian 1.14.4 smoke passes. Published 0.18.140 main/direct-popout/moved-popout input/save/cleanup smoke passes. Plugin npm tree/audit confirms no braces and source-map-js 1.2.2. Component full typecheck remains blocked by documented window.h/stale test-type failures. Packed manifest confirms Sass dev-only; no publication/version bump. The 5 MB target is 5 * 1024 * 1024 = 5,242,880 bytes. Plugin main.js: 5,051,865 bytes with published component (191,015 bytes of headroom), 5,057,617 with local fork (185,263 bytes of headroom); both are below the target. No full scanner, macOS or physical-mobile run in this checkpoint.",
     "layout_followup": "Validated follow-up: W/menu predicate enabled for full/tray/compact, excluded in mobile. 25 focused tests, isolated source typecheck, declarations/artifacts and plugin production/development builds pass. Full typecheck retains 262 existing diagnostics. Baseline tray/compact keyboard tests already passed; original reported tray failure was not reproduced. Extra live probe passed full-layout keyboard/link/history then stopped on unavailable host command-palette rendering; cleanup restored settings and removed owned drawing/controller. No full live layout-matrix pass claimed.",
     "layout_precommit": "Precommit snapshot-update run stopped at explicit maintainer request to skip further testing and commit/merge. Unrelated generated snapshots restored. Prior focused tests/builds remain the validation evidence.",
@@ -177,15 +177,27 @@
       "scope": "Packaging-only production WASM and locale paths; preserve exact binaries, JSON namespaces and dev artifacts. Paired plugin CJK reuse/private Chroma.",
       "validation": "Runtime compaction: 1,637 canonical cases pass (1,161 portable + 316 core + 160 device), full/owned types, development/production/library builds, packed consumers, strict gates and cleanup. 290 reviewed differing paths; 15 checker tests. Exact identities and platform limits: runtime-compaction-results.json.",
       "maintainer_acceptance": "2026-11-20: maintainer confirmed Obsidian mobile works and authorized commit, push, PR and merge. Package version upgrades remain with maintainer."
+    },
+    "color_shortcuts_3061": {
+      "reference": "color-shortcuts-3061.md",
+      "parent": "6a731945b98c57d1f03d8eb42f1d2d1f82caf924",
+      "negative_control": "Native main S/S passes; popout fails. Production artifact loses nested picker focus before guard.",
+      "validation": "1,163 portable cases including 36 real-artifact browser cases, focused main/popout native recolor/toolbar/panel tests, full/owned types, coverage, package consumers, strict errors and cleanup pass. Baseline and original window bounds restored. Exact evidence: color-shortcuts-3061-results.json."
+    },
+    "alt_arrow_navigation": {
+      "status": "passed-plugin-fix",
+      "reference": "alt-arrow-navigation.md",
+      "validation": "Genuine native main/popout negative control with core move-line hotkeys; fixed plugin passes navigation, actual Markdown line movement and root-scope lifecycle. 829 plugin fast cases, five bundle contracts, 38 browser cases, focused lint and inventories pass.",
+      "merge_authorization": "Maintainer requested commits, paired PRs and merges. No component version bump or npm publication."
     }
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "0a93447eb2dfeb2bbdbf9c6ab4f85132d26111a4",
+      "parent_commit": "d89c0da019c0ff75e2b2bd8e1077119d6ab54fb0",
       "package": "@zsviczian/excalidraw",
-      "version": "0.18.148",
-      "working_tree_changes": "Approved runtime compaction on perf/compact-obsidian-artifact; no package/version/protocol change."
+      "version": "0.18.149",
+      "working_tree_changes": "Test-only Alt/Option+Arrow navigation coverage on fix/popout-color-shortcuts-3061; product runtime unchanged."
     },
     "upstream": {
       "kind": "local Git commit",
@@ -196,10 +208,10 @@
     },
     "plugin": {
       "kind": "Git source checkpoint",
-      "commit": "73b631abff6acb18a52acea72aad13307c49907f",
+      "commit": "c41468c70677bbf6cf0759ac43970c4bcce9b416",
       "version": "2.29.2",
-      "fork_dependency": "0.18.148",
-      "working_tree_changes": "Approved runtime compaction on perf/compact-plugin-runtime; dependency unchanged, temporary four-artifact local integration."
+      "fork_dependency": "0.18.149",
+      "working_tree_changes": "Scoped root-keymap Alt/Option+Arrow guard, source/native tests and feature mappings on fix/tools-panel-drag-bar-width. Maintainer Messages.ts edit preserved; no version/dependency change."
     },
     "extras": {
       "kind": "Git working tree",
@@ -220,8 +232,8 @@
   },
   "comparison": {
     "fork": {
-      "files": 1386,
-      "sha256": "0984f898e344ce99c78becd33b7d0f5c7c673a41d5aeee728f91ff53f3b9779d"
+      "files": 1388,
+      "sha256": "828692519f409ea44bf2299489936460d42cb0c519104ba4ffb17fa7cf5cdacc"
     },
     "upstream": {
       "files": 1342,
@@ -468,7 +480,7 @@
     {
       "path": ".github/workflows/obsidian-tests.yml",
       "status": "fork-only",
-      "fork_sha256": "de1e663ae26d13ac55b293117cbf9389d79e148d10413752a8d290736f9ae787",
+      "fork_sha256": "85695f384b7b4a896ed6f60f61d3ab8ff6ffb7f6d5c97ffe9ec68d95ce0db8a7",
       "upstream_sha256": null,
       "ids": [
         "OBS-001",
@@ -476,7 +488,7 @@
         "OBS-034"
       ],
       "kind": "ci",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. PR #478: advance the explicit reviewed upstream baseline to a758e93d6."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. PR #478: advance the explicit reviewed upstream baseline to a758e93d6. PR closeout: compare against the already-reviewed upstream 2c3dcc06e baseline; the prior a758e93d6 pin predates the merged source and cannot validate the current ledger."
     },
     {
       "path": ".github/workflows/test-coverage-pr.yml",
@@ -2126,12 +2138,13 @@
     {
       "path": "packages/excalidraw/components/PropertiesPopover.tsx",
       "status": "modified",
-      "fork_sha256": "22d8109771c3444622506ef2fcfe452553daabf86caaeef08d3d73ca9577352c",
+      "fork_sha256": "6179ec534345c6e772d52edb0efe1fc3c395f85a1c67649ea8175ea928178b4a",
       "upstream_sha256": "e593fbf0b9adfe21108579475024c9c34431b0fde9bda558e8331fb693cd4fc2",
       "ids": [
-        "OBS-021"
+        "OBS-021",
+        "OBS-025"
       ],
-      "note": "Use the shared Obsidian body portal instead of the source container portal.",
+      "note": "Use the shared Obsidian body portal instead of the source container portal. Plugin #3061: preserve already-focused popup descendants in their owning document; actual artifact regression and native main/popout evidence. See color-shortcuts-3061.md.",
       "kind": "integration"
     },
     {
@@ -2913,14 +2926,14 @@
     {
       "path": "packages/excalidraw/package.json",
       "status": "modified",
-      "fork_sha256": "cc61f22dc29347c40cc4ff0d3a61ec7bb0d3aebb0bb17e3e6dcb7a3ec0a5b3ab",
+      "fork_sha256": "4bc6dbd6fe25ca0e4182baa32a45fba6bfd4232f5ba3a1c1ee82f203edcc58bd",
       "upstream_sha256": "7a7226be91e3365916b5c680811f8c7f43d1eafd78db52711722287e6f3fe76a",
       "ids": [
         "OBS-002",
         "OBS-003",
         "OBS-004"
       ],
-      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies. Baseline bee1292f3 already bumps to 0.18.142; the layout fix does not bump or publish. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. 2026-10-23: acknowledge the existing manifest-only 0.18.144 release commit 9d1e20b60 while correcting consumer declarations; no version change in this repair. PR #475: Converter 3.0.0 remains dev-only; preserve fork exports, external runtime and existing 0.18.144 version. See pr-475-merge-review.md. #3019 accounting acknowledges the already committed 0.18.145 version; this feature does not bump it. PR #477: clean packed bundler consumer failed on nonexistent dist/types export-map paths; point existing type exports to actual generated types/. No runtime/version/API-signature change. PR #478: exact converter 3.1.0 remains dev-only; no fork version/export/security-resolution change. PR #482: reviewed source and both parents, preserving all prior fork contracts; accounts separately for pre-existing #480/#481 frame changes and version 0.18.146. See pr-482-merge-review.md; 876 portable and 387 native cases pass, with additional focused Mermaid/SVG checks. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Version 0.18.147 inherited from fork parent 910845750; no version bump here. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
+      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies. Baseline bee1292f3 already bumps to 0.18.142; the layout fix does not bump or publish. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. 2026-10-23: acknowledge the existing manifest-only 0.18.144 release commit 9d1e20b60 while correcting consumer declarations; no version change in this repair. PR #475: Converter 3.0.0 remains dev-only; preserve fork exports, external runtime and existing 0.18.144 version. See pr-475-merge-review.md. #3019 accounting acknowledges the already committed 0.18.145 version; this feature does not bump it. PR #477: clean packed bundler consumer failed on nonexistent dist/types export-map paths; point existing type exports to actual generated types/. No runtime/version/API-signature change. PR #478: exact converter 3.1.0 remains dev-only; no fork version/export/security-resolution change. PR #482: reviewed source and both parents, preserving all prior fork contracts; accounts separately for pre-existing #480/#481 frame changes and version 0.18.146. See pr-482-merge-review.md; 876 portable and 387 native cases pass, with additional focused Mermaid/SVG checks. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Version 0.18.147 inherited from fork parent 910845750; no version bump here. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately. Maintainer release 6a731945b: version 0.18.149 was already present before #3061; no version change by this fix.",
       "kind": "packaging"
     },
     {
@@ -3452,6 +3465,31 @@
       "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477: final formatting/source-contract/typed-owned-suite refinement; source behavior and reviewed assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. PR #477 follow-up: maintainer-approved local/system-font CSS no-fetch fix and its independent bundled/local-font regressions; 127 source cases pass, including custom Local Font preservation."
     },
     {
+      "path": "tests/obsidian/browser/colorShortcuts.mjs",
+      "status": "fork-only",
+      "fork_sha256": "9eac45560493ecaef45eaedbd6e3e80cdd0e82a206b090088dae2be102090097",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-021",
+        "OBS-025",
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "Plugin #3061: actual shared artifacts and foreign ownerDocument, trusted palette/Tab/Escape/history input and main-scene isolation. Negative control reproduces nested-focus loss."
+    },
+    {
+      "path": "tests/obsidian/browser/flowchartNavigation.mjs",
+      "status": "fork-only",
+      "fork_sha256": "e7c366fcf0f3d7d38b072e39f605f1c52a353dace16911399c748d3f9ecad08e",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-028",
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "Alt+Arrow investigation: actual artifact pointer-selected plain/labeled connected charts in full/tray/compact. All four directions pass in both artifacts; original reported defect remains unreproduced. See alt-arrow-navigation.md."
+    },
+    {
       "path": "tests/obsidian/browser/minimap.mjs",
       "status": "fork-only",
       "fork_sha256": "95d35067cb508208b45c709f3494a10917cdf414555a50a8400a864ed24508f8",
@@ -3468,7 +3506,7 @@
     {
       "path": "tests/obsidian/browser/run.mjs",
       "status": "fork-only",
-      "fork_sha256": "19a7eae157c71f6b2bf567cedaa32f3bca899bee2ff7bd150438277ff8e011ec",
+      "fork_sha256": "51af0ef128973c983560237fe24883db958192914976902fac2761d5643195ec",
       "upstream_sha256": null,
       "ids": [
         "OBS-003",
@@ -3480,7 +3518,7 @@
         "OBS-032"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Register the built production/development YouTube fullscreen regression with offline nested cross-origin provider fixtures, trusted clicks, two zoom levels and exit geometry. Plugin #3048 / PR #3052. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; complete matching-build portable/native acceptance passes; see pr-486-results.json. See pr-486-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately. PR #491 release-size preservation: production-only empty/English-equivalent translation compaction with exhaustive fallback and four-language browser verification; unchanged 5 MiB gate passes at 5,218,572 bytes. Runtime compaction: production exact WASM/shared locale paths and first/warm actual-browser subset regression; see runtime-compaction.md."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Register the built production/development YouTube fullscreen regression with offline nested cross-origin provider fixtures, trusted clicks, two zoom levels and exit geometry. Plugin #3048 / PR #3052. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; complete matching-build portable/native acceptance passes; see pr-486-results.json. See pr-486-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately. PR #491 release-size preservation: production-only empty/English-equivalent translation compaction with exhaustive fallback and four-language browser verification; unchanged 5 MiB gate passes at 5,218,572 bytes. Runtime compaction: production exact WASM/shared locale paths and first/warm actual-browser subset regression; see runtime-compaction.md. Plugin #3061: preserve already-focused popup descendants in their owning document; actual artifact regression and native main/popout evidence. See color-shortcuts-3061.md. Alt+Arrow: register actual artifact baseline coverage with P07 feature identity; no runtime fix."
     },
     {
       "ids": [

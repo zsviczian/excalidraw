@@ -378,6 +378,8 @@ Consumers include `P: ExcalidrawView.ts` theme updates, custom embed renderers, 
 <a id="obs-028"></a>
 ## OBS-028 — Zoom, pen/touch gestures, and navigation
 
+**Alt/Option+Arrow correction (2026-11-21):** The reported core-Obsidian move-line hotkeys reproduce the failure in both native windows. The plugin passes only eligible owning-canvas navigation through its root scope, preserving Markdown input and cleanup. Component navigation remains upstream-identical; this branch adds artifact baseline coverage only. See [before/after evidence](alt-arrow-navigation.md).
+
 **PR #485 (2026-11-15):** Adopt upstream caret-anchored keyboard zoom while
 preserving live host step/min/max. Null anchors still use the viewport center;
 canvas offsets and changed settings are covered by seven owned action cases.
@@ -661,3 +663,7 @@ Validation and platform limits are recorded in `svg-conversion-entry-points.md`.
 ## Runtime compaction checkpoint (OBS-003, OBS-013, OBS-032, OBS-033)
 
 Production packaging compresses exact font-subsetting binaries and shares locale paths while retaining JSON module namespaces. The plugin reuses existing font metadata and narrows its private Chroma entry. Source/namespace/binary/browser/native assertions preserve the existing contracts. See [scope, measurements and acceptance](runtime-compaction.md).
+
+## Color picker ownership checkpoint — OBS-021/025/033
+
+Plugin #3061: preserve existing nested popup focus using the mounted content owning document before Radix default autofocus. Exact main/pass and popout/fail native reproduction plus actual production/development artifact regression. No new listeners or protocol. [Investigation and acceptance](color-shortcuts-3061.md).

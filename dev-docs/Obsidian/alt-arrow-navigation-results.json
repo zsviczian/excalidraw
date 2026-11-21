@@ -1,0 +1,217 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-11-21",
+  "status": "passed",
+  "productFix": "Plugin-only scoped hotkey passthrough; no component runtime change.",
+  "cause": "Core Obsidian editor:swap-line-up/down bindings on Alt+Up/Down consumed canvas navigation before Excalidraw received the event. Existing user overrides covered only horizontal arrows.",
+  "branches": {
+    "plugin": "fix/tools-panel-drag-bar-width",
+    "fork": "fix/popout-color-shortcuts-3061"
+  },
+  "parents": {
+    "plugin": "c41468c70677bbf6cf0759ac43970c4bcce9b416",
+    "fork": "d89c0da019c0ff75e2b2bd8e1077119d6ab54fb0",
+    "upstream": "2c3dcc06ec807e81ab9437eceb1a8f7a3c590743"
+  },
+  "validation": {
+    "negative": {
+      "path": ".test-work/reports/native-050eef18-83bc-4dd9-9ee2-e971568262a2/report.json",
+      "status": "failed",
+      "cases": [
+        {
+          "testId": "native:behavior:main:toolbar-context-shortcuts",
+          "status": "failed",
+          "reason": "Error: Timed out: Alt/Option+ArrowUp selects the flowchart neighbor"
+        },
+        {
+          "testId": "native:behavior:popout:toolbar-context-shortcuts",
+          "status": "failed",
+          "reason": "Error: Timed out: Alt/Option+ArrowUp selects the flowchart neighbor"
+        }
+      ],
+      "cleanup": "passed"
+    },
+    "native": {
+      "path": ".test-work/reports/native-cd234c13-c71c-45e6-bf25-e91402d1869d/report.json",
+      "status": "passed",
+      "host": "1.15.1 (installer 1.14.5)",
+      "caseIds": [
+        "native:behavior:main:toolbar-context-shortcuts",
+        "native:behavior:popout:toolbar-context-shortcuts"
+      ],
+      "navigationChecks": 24,
+      "markdownAndScope": true,
+      "cleanup": "passed",
+      "baselineRestoration": {
+        "restored": true,
+        "pluginEnabled": true,
+        "extrasEnabled": true,
+        "kplexEnabled": false,
+        "theme": "moonstone",
+        "restoredFixturePaths": []
+      },
+      "sourceStability": "passed"
+    },
+    "browser": {
+      "path": ".test-work/alt-navigation-browser-final/report.json",
+      "cases": 38,
+      "navigationChecks": 48,
+      "status": "passed",
+      "componentArtifacts": {
+        "excalidraw.production.min.js": "d9279c841e0d8d9417e8b66042bc29e9db59ad2e2c8e78e7d879bbd91d3d6f47",
+        "excalidraw.production.min.css": "ec335630eb0117a57585053c04ad014cf45471bbde39d5acca909c056899aabf",
+        "excalidraw.development.js": "04a72e928c28f960eb295bb44a7801d49ceea87b29bf3f0327608d18a9e373a9",
+        "excalidraw.development.css": "4e3777b2799487b0a0aac432ff5db2588a59228d373bdff6c598bc9bff1ada3c"
+      }
+    },
+    "fast": {
+      "path": ".test-work/reports/fast/report.json",
+      "cases": 829,
+      "status": "passed"
+    },
+    "bundleContracts": {
+      "cases": 5,
+      "status": "passed"
+    },
+    "lint": {
+      "files": [
+        "src/core/main.ts",
+        "src/view/managers/flowchartNavigationShortcut.ts"
+      ],
+      "errors": 0,
+      "warnings": 0
+    },
+    "artifactInputs": "All four rebuilt component artifacts match browser-tested files and installed plugin inputs exactly; deployed native plugin artifacts match dist/.",
+    "forkAudit": {
+      "paths": 292,
+      "checkerTests": 15,
+      "status": "passed"
+    },
+    "restoredWindow": {
+      "bounds": {
+        "x": 250,
+        "y": 305,
+        "width": 629,
+        "height": 800
+      },
+      "zoom": 1,
+      "popouts": 0,
+      "prints": 0,
+      "tasks": [],
+      "debuggerAttached": false
+    },
+    "ciBaseline": "Fork CI audit pin corrected to the already-reviewed 2c3dcc06ec807e81ab9437eceb1a8f7a3c590743; no runtime changes."
+  },
+  "sourceHashes": {
+    "plugin:src/core/main.ts": "f85acd8ec524a5b0b8155bdf1fadd25bfd284d8c292b7585fd94d43165f58223",
+    "plugin:src/view/managers/flowchartNavigationShortcut.ts": "07ddddbbacf6b042859a0911abbd8fc6fc7ab84e514a87a8b0c48e487921527d",
+    "plugin:scripts/testing/flowchartNavigationShortcut.test.mjs": "cf53e633da76597f61375d8bdd61722c27ae902711467d43868f57e0feeba40d",
+    "plugin:scripts/testing/behaviorPlan.mjs": "a2da1f9c796900720b1d1dd4c43b3e4423f3eb9dc81b77fe8ddc8257509436b1",
+    "plugin:scripts/testing/host/interactionBehavior.mjs": "1d9bd089cfa41db0ec227880538829efa4ef27c2b7b838d98ce21818d96f64ee",
+    "plugin:tests/features.json": "c9c9a8ab458d9ac6953d1188aaa8ff6adc33e5d4d006b91d30dd10283a60e99e",
+    "plugin:tests/inventory.json": "7de6c8831d112103688a1ae259ba4fed793f92e9c53550fe3241fddb6fd2dd94",
+    "fork:tests/obsidian/browser/run.mjs": "51af0ef128973c983560237fe24883db958192914976902fac2761d5643195ec",
+    "fork:tests/obsidian/browser/flowchartNavigation.mjs": "e7c366fcf0f3d7d38b072e39f605f1c52a353dace16911399c748d3f9ecad08e"
+  },
+  "artifacts": {
+    "plugin": {
+      "main.js": "f4f212b501b055c23b4a09389b8150f2ab8f1583171caa5e3af663f9c41918f2",
+      "styles.css": "0e5f003b73772b695dbf764a12428ae9821792e28e1c04d2bae4733b8654562a",
+      "manifest.json": "8e82828fd9125615e8a361d0f15553e548cac2ee7a303e55387378a53b925fd9"
+    },
+    "mainBytes": 4842001,
+    "mainIncrease": 709,
+    "headroom": 400879,
+    "component": {
+      "excalidraw.production.min.js": "d9279c841e0d8d9417e8b66042bc29e9db59ad2e2c8e78e7d879bbd91d3d6f47",
+      "excalidraw.production.min.css": "ec335630eb0117a57585053c04ad014cf45471bbde39d5acca909c056899aabf",
+      "excalidraw.development.js": "04a72e928c28f960eb295bb44a7801d49ceea87b29bf3f0327608d18a9e373a9",
+      "excalidraw.development.css": "4e3777b2799487b0a0aac432ff5db2588a59228d373bdff6c598bc9bff1ada3c"
+    }
+  },
+  "scope": {
+    "personalVault": "Read-only inspection only; no deployment, hotkey changes or drawing writes.",
+    "settings": "No migration/dependency/version change; user Messages.ts hash preserved.",
+    "upstream": "No new upstream PR or component runtime change.",
+    "git": "Maintainer authorized commits, pushes and paired PR merges after the passing implementation checkpoint; package publication/versioning remains separate."
+  },
+  "limits": [
+    "Focused native evidence, not a complete portable/native release acceptance run.",
+    "Windows trusted CDP input does not establish physical macOS Option key behavior."
+  ],
+  "baselineInvestigation": {
+    "date": "2026-11-21",
+    "status": "baseline-passes-reproduction-needed",
+    "productFix": false,
+    "pendingInput": "Failing drawing/path, selected node, and main/popout context. Physical keyboard/OS and custom hotkeys may also be relevant; no cause is inferred.",
+    "branches": {
+      "plugin": "fix/tools-panel-drag-bar-width",
+      "fork": "fix/popout-color-shortcuts-3061"
+    },
+    "parents": {
+      "plugin": "c41468c70677bbf6cf0759ac43970c4bcce9b416",
+      "fork": "d89c0da019c0ff75e2b2bd8e1077119d6ab54fb0",
+      "upstream": "2c3dcc06ec807e81ab9437eceb1a8f7a3c590743"
+    },
+    "validation": {
+      "native": {
+        "path": ".test-work/reports/native-e9a188ad-5803-4f7e-b345-9c09a93b64c5/report.json",
+        "status": "passed",
+        "host": "1.15.1 (installer 1.14.5)",
+        "scope": "Focused two main/popout toolbar cases, each including 12 mouse-selected labeled-node navigation checks across full/tray/compact and the unchanged color/panel/authoring/history/save assertions."
+      },
+      "browser": {
+        "path": ".test-work/alt-navigation-browser-final/report.json",
+        "status": "passed",
+        "cases": 38,
+        "navigationChecks": 48,
+        "artifacts": {
+          "excalidraw.production.min.js": "d9279c841e0d8d9417e8b66042bc29e9db59ad2e2c8e78e7d879bbd91d3d6f47",
+          "excalidraw.production.min.css": "ec335630eb0117a57585053c04ad014cf45471bbde39d5acca909c056899aabf",
+          "excalidraw.development.js": "04a72e928c28f960eb295bb44a7801d49ceea87b29bf3f0327608d18a9e373a9",
+          "excalidraw.development.css": "4e3777b2799487b0a0aac432ff5db2588a59228d373bdff6c598bc9bff1ada3c"
+        }
+      },
+      "fast": {
+        "path": ".test-work/reports/fast/report.json",
+        "cases": 826,
+        "status": "passed"
+      },
+      "sourceComparison": "FlowChartNavigator and AppFlowchart are identical to the reviewed upstream/master baseline; no runtime source changes."
+    },
+    "sourceHashes": {
+      "plugin:scripts/testing/behaviorPlan.mjs": "d01e38bbe158c361336e7db79fafe6b60df7ae219615da64e36f8a903b258be8",
+      "plugin:scripts/testing/host/interactionBehavior.mjs": "1bbbc6f59a0845dd1c14e9ff852062ba19141b07a4f0f5282c5e53d27649ef6e",
+      "plugin:tests/features.json": "9400b12de1dcbe6ea02352d1ab6ad9d65c7f1a0acee28f53e679480d5e277a97",
+      "fork:tests/obsidian/browser/run.mjs": "51af0ef128973c983560237fe24883db958192914976902fac2761d5643195ec",
+      "fork:tests/obsidian/browser/flowchartNavigation.mjs": "e7c366fcf0f3d7d38b072e39f605f1c52a353dace16911399c748d3f9ecad08e"
+    },
+    "pluginArtifact": {
+      "bytes": 4841292,
+      "sha256": "95daa68f427d14606ae1aa098da28b4d4df2e31bdda5808e7fc212d008e1c8a2"
+    },
+    "limits": [
+      "Original user failure remains unreproduced.",
+      "Native evidence is Windows Obsidian with trusted CDP input; physical macOS Option shortcuts and user-specific mappings remain separate.",
+      "No full portable/native acceptance or release-readiness claim."
+    ],
+    "preservedFailures": [
+      {
+        "path": ".test-work/reports/native-2ee80025-25df-45fd-9dd6-678b2db01fae/report.json",
+        "cause": "Invalid initial test arrows lacked vertical/left end bindings; not a product negative control."
+      },
+      {
+        "path": ".test-work/alt-navigation-browser-valid-fixture/report.json",
+        "cause": "Navigation passed; following pre-existing TTD dialog check observed opening-animation geometry. Later full browser runs pass unchanged assertions."
+      },
+      {
+        "path": ".test-work/reports/native-04182573-2513-4d0a-a417-e5d6cc6fcf50/report.json",
+        "cause": "Pointer coordinates were read before viewport commits settled; fixed test readiness."
+      },
+      {
+        "path": ".test-work/reports/native-41b677b5-263a-4842-877c-72a51c9f63a6/report.json",
+        "cause": "Full mode navigation passed; test did not change the real host layout setting before switching modes. Corrected test configuration."
+      }
+    ]
+  }
+}
