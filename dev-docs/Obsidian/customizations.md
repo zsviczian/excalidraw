@@ -671,3 +671,7 @@ Plugin #3061: preserve existing nested popup focus using the mounted content own
 ## Glyph comparison CI follow-up — OBS-019/033
 
 Plugin PR #3064 CI exposed one synthetic text fringe pixel changing from 204 to 192 with both dark glyph silhouettes unchanged. The browser test now uses the same strict dark-core comparator as seven executable controls, including four one-pixel translations and removal of one core pixel. Threshold 200 remains diagnostic. The exact CI sample is a test-only fixture; production text placement is unchanged. [Details](glyph-pixel-ci.md).
+
+## Fractional paste fixture in Linux CI — OBS-019/033
+
+Plugin PR #3064 run 44891234165 passed the corrected glyph comparison, then exposed a platform-dependent paste fixture: Linux measured a legitimate natural text width of 195px. The test now pastes a glyph at 400px so its width exceeds the 200.46px container limit, and requires exactly that fractional limit. This strengthens the precision assertion without assuming system-font metrics. All 38 production/development browser cases and focused lint/format pass; the hosted rerun remains pending. Production text code, artifacts, versions and public/serialized contracts are unchanged. Existing Windows native keyboard evidence remains applicable; this test-only correction does not require a new device workflow.
