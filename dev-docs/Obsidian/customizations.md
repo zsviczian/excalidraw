@@ -667,3 +667,7 @@ Production packaging compresses exact font-subsetting binaries and shares locale
 ## Color picker ownership checkpoint — OBS-021/025/033
 
 Plugin #3061: preserve existing nested popup focus using the mounted content owning document before Radix default autofocus. Exact main/pass and popout/fail native reproduction plus actual production/development artifact regression. No new listeners or protocol. [Investigation and acceptance](color-shortcuts-3061.md).
+
+## Glyph comparison CI follow-up — OBS-019/033
+
+Plugin PR #3064 CI exposed one synthetic text fringe pixel changing from 204 to 192 with both dark glyph silhouettes unchanged. The browser test now uses the same strict dark-core comparator as seven executable controls, including four one-pixel translations and removal of one core pixel. Threshold 200 remains diagnostic. The exact CI sample is a test-only fixture; production text placement is unchanged. [Details](glyph-pixel-ci.md).

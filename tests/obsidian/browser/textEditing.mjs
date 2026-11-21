@@ -8,6 +8,8 @@ import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { compareTextGlyphPixels } from "./textGlyphPixels.mjs";
+
 export async function verifyTextEditing(page, modifier) {
   const session = await page.context().newCDPSession(page);
   const originalViewport = {
@@ -275,11 +277,9 @@ export async function verifyTextEditing(page, modifier) {
               .rawText.endsWith("mmmmmmmmmmmm"),
           );
           const after = await capture(initial);
-          // Compare decoded glyph silhouettes, rather than PNG bytes or faint
-          // antialias fringes. At fractional DPR Chromium changed two pixels
-          // from white to 244/210 while all three glyph masks stayed identical.
-          // A one-pixel displacement changes these masks and must still fail.
-          const masks = await page.evaluate(
+          // Compare glyph cores, retaining the fringe mask for diagnostics.
+          // Exact CI-image and one-pixel displacement controls cover the oracle.
+          const pixels = await page.evaluate(
             async (encoded) => {
               const images = await Promise.all(
                 encoded.map(async (png) => {
@@ -291,25 +291,21 @@ export async function verifyTextEditing(page, modifier) {
                   canvas.height = image.naturalHeight;
                   const context = canvas.getContext("2d");
                   context.drawImage(image, 0, 0);
-                  return context.getImageData(0, 0, canvas.width, canvas.height)
-                    .data;
+                  return Array.from(
+                    context.getImageData(0, 0, canvas.width, canvas.height)
+                      .data,
+                  );
                 }),
               );
-              return [64, 128, 200].map((threshold) => ({
-                threshold,
-                changed: images[0].reduce((count, value, index) => {
-                  const beforeDark = value < threshold;
-                  const afterDark = images[1][index] < threshold;
-                  return (
-                    count +
-                    (index % 4 === 0 && beforeDark !== afterDark ? 1 : 0)
-                  );
-                }, 0),
-              }));
+              return images;
             },
             [before.toString("base64"), after.toString("base64")],
           );
-          if (masks.some((mask) => mask.changed)) {
+          const { masks, stable } = compareTextGlyphPixels(
+            pixels[0],
+            pixels[1],
+          );
+          if (!stable) {
             const directory =
               process.env.EXCALIDRAW_TEST_REPORT_DIR ||
               ".test-work/reports/browser";
@@ -335,7 +331,7 @@ export async function verifyTextEditing(page, modifier) {
             );
           }
           assert.ok(
-            masks.every((mask) => mask.changed === 0),
+            stable,
             `${mode}/${scale}/${align}: unchanged first line moved while typing on the second`,
           );
           await close();
