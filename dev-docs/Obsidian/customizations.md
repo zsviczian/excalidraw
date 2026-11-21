@@ -661,3 +661,7 @@ Validation and platform limits are recorded in `svg-conversion-entry-points.md`.
 ## Runtime compaction checkpoint (OBS-003, OBS-013, OBS-032, OBS-033)
 
 Production packaging compresses exact font-subsetting binaries and shares locale paths while retaining JSON module namespaces. The plugin reuses existing font metadata and narrows its private Chroma entry. Source/namespace/binary/browser/native assertions preserve the existing contracts. See [scope, measurements and acceptance](runtime-compaction.md).
+
+## Color picker ownership checkpoint — OBS-021/025/033
+
+Plugin #3061: preserve existing nested popup focus using the mounted content owning document before Radix default autofocus. Exact main/pass and popout/fail native reproduction plus actual production/development artifact regression. No new listeners or protocol. [Investigation and acceptance](color-shortcuts-3061.md).

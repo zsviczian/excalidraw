@@ -66,6 +66,19 @@ export const PropertiesPopover = React.forwardRef<
           onFocusOutside={onFocusOutside}
           onPointerDownOutside={onPointerDownOutside}
           onOpenAutoFocus={(e) => {
+            // zsviczian START -- preserve nested focus in the popup's own document (#3061).
+            // Radix checks the runtime-global document and can overwrite focus
+            // already placed by a picker rendered in another document.
+            const content = e.target;
+            const ownerWindow = container?.ownerDocument.defaultView;
+            if (
+              ownerWindow &&
+              content instanceof ownerWindow.HTMLElement &&
+              content.contains(content.ownerDocument.activeElement)
+            ) {
+              e.preventDefault();
+            }
+            // zsviczian END
             // prevent auto-focus on touch devices to avoid keyboard popup
             if (preventAutoFocusOnTouch && editorInterface.isTouchScreen) {
               e.preventDefault();

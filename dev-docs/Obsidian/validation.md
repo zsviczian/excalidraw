@@ -376,3 +376,11 @@ Implementation and focused validation are recorded in [runtime-compaction.md](ru
 Final runtime-compaction acceptance: `npm run test:regression` passes all 1,637 canonical cases: 1,161 portable, 316 native core and 160 device cases. Required identities, source/artifact checks, coverage, package consumers, strict errors and cleanup pass; baseline restored. Windows Obsidian 1.15.1 (installer 1.14.5), Node 22.22.3. Guarded restoration returned the test window to its original bounds. Main.js is 4,841,250 bytes (377,322 saved). See [exact sources, artifacts and limits](runtime-compaction-results.json). Only final acceptance documentation follows the frozen run.
 
 Maintainer acceptance, 2026-11-20: solution confirmed working on Obsidian mobile (OS/device unspecified). Maintainer authorized commit/push/PR/merge of both compaction branches and will handle package version upgrades separately. This is reported manual mobile acceptance, not an automated physical-device result.
+
+## Plugin #3061 — 2026-11-21
+
+Native main passes and popout fails the same trusted S/S selected-text recolor before the fix. Production browser negative control independently reproduces focus landing on the outer dialog. Guarded properties-popup autofocus preserves its own focused descendant; 36 actual-artifact browser cases pass. Post-fix native and full portable checks pending. [Details](color-shortcuts-3061.md).
+
+Final #3061 acceptance: all 1,163 portable cases pass, including 36 actual-artifact browser cases. Focused native main/popout S/S recolor, tools-panel width/collapse and existing toolbar cases pass with strict error/cleanup/source gates. Full/owned types, coverage, package consumers, inventory fingerprints and 15 checker tests pass. Settings and original test-window bounds restored. Only final acceptance documentation follows the frozen successful runs. [Exact sources/artifacts and limits](color-shortcuts-3061-results.json).
+
+Maintainer acceptance, 2026-11-21: #3061 confirmed fixed; commit/push and a targeted upstream follow-up to #11997 authorized. Runtime implementation remains identical to the accepted source hashes.

@@ -17,6 +17,7 @@ import { verifyYouTubeFullscreen } from "./youtubeFullscreen.mjs";
 import { verifyTextEditing } from "./textEditing.mjs";
 import { verifyWrapMerge } from "./wrapMerge.mjs";
 import { verifyTextFocus } from "./textFocus.mjs";
+import { verifyColorShortcuts } from "./colorShortcuts.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const shortcutModifier = process.platform === "darwin" ? "Meta" : "Control";
@@ -846,6 +847,11 @@ try {
       }
       return { owningDocument: true, survivingElements: 1 };
     });
+    await run(
+      "color-shortcuts-owning-document",
+      () => verifyColorShortcuts(page, shortcutModifier),
+      true,
+    );
     await run("ttd-close-button", () => verifyTTDClose(page), true);
     await run("minimap-zoom-layouts", () => verifyMinimap(page), true);
     await run(

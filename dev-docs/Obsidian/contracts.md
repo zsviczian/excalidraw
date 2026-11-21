@@ -272,3 +272,7 @@ The upstream minimap is browser-only AppState, omitted from exported scenes. Its
 ## Runtime compaction (2026-11-20)
 
 The existing published `Fonts` registry is consumed by plugin CJKLoader and FontManager. Font IDs, URL/descriptor data, settings and document ownership remain unchanged. Production WASM restores exact bytes; shared locale paths retain default and named JSON exports. No new public API, protocol or persisted format. See [runtime compaction](runtime-compaction.md).
+
+## Color picker focus ownership (#3061)
+
+When opening a properties popup, an already-focused descendant in that popup owning document retains focus, including when the shared runtime was evaluated in another document. Existing touch autofocus suppression and default behavior for an unfocused popup remain. See [the checkpoint](color-shortcuts-3061.md).
