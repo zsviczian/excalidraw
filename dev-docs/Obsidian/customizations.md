@@ -378,6 +378,8 @@ Consumers include `P: ExcalidrawView.ts` theme updates, custom embed renderers, 
 <a id="obs-028"></a>
 ## OBS-028 — Zoom, pen/touch gestures, and navigation
 
+**Alt/Option+Arrow correction (2026-11-21):** The reported core-Obsidian move-line hotkeys reproduce the failure in both native windows. The plugin passes only eligible owning-canvas navigation through its root scope, preserving Markdown input and cleanup. Component navigation remains upstream-identical; this branch adds artifact baseline coverage only. See [before/after evidence](alt-arrow-navigation.md).
+
 **PR #485 (2026-11-15):** Adopt upstream caret-anchored keyboard zoom while
 preserving live host step/min/max. Null anchors still use the viewport center;
 canvas offsets and changed settings are covered by seven owned action cases.

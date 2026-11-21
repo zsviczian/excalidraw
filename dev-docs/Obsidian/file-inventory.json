@@ -3,7 +3,7 @@
   "review": {
     "date": "2026-11-21",
     "dependency_precommit_tests": "1,163 portable cases including 36 real-artifact browser cases, focused main/popout native recolor/toolbar/panel tests, full/owned types, coverage, package consumers, strict errors and cleanup pass. Baseline and original window bounds restored. Exact evidence: color-shortcuts-3061-results.json.",
-    "method": "Targeted plugin #3061 popup-focus correction after the maintainer 0.18.149 release; preserve earlier customizations and compare with reviewed upstream 2c3dcc06e. No upstream merge.",
+    "method": "Alt/Option+Arrow artifact baseline coverage plus confirmed plugin-only core-hotkey fix; upstream navigation unchanged at 2c3dcc06e. No upstream merge.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
       "fork_parent": "fd6fb4fc77cc428c5c23fef022d484ae30a7e289",
@@ -183,15 +183,21 @@
       "parent": "6a731945b98c57d1f03d8eb42f1d2d1f82caf924",
       "negative_control": "Native main S/S passes; popout fails. Production artifact loses nested picker focus before guard.",
       "validation": "1,163 portable cases including 36 real-artifact browser cases, focused main/popout native recolor/toolbar/panel tests, full/owned types, coverage, package consumers, strict errors and cleanup pass. Baseline and original window bounds restored. Exact evidence: color-shortcuts-3061-results.json."
+    },
+    "alt_arrow_navigation": {
+      "status": "passed-plugin-fix",
+      "reference": "alt-arrow-navigation.md",
+      "validation": "Genuine native main/popout negative control with core move-line hotkeys; fixed plugin passes navigation, actual Markdown line movement and root-scope lifecycle. 829 plugin fast cases, five bundle contracts, 38 browser cases, focused lint and inventories pass.",
+      "merge_authorization": "Maintainer requested commits, paired PRs and merges. No component version bump or npm publication."
     }
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "6a731945b98c57d1f03d8eb42f1d2d1f82caf924",
+      "parent_commit": "d89c0da019c0ff75e2b2bd8e1077119d6ab54fb0",
       "package": "@zsviczian/excalidraw",
       "version": "0.18.149",
-      "working_tree_changes": "Targeted PropertiesPopover focus preservation and artifact keyboard regression on fix/popout-color-shortcuts-3061."
+      "working_tree_changes": "Test-only Alt/Option+Arrow navigation coverage on fix/popout-color-shortcuts-3061; product runtime unchanged."
     },
     "upstream": {
       "kind": "local Git commit",
@@ -202,10 +208,10 @@
     },
     "plugin": {
       "kind": "Git source checkpoint",
-      "commit": "4f0e2fb7d7eb2788707806ca3003dc3f557a775c",
+      "commit": "c41468c70677bbf6cf0759ac43970c4bcce9b416",
       "version": "2.29.2",
       "fork_dependency": "0.18.149",
-      "working_tree_changes": "Bundled tools-panel width and native color-key regression on fix/tools-panel-drag-bar-width. Maintainer Messages.ts edit retained; no version/dependency change."
+      "working_tree_changes": "Scoped root-keymap Alt/Option+Arrow guard, source/native tests and feature mappings on fix/tools-panel-drag-bar-width. Maintainer Messages.ts edit preserved; no version/dependency change."
     },
     "extras": {
       "kind": "Git working tree",
@@ -226,8 +232,8 @@
   },
   "comparison": {
     "fork": {
-      "files": 1387,
-      "sha256": "be4b31639dfefb0ee1e3fc9a7fb2ce04a9d253858d585a1f46fff4567c2f9c22"
+      "files": 1388,
+      "sha256": "828692519f409ea44bf2299489936460d42cb0c519104ba4ffb17fa7cf5cdacc"
     },
     "upstream": {
       "files": 1342,
@@ -474,7 +480,7 @@
     {
       "path": ".github/workflows/obsidian-tests.yml",
       "status": "fork-only",
-      "fork_sha256": "de1e663ae26d13ac55b293117cbf9389d79e148d10413752a8d290736f9ae787",
+      "fork_sha256": "85695f384b7b4a896ed6f60f61d3ab8ff6ffb7f6d5c97ffe9ec68d95ce0db8a7",
       "upstream_sha256": null,
       "ids": [
         "OBS-001",
@@ -482,7 +488,7 @@
         "OBS-034"
       ],
       "kind": "ci",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. PR #478: advance the explicit reviewed upstream baseline to a758e93d6."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. PR #478: advance the explicit reviewed upstream baseline to a758e93d6. PR closeout: compare against the already-reviewed upstream 2c3dcc06e baseline; the prior a758e93d6 pin predates the merged source and cannot validate the current ledger."
     },
     {
       "path": ".github/workflows/test-coverage-pr.yml",
@@ -3472,6 +3478,18 @@
       "note": "Plugin #3061: actual shared artifacts and foreign ownerDocument, trusted palette/Tab/Escape/history input and main-scene isolation. Negative control reproduces nested-focus loss."
     },
     {
+      "path": "tests/obsidian/browser/flowchartNavigation.mjs",
+      "status": "fork-only",
+      "fork_sha256": "e7c366fcf0f3d7d38b072e39f605f1c52a353dace16911399c748d3f9ecad08e",
+      "upstream_sha256": null,
+      "ids": [
+        "OBS-028",
+        "OBS-033"
+      ],
+      "kind": "test-tooling",
+      "note": "Alt+Arrow investigation: actual artifact pointer-selected plain/labeled connected charts in full/tray/compact. All four directions pass in both artifacts; original reported defect remains unreproduced. See alt-arrow-navigation.md."
+    },
+    {
       "path": "tests/obsidian/browser/minimap.mjs",
       "status": "fork-only",
       "fork_sha256": "95d35067cb508208b45c709f3494a10917cdf414555a50a8400a864ed24508f8",
@@ -3488,7 +3506,7 @@
     {
       "path": "tests/obsidian/browser/run.mjs",
       "status": "fork-only",
-      "fork_sha256": "f9b0de3d1a40e7e5bb86c5a4d8970381f77af1b2fa31b877d3ef42e5c96e9dc2",
+      "fork_sha256": "51af0ef128973c983560237fe24883db958192914976902fac2761d5643195ec",
       "upstream_sha256": null,
       "ids": [
         "OBS-003",
@@ -3500,7 +3518,7 @@
         "OBS-032"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Register the built production/development YouTube fullscreen regression with offline nested cross-origin provider fixtures, trusted clicks, two zoom levels and exit geometry. Plugin #3048 / PR #3052. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; complete matching-build portable/native acceptance passes; see pr-486-results.json. See pr-486-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately. PR #491 release-size preservation: production-only empty/English-equivalent translation compaction with exhaustive fallback and four-language browser verification; unchanged 5 MiB gate passes at 5,218,572 bytes. Runtime compaction: production exact WASM/shared locale paths and first/warm actual-browser subset regression; see runtime-compaction.md. Plugin #3061: preserve already-focused popup descendants in their owning document; actual artifact regression and native main/popout evidence. See color-shortcuts-3061.md."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Register the built production/development YouTube fullscreen regression with offline nested cross-origin provider fixtures, trusted clicks, two zoom levels and exit geometry. Plugin #3048 / PR #3052. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; complete matching-build portable/native acceptance passes; see pr-486-results.json. See pr-486-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately. PR #491 release-size preservation: production-only empty/English-equivalent translation compaction with exhaustive fallback and four-language browser verification; unchanged 5 MiB gate passes at 5,218,572 bytes. Runtime compaction: production exact WASM/shared locale paths and first/warm actual-browser subset regression; see runtime-compaction.md. Plugin #3061: preserve already-focused popup descendants in their owning document; actual artifact regression and native main/popout evidence. See color-shortcuts-3061.md. Alt+Arrow: register actual artifact baseline coverage with P07 feature identity; no runtime fix."
     },
     {
       "ids": [

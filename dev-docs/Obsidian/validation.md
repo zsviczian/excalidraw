@@ -384,3 +384,11 @@ Native main passes and popout fails the same trusted S/S selected-text recolor b
 Final #3061 acceptance: all 1,163 portable cases pass, including 36 actual-artifact browser cases. Focused native main/popout S/S recolor, tools-panel width/collapse and existing toolbar cases pass with strict error/cleanup/source gates. Full/owned types, coverage, package consumers, inventory fingerprints and 15 checker tests pass. Settings and original test-window bounds restored. Only final acceptance documentation follows the frozen successful runs. [Exact sources/artifacts and limits](color-shortcuts-3061-results.json).
 
 Maintainer acceptance, 2026-11-21: #3061 confirmed fixed; commit/push and a targeted upstream follow-up to #11997 authorized. Runtime implementation remains identical to the accepted source hashes.
+
+## Alt/Option+Arrow investigation — 2026-11-21
+
+All 38 actual-artifact browser cases pass, including 48 plain/labeled pointer-selected navigation checks. Focused native main/popout cases pass 24 labeled-node layout/direction checks plus existing toolbar/color/history/save assertions. Plugin fast: 826 pass. The original issue remains unreproduced, so no runtime fix is claimed. Test setup failures and platform/input limits are retained in [the investigation](alt-arrow-navigation.md).
+
+### Confirmed core-Obsidian hotkey conflict and plugin fix
+
+The supplied configuration identified Alt+Up/Down bound to core move-line commands. Both windows fail navigation with those bindings before the plugin edit and pass afterward. The scoped wildcard preserves actual Markdown line movement, repeated registration/teardown and drawing reopen. All 829 fast cases, five bundle contracts and changed-source lint pass; four unchanged component artifacts match the 38-case browser report and native plugin inputs. [Exact record](alt-arrow-navigation-results.json). No component runtime/package version changed; personal-vault inspection was read-only.

@@ -18,6 +18,7 @@ import { verifyTextEditing } from "./textEditing.mjs";
 import { verifyWrapMerge } from "./wrapMerge.mjs";
 import { verifyTextFocus } from "./textFocus.mjs";
 import { verifyColorShortcuts } from "./colorShortcuts.mjs";
+import { verifyFlowchartNavigation } from "./flowchartNavigation.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const shortcutModifier = process.platform === "darwin" ? "Meta" : "Control";
@@ -150,13 +151,18 @@ try {
         `${source};return ExcalidrawLib;`,
       )(React, ReactDOM, JSX, JSXDEV);
     }, payload);
-    const run = async (name, execute, driver = false) => {
+    const run = async (
+      name,
+      execute,
+      driver = false,
+      featureIds = ["P01", "P03", "P09"],
+    ) => {
       const testId = `fork-browser:${mode}:${name}`;
       try {
         const evidence = await (driver ? execute() : page.evaluate(execute));
         tests.push({
           testId,
-          featureIds: ["P01", "P03", "P09"],
+          featureIds,
           status: "passed",
           evidence,
         });
@@ -851,6 +857,12 @@ try {
       "color-shortcuts-owning-document",
       () => verifyColorShortcuts(page, shortcutModifier),
       true,
+    );
+    await run(
+      "flowchart-alt-navigation",
+      () => verifyFlowchartNavigation(page),
+      true,
+      ["P07"],
     );
     await run("ttd-close-button", () => verifyTTDClose(page), true);
     await run("minimap-zoom-layouts", () => verifyMinimap(page), true);
