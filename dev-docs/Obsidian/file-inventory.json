@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
   "review": {
-    "date": "2026-11-21",
+    "date": "2026-11-22",
     "dependency_precommit_tests": "1,163 portable cases including 36 real-artifact browser cases, focused main/popout native recolor/toolbar/panel tests, full/owned types, coverage, package consumers, strict errors and cleanup pass. Baseline and original window bounds restored. Exact evidence: color-shortcuts-3061-results.json.",
-    "method": "Test-only glyph oracle follow-up for plugin PR #3064, against the existing reviewed 2c3dcc06e upstream baseline. Production text placement and all package versions unchanged.",
+    "method": "Two-parent PR #496 review of both incoming paths, existing focus equivalence, retained portal/migration/tooltip behavior and new upstream regression. No runtime rewrite.",
     "self_exclusion": "dev-docs/Obsidian/ (inventory documentation and tooling only; root AGENTS.md and CONTRIBUTING.md remain included)",
     "merge": {
-      "fork_parent": "fd6fb4fc77cc428c5c23fef022d484ae30a7e289",
-      "upstream_parent": "2c3dcc06ec807e81ab9437eceb1a8f7a3c590743",
-      "merge_base": "d732d4f3d50e6ac092ec6e86a4e04a40546a9395",
-      "reference": "https://github.com/zsviczian/excalidraw/pull/491",
-      "state": "Resolved and validated two-parent merge checkpoint. Only final acceptance documentation differs from the frozen candidate; implementation hashes are recorded in pr-491-results.json. No version/publication/plugin dependency change."
+      "fork_parent": "9de2cfd394b5772d50b27b1ff9214290ba1854c0",
+      "upstream_parent": "9c2e462ec23e54c4cf0493328840d6a27191c674",
+      "merge_base": "2c3dcc06ec807e81ab9437eceb1a8f7a3c590743",
+      "reference": "https://github.com/zsviczian/excalidraw/pull/496",
+      "state": "Resolved and reviewed mechanical merge. Existing production JS/CSS are byte-identical to published 0.18.150. Maintainer explicitly stopped oversized testing; no complete acceptance claimed. See pr-496-merge-review.md."
     },
     "runtime_validation": "1,163 portable cases including 36 real-artifact browser cases, focused main/popout native recolor/toolbar/panel tests, full/owned types, coverage, package consumers, strict errors and cleanup pass. Baseline and original window bounds restored. Exact evidence: color-shortcuts-3061-results.json.",
     "dependency_checkpoint": "2026-10-11: Obsidian artifact/declaration and plugin production/library builds pass. Local fork Windows Obsidian 1.14.4 smoke passes. Published 0.18.140 main/direct-popout/moved-popout input/save/cleanup smoke passes. Plugin npm tree/audit confirms no braces and source-map-js 1.2.2. Component full typecheck remains blocked by documented window.h/stale test-type failures. Packed manifest confirms Sass dev-only; no publication/version bump. The 5 MB target is 5 * 1024 * 1024 = 5,242,880 bytes. Plugin main.js: 5,051,865 bytes with published component (191,015 bytes of headroom), 5,057,617 with local fork (185,263 bytes of headroom); both are below the target. No full scanner, macOS or physical-mobile run in this checkpoint.",
@@ -200,29 +200,39 @@
       "cause": "Linux measured a valid natural width of 195px; the original test incorrectly assumed every font measurement is fractional.",
       "correction": "Force the paste width to reach the fractional container limit with a large glyph; assert exactly 200.46px instead of guessing font metrics.",
       "validation": "All 38 production/development artifact browser cases pass; focused formatting and lint pass. Hosted Linux rerun pending."
+    },
+    "pr496": {
+      "retirement": "Autofocus fingerprint only: identical guard accepted upstream #12700. OBS-021/025/033 remain active.",
+      "incomingPaths": [
+        "packages/excalidraw/components/PropertiesPopover.tsx",
+        "packages/excalidraw/tests/crossDocument.test.tsx"
+      ],
+      "validation": "Component and plugin builds/full types pass; production JS and both CSS match published bytes. Six retained source cases pass; unchanged inherited test has an existing asynchronous tool-readiness mismatch, confirmed by seven passing diagnostic cases with a readiness wait. Inventory accounting maintained. Oversized native run retained as failed, with relevant main/popout palette checks passing; maintainer stopped testing. Cleanup-only baseline restoration completes with no tasks/prints/popouts. No full-profile pass claimed.",
+      "release": "Maintainer 0.18.150 retained; no package version, publication or consumer dependency change.",
+      "prevention": "Explicit maintainer request: align fork AGENTS.md and plugin CODING_STANDARDS.md around actual behavioral risk; remove automatic full-profile requirement for identical upstream adoption and require an escalation reason."
     }
   },
   "sources": {
     "fork": {
       "kind": "Git working tree",
-      "parent_commit": "cf11a3ca55aaed413f219c90fbcc1de934d766c8",
+      "parent_commit": "9de2cfd394b5772d50b27b1ff9214290ba1854c0",
       "package": "@zsviczian/excalidraw",
-      "version": "0.18.149",
-      "working_tree_changes": "Test-only fractional paste fixture correction; production runtime, package versions and dependency declarations unchanged."
+      "version": "0.18.150",
+      "working_tree_changes": "Resolved upstream PR #496; adopt identical focus guard without obsolete fingerprint, preserve portal and fork tests, update reviewed inventory."
     },
     "upstream": {
       "kind": "local Git commit",
-      "commit": "2c3dcc06ec807e81ab9437eceb1a8f7a3c590743",
-      "tree": "879e10749e4dbfb941b24e862f9ba000564ae803",
+      "commit": "9c2e462ec23e54c4cf0493328840d6a27191c674",
+      "tree": "08f50483db2f07ea617752dec4b2aabc7f1a9eba",
       "package": "@excalidraw/excalidraw",
       "version": "0.18.0"
     },
     "plugin": {
       "kind": "Git source checkpoint",
-      "commit": "c41468c70677bbf6cf0759ac43970c4bcce9b416",
-      "version": "2.29.2",
-      "fork_dependency": "0.18.149",
-      "working_tree_changes": "Scoped root-keymap Alt/Option+Arrow guard, source/native tests and feature mappings on fix/tools-panel-drag-bar-width. Maintainer Messages.ts edit preserved; no version/dependency change."
+      "commit": "531563609622bb17573d8cd04e79a804e7dc208e",
+      "version": "2.29.3",
+      "fork_dependency": "0.18.150",
+      "working_tree_changes": "Clean detached linked worktree of master for testing. Unrelated floating-preview working-tree edits are excluded and untouched."
     },
     "extras": {
       "kind": "Git working tree",
@@ -244,11 +254,11 @@
   "comparison": {
     "fork": {
       "files": 1391,
-      "sha256": "343171576d6817b316d9a26450496d9178face5c6d6d15e8bd340488a6ffd4b1"
+      "sha256": "af437ec82b8dea25c7511e8e3843bcf913584c5c2cd69787cd143ea3270f77c9"
     },
     "upstream": {
       "files": 1342,
-      "sha256": "65f7949f283ea102846a15e68ecb18f1a72cb58008d89ee3a0ff6cf5d877d714"
+      "sha256": "efbd64bc3d01482b4c64ca908338b7acfd70f046297aeba4beae36d6a97df1b9"
     }
   },
   "customizations": [
@@ -491,7 +501,7 @@
     {
       "path": ".github/workflows/obsidian-tests.yml",
       "status": "fork-only",
-      "fork_sha256": "85695f384b7b4a896ed6f60f61d3ab8ff6ffb7f6d5c97ffe9ec68d95ce0db8a7",
+      "fork_sha256": "4a8958ad15c51b8d7cb9c46ced30202af4fbb92450d91a5361a2d9be26eefc41",
       "upstream_sha256": null,
       "ids": [
         "OBS-001",
@@ -499,7 +509,7 @@
         "OBS-034"
       ],
       "kind": "ci",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. PR #478: advance the explicit reviewed upstream baseline to a758e93d6. PR closeout: compare against the already-reviewed upstream 2c3dcc06e baseline; the prior a758e93d6 pin predates the merged source and cannot validate the current ledger."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. PR #478: advance the explicit reviewed upstream baseline to a758e93d6. PR closeout: compare against the already-reviewed upstream 2c3dcc06e baseline; the prior a758e93d6 pin predates the merged source and cannot validate the current ledger. PR #496 advances the source-inventory comparison to incoming upstream 9c2e462ec."
     },
     {
       "path": ".github/workflows/test-coverage-pr.yml",
@@ -549,14 +559,14 @@
     {
       "path": "AGENTS.md",
       "status": "modified",
-      "fork_sha256": "69058be8c02ceec3f32478168fde95325ffa2743dd4e74a00d7f489a6f84188b",
+      "fork_sha256": "8ecc02c176e8c85a5d31f8ad6fca34f1e7694b0ab2b2139c94e41a2bc13875f6",
       "upstream_sha256": "1a93e041546f379aa48c7dde5ee3a614ddc383b4079725ff10efd98913e2e5e5",
       "ids": [
         "OBS-001",
         "OBS-033",
         "OBS-034"
       ],
-      "note": "Fork execution, merge, host, artifact, and handoff policies; now requires the persisted inventory. 2026-10-12: requested reminder to use isFullPanelMode for full/tray and explicitly include compact/tablet where supported. PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: require behavioral regression authoring for feature/fix/refactor changes, focused checkpoint checks, explicit PR-ready portable/native gates, and release/upstream/Obsidian-alpha validation; document CI versus manual native execution and documentation-only exceptions. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
+      "note": "Fork execution, merge, host, artifact, and handoff policies; now requires the persisted inventory. 2026-10-12: requested reminder to use isFullPanelMode for full/tray and explicitly include compact/tablet where supported. PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: require behavioral regression authoring for feature/fix/refactor changes, focused checkpoint checks, explicit PR-ready portable/native gates, and release/upstream/Obsidian-alpha validation; document CI versus manual native execution and documentation-only exceptions. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487\u2013#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately. PR #496 maintainer-requested prevention: classify actual behavior before choosing tests; upstream adoption of identical code/fingerprint removal is mechanical; broad profiles require an explicit risk justification.",
       "kind": "governance"
     },
     {
@@ -1628,7 +1638,7 @@
         "OBS-009",
         "OBS-026"
       ],
-      "note": "Upstream text-session owner with narrow Obsidian calls: Markdown preparation/submission, zoom-aware creation, and unchanged-source history restoration for plugin #2976. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Adopt upstream host-metrics forwarding; preserve the existing documented host behavior and compatibility. See pr-475-merge-review.md. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
+      "note": "Upstream text-session owner with narrow Obsidian calls: Markdown preparation/submission, zoom-aware creation, and unchanged-source history restoration for plugin #2976. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Adopt upstream host-metrics forwarding; preserve the existing documented host behavior and compatibility. See pr-475-merge-review.md. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487\u2013#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
       "kind": "integration"
     },
     {
@@ -1658,7 +1668,7 @@
         "OBS-032",
         "OBS-037"
       ],
-      "note": "Main cross-cutting integration: public adapters, early state, scaled webviews, highlighter layer, frame/link UI, image lifecycle, teardown/test-hook suppression, menus/input ordering, host layout, and selection/geometry wrappers. See catalog and API contract table. PR #458: setSelection retained byte-for-byte; selection and transform handlers follow the upstream extraction, with unlocked-hit override now in App.selectionTool.ts. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #463: crop/text-resize integration reviewed against incoming 2df993fb; see pr-463-merge-review.md. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Adopt upstream host-metrics forwarding; preserve the existing documented host behavior and compatibility. See pr-475-merge-review.md. PR #482: reviewed source and both parents, preserving all prior fork contracts; accounts separately for pre-existing #480/#481 frame changes and version 0.18.146. See pr-482-merge-review.md; 876 portable and 387 native cases pass, with additional focused Mermaid/SVG checks. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. YouTube video and playlist wrappers use the existing iframe fallback so HTML fullscreen and postMessage stay in the owning document; generic desktop webviews and Vimeo remain unchanged. Plugin #3048 / PR #3052. Two fingerprinted conditions; no host protocol, URL transformation, permission or saved-data change. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
+      "note": "Main cross-cutting integration: public adapters, early state, scaled webviews, highlighter layer, frame/link UI, image lifecycle, teardown/test-hook suppression, menus/input ordering, host layout, and selection/geometry wrappers. See catalog and API contract table. PR #458: setSelection retained byte-for-byte; selection and transform handlers follow the upstream extraction, with unlocked-hit override now in App.selectionTool.ts. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #463: crop/text-resize integration reviewed against incoming 2df993fb; see pr-463-merge-review.md. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Adopt upstream host-metrics forwarding; preserve the existing documented host behavior and compatibility. See pr-475-merge-review.md. PR #482: reviewed source and both parents, preserving all prior fork contracts; accounts separately for pre-existing #480/#481 frame changes and version 0.18.146. See pr-482-merge-review.md; 876 portable and 387 native cases pass, with additional focused Mermaid/SVG checks. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. YouTube video and playlist wrappers use the existing iframe fallback so HTML fullscreen and postMessage stay in the owning document; generic desktop webviews and Vimeo remain unchanged. Plugin #3048 / PR #3052. Two fingerprinted conditions; no host protocol, URL transformation, permission or saved-data change. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487\u2013#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
       "kind": "integration"
     },
     {
@@ -2149,13 +2159,13 @@
     {
       "path": "packages/excalidraw/components/PropertiesPopover.tsx",
       "status": "modified",
-      "fork_sha256": "6179ec534345c6e772d52edb0efe1fc3c395f85a1c67649ea8175ea928178b4a",
-      "upstream_sha256": "e593fbf0b9adfe21108579475024c9c34431b0fde9bda558e8331fb693cd4fc2",
+      "fork_sha256": "98c0caf5d4dcd1344382c9ada6a88aaf8e314800e2a936e109be9d65b6544c52",
+      "upstream_sha256": "e2508bd04b1b2da38c7979bda5797abb02e71b525c465f504bfa6d898e2c0579",
       "ids": [
         "OBS-021",
         "OBS-025"
       ],
-      "note": "Use the shared Obsidian body portal instead of the source container portal. Plugin #3061: preserve already-focused popup descendants in their owning document; actual artifact regression and native main/popout evidence. See color-shortcuts-3061.md.",
+      "note": "Use the shared Obsidian body portal instead of the source container portal. Plugin #3061: preserve already-focused popup descendants in their owning document; actual artifact regression and native main/popout evidence. See color-shortcuts-3061.md. PR #496: upstream #12700 now owns the identical autofocus guard; remove only its obsolete fingerprint/comments. Obsidian body portal remains necessary.",
       "kind": "integration"
     },
     {
@@ -2441,7 +2451,7 @@
         "OBS-027",
         "OBS-028"
       ],
-      "note": "Use supplied owner DPI, allow double-click forwarding in view mode, and select host renderer state. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
+      "note": "Use supplied owner DPI, allow double-click forwarding in view mode, and select host renderer state. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487\u2013#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
       "kind": "integration"
     },
     {
@@ -2790,7 +2800,7 @@
         "OBS-015",
         "OBS-026"
       ],
-      "note": "Add frame-role, extra-small, extra-thin, and extra-bold labels. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #482: reviewed source and both parents, preserving all prior fork contracts; accounts separately for pre-existing #480/#481 frame changes and version 0.18.146. See pr-482-merge-review.md; 876 portable and 387 native cases pass, with additional focused Mermaid/SVG checks. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
+      "note": "Add frame-role, extra-small, extra-thin, and extra-bold labels. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. PR #472: reviewed lazy-load/status integration against 1d4dc2c0; preserve host Mermaid, selected source and existing preview behavior. See pr-472-merge-review.md. PR #482: reviewed source and both parents, preserving all prior fork contracts; accounts separately for pre-existing #480/#481 frame changes and version 0.18.146. See pr-482-merge-review.md; 876 portable and 387 native cases pass, with additional focused Mermaid/SVG checks. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487\u2013#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
       "kind": "presentation"
     },
     {
@@ -2801,7 +2811,7 @@
       "ids": [
         "OBS-015"
       ],
-      "note": "Add Chinese marker-frame-role label. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
+      "note": "Add Chinese marker-frame-role label. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487\u2013#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
       "kind": "presentation"
     },
     {
@@ -2937,14 +2947,14 @@
     {
       "path": "packages/excalidraw/package.json",
       "status": "modified",
-      "fork_sha256": "4bc6dbd6fe25ca0e4182baa32a45fba6bfd4232f5ba3a1c1ee82f203edcc58bd",
+      "fork_sha256": "ca40094451daf6cf5f97c1b90e6988cd7bb38729e5505d7dbbc6a50164333926",
       "upstream_sha256": "7a7226be91e3365916b5c680811f8c7f43d1eafd78db52711722287e6f3fe76a",
       "ids": [
         "OBS-002",
         "OBS-003",
         "OBS-004"
       ],
-      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies. Baseline bee1292f3 already bumps to 0.18.142; the layout fix does not bump or publish. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. 2026-10-23: acknowledge the existing manifest-only 0.18.144 release commit 9d1e20b60 while correcting consumer declarations; no version change in this repair. PR #475: Converter 3.0.0 remains dev-only; preserve fork exports, external runtime and existing 0.18.144 version. See pr-475-merge-review.md. #3019 accounting acknowledges the already committed 0.18.145 version; this feature does not bump it. PR #477: clean packed bundler consumer failed on nonexistent dist/types export-map paths; point existing type exports to actual generated types/. No runtime/version/API-signature change. PR #478: exact converter 3.1.0 remains dev-only; no fork version/export/security-resolution change. PR #482: reviewed source and both parents, preserving all prior fork contracts; accounts separately for pre-existing #480/#481 frame changes and version 0.18.146. See pr-482-merge-review.md; 876 portable and 387 native cases pass, with additional focused Mermaid/SVG checks. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Version 0.18.147 inherited from fork parent 910845750; no version bump here. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately. Maintainer release 6a731945b: version 0.18.149 was already present before #3061; no version change by this fix.",
+      "note": "Fork name/version, types and ESM/IIFE build scripts, publish hook, dependency changes, and stale example commands; verify ESM/type export graph separately from IIFE. Sass 1.51.0 is build-only and moves to development dependencies without changing the compiler version. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. Baseline 52e99975d already increments version to 0.18.141; PR #465 does not change versions or dependencies. Baseline bee1292f3 already bumps to 0.18.142; the layout fix does not bump or publish. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. 2026-10-23: acknowledge the existing manifest-only 0.18.144 release commit 9d1e20b60 while correcting consumer declarations; no version change in this repair. PR #475: Converter 3.0.0 remains dev-only; preserve fork exports, external runtime and existing 0.18.144 version. See pr-475-merge-review.md. #3019 accounting acknowledges the already committed 0.18.145 version; this feature does not bump it. PR #477: clean packed bundler consumer failed on nonexistent dist/types export-map paths; point existing type exports to actual generated types/. No runtime/version/API-signature change. PR #478: exact converter 3.1.0 remains dev-only; no fork version/export/security-resolution change. PR #482: reviewed source and both parents, preserving all prior fork contracts; accounts separately for pre-existing #480/#481 frame changes and version 0.18.146. See pr-482-merge-review.md; 876 portable and 387 native cases pass, with additional focused Mermaid/SVG checks. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Version 0.18.147 inherited from fork parent 910845750; no version bump here. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487\u2013#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately. Maintainer release 6a731945b: version 0.18.149 was already present before #3061; no version change by this fix. Acknowledge maintainer release 0.18.150 in parent 9de2cfd39; no version or dependency change in PR #496.",
       "kind": "packaging"
     },
     {
@@ -2981,7 +2991,7 @@
         "OBS-018",
         "OBS-027"
       ],
-      "note": "Host-aware contrast highlight colors, frame colors, search-result emphasis, and selection/binding widths. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
+      "note": "Host-aware contrast highlight colors, frame colors, search-result emphasis, and selection/binding widths. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487\u2013#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
       "kind": "behavior"
     },
     {
@@ -3133,15 +3143,15 @@
     {
       "path": "packages/excalidraw/tests/crossDocument.test.tsx",
       "status": "modified",
-      "fork_sha256": "a5bc844ce86de754c2c702c869582e0bd4ad73baad150fd880724c3bcb8c8ef6",
-      "upstream_sha256": "0199bd851d267408e94d91bf319a80a53fb8073363d3271be73d40cc6844c8f8",
+      "fork_sha256": "14b66647729a108689384c08dac9c2a5d8262c2e472c961f5c10bcdd9b14b267",
+      "upstream_sha256": "acffa8fd359feff2a5824667449a5392616235f45e565768b87ec0dc1ade3cbd",
       "ids": [
         "OBS-017",
         "OBS-020",
         "OBS-021",
         "OBS-033"
       ],
-      "note": "Add owner-window drag/tooltip and awaited image decoding checks; updated element fixture. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md.",
+      "note": "Add owner-window drag/tooltip and awaited image decoding checks; updated element fixture. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #496: retain the upstream color-picker regression verbatim, plus existing fork migration/tooltip coverage; combine only COLOR_PALETTE/MIME_TYPES imports.",
       "kind": "test"
     },
     {
@@ -3351,7 +3361,7 @@
         "OBS-009",
         "OBS-033"
       ],
-      "note": "End-to-end component text editing stores raw Markdown, parsed display, and link. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
+      "note": "End-to-end component text editing stores raw Markdown, parsed display, and link. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #465: reviewed crop-independent wrap/frame integration against incoming 541653c7; see pr-465-merge-review.md. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487\u2013#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
       "kind": "test"
     },
     {
@@ -3365,7 +3375,7 @@
         "OBS-021",
         "OBS-024"
       ],
-      "note": "Attach/close host suggester, preserve editing across host panels, round scaled text width, and adjust caret; a new instanceof path still uses global constructors. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Adopt upstream host-metrics forwarding; preserve the existing documented host behavior and compatibility. See pr-475-merge-review.md. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
+      "note": "Attach/close host suggester, preserve editing across host panels, round scaled text width, and adjust caret; a new instanceof path still uses global constructors. PR #462: reviewed against incoming e65eca999; see pr-462-merge-review.md. PR #469: reviewed against d3a9c2a19; preserve the recorded host contract while adopting scoped upstream rendering/ownership. See pr-469-merge-review.md. PR #475: Adopt upstream host-metrics forwarding; preserve the existing documented host behavior and compatibility. See pr-475-merge-review.md. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487\u2013#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately.",
       "kind": "integration"
     },
     {
@@ -3529,7 +3539,7 @@
         "OBS-032"
       ],
       "kind": "test-tooling",
-      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Register the built production/development YouTube fullscreen regression with offline nested cross-origin provider fixtures, trusted clicks, two zoom levels and exit geometry. Plugin #3048 / PR #3052. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; complete matching-build portable/native acceptance passes; see pr-486-results.json. See pr-486-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487–#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately. PR #491 release-size preservation: production-only empty/English-equivalent translation compaction with exhaustive fallback and four-language browser verification; unchanged 5 MiB gate passes at 5,218,572 bytes. Runtime compaction: production exact WASM/shared locale paths and first/warm actual-browser subset regression; see runtime-compaction.md. Plugin #3061: preserve already-focused popup descendants in their owning document; actual artifact regression and native main/popout evidence. See color-shortcuts-3061.md. Alt+Arrow: register actual artifact baseline coverage with P07 feature identity; no runtime fix."
+      "note": "PR #477 / plugin #3022: additive independent owned/inherited validation, exact source/artifact evidence and fail-closed reporting; never shipped. PR #477 final focused lint: mechanical import/bracing/template formatting, explicit built-payload evaluation/XML-control justifications and stdout/stderr reporting. Zero errors/warnings with JSON formatter; source/model/browser assertions preserved. #3022 correction: current fork behavior is accepted; independent regression and trusted built-browser workflows replace inherited helper coupling. Historical upstream audit is manual only. 2026-10-30: guard the redundant Selection setup click, which intentionally toggles an active selection tool to Lasso. Passive failure capture proves the cause; all 18 normal built-browser cases pass with grouping/deletion/history assertions unchanged. No production change. 2026-10-31: Opt-in shared TTD close control and owned browser validation; see ttd-close-button.md. PR #483: both parents and incoming 82d5847e reviewed; preserve prior host contracts. See pr-483-merge-review.md. Register the built production/development YouTube fullscreen regression with offline nested cross-origin provider fixtures, trusted clicks, two zoom levels and exit geometry. Plugin #3048 / PR #3052. PR #485: reviewed against incoming 9e9621b87; preserve recorded host behavior while adopting upstream text editing. See pr-485-merge-review.md. PR #486: adopt upstream retained-container/discovery/history changes, preserving link ownership only at conditional transfer points. Eighteen focused source cases and 28 actual-artifact browser cases pass; complete matching-build portable/native acceptance passes; see pr-486-results.json. See pr-486-merge-review.md. PR #491: reviewed against incoming 2c3dcc06e; see pr-491-merge-review.md. Prior #487\u2013#489 upstream autosize/app changes and carried version 0.18.148 are accounted separately. PR #491 release-size preservation: production-only empty/English-equivalent translation compaction with exhaustive fallback and four-language browser verification; unchanged 5 MiB gate passes at 5,218,572 bytes. Runtime compaction: production exact WASM/shared locale paths and first/warm actual-browser subset regression; see runtime-compaction.md. Plugin #3061: preserve already-focused popup descendants in their owning document; actual artifact regression and native main/popout evidence. See color-shortcuts-3061.md. Alt+Arrow: register actual artifact baseline coverage with P07 feature identity; no runtime fix."
     },
     {
       "ids": [

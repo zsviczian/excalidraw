@@ -275,4 +275,6 @@ The existing published `Fonts` registry is consumed by plugin CJKLoader and Font
 
 ## Color picker focus ownership (#3061)
 
+**PR #496:** the existing focus contract is now supplied verbatim by upstream #12700; no API/protocol or saved-scene changes. Keep the Obsidian portal bridge and independent main/popout keyboard coverage. [Review](pr-496-merge-review.md).
+
 When opening a properties popup, an already-focused descendant in that popup owning document retains focus, including when the shared runtime was evaluated in another document. Existing touch autofocus suppression and default behavior for an unfocused popup remain. See [the checkpoint](color-shortcuts-3061.md).

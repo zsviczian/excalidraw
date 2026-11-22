@@ -18,6 +18,10 @@ Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md]
 
 ## Reviewed merge checkpoints
 
+### PR #496 upstream autofocus adoption — 2026-11-22
+
+The [review](pr-496-merge-review.md) compares fork parent `9de2cfd39`, merge base `2c3dcc06e` and incoming `9c2e462ec23e54c4cf0493328840d6a27191c674`. Only two incoming paths changed. Adopt the now-upstream focus guard without the redundant local fingerprint, preserving the body portal and migration/tooltip tests. Use the incoming commit for the current inventory comparison; prior checkpoint commands remain historical. Validation is recorded in the review. No version, publication or dependency change.
+
 ### PR #491 focus/sync/teardown and upstreamed frame fix — 2026-11-19
 
 [The review](pr-491-merge-review.md) accounts for all 70 incoming paths against

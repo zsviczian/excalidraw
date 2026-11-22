@@ -311,6 +311,8 @@ contracts. Source and built-artifact teardown cases are recorded in the
 <a id="obs-021"></a>
 ## OBS-021 — Owner-document portals, tooltips, and drag ghosts
 
+**PR #496 (2026-11-22):** upstream #12700 owns the identical PropertiesPopover autofocus guard. Its obsolete fingerprint/comments retire; the separate Obsidian body portal, tooltip isolation and migration tests remain. Public/serialized contracts are unchanged. [Review](pr-496-merge-review.md).
+
 **PR #469 (2026-10-20):** The complete colorTopPicksDnD.ts, fontTopPicksDnD.ts and TopPicksDnD/topPicksDnD.tsx deltas retire because upstream now owns the same source-window DOM/styles/timers. Hyperlink ownership follows upstream. Generic tooltip timers/observers/warm state remain document-local because upstream still has one process-wide slot; the Radix bridge remains necessary. [Merge review](pr-469-merge-review.md).
 
 **Retain; upstream generic realm fixes where possible.** [ObsidianRadixPortal.tsx](../../packages/excalidraw/components/ObsidianRadixPortal.tsx) portals selected Radix content to the owning body to escape Obsidian's offset containing block. A `display: contents` bridge carries classes and live CSS custom properties/color; a layout effect avoids stale theme values, and an owning ResizeObserver mirrors hidden tabs without unmounting popup content. Tool, property, dropdown, and modal-origin history controls use that bridge and travelling classes/collision boundaries/outside-click rules.

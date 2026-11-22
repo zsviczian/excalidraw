@@ -1,0 +1,32 @@
+# PR #496: upstream color-picker focus adoption
+
+Fork parent: 9de2cfd394b5772d50b27b1ff9214290ba1854c0. Incoming upstream: 9c2e462ec23e54c4cf0493328840d6a27191c674 (merged upstream #12700). Merge base: 2c3dcc06ec807e81ab9437eceb1a8f7a3c590743. The upstream delta contains exactly two paths. The maintainer's later 0.18.150 release is already present in the fork parent and is acknowledged, without another version change.
+
+## Behavior inventory and conflict decisions
+
+| Path | Previous fork behavior and consumer | Incoming change / resulting owner | Resolution |
+| --- | --- | --- | --- |
+| packages/excalidraw/components/PropertiesPopover.tsx | Prevent Radix from replacing a focused child in a secondary document; Obsidian main/popout palettes (#3061). Separate body portal avoids containing-block displacement. | Upstream #12700 adds exactly the same ownerWindow/HTMLElement/contains(activeElement) guard in onOpenAutoFocus. | Use the upstream guard and comments verbatim. Remove the redundant local START/END fingerprint. Preserve existing touch suppression, close behavior and the Obsidian portal wrapper. |
+| packages/excalidraw/tests/crossDocument.test.tsx | Fork imports and cases cover tooltip ownership, tooltip independence and awaited image decoding during migration. | Upstream adds COLOR_PALETTE and a color-picker focus/keyboard regression. | Combine imports only; keep the upstream regression verbatim and all fork cases. No test expectation rewrite. |
+
+Both conflicts were reviewed against merge base, fork and incoming sides. There are no additional cleanly merged paths. Against incoming upstream, PropertiesPopover retains only the preexisting ObsidianRadixPortal import/wrapper difference. Against the fork parent, the runtime change consists solely of comments; its executable guard and call order are identical. This is partial retirement under OBS-021/025/033, not removal of the body portal or whole behavior groups. No API, host protocol, settings, saved scene or scripting migration is required.
+
+The file ledger compares against incoming 9c2e462ec23e54c4cf0493328840d6a27191c674. Four reviewed rows change: the two incoming paths, the inventory workflow baseline and the preexisting maintainer package-version bump. Its 295 differing paths remain; the component still differs because its body portal is needed. Inventory hashes are reviewed accounting, not runtime evidence.
+
+## Validation
+
+Component Obsidian build, full TypeScript and clean plugin integration build pass. The runtime change is mechanical and requires no complete portable/native acceptance run. Clean plugin master 53156360 was used in a linked worktree so unrelated floating-preview edits in the primary checkout remain untouched. Test deployment targeted only the existing marker-owned excalidraw-auto-test vault under the shared host lock. No package publication, version bump or personal-vault deployment.
+
+The unchanged incoming source test fails before opening the picker: the fork intentionally schedules tool activation, so the immediate key is sent while selection is still active. The existing compatibility host configuration alone does not change that timing. A read-only diagnostic captures selection/full-layout/null popup at the dispatch; an ignored diagnostic harness adding only an observable rectangle-readiness wait passes all seven cross-document tests. The tracked upstream test remains verbatim. Its raw failure is retained, not counted as a clean inherited pass or fixed by altering runtime behavior. Existing owned actual-browser/native tests already await readiness. Focused lint reports zero errors and the same two preexisting portal JSX/comment warnings; formatting likewise flags that unchanged portal line.
+
+The rebuilt production JavaScript and both CSS artifacts are byte-identical to the installed published 0.18.150 artifacts. Only development JavaScript differs, because it embeds the original source comments. The clean plugin integration build is 4,843,758 bytes. The first native preparation installs verified artifacts but stops with the registered automation vault closed. Reopening only that vault restores a successful canonical-path/config/plugin-readiness CLI probe. A clean linked K-Plex revision is also used for the required companion cases, excluding unrelated primary-checkout edits.
+
+Production component JS SHA-256: e8c244bdc1d2783d7bc4704e864a2d4d5366106519423e9e8dff675275ed1b5f. Production CSS: ec335630eb0117a57585053c04ad014cf45471bbde39d5acca909c056899aabf. Plugin build SHA-256: 9b77d804ddc8eeb559056c5ec280b0514f603560502f7968b19cb87ed1a72203. These builds contain the reviewed merge; no generated artifact is committed.
+
+## Testing scope correction requested by the maintainer
+
+The agent incorrectly selected a complete regression profile by the "upstream merge" label despite the mechanical-change exception and byte-identical production artifact. The oversized run is not acceptance evidence: it reports an unrelated split-pane Markdown alias timeout and later drawing-geometry failure. Main, nested-split and popout matrices, including both reported palette-shortcut contexts, passed before termination. The maintainer explicitly instructed risk-based testing and then stopped testing. No failed-case rerun or complete acceptance is required or claimed for this mechanical change. Preserve the ignored raw reports under the clean plugin worktree's regression-0913d740-d393-4e2c-bb55-f57a34eead7c directory. Task cleanup passed; a subsequent cleanup-only operation confirmed no tasks/prints/popouts and restored the declared baseline.
+
+At the maintainer's explicit request to prevent recurrence, fork AGENTS.md now classifies the actual behavioral delta before selecting checks, narrows blanket full-profile wording, explicitly identifies upstream adoption/fingerprint removal as mechanical, and requires a concrete broad or unresolved risk before escalation. The plugin CODING_STANDARDS.md receives the matching clarification in its primary working tree, separate from unrelated preview edits. This instruction clarification is specifically authorized; it does not change runtime behavior.
+
+Highest-probability manual regression: select text and press S, S in main and restored/new popouts; verify palette focus/Tab/Escape and surviving-main-editor input. Physical mobile touch autofocus, other desktop OSes and isolated application restart remain separate environments.

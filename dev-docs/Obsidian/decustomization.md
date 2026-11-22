@@ -6,6 +6,8 @@ Scope is the supplied snapshots, with [provenance and limitations](README.md). â
 
 ## Recommended sequence
 
+**PR #496 autofocus retirement (2026-11-22):** upstream #12700 supplies the same owning-document guard. Retire only the redundant autofocus fingerprint; preserve the separate portal customization and all source/browser/native regressions. OBS-021/025/033 remain active. [Review](pr-496-merge-review.md).
+
 **PR #491 completed upstream retirement (2026-11-19):** The frame/group selection
 guard accepted in upstream #12692 now owns the complete `groups.ts` change.
 Restore the exact upstream file and retire its fork fingerprint/file row under
