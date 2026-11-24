@@ -39,6 +39,7 @@ import type {
 import type { JSX } from "react";
 
 type TrayMenuProps = {
+  actionToast?: JSX.Element | null;
   appState: UIAppState;
   actionManager: ActionManager;
   renderJSONExportDialog: () => React.ReactNode;
@@ -61,6 +62,7 @@ type TrayMenuProps = {
 };
 
 export const TrayMenu = ({
+  actionToast,
   appState,
   elements,
   actionManager,
@@ -239,6 +241,9 @@ export const TrayMenu = ({
         }}
       >
         <Island padding={0}>
+          {actionToast && (
+            <div className="tray-action-toast">{actionToast}</div>
+          )}
           {appState.openMenu === "shape" &&
           !appState.viewModeEnabled &&
           appState.openDialog?.name !== "elementLinkSelector" &&

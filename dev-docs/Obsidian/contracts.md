@@ -170,6 +170,14 @@ Canonical definitions: [types.ts](../../packages/excalidraw/types.ts), forwardin
 
 Upstream already supplies `ownerDocument`, `initialData`, `onLinkOpen`, `renderEmbeddable`, `renderTopRightUI`, `theme`, `onThemeChange`, `UIOptions.getFormFactor`, and image insertion options in this snapshot. Their use by the plugin is **not** itself a fork customization. Prefer extending/reusing these surfaces where equivalent lifecycle and callback semantics can be established.
 
+For PR #497, Obsidian Markdown containing links retains line-wise creation
+during ordinary multiline paste. `ExcalidrawView.onPaste` resolves individual
+links and image-only lines after the component inserts them. Shift-paste
+still creates one text element. The component text factory derives persisted
+`rawText` from unwrapped `originalText` for both initial paste and split
+output. The optional upstream toast action affects transient UI state.
+[Merge review](pr-497-merge-review.md).
+
 ## Imperative API additions and changed semantics — OBS-007/017/022/028/029
 
 The public object is assembled in `App.tsx` and declared in `ExcalidrawImperativeAPI` in [types.ts](../../packages/excalidraw/types.ts). A method on `AppClassProperties` alone is not proof of public exposure: notably, `setSelection` is not added to the public imperative object by this fork.

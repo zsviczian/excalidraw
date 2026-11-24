@@ -4,6 +4,11 @@
 
 Scope is the supplied snapshots, with [provenance and limitations](README.md). “High confidence” below concerns the stated source observation; it does not mean an unexecuted build or Obsidian test passed. Owner roles and full implementation/consumer detail are in the [catalog](customizations.md); gate IDs refer to [validation.md](validation.md). Preserve retirement decisions under stable `OBS-xxx` IDs after the corresponding diff disappears.
 
+PR #497 retires the two clipboard-specific raw-source writes. The existing
+text factory obtains the same unwrapped values from `originalText`. Retain
+the factory’s `rawText` support and the host’s line-wise Markdown import
+under OBS-009/011. [Merge review](pr-497-merge-review.md).
+
 ## Recommended sequence
 
 **PR #496 autofocus retirement (2026-11-22):** upstream #12700 supplies the same owning-document guard. Retire only the redundant autofocus fingerprint; preserve the separate portal customization and all source/browser/native regressions. OBS-021/025/033 remain active. [Review](pr-496-merge-review.md).

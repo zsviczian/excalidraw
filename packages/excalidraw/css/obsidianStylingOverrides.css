@@ -401,3 +401,15 @@
     pointer-events: var(--ui-pointerEvents);
   }
 }
+
+
+/* zsviczian -- place the paste split action above the Obsidian tray, PR #497 */
+.excalidraw .App-bottom-bar .tray-action-toast {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  pointer-events: none;
+}

@@ -19,6 +19,7 @@ import { verifyWrapMerge } from "./wrapMerge.mjs";
 import { verifyTextFocus } from "./textFocus.mjs";
 import { verifyColorShortcuts } from "./colorShortcuts.mjs";
 import { verifyFlowchartNavigation } from "./flowchartNavigation.mjs";
+import { verifyClipboardPaste } from "./clipboardPaste.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 const shortcutModifier = process.platform === "darwin" ? "Meta" : "Control";
@@ -863,6 +864,11 @@ try {
       () => verifyFlowchartNavigation(page),
       true,
       ["P07"],
+    );
+    await run(
+      "clipboard-paste-markdown-and-split",
+      () => verifyClipboardPaste(page, shortcutModifier),
+      true,
     );
     await run("ttd-close-button", () => verifyTTDClose(page), true);
     await run("minimap-zoom-layouts", () => verifyMinimap(page), true);

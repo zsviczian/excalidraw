@@ -29,6 +29,7 @@ import { Stats } from "./Stats";
 import { actionToggleStats } from "../actions";
 
 type MobileMenuProps = {
+  actionToast?: JSX.Element | null; // zsviczian -- expose the paste split action
   appState: UIAppState;
   actionManager: ActionManager;
   renderJSONExportDialog: () => React.ReactNode;
@@ -54,6 +55,7 @@ type MobileMenuProps = {
 };
 
 export const MobileMenu = ({
+  actionToast, // zsviczian -- expose the paste split action
   appState,
   elements,
   actionManager,
@@ -158,6 +160,7 @@ export const MobileMenu = ({
       </button>
     ) : null;
 
+  const floatingStatus = actionToast ?? scrollBackToContentButton; // zsviczian -- prioritize the actionable toast like LayerUI
   const viewportStatusLabel = app.props.viewportStatusFrame?.label;
   const viewportStatusBadge = viewportStatusLabel ? (
     <ViewportStatusBadge
@@ -183,10 +186,8 @@ export const MobileMenu = ({
           }}
           data-viewport-ui="bottom"
         >
-          {scrollBackToContentButton && (
-            <div className="floating-status-stack">
-              {scrollBackToContentButton}
-            </div>
+          {floatingStatus && ( // zsviczian -- surface the split action above the toolbar
+            <div className="floating-status-stack">{floatingStatus}</div>
           )}
 
           <MobileShapeActions
@@ -204,8 +205,8 @@ export const MobileMenu = ({
         </div>
       )}
 
-      {!shouldRenderDefaultBottomBar && scrollBackToContentButton && (
-        <div className="floating-status-stack">{scrollBackToContentButton}</div>
+      {!shouldRenderDefaultBottomBar && floatingStatus && (
+        <div className="floating-status-stack">{floatingStatus}</div> // zsviczian -- include the action without the toolbar
       )}
 
       {viewportStatusBadge && (

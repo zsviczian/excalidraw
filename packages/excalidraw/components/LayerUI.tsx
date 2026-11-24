@@ -515,6 +515,20 @@ const LayerUI = ({
     editorInterface.canFitSidebar
   );
 
+  // zsviczian START -- use the same paste action in full, tray, and mobile layouts, PR #497
+  const toast = appState.toast && (
+    <Toast
+      message={appState.toast.message}
+      onClose={() => setAppState({ toast: null })}
+      duration={appState.toast.duration}
+      closable={appState.toast.closable}
+      action={appState.toast.action}
+      timerKey={appState.toast}
+    />
+  );
+  const actionToast = appState.toast?.action ? toast : null;
+  // zsviczian END
+
   const layerUIJSX = (
     <>
       {/* ------------------------- tunneled UI ---------------------------- */}
@@ -659,6 +673,7 @@ const LayerUI = ({
       )}
       {isTrayMode && ( //zsviczian Added isTrayMode condition
         <TrayMenu
+          actionToast={actionToast} // zsviczian -- expose paste splitting in this layout
           app={app}
           appState={appState}
           elements={elements}
@@ -678,6 +693,7 @@ const LayerUI = ({
       )}
       {isMobileMode && ( //zsviczian was editorInterface.formFactor === "phone"
         <MobileMenu
+          actionToast={actionToast} // zsviczian -- expose paste splitting in this layout
           app={app}
           appState={appState}
           elements={elements}
@@ -735,14 +751,7 @@ const LayerUI = ({
               (scrollBackToContentUIEnabled && appState.scrolledOutside) ||
               appProps.viewportStatusFrame?.label) && (
               <div className="floating-status-stack">
-                {appState.toast && (
-                  <Toast
-                    message={appState.toast.message}
-                    onClose={() => setAppState({ toast: null })}
-                    duration={appState.toast.duration}
-                    closable={appState.toast.closable}
-                  />
-                )}
+                {toast}
                 {!appState.toast &&
                   scrollBackToContentUIEnabled &&
                   appState.scrolledOutside && (

@@ -120,6 +120,8 @@ Direct consumers are `P: ExcalidrawRoot.ts`, `ExcalidrawView.ts`, `ExcalidrawAut
 <a id="obs-009"></a>
 ## OBS-009 — Raw Markdown text lifecycle
 
+PR #497 removes explicit clipboard raw-source assignments. The text factory reads unwrapped `originalText` for initial paste and split output, preserving editable Markdown and saved data. See [merge review](pr-497-merge-review.md).
+
 **PR #491 (2026-11-19):** Adopt upstream window-blur continuation, remote text
 reconciliation and deleted-text/unmount cleanup. When an external scene replaces
 the followed text, the existing `onBeforeTextEdit(element, true)` callback must
@@ -162,6 +164,8 @@ undo transactions remain intact. See the [review](pr-486-merge-review.md).
 
 <a id="obs-011"></a>
 ## OBS-011 — Drop and paste interception
+
+PR #497 uses upstream one-element paste for ordinary text. The Obsidian host still sees separate Markdown link/image lines before its deferred processing, and still receives parsed files as the third paste argument. See [merge review](pr-497-merge-review.md).
 
 **PR #471:** Upstream's separate loader-script filtering is adopted verbatim;
 file-aware host interception, cancellation and raw Markdown remain unchanged.
@@ -311,6 +315,8 @@ contracts. Source and built-artifact teardown cases are recorded in the
 <a id="obs-021"></a>
 ## OBS-021 — Owner-document portals, tooltips, and drag ghosts
 
+PR #497 ties the upstream toast timer to its mounted document window. Toast identity and the stable close callback retain upstream duration semantics across renders and replacement. See [merge review](pr-497-merge-review.md).
+
 **PR #496 (2026-11-22):** upstream #12700 owns the identical PropertiesPopover autofocus guard. Its obsolete fingerprint/comments retire; the separate Obsidian body portal, tooltip isolation and migration tests remain. Public/serialized contracts are unchanged. [Review](pr-496-merge-review.md).
 
 **PR #469 (2026-10-20):** The complete colorTopPicksDnD.ts, fontTopPicksDnD.ts and TopPicksDnD/topPicksDnD.tsx deltas retire because upstream now owns the same source-window DOM/styles/timers. Hyperlink ownership follows upstream. Generic tooltip timers/observers/warm state remain document-local because upstream still has one process-wide slot; the Radix bridge remains necessary. [Merge review](pr-469-merge-review.md).
@@ -323,6 +329,8 @@ Do not delete the bridge just because upstream offers a portal container: the co
 
 <a id="obs-022"></a>
 ## OBS-022 — Tray layout and host device/UI preferences
+
+PR #497 exposes the same clickable paste split action above the compact, full, tray and mobile toolbars using the existing layout owners. See [merge review](pr-497-merge-review.md).
 
 **PR #483 (2026-11-13):** Upstream flex-based ZoomActions replaces the old trayMode prop/Stack wrappers. TrayMenu now owns the class and right-hand minimap; isFullPanelMode plus compact protects host layout choices. Keep the tray and existing public layout APIs. See [merge review](pr-483-merge-review.md).
 
@@ -410,6 +418,8 @@ The fork also retains `toggleLaserPointerTool` in the action-name/shortcut maps 
 
 <a id="obs-029"></a>
 ## OBS-029 — Selection, line editing, and geometry API adapters
+
+PR #497 adopts upstream same-frame group retention and cross-frame ungrouping. The fork’s independent unlocked-hit selection rule stays in the pointer-down path. See [merge review](pr-497-merge-review.md).
 
 **PR #486:** Adopt upstream fractional-index conflict prioritization unchanged.
 Owned three-step undo/redo coverage preserves link/custom-data sentinels; exact

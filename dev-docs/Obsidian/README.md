@@ -9,7 +9,7 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 | [Customization catalog](customizations.md) | 39 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
-| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 285 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
+| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 297 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
 | [Validation and merge playbook](validation.md) | What was actually verified, existing regression tests, missing runtime evidence, and behavior-specific gates. |
 | [Obsidian runtime testing](OBSIDIAN_RUNTIME_TESTING.md) | Guarded CLI test-vault deployment, exact-build desktop smoke, reports, and feature-specific host probes. |
 | [Local audit checker](audit.py) / [checker tests](test_audit.py) | Dependency-free, offline source accounting; detects changed, new, or retired differences and stale tree fingerprints. |
@@ -18,9 +18,18 @@ Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md]
 
 ## Reviewed merge checkpoints
 
+### PR #497 upstream multiline paste and frame groups — 2026-11-24
+
+The [review](pr-497-merge-review.md) accounts for ten incoming paths and the
+clipboard conflict against incoming `eaa7fa32a6645ae9da57eda548e838d0e2a024a1`.
+Ordinary paste uses the upstream split action. Obsidian Markdown keeps
+line-wise link/image import, and the text factory replaces redundant
+clipboard raw-source assignments. Use this incoming commit for the current
+inventory comparison.
+
 ### PR #496 upstream autofocus adoption — 2026-11-22
 
-The [review](pr-496-merge-review.md) compares fork parent `9de2cfd39`, merge base `2c3dcc06e` and incoming `9c2e462ec23e54c4cf0493328840d6a27191c674`. Only two incoming paths changed. Adopt the now-upstream focus guard without the redundant local fingerprint, preserving the body portal and migration/tooltip tests. Use the incoming commit for the current inventory comparison; prior checkpoint commands remain historical. Validation is recorded in the review. No version, publication or dependency change.
+The [review](pr-496-merge-review.md) compares fork parent `9de2cfd39`, merge base `2c3dcc06e` and incoming `9c2e462ec23e54c4cf0493328840d6a27191c674`. Only two incoming paths changed. Adopt the now-upstream focus guard without the redundant local fingerprint, preserving the body portal and migration/tooltip tests. The incoming commit is the historical inventory baseline for PR #496. Validation is recorded in the review. No version, publication or dependency change.
 
 ### PR #491 focus/sync/teardown and upstreamed frame fix — 2026-11-19
 
@@ -256,7 +265,7 @@ Requires Python 3.10+ only. Run from the fork monorepo root. No dependency insta
 
 ```bash
 python dev-docs/Obsidian/test_audit.py
-python dev-docs/Obsidian/audit.py --upstream-ref a758e93d6a03e9f995973703cb886850a398a6d3
+python dev-docs/Obsidian/audit.py --upstream-ref eaa7fa32a6645ae9da57eda548e838d0e2a024a1
 ```
 
 `--upstream` can instead name the supplied upstream ZIP. `--fork` defaults to the repository containing this script and can also name a clean directory or ZIP. Comparing the **original** fork ZIP against the handoff ledger should report the two intentional root-policy edits; use the patched checkout for a clean handoff comparison.
