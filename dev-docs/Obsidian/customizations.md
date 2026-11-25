@@ -174,6 +174,12 @@ React clipboard harness. See the [merge review](pr-471-merge-review.md).
 
 **Retain.** [App.clipboard.ts](../../packages/excalidraw/components/App.clipboard.ts) passes parsed files as a **third** `onPaste` argument before native insertion. `App` invokes/awaits `onDrop` and stops the upstream path only when it returns `false`; thrown errors are caught/logged. [data/blob.ts](../../packages/excalidraw/data/blob.ts) tolerates a missing `DataTransferItem`, which occurs for host tab drags. Text paste also retains raw text and adjusts font sizing.
 
+PR #499 adopts the remembered split/join choice for ordinary desktop text.
+The Markdown import branch retains per-line source, layout, and the host's
+deferred link/image conversion regardless of that choice. The Obsidian phone
+toolbar keeps the existing one-time split action. See the
+[merge review](pr-499-merge-review.md) for browser and native verification.
+
 `P: src/view/managers/DropManager.ts` and `ExcalidrawView.ts` handle vault files, host draggables, and the public EA `onDropHook`; `ExcalidrawRoot.ts` wires these callbacks. The supplied upstream onPaste contract lacks the file list and there is no equivalent onDrop prop. A plugin DOM listener is not automatically equivalent because payload availability, await/cancel behavior, and insertion ordering matter. The difference in `data/filesystem.ts` is only a TODO/newline, **not** an alternative file-open implementation. **Gate:** V04, V06; D01 for that unrelated comment.
 
 <a id="obs-012"></a>
