@@ -10,7 +10,6 @@ import {
 } from "@excalidraw/element";
 
 import {
-  EDITOR_LS_KEYS,
   KEYS,
   TEXT_VIEWPORT_PADDING,
   TEXT_MAX_WRAP_WIDTH,
@@ -180,6 +179,15 @@ const pasteAndSplit = async (
 };
 
 describe("paste multiline text", () => {
+  // zsviczian START -- exercise the upstream AppState contract without the Obsidian persistence override, PR #500
+  beforeEach(() => {
+    const compatibilityHost = getObsidianExcalidrawHost();
+    if (compatibilityHost) {
+      configureObsidianExcalidrawHost(compatibilityHost)();
+    }
+  });
+  // zsviczian END
+
   it("should paste a single element, and offer to split it into an element per line", async () => {
     const text = "sajgfakfn\n\n  aaksfnknas\nakefnkasf\n";
     const { pasted, texts } = await pasteAndSplit(text);
@@ -387,7 +395,7 @@ describe("paste multiline text", () => {
   });
 
   it("should center the lines a text's pasted split into at the pointer, whatever blank lines it has", async () => {
-    localStorage.setItem(EDITOR_LS_KEYS.PASTE_TEXT_AS_LINES, "true");
+    API.setAppState({ splitOnPaste: true });
     h.app.viewport.lastPosition.x = 300;
     h.app.viewport.lastPosition.y = 300;
     pasteWithCtrlCmdV(`first${"\n".repeat(50)}second`);
@@ -401,12 +409,6 @@ describe("paste multiline text", () => {
 
   it("should never paste split into lines on a phone, which shows no toast to have it as one from", async () => {
     unmountComponent();
-    // zsviczian START -- this upstream assertion is for an editor without an Obsidian host, PR #499
-    const compatibilityHost = getObsidianExcalidrawHost();
-    if (compatibilityHost) {
-      configureObsidianExcalidrawHost(compatibilityHost)();
-    }
-    // zsviczian END
     await render(
       <Excalidraw
         autoFocus={true}
@@ -417,7 +419,7 @@ describe("paste multiline text", () => {
     h.app.setMobileModeAllowed(true); // zsviczian -- opt in to the phone layout in the standalone fork test
     fireEvent.resize(window);
     await waitFor(() => expect(h.app.editorInterface.formFactor).toBe("phone"));
-    localStorage.setItem(EDITOR_LS_KEYS.PASTE_TEXT_AS_LINES, "true");
+    API.setAppState({ splitOnPaste: true });
     pasteWithCtrlCmdV("a\nb");
     await waitFor(() => {
       expect(h.elements.length).toBe(1);
@@ -425,7 +427,7 @@ describe("paste multiline text", () => {
     expect(h.state.toast).toBe(null);
   });
 
-  it("should paste split into lines once a text's been split (in this browser), and as one again once they've been joined", async () => {
+  it("should paste split into lines once a text's been split (an app state preference), and as one again once they've been joined", async () => {
     API.setAppState({
       width: 1000,
       zoom: { value: 8 as NormalizedZoomValue },
@@ -437,9 +439,17 @@ describe("paste multiline text", () => {
     const { pasted } = await pasteAndSplit(text);
     expect(pasted.autoResize).toBe(false);
 
-    // kept in the browser: for an editor mounted after, too
+    // kept in the app state, for the host to store: as an editor mounted
+    // after gets it
+    expect(h.state.splitOnPaste).toBe(true);
     unmountComponent();
-    await render(<Excalidraw autoFocus={true} handleKeyboardGlobally={true} />);
+    await render(
+      <Excalidraw
+        autoFocus={true}
+        handleKeyboardGlobally={true}
+        initialData={{ appState: { splitOnPaste: true } }}
+      />,
+    );
     API.setAppState({
       width: 1000,
       zoom: { value: 8 as NormalizedZoomValue },
@@ -486,6 +496,7 @@ describe("paste multiline text", () => {
     );
 
     // pasted as one again
+    expect(h.state.splitOnPaste).toBe(false);
     pasteWithCtrlCmdV(text);
     expect((await getToastAction()).textContent).toBe(
       "Split into separate text elements",

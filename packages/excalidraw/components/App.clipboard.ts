@@ -3,7 +3,6 @@ import { flushSync } from "react-dom";
 import {
   DEFAULT_TEXT_ALIGN, // zsviczian -- preserve layout of imported Markdown lines
   DEFAULT_VERTICAL_ALIGN,
-  EDITOR_LS_KEYS,
   getFontString,
   getLineHeight,
   isWritableElement,
@@ -43,14 +42,19 @@ import { getFontSize } from "../actions/actionProperties"; // zsviczian -- prese
 import { tryParseSpreadsheet } from "../charts";
 import { parseClipboard, parseDataTransferEvent } from "../clipboard";
 import { ImageURLToFile, SVGStringToFile } from "../data/blob";
-import { EditorLocalStorage } from "../data/EditorLocalStorage";
 import { t } from "../i18n";
 import {
   isMaybeMermaidDefinition,
   MERMAID_TO_EXCALIDRAW_CONFIG,
 } from "../mermaid";
 import { hasObsidianExcalidrawHost } from "../obsidianExcalidrawHost"; // zsviczian -- scope Markdown line import to Obsidian
-import { getSharedMermaidInstance } from "../obsidianUtils"; // zsviczian -- reuse the offline host Mermaid runtime
+// zsviczian START -- hosted paste preference and offline Mermaid loader
+import {
+  getObsidianSplitOnPaste,
+  getSharedMermaidInstance,
+  setObsidianSplitOnPaste,
+} from "../obsidianUtils";
+// zsviczian END
 import { withBatchedUpdates } from "../reactUtils";
 import { scrollBoundsIntoView } from "../viewport";
 
@@ -508,15 +512,16 @@ export class AppClipboard {
 
     const originalText = normalizedText.trim(); // zsviczian -- reuse normalization for Markdown import
     const isPhone = this.app.editorInterface.formFactor === "phone";
-    // as last chosen from the toast after a paste, kept in the browser
+    // as last chosen from the toast after a paste (kept by the host, with
+    // the app state it stores)
+    // zsviczian START -- preserve Obsidian Markdown import and the shared paste preference, PR #500
+    // const asLines = !isPlainPaste && !isPhone && this.app.state.splitOnPaste;
     const asLines =
-      !importMarkdownLines && // zsviczian -- Markdown imports always use the existing host processing, PR #499
+      !importMarkdownLines &&
       !isPlainPaste &&
       !isPhone &&
-      EditorLocalStorage.get<boolean>(
-        EDITOR_LS_KEYS.PASTE_TEXT_AS_LINES,
-        this.app.ownerWindow,
-      ) === true;
+      (isObsidian ? getObsidianSplitOnPaste() : this.app.state.splitOnPaste);
+    // zsviczian END
     /** the text as one element, as laid out last: what its lines are of */
     let singleTextElement: ExcalidrawTextElement | null = null;
     // zsviczian START -- share upstream wrapping with Markdown line import, PR #497
@@ -734,6 +739,15 @@ export class AppClipboard {
       // zsviczian END
       return;
     }
+    // zsviczian START -- use shared Obsidian storage or the standalone host's AppState, PR #500
+    const rememberSplitOnPaste = (value: boolean) => {
+      if (isObsidian) {
+        setObsidianSplitOnPaste(value);
+      } else {
+        this.app.setState({ splitOnPaste: value });
+      }
+    };
+    // zsviczian END
     const single: ExcalidrawTextElement | null = singleTextElement;
     if (textElements.length > 1 && single) {
       const lineIds = textElements.map((element) => element.id);
@@ -741,10 +755,7 @@ export class AppClipboard {
         t("toast.pastedAsTextElements"),
         t("toast.pasteAsSingleText"),
         () => {
-          EditorLocalStorage.delete(
-            EDITOR_LS_KEYS.PASTE_TEXT_AS_LINES,
-            this.app.ownerWindow,
-          );
+          rememberSplitOnPaste(false); // zsviczian -- clear the saved choice through its owner, PR #500
           this.replaceTextLines(lineIds, single);
         },
       );
@@ -754,13 +765,9 @@ export class AppClipboard {
         t("toast.pastedAsSingleText"),
         t("toast.splitIntoTextElements"),
         () => {
-          // zsviczian START -- the Obsidian phone action applies only to this paste, PR #499
+          // zsviczian START -- the Obsidian phone action applies only to this paste, PR #500
           if (!isPhone) {
-            EditorLocalStorage.set(
-              EDITOR_LS_KEYS.PASTE_TEXT_AS_LINES,
-              true,
-              this.app.ownerWindow,
-            );
+            rememberSplitOnPaste(true);
           }
           // zsviczian END
           this.splitTextIntoLines(id);

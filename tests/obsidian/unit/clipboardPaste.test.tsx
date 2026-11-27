@@ -7,9 +7,8 @@ import {
   render,
   waitFor,
 } from "@testing-library/react";
-import { afterEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
-import { EDITOR_LS_KEYS } from "@excalidraw/common";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import {
   configureObsidianExcalidrawHost,
@@ -21,10 +20,39 @@ import type { ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 
 import { createPasteEvent } from "../../../packages/excalidraw/clipboard";
 
-const preference = EDITOR_LS_KEYS.PASTE_TEXT_AS_LINES;
+const preference = "excalidraw-paste-text-as-lines";
+let disposeHost: () => void;
+
+beforeEach(() => {
+  disposeHost = configureObsidianExcalidrawHost({
+    protocolVersion: OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION,
+    getZoomStep: () => 0.1,
+    getZoomMin: () => 0.1,
+    getZoomMax: () => 30,
+    getZoomToFitMaxLevel: () => 10,
+    isDoubleTapEraserEnabled: () => false,
+    isPenModeCrosshairVisible: () => false,
+    isSingleFingerPanningEnabled: () => false,
+    isDoubleClickTextEditingDisabled: () => false,
+    isContextMenuDisabled: () => false,
+    shouldSyncElementLinkWithText: () => true,
+    loadFontFromFile: async () => undefined,
+    getMermaid: async () => {
+      throw Error("Text clipboard cases must not load Mermaid");
+    },
+    runAction() {},
+    prepareMermaidSVGInsert: async (_id, diagram) => diagram,
+    getLabel: (key) => key,
+    attachInlineLinkSuggester: () => ({
+      isBlockingKeys: () => false,
+      close() {},
+    }),
+  });
+});
 
 afterEach(() => {
   cleanup();
+  disposeHost();
   localStorage.removeItem(preference);
   vi.restoreAllMocks();
 });
@@ -107,44 +135,15 @@ it("remembers split and rejoins the same wrapped source with the next paste", as
 });
 
 it("keeps Markdown link and image source lines outside the remembered paste choice", async () => {
-  const dispose = configureObsidianExcalidrawHost({
-    protocolVersion: OBSIDIAN_EXCALIDRAW_HOST_PROTOCOL_VERSION,
-    getZoomStep: () => 0.1,
-    getZoomMin: () => 0.1,
-    getZoomMax: () => 30,
-    getZoomToFitMaxLevel: () => 10,
-    isDoubleTapEraserEnabled: () => false,
-    isPenModeCrosshairVisible: () => false,
-    isSingleFingerPanningEnabled: () => false,
-    isDoubleClickTextEditingDisabled: () => false,
-    isContextMenuDisabled: () => false,
-    shouldSyncElementLinkWithText: () => true,
-    loadFontFromFile: async () => undefined,
-    getMermaid: async () => {
-      throw Error("Markdown links must not load Mermaid");
-    },
-    runAction() {},
-    prepareMermaidSVGInsert: async (_id, diagram) => diagram,
-    getLabel: (key) => key,
-    attachInlineLinkSuggester: () => ({
-      isBlockingKeys: () => false,
-      close() {},
-    }),
-  });
+  const editor = await mountEditor();
   try {
-    const editor = await mountEditor();
-    try {
-      localStorage.setItem(preference, "true");
-      const source = ["[[Note|Label]]", "![[image.png]]", "[Second](notes.md)"];
-      editor.paste(source.join("\n"));
-      await waitFor(() => expect(editor.texts()).toEqual(source));
-      expect(editor.container.querySelector(".Toast__action")).toBeNull();
-      expect(localStorage.getItem(preference)).toBe("true");
-    } finally {
-      editor.restoreHitTest();
-    }
+    localStorage.setItem(preference, "true");
+    const source = ["[[Note|Label]]", "![[image.png]]", "[Second](notes.md)"];
+    editor.paste(source.join("\n"));
+    await waitFor(() => expect(editor.texts()).toEqual(source));
+    expect(editor.container.querySelector(".Toast__action")).toBeNull();
+    expect(localStorage.getItem(preference)).toBe("true");
   } finally {
-    cleanup();
-    dispose();
+    editor.restoreHitTest();
   }
 });

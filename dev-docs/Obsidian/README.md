@@ -9,7 +9,7 @@ This directory records **why this fork differs from Excalidraw upstream, who con
 | [Customization catalog](customizations.md) | 39 stable `OBS-xxx` behavior/maintenance groups, implementation owners, consumers, upstream overlap, and retirement gates. |
 | [Integration and compatibility contracts](contracts.md) | Exact host protocols, extra props and APIs, saved data, public scripting, and artifact constraints. |
 | [Decustomization backlog](decustomization.md) | Ranked source-proven cleanup, conditional migrations, non-candidates, and correctness debt discovered during review. |
-| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 298 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
+| [File ledger](file-inventory.md) / [JSON](file-inventory.json) | All 299 currently differing source paths, including unmarked differences and observed absences. JSON is the editable ledger; Markdown is generated. |
 | [Validation and merge playbook](validation.md) | What was actually verified, existing regression tests, missing runtime evidence, and behavior-specific gates. |
 | [Obsidian runtime testing](OBSIDIAN_RUNTIME_TESTING.md) | Guarded CLI test-vault deployment, exact-build desktop smoke, reports, and feature-specific host probes. |
 | [Local audit checker](audit.py) / [checker tests](test_audit.py) | Dependency-free, offline source accounting; detects changed, new, or retired differences and stale tree fingerprints. |
@@ -18,13 +18,21 @@ Repository policies remain in [AGENTS.md](../../AGENTS.md) and [CONTRIBUTING.md]
 
 ## Reviewed merge checkpoints
 
+### PR #500 SVG font subsetting and clipboard preference — 2026-11-27
+
+The [review](pr-500-merge-review.md) compares all 22 incoming paths against
+`f4e5226a3d84d51758e5967c23674f3671c11ea5`. The upstream WOFF2 memory fix applies
+to the Obsidian export path. Standalone paste uses upstream AppState, while
+Obsidian keeps its existing shared device preference and Markdown import.
+Use this incoming commit for the current inventory comparison.
+
 ### PR #499 remembered multiline paste — 2026-11-25
 
 The [review](pr-499-merge-review.md) compares all five incoming paths against
 `b55c9ee92e0cb81429041871d57fbbf10d1b443a`. Obsidian preserves separate raw
 Markdown lines for link and image processing and the existing phone split
 action. Ordinary desktop multiline paste adopts upstream's remembered split/join
-choice. Use this incoming commit for the current inventory comparison.
+choice.
 
 ### PR #497 upstream multiline paste and frame groups — 2026-11-24
 

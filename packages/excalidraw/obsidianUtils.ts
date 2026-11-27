@@ -50,6 +50,37 @@ import type {
 
 import type { AppClassProperties, AppState } from "./types";
 
+// zsviczian -- retain the device-local key introduced by PR #499.
+const OBSIDIAN_SPLIT_ON_PASTE_KEY = "excalidraw-paste-text-as-lines";
+
+/**
+ * Reads the paste choice from the shared Obsidian runtime's main window.
+ * Author: zsviczian. https://github.com/zsviczian/excalidraw/pull/500
+ */
+export function getObsidianSplitOnPaste(): boolean {
+  try {
+    return window.localStorage.getItem(OBSIDIAN_SPLIT_ON_PASTE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Shares the desktop paste choice across drawings and popouts on this device.
+ * Author: zsviczian. https://github.com/zsviczian/excalidraw/pull/500
+ */
+export function setObsidianSplitOnPaste(value: boolean): void {
+  try {
+    if (value) {
+      window.localStorage.setItem(OBSIDIAN_SPLIT_ON_PASTE_KEY, "true");
+    } else {
+      window.localStorage.removeItem(OBSIDIAN_SPLIT_ON_PASTE_KEY);
+    }
+  } catch {
+    // Storage can be disabled; the current paste still changes from the toast.
+  }
+}
+
 export function allowDoubleTapEraser() {
   return getObsidianExcalidrawHost()?.isDoubleTapEraserEnabled() ?? false;
 }

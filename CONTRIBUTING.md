@@ -15,6 +15,7 @@ Before opening a pull request, please understand that this repository is **not t
 ## First: Can This Be Added Upstream?
 
 The preferred place for almost all Excalidraw improvements is the main Excalidraw project.
+For changes to the main project, follow the [upstream contribution guide](https://plus.excalidraw.com/docs/sdk/contributing).
 
 Before submitting a PR here, please ask yourself:
 

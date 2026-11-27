@@ -198,6 +198,11 @@ filtering. The public loader accepts both its existing Document argument and the
 new FontFaceSet form. No font identity/protocol change or retirement. Focused
 ownership/compatibility tests and validation limits are in the [review](pr-471-merge-review.md).
 
+**PR #500 (2026-11-27):** Adopt upstream WOFF2 vector cleanup in the shared
+codec loader. Bundled and vault WOFF2 exports still use the fork's offline
+main-thread subsetting path. Non-WOFF2 data fonts and Markdown-image CSS
+retain whole-font data where previously used. See the [font path review](pr-500-merge-review.md).
+
 **PR #469 (2026-10-20):** Upstream now prewarms the actual current item font through each editor document, superseding the empty-scene-only Excalifont preload. Local Font identity/replacement, host-font filtering and public font helpers remain. [Merge review](pr-469-merge-review.md).
 
 **Retain.** Local Font numeric ID **4** is a persistent/public identity, not a spare upstream font slot. [Fonts.ts](../../packages/excalidraw/fonts/Fonts.ts) exposes registration/loading helpers, allows local-font replacement, filters unrelated host font loads, and ensures an empty scene can load the welcome font. It avoids registering/checking the changing local face like ordinary static fonts. [ExcalidrawFontFace.ts](../../packages/excalidraw/fonts/ExcalidrawFontFace.ts) asks the host for vault fonts first, accepts whole-face CSS data, and supplies `getContentLegacy`. `obsidianUtils.ts` exposes metrics, family enumeration, local registration, scene font loading, CSS registration/definitions, and filename-based vault delegation.
